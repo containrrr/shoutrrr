@@ -1,0 +1,16 @@
+services:
+  slack:
+    botname: shoutrrr
+    token:
+      a: abc
+      b: def
+      c: ghi
+  teams:
+    botname: shoutrrr
+    token:
+      a: abcdefg
+      b: hijklmn
+      c: opqrstu
+  telegram:
+    botname: shoutrrr
+    token: 000000000:XXXXXXXXXXXXXXXXXXXXX-YYYYYYYYYYYYY

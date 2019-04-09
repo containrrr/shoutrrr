@@ -1,0 +1,45 @@
+version: 2.1
+
+executors:
+  go:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: ~/shoutrrr
+
+workflows:
+  version: 2
+  shoutrrr:
+    jobs:
+      - checkout
+      - build:
+          requires:
+            - checkout
+      - test:
+          requires:
+            - build
+jobs:
+  checkout:
+    executor: go
+    steps:
+      - checkout
+      - persist_to_workspace:
+          paths:
+            - .
+          root: ~/shoutrrr
+  build:
+    executor: go
+    steps:
+      - attach_workspace:
+            at: .
+      - run: go build .
+      - persist_to_workspace:
+          paths:
+            - .
+          root: ~/shoutrrr
+  test:
+    executor: go
+    steps:
+      - attach_workspace:
+            at: .
+      - run: go test ./...
+
