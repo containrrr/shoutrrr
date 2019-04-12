@@ -2,7 +2,7 @@
   <h1 align="center">
     Shoutrrr
   </h1>
-  <span align="center">
+  <p align="center">
     <img
       alt="codacy coverage"
       src="https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square"
@@ -35,4 +35,4 @@
         src="https://beerpay.io/containrrr/shoutrrr/badge.svg?style=flat-square"
       />
     </a>
-</span>
+</p>
