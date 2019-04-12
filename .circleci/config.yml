@@ -31,7 +31,7 @@ jobs:
     steps:
       - attach_workspace:
             at: .
-      - run: go build .
+      - run: go build ./...
       - persist_to_workspace:
           paths:
             - .
