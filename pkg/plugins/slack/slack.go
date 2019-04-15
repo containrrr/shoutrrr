@@ -1,15 +1,13 @@
 package slack
 
 import (
+    "fmt"
     NotifyFormat "github.com/containrrr/shoutrrr/pkg/format"
+    "net/http"
+    "strings"
 )
 
 type SlackPlugin struct {}
-
-type SlackConfig struct {
-    Botname string
-    Token SlackToken
-}
 
 const (
     name = "Slack"
@@ -19,21 +17,32 @@ const (
     format = NotifyFormat.Markdown
 )
 
-type SlackErrorMessage string
-const (
-    TokenAMissing SlackErrorMessage = "First part of the API token is missing."
-    TokenBMissing SlackErrorMessage = "Second part of the API token is missing."
-    TokenCMissing SlackErrorMessage = "Third part of the API token is missing."
-    TokenAMalformed SlackErrorMessage = "First part of the API token is malformed."
-    TokenBMalformed SlackErrorMessage = "Second part of the API token is malformed."
-    TokenCMalformed SlackErrorMessage = "Third part of the API token is malformed."
-)
 
-func (slack *SlackPlugin) Send(config SlackConfig, message string) error {
 
+func (slack *SlackPlugin) Send(url string, message string) error {
+    config, err := CreateConfigFromUrl(url)
+    if err != nil {
+        return err
+    }
     if err := validateToken(config.Token); err != nil {
         return err
     }
+    slack.getUrl(config)
 
     return nil
+}
+
+func (slack *SlackPlugin) doSend(config *SlackConfig, message string) error {
+    url := slack.getUrl(config)
+    _, err := http.Post(url, "application/json", strings.NewReader(message))
+    return err
+}
+
+func (slack *SlackPlugin) getUrl(config *SlackConfig) string {
+    return fmt.Sprintf(
+        "%s/%s/%s/%s",
+        url,
+        config.Token.A,
+        config.Token.B,
+        config.Token.C)
 }

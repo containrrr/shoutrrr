@@ -2,6 +2,7 @@ package router
 
 import (
     "errors"
+    "github.com/containrrr/shoutrrr/pkg/plugins/slack"
     "regexp"
     "strings"
 )
@@ -21,15 +22,22 @@ func (router *ServiceRouter) ExtractServiceName(url string) (string, error) {
     return match[1], nil
 }
 
+func (router *ServiceRouter) RouteToSlack(url string, message string) error {
+    plugin := slack.SlackPlugin{}
+    plugin.Send(url, message)
+    return nil
+}
 
-func (router *ServiceRouter) ExtractArguments(url string) ([]string, error) {
-    regex, err := regexp.Compile("^[a-zA-Z]+://(.*)$")
+func (router *ServiceRouter) Route(url string, message string) error {
+    svc, err := router.ExtractServiceName(url)
     if err != nil {
-        return nil, errors.New("could not compile regex")
+        return err
     }
-    match := regex.FindStringSubmatch(url)
-    if len(match[1]) <= 0 {
-        return nil, errors.New("could not extract any arguments")
+
+    if strings.ToLower(svc) == "slack" {
+        err := router.RouteToSlack(url, message)
+        return err
+    } else {
+        return errors.New("unknown service")
     }
-    return strings.Split(match[1], "/"), nil
 }

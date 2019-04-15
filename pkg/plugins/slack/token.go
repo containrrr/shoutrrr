@@ -5,13 +5,14 @@ import (
     "regexp"
 )
 
-type SlackToken struct {
+// Token is a three part string split into A, B and C
+type Token struct {
     A string
     B string
     C string
 }
 
-func validateToken(token SlackToken) error {
+func validateToken(token Token) error {
     if err := tokenPartsAreNotEmpty(token); err != nil {
         return err
     } else if err := tokenPartsAreValidFormat(token); err != nil {
@@ -20,7 +21,7 @@ func validateToken(token SlackToken) error {
     return nil
 }
 
-func tokenPartsAreNotEmpty(token SlackToken) error {
+func tokenPartsAreNotEmpty(token Token) error {
     if token.A == "" {
         return errors.New(string(TokenAMissing))
     } else if token.B == "" {
@@ -31,7 +32,7 @@ func tokenPartsAreNotEmpty(token SlackToken) error {
     return nil
 }
 
-func tokenPartsAreValidFormat(token SlackToken) error {
+func tokenPartsAreValidFormat(token Token) error {
     if !matchesPattern("[A-Z0-9]{9}", token.A) {
         return errors.New(string(TokenAMalformed))
     } else if !matchesPattern("[A-Z0-9]{9}", token.B) {
