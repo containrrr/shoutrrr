@@ -2,6 +2,9 @@
     Shoutrrr
   </h1>
   <p align="center">
+    Notification library for gophers and their furry friends.
+    Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
+  <p align="center">
     <img
       alt="codacy coverage"
       src="https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square"
