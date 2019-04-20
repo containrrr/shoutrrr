@@ -1,7 +1,6 @@
 package telegram_test
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
 	"testing"
@@ -21,7 +20,6 @@ var _ = Describe("the telegram plugin", func() {
 	var envTelegramUrl string
 
 	BeforeSuite(func() {
-		logrus.SetLevel(logrus.DebugLevel)
 		telegram = &TelegramPlugin{}
 		envTelegramUrl = os.Getenv("SHOUTRRR_TELEGRAM_URL")
 
