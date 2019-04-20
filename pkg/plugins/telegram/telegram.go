@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/containrrr/shoutrrr/pkg/plugins"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"regexp"
 )
@@ -29,7 +28,6 @@ type TelegramJson struct {
 type TelegramPlugin struct {}
 
 func (plugin *TelegramPlugin) Send(url string, message string) error {
-	logrus.Error(len(message))
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
@@ -60,7 +58,6 @@ func sendMessageToApi(message string, channel string, apiToken string) error {
 
 	res, err := http.Post(postUrl, "application/json", bytes.NewBuffer(json))
 	if res.StatusCode != http.StatusOK {
-		logrus.Error(res)
 		return errors.New(fmt.Sprintf("failed to send notification to \"%s\", response status code %s", channel, res.Status))
 	}
 	return err
@@ -86,6 +83,5 @@ func (plugin *TelegramPlugin) CreateConfigFromUrl(url string) (*TelegramConfig, 
 
 func IsTokenValid(token string) bool {
 	matched, err := regexp.MatchString("^[0-9]+:[a-zA-Z0-9_-]+$", token)
-	logrus.Error(matched, err)
 	return matched && err == nil
 }
