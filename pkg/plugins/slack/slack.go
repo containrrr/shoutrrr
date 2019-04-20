@@ -1,8 +1,8 @@
 package slack
 
 import (
+    "errors"
     "fmt"
-    NotifyFormat "github.com/containrrr/shoutrrr/pkg/format"
     "net/http"
     "strings"
 )
@@ -10,11 +10,8 @@ import (
 type SlackPlugin struct {}
 
 const (
-    name = "Slack"
-    serviceUrl = "https://slack.com/"
     url = "https://hooks.slack.com/services"
     maxlength = 1000
-    format = NotifyFormat.Markdown
 )
 
 
@@ -26,6 +23,9 @@ func (slack *SlackPlugin) Send(url string, message string) error {
     }
     if err := validateToken(config.Token); err != nil {
         return err
+    }
+    if len(message) > maxlength {
+        return errors.New("message exceeds max length")
     }
     slack.getUrl(config)
 

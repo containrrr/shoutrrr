@@ -37,27 +37,4 @@ var _ = Describe("the slack config", func() {
             Expect(configError).To(HaveOccurred())
         })
     })
-    When("extract arguments is given a url", func() {
-        It("should return the arguments", func() {
-            url := "slack://aaaa"
-            arguments, err := slack.ExtractArguments(url)
-            Expect(err).NotTo(HaveOccurred())
-            Expect(len(arguments)).To(Equal(1))
-        })
-        It("should return an error if no arguments could be found", func() {
-            url := "slack://"
-            arguments, err := slack.ExtractArguments(url)
-            Expect(err).To(HaveOccurred())
-            Expect(len(arguments)).To(Equal(0))
-        })
-        It("should split the arguments by /", func() {
-            url := "slack://aaaa/bbb/ccc"
-            arguments, err := slack.ExtractArguments(url)
-            Expect(err).NotTo(HaveOccurred())
-            Expect(len(arguments)).To(Equal(3))
-            Expect(arguments[0]).To(Equal("aaaa"))
-            Expect(arguments[1]).To(Equal("bbb"))
-            Expect(arguments[2]).To(Equal("ccc"))
-        })
-    })
 })

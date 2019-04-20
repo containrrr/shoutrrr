@@ -2,9 +2,8 @@ package slack
 
 import (
 	"errors"
-	"regexp"
-	"strings"
-)
+	. "github.com/containrrr/shoutrrr/pkg/plugins"
+	)
 
 type SlackConfig struct {
 	Botname string
@@ -43,16 +42,4 @@ func CreateConfigFromUrl(url string ) (*SlackConfig, error) {
 			C: arguments[3],
 		},
 	}, nil
-}
-
-func ExtractArguments(url string) ([]string, error) {
-	regex, err := regexp.Compile("^[a-zA-Z]+://(.*)$")
-	if err != nil {
-		return nil, errors.New("could not compile regex")
-	}
-	match := regex.FindStringSubmatch(url)
-	if len(match[1]) <= 0 {
-		return nil, errors.New("could not extract any arguments")
-	}
-	return strings.Split(match[1], "/"), nil
 }
