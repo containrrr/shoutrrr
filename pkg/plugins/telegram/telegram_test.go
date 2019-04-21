@@ -40,7 +40,7 @@ var _ = Describe("the telegram plugin", func() {
 	Describe("sending a message", func() {
 		When("given a valid request with a faked token", func() {
 			It("should generate a 401", func() {
-				url := "telegram://703391768:AAEWjOpAH_szG7Ym-WaaiPp6emexFc13uf0/channel-id"
+				url := "telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/channel-id"
 				message := "this is a perfectly valid message"
 				err := telegram.Send(url, message)
 				Expect(err).To(HaveOccurred())
