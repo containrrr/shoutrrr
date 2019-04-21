@@ -25,6 +25,9 @@ var _ = Describe("the pushover plugin", func() {
 	})
 	When("running integration tests", func() {
 		It("should work", func() {
+			if envPushoverUrl == "" {
+				return
+			}
 			err := plugin.Send(envPushoverUrl, "this is an integration test")
 			Expect(err).NotTo(HaveOccurred())
 		})
