@@ -65,9 +65,9 @@ To make it easy and streamlined to consume shoutrrr regardless of the notificati
 we've implemented a notification service url schema. To send notifications, instantiate the ShoutrrrrClient using one of
 the service urls below.
 
-| Service   | Format                                                                                      |
-| --------- | ------------------------------------------------------------------------------------------- |
-| Telegram  | `telegram://api-token/channel` or `telegram://api-token/channel-a/channel-b/channel-c` etc. |
-| Slack     | `slack://token-a/token-b/token-c` or `slack://botname/token-a/token-b/token-c`              |
-| Discord   | `discord://channel/token`                                                                   |
-| Pushover  | `pushover://token/user/device`                                                              |
+| Service   | Format                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------- |
+| Telegram  | `telegram://api-token/channel`<br/>`telegram://api-token/channel-a/channel-b/channel-c/...`  |
+| Slack     | `slack://token-a/token-b/token-c`<br/>`slack://botname/token-a/token-b/token-c`              |
+| Discord   | `discord://channel/token`                                                                    |
+| Pushover  | `pushover://token/user/device`                                                               |
