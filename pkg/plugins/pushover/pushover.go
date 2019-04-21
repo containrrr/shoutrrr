@@ -1,9 +1,9 @@
 package pushover
 
 import (
+	"errors"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/plugins"
-	"github.com/pkg/errors"
 	"net/http"
 	netUrl "net/url"
 	"strings"
