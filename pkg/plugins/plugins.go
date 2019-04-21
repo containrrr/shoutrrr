@@ -7,7 +7,7 @@ import (
 )
 
 type Plugin interface {
-    Execute(config, message string) error
+    Send(config, message string) error
 }
 
 func ExtractArguments(url string) ([]string, error) {

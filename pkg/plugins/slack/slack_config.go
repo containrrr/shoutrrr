@@ -2,6 +2,7 @@ package slack
 
 import (
 	"errors"
+	"fmt"
 	. "github.com/containrrr/shoutrrr/pkg/plugins"
 	)
 
@@ -11,7 +12,7 @@ type SlackConfig struct {
 }
 
 const (
-	defaultUser = "Shoutrrr"
+	DefaultUser = "Shoutrrr"
 )
 
 func CreateConfigFromUrl(url string ) (*SlackConfig, error) {
@@ -20,12 +21,13 @@ func CreateConfigFromUrl(url string ) (*SlackConfig, error) {
 		return nil, err
 	}
 	if len(arguments) < 3 {
+		fmt.Println(arguments)
 		return nil, errors.New(string(NotEnoughArguments))
 	}
 
 	if len(arguments) < 4 {
 		return &SlackConfig{
-			Botname: defaultUser,
+			Botname: DefaultUser,
 			Token: Token{
 				A: arguments[0],
 				B: arguments[1],

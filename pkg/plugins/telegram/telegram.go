@@ -7,7 +7,6 @@ import (
 	"fmt"
 	. "github.com/containrrr/shoutrrr/pkg/plugins"
 	"net/http"
-	"regexp"
 )
 
 const (
@@ -15,16 +14,8 @@ const (
 	maxlength = 4096
 )
 
-type TelegramConfig struct {
-	ApiToken string
-	Channels []string
-}
 
-type TelegramJson struct {
-	Text string `json:"text"`
-	Id string `json:"chat_id"`
-}
-
+// TelegramPlugin sends notifications to a given telegram chat
 type TelegramPlugin struct {}
 
 func (plugin *TelegramPlugin) Send(url string, message string) error {
@@ -79,9 +70,4 @@ func (plugin *TelegramPlugin) CreateConfigFromUrl(url string) (*TelegramConfig, 
 		ApiToken: arguments[0],
 		Channels: arguments[1:],
 	}, nil
-}
-
-func IsTokenValid(token string) bool {
-	matched, err := regexp.MatchString("^[0-9]+:[a-zA-Z0-9_-]+$", token)
-	return matched && err == nil
 }

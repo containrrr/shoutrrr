@@ -1,6 +1,7 @@
 package telegram_test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -12,7 +13,7 @@ import (
 
 func TestTelegram(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Telegram Suite")
+	RunSpecs(t, "Shoutrrr Telegram Suite")
 }
 
 var _ = Describe("the telegram plugin", func() {
@@ -38,12 +39,13 @@ var _ = Describe("the telegram plugin", func() {
 
 	Describe("sending a message", func() {
 		When("given a valid request with a faked token", func() {
-			It("should generate a 400", func() {
+			It("should generate a 401", func() {
 				url := "telegram://703391768:AAEWjOpAH_szG7Ym-WaaiPp6emexFc13uf0/channel-id"
 				message := "this is a perfectly valid message"
 				err := telegram.Send(url, message)
 				Expect(err).To(HaveOccurred())
-				Expect(strings.Contains(err.Error(), "400 Bad Request")).To(BeTrue())
+				fmt.Println(err.Error())
+				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
 			})
 		})
 		When("given a message that exceeds the max length", func() {

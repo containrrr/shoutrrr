@@ -1,12 +1,13 @@
 package slack
 
 import (
+    "bytes"
     "errors"
     "fmt"
     "net/http"
-    "strings"
 )
 
+// SlackPlugin sends notifications to a pre-configured channel or user
 type SlackPlugin struct {}
 
 const (
@@ -27,14 +28,18 @@ func (slack *SlackPlugin) Send(url string, message string) error {
     if len(message) > maxlength {
         return errors.New("message exceeds max length")
     }
-    slack.getUrl(config)
 
-    return nil
+    return slack.doSend(config, message)
 }
 
 func (slack *SlackPlugin) doSend(config *SlackConfig, message string) error {
     url := slack.getUrl(config)
-    _, err := http.Post(url, "application/json", strings.NewReader(message))
+    json, _ := CreateJsonPayload(config, message)
+    res, err := http.Post(url, "application/json", bytes.NewReader(json))
+
+    if res.StatusCode != http.StatusOK {
+        return errors.New(fmt.Sprintf("failed to send notification to slack, response status code %s", res.Status))
+    }
     return err
 }
 
