@@ -15,20 +15,20 @@ func TestPushover(t *testing.T) {
 }
 
 var (
-	plugin *pushover.PushoverPlugin
-	envPushoverUrl string
+	plugin         *pushover.PushoverPlugin
+	envPushoverURL string
 )
 var _ = Describe("the pushover plugin", func() {
 	BeforeSuite(func() {
 		plugin = &pushover.PushoverPlugin{}
-		envPushoverUrl = os.Getenv("SHOUTRRR_PUSHOVER_URL")
+		envPushoverURL = os.Getenv("SHOUTRRR_PUSHOVER_URL")
 	})
 	When("running integration tests", func() {
 		It("should work", func() {
-			if envPushoverUrl == "" {
+			if envPushoverURL == "" {
 				return
 			}
-			err := plugin.Send(envPushoverUrl, "this is an integration test")
+			err := plugin.Send(envPushoverURL, "this is an integration test")
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

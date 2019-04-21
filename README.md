@@ -40,9 +40,7 @@
     </a>
 </p>
 
-
 ### Using Shoutrrr
-
 
 Using shoutrrr is as easy as:
 
@@ -53,7 +51,6 @@ Using shoutrrr is as easy as:
 ```
 
 If you've provided the environment variable `SHOUTRRR_URL`, you may instead use
-
 
 ```
   err := shoutrrr.SendEnv("Hello world (or slack channel) !")
