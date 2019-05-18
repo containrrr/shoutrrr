@@ -75,7 +75,7 @@ var _ = Describe("the slack plugin", func() {
 		When("generating a config object", func() {
 			It("should use the default botname if the argument list contains three strings", func() {
 				url := "slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
-				config, configError := CreateConfigFromUrl(url)
+				config, configError := CreateConfigFromURL(url)
 
 				Expect(config.Botname).To(Equal(DefaultUser))
 				Expect(configError).NotTo(HaveOccurred())
@@ -83,14 +83,14 @@ var _ = Describe("the slack plugin", func() {
 			})
 			It("should set the botname if the argument list is larger than three", func() {
 				url := "slack://testbot/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
-				config, configError := CreateConfigFromUrl(url)
+				config, configError := CreateConfigFromURL(url)
 
 				Expect(configError).NotTo(HaveOccurred())
 				Expect(config.Botname).To(Equal("testbot"))
 			})
 			It("should return an error if the argument list is shorter than three", func() {
 				url := "slack://AAAAAAAA"
-				_, configError := CreateConfigFromUrl(url)
+				_, configError := CreateConfigFromURL(url)
 				Expect(configError).To(HaveOccurred())
 			})
 		})

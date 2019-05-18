@@ -23,7 +23,7 @@ const (
 type PushoverPlugin struct{}
 
 func (plugin *PushoverPlugin) Send(url string, message string) error {
-	config, _ := CreateConfigFromUrl(url)
+	config, _ := CreateConfigFromURL(url)
 	data := netUrl.Values{}
 	data.Set("device", config.Devices[0])
 	data.Set("user", config.User)
@@ -41,7 +41,7 @@ func (plugin *PushoverPlugin) Send(url string, message string) error {
 	return err
 }
 
-func CreateConfigFromUrl(url string) (PushoverConfig, error) {
+func CreateConfigFromURL(url string) (PushoverConfig, error) {
 	args, err := plugins.ExtractArguments(url)
 	if err != nil {
 		return PushoverConfig{}, err

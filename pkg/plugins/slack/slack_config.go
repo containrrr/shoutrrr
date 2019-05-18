@@ -15,7 +15,7 @@ const (
 	DefaultUser = "Shoutrrr"
 )
 
-func CreateConfigFromUrl(url string ) (*SlackConfig, error) {
+func CreateConfigFromURL(url string ) (*SlackConfig, error) {
 	arguments, err := ExtractArguments(url)
 	if err != nil {
 		return nil, err

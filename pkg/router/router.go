@@ -2,7 +2,6 @@ package router
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/plugins"
 	"github.com/containrrr/shoutrrr/pkg/plugins/discord"
 	"github.com/containrrr/shoutrrr/pkg/plugins/pushover"
 	"github.com/containrrr/shoutrrr/pkg/plugins/slack"
@@ -26,10 +25,6 @@ func (router *ServiceRouter) ExtractServiceName(url string) (string, error) {
 	return match[1], nil
 }
 
-func (router *ServiceRouter) RouteToPlugin(plugin plugins.Plugin, url string, message string) error {
-	plugin.Send(url, message)
-	return nil
-}
 
 func (router *ServiceRouter) Route(url string, message string) error {
 	svc, err := router.ExtractServiceName(url)
@@ -37,20 +32,15 @@ func (router *ServiceRouter) Route(url string, message string) error {
 		return err
 	}
 
-	var plugin plugins.Plugin
-
 	switch strings.ToLower(svc) {
 	case "slack":
-		plugin = &slack.SlackPlugin{}
+		return (&slack.SlackPlugin{}).Send(url, message)
 	case "telegram":
-		plugin = &telegram.TelegramPlugin{}
+		return (&telegram.TelegramPlugin{}).Send(url, message)
 	case "discord":
-		plugin = &discord.DiscordPlugin{}
+		return (&discord.DiscordPlugin{}).Send(url, message)
 	case "pushover":
-		plugin = &pushover.PushoverPlugin{}
-	default:
-		return errors.New("unknown service")
+		return (&pushover.PushoverPlugin{}).Send(url, message)
 	}
-
-	return router.RouteToPlugin(plugin, url, message)
+	return errors.New("unknown service")
 }

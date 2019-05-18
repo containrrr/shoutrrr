@@ -22,7 +22,7 @@ func (plugin *TelegramPlugin) Send(url string, message string) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
-	config, err := plugin.CreateConfigFromUrl(url)
+	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func sendMessageToApi(message string, channel string, apiToken string) error {
 }
 
 
-func (plugin *TelegramPlugin) CreateConfigFromUrl(url string) (*TelegramConfig, error) {
+func (plugin *TelegramPlugin) CreateConfigFromURL(url string) (*TelegramConfig, error) {
 	arguments, err := ExtractArguments(url)
 	if err != nil {
 		return nil, err

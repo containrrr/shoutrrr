@@ -18,7 +18,7 @@ const (
 
 
 func (slack *SlackPlugin) Send(url string, message string) error {
-    config, err := CreateConfigFromUrl(url)
+    config, err := CreateConfigFromURL(url)
     if err != nil {
         return err
     }

@@ -6,10 +6,6 @@ import (
     "strings"
 )
 
-type Plugin interface {
-    Send(config, message string) error
-}
-
 func ExtractArguments(url string) ([]string, error) {
     regex, err := regexp.Compile("^[a-zA-Z]+://(.*)$")
     if err != nil {

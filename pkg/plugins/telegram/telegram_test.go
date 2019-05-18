@@ -66,37 +66,37 @@ var _ = Describe("the telegram plugin", func() {
 		When("given an url", func() {
 			It("should return an error if no arguments where supplied", func() {
 				url := "telegram://"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).To(HaveOccurred())
 				Expect(config == nil).To(BeTrue())
 			})
 			It("should return an error if the token has an invalid format", func() {
 				url := "telegram://invalid-token"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).To(HaveOccurred())
 				Expect(config == nil).To(BeTrue())
 			})
 			It("should return an error if only the api token where supplied", func() {
 				url := "telegram://12345:mock-token"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).To(HaveOccurred())
 				Expect(config == nil).To(BeTrue())
 			})
 			It("should create a config object", func() {
 				url := "telegram://12345:mock-token/channel-1/channel-2/channel-3"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(config != nil).To(BeTrue())
 			})
 			It("should create a config object containing the API Token", func() {
 				url := "telegram://12345:mock-token/channel-1/channel-2/channel-3"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(config.ApiToken).To(Equal("12345:mock-token"))
 			})
 			It("should add every subsequent argument as a channel id", func() {
 				url := "telegram://12345:mock-token/channel-1/channel-2/channel-3"
-				config, err := telegram.CreateConfigFromUrl(url)
+				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(config.Channels).To(Equal([]string {
 					"channel-1",
