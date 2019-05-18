@@ -15,23 +15,23 @@ func TestShoutrrr(t *testing.T) {
 
 var (
 	plugin      *SlackPlugin
-	envSlackUrl string
+	envSlackURL string
 )
 
 var _ = Describe("the slack plugin", func() {
 
 	BeforeSuite(func() {
 		plugin = &SlackPlugin{}
-		envSlackUrl = os.Getenv("SHOUTRRR_SLACK_URL")
+		envSlackURL = os.Getenv("SHOUTRRR_SLACK_URL")
 
 	})
 
 	When("running integration tests", func() {
 		It("should not error out", func() {
-			if envSlackUrl == "" {
+			if envSlackURL == "" {
 				return
 			}
-			err := plugin.Send(envSlackUrl, "This is an integration test message")
+			err := plugin.Send(envSlackURL, "This is an integration test message")
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

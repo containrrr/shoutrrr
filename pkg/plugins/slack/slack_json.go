@@ -2,14 +2,15 @@ package slack
 
 import "encoding/json"
 
-type SlackJson struct {
+type SlackJSON struct {
 	Text string `json:"text"`
 	Botname string `json:"username"`
 }
 
-func CreateJsonPayload(config *SlackConfig, message string) ([]byte, error) {
+// CreateJSONPayload compatible with the slack webhook api
+func CreateJSONPayload(config *SlackConfig, message string) ([]byte, error) {
 	return json.Marshal(
-		SlackJson {
+		SlackJSON{
 			Text: message,
 			Botname: config.Botname,
 		})

@@ -15,21 +15,21 @@ func TestDiscord(t *testing.T) {
 }
 
 var (
-	plugin *DiscordPlugin
-	envDiscordUrl string
+	plugin        *DiscordPlugin
+	envDiscordURL string
 )
 
 var _ = Describe("the discord plugin", func() {
 	BeforeSuite(func() {
 		plugin = &DiscordPlugin{}
-		envDiscordUrl = os.Getenv("SHOUTRRR_DISCORD_URL")
+		envDiscordURL = os.Getenv("SHOUTRRR_DISCORD_URL")
 	})
 	When("running integration tests", func() {
 		It("should work without errors", func() {
-			if envDiscordUrl == "" {
+			if envDiscordURL == "" {
 				return
 			}
-			err := plugin.Send(envDiscordUrl, "this is an integration test")
+			err := plugin.Send(envDiscordURL, "this is an integration test")
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

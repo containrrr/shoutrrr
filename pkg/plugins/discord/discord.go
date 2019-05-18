@@ -15,6 +15,7 @@ const (
 	maxlength = 2000
 )
 
+// Send a notification message to discord
 func (plugin *DiscordPlugin) Send(url string, message string) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
@@ -27,13 +28,14 @@ func (plugin *DiscordPlugin) Send(url string, message string) error {
 	}
 	fmt.Println(string(payload))
 
-	apiUrl := CreateApiUrlFromConfig(config)
+	apiUrl := CreateApiURLFromConfig(config)
 	fmt.Println(apiUrl)
 
 	return doSend(payload, apiUrl)
 }
 
-func CreateApiUrlFromConfig(config DiscordConfig) string {
+// CreateApiURLFromConfig takes a discord config object and creates a post url
+func CreateApiURLFromConfig(config DiscordConfig) string {
 	return fmt.Sprintf(
 		"%s/%s/%s",
 		hookUrl,
@@ -41,6 +43,7 @@ func CreateApiUrlFromConfig(config DiscordConfig) string {
 		config.Token)
 }
 
+// CreateConfigFromURL creates a DiscordConfig struct given a valid discord notification url
 func (plugin *DiscordPlugin) CreateConfigFromURL(url string) (DiscordConfig, error) {
 	args, err := plugins.ExtractArguments(url)
 	if err != nil {

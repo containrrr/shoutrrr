@@ -16,7 +16,7 @@ const (
 )
 
 
-
+// Send a notification message to Slack
 func (slack *SlackPlugin) Send(url string, message string) error {
     config, err := CreateConfigFromURL(url)
     if err != nil {
@@ -33,8 +33,8 @@ func (slack *SlackPlugin) Send(url string, message string) error {
 }
 
 func (slack *SlackPlugin) doSend(config *SlackConfig, message string) error {
-    url := slack.getUrl(config)
-    json, _ := CreateJsonPayload(config, message)
+    url := slack.getURL(config)
+    json, _ := CreateJSONPayload(config, message)
     res, err := http.Post(url, "application/json", bytes.NewReader(json))
 
     if res.StatusCode != http.StatusOK {
@@ -43,7 +43,7 @@ func (slack *SlackPlugin) doSend(config *SlackConfig, message string) error {
     return err
 }
 
-func (slack *SlackPlugin) getUrl(config *SlackConfig) string {
+func (slack *SlackPlugin) getURL(config *SlackConfig) string {
     return fmt.Sprintf(
         "%s/%s/%s/%s",
         url,

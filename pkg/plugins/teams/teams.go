@@ -10,13 +10,14 @@ import (
 
 type TeamsPlugin struct{}
 
+// Send a notification message to Microsoft Teams
 func (plugin *TeamsPlugin) Send(url string, message string) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
 
-	postUrl := buildUrl(config)
+	postUrl := buildURL(config)
 	return plugin.doSend(postUrl, message)
 }
 
@@ -41,7 +42,7 @@ func (plugin *TeamsPlugin) doSend(postUrl string, message string) error {
 	return nil
 }
 
-func buildUrl(config *TeamsConfig) string {
+func buildURL(config *TeamsConfig) string {
 	var baseUrl = "https://outlook.office.com/webhook"
 	return fmt.Sprintf(
 		"%s/%s/IncomingWebhook/%s/%s",

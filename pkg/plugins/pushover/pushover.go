@@ -22,6 +22,7 @@ const (
 
 type PushoverPlugin struct{}
 
+// Send a notification message to Pushover
 func (plugin *PushoverPlugin) Send(url string, message string) error {
 	config, _ := CreateConfigFromURL(url)
 	data := netUrl.Values{}
