@@ -16,7 +16,7 @@ const (
 )
 
 func (plugin *DiscordPlugin) Send(url string, message string) error {
-	config, err := plugin.CreateConfigFromUrl(url)
+	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func CreateApiUrlFromConfig(config DiscordConfig) string {
 		config.Token)
 }
 
-func (plugin *DiscordPlugin) CreateConfigFromUrl(url string) (DiscordConfig, error) {
+func (plugin *DiscordPlugin) CreateConfigFromURL(url string) (DiscordConfig, error) {
 	args, err := plugins.ExtractArguments(url)
 	if err != nil {
 		return DiscordConfig{}, err

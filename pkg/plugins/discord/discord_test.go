@@ -37,17 +37,17 @@ var _ = Describe("the discord plugin", func() {
 		When("given an url and a message", func() {
 			It("should return an error if no arguments where supplied", func() {
 				url := "discord://"
-				_, err := plugin.CreateConfigFromUrl(url)
+				_, err := plugin.CreateConfigFromURL(url)
 				Expect(err).To(HaveOccurred())
 			})
 			It("should not return an error if exactly two arguments are given", func() {
 				url := "discord://channel/token"
-				_, err := plugin.CreateConfigFromUrl(url)
+				_, err := plugin.CreateConfigFromURL(url)
 				Expect(err).NotTo(HaveOccurred())
 			})
 			It("should return an error if more than two arguments are given", func() {
 				url := "discord://channel/token/illegal-argument"
-				_, err := plugin.CreateConfigFromUrl(url)
+				_, err := plugin.CreateConfigFromURL(url)
 				Expect(err).To(HaveOccurred())
 			})
 		})
