@@ -64,7 +64,8 @@ the service urls below.
 
 | Service   | Format                                                                                       |
 | --------- | -------------------------------------------------------------------------------------------- |
-| Telegram  | `telegram://api-token/channel`<br/>`telegram://api-token/channel-a/channel-b/channel-c/...`  |
-| Slack     | `slack://token-a/token-b/token-c`<br/>`slack://botname/token-a/token-b/token-c`              |
 | Discord   | `discord://channel/token`                                                                    |
 | Pushover  | `pushover://token/user/device`                                                               |
+| Slack     | `slack://token-a/token-b/token-c`<br/>`slack://botname/token-a/token-b/token-c`              |
+| Teams     | `teams://token-a/token-b/token-c`                                                            |
+| Telegram  | `telegram://api-token/channel`<br/>`telegram://api-token/channel-a/channel-b/channel-c/...`  |
