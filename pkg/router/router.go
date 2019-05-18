@@ -5,6 +5,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/plugins/discord"
 	"github.com/containrrr/shoutrrr/pkg/plugins/pushover"
 	"github.com/containrrr/shoutrrr/pkg/plugins/slack"
+	"github.com/containrrr/shoutrrr/pkg/plugins/teams"
 	"github.com/containrrr/shoutrrr/pkg/plugins/telegram"
 	"regexp"
 	"strings"
@@ -33,14 +34,16 @@ func (router *ServiceRouter) Route(url string, message string) error {
 	}
 
 	switch strings.ToLower(svc) {
-	case "slack":
-		return (&slack.SlackPlugin{}).Send(url, message)
-	case "telegram":
-		return (&telegram.TelegramPlugin{}).Send(url, message)
 	case "discord":
 		return (&discord.DiscordPlugin{}).Send(url, message)
 	case "pushover":
 		return (&pushover.PushoverPlugin{}).Send(url, message)
+	case "slack":
+		return (&slack.SlackPlugin{}).Send(url, message)
+	case "teams":
+		return (&teams.TeamsPlugin{}).Send(url, message)
+	case "telegram":
+		return (&telegram.TelegramPlugin{}).Send(url, message)
 	}
 	return errors.New("unknown service")
 }
