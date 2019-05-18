@@ -20,7 +20,7 @@ func isTokenValid(arguments []string) bool {
 }
 
 func isTokenAValid(token string) bool {
-	pattern := fmt.Sprintf("%s@%s", uuid4_pattern)
+	pattern := fmt.Sprintf("%s@%s", uuid4_pattern, uuid4_pattern)
 	return matchesRegexp(pattern, token)
 }
 
