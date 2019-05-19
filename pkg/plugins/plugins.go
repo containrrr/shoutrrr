@@ -6,6 +6,7 @@ import (
     "strings"
 )
 
+// ExtractArguments extracts the arguments from a notification url, i.e everything following the initial ://
 func ExtractArguments(url string) ([]string, error) {
     regex, err := regexp.Compile("^[a-zA-Z]+://(.*)$")
     if err != nil {

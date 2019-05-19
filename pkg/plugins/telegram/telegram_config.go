@@ -1,7 +1,7 @@
 package telegram
 
-
-type TelegramConfig struct {
-	ApiToken string
+// Config for use within the telegram plugin
+type Config struct {
+	Token    string
 	Channels []string
 }

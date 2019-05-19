@@ -17,11 +17,11 @@ func TestTelegram(t *testing.T) {
 }
 
 var _ = Describe("the telegram plugin", func() {
-	var telegram *TelegramPlugin
+	var telegram *Plugin
 	var envTelegramUrl string
 
 	BeforeSuite(func() {
-		telegram = &TelegramPlugin{}
+		telegram = &Plugin{}
 		envTelegramUrl = os.Getenv("SHOUTRRR_TELEGRAM_URL")
 
 	})
@@ -92,7 +92,7 @@ var _ = Describe("the telegram plugin", func() {
 				url := "telegram://12345:mock-token/channel-1/channel-2/channel-3"
 				config, err := telegram.CreateConfigFromURL(url)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(config.ApiToken).To(Equal("12345:mock-token"))
+				Expect(config.Token).To(Equal("12345:mock-token"))
 			})
 			It("should add every subsequent argument as a channel id", func() {
 				url := "telegram://12345:mock-token/channel-1/channel-2/channel-3"

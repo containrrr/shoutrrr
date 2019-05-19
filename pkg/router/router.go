@@ -11,9 +11,11 @@ import (
 	"strings"
 )
 
-type ServiceRouter struct {
-}
 
+// ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
+type ServiceRouter struct {}
+
+// ExtractServiceName from a notification URL
 func (router *ServiceRouter) ExtractServiceName(url string) (string, error) {
 	regex, err := regexp.Compile("^([a-zA-Z]+)://")
 	if err != nil {
@@ -27,6 +29,7 @@ func (router *ServiceRouter) ExtractServiceName(url string) (string, error) {
 }
 
 
+// Route a message to a specific notification service using the notification URL
 func (router *ServiceRouter) Route(url string, message string) error {
 	svc, err := router.ExtractServiceName(url)
 	if err != nil {
@@ -35,15 +38,15 @@ func (router *ServiceRouter) Route(url string, message string) error {
 
 	switch strings.ToLower(svc) {
 	case "discord":
-		return (&discord.DiscordPlugin{}).Send(url, message)
+		return (&discord.Plugin{}).Send(url, message)
 	case "pushover":
-		return (&pushover.PushoverPlugin{}).Send(url, message)
+		return (&pushover.Plugin{}).Send(url, message)
 	case "slack":
-		return (&slack.SlackPlugin{}).Send(url, message)
+		return (&slack.Plugin{}).Send(url, message)
 	case "teams":
-		return (&teams.TeamsPlugin{}).Send(url, message)
+		return (&teams.Plugin{}).Send(url, message)
 	case "telegram":
-		return (&telegram.TelegramPlugin{}).Send(url, message)
+		return (&telegram.Plugin{}).Send(url, message)
 	}
 	return errors.New("unknown service")
 }

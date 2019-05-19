@@ -7,8 +7,8 @@ import (
     "net/http"
 )
 
-// SlackPlugin sends notifications to a pre-configured channel or user
-type SlackPlugin struct {}
+// Plugin sends notifications to a pre-configured channel or user
+type Plugin struct {}
 
 const (
     url = "https://hooks.slack.com/services"
@@ -17,7 +17,7 @@ const (
 
 
 // Send a notification message to Slack
-func (slack *SlackPlugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url string, message string) error {
     config, err := CreateConfigFromURL(url)
     if err != nil {
         return err
@@ -29,21 +29,21 @@ func (slack *SlackPlugin) Send(url string, message string) error {
         return errors.New("message exceeds max length")
     }
 
-    return slack.doSend(config, message)
+    return plugin.doSend(config, message)
 }
 
-func (slack *SlackPlugin) doSend(config *SlackConfig, message string) error {
-    url := slack.getURL(config)
+func (plugin *Plugin) doSend(config *Config, message string) error {
+    url := plugin.getURL(config)
     json, _ := CreateJSONPayload(config, message)
     res, err := http.Post(url, "application/json", bytes.NewReader(json))
 
     if res.StatusCode != http.StatusOK {
-        return errors.New(fmt.Sprintf("failed to send notification to slack, response status code %s", res.Status))
+        return fmt.Errorf("failed to send notification to plugin, response status code %s", res.Status)
     }
     return err
 }
 
-func (slack *SlackPlugin) getURL(config *SlackConfig) string {
+func (plugin *Plugin) getURL(config *Config) string {
     return fmt.Sprintf(
         "%s/%s/%s/%s",
         url,

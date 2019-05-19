@@ -2,16 +2,17 @@ package slack
 
 import "encoding/json"
 
-type SlackJSON struct {
-	Text string `json:"text"`
-	Botname string `json:"username"`
+// JSON used within the Slack plugin
+type JSON struct {
+	Text    string `json:"text"`
+	BotName string `json:"username"`
 }
 
 // CreateJSONPayload compatible with the slack webhook api
-func CreateJSONPayload(config *SlackConfig, message string) ([]byte, error) {
+func CreateJSONPayload(config *Config, message string) ([]byte, error) {
 	return json.Marshal(
-		SlackJSON{
-			Text: message,
-			Botname: config.Botname,
+		JSON{
+			Text:    message,
+			BotName: config.BotName,
 		})
 }

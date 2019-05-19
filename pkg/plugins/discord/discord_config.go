@@ -1,7 +1,7 @@
 package discord
 
-// DiscordConfig is the configuration needed to send discord notifications
-type DiscordConfig struct {
+// Config is the configuration needed to send discord notifications
+type Config struct {
 	Channel string
 	Token string
 }

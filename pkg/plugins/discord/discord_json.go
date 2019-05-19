@@ -6,18 +6,20 @@ import (
 )
 
 
-type DiscordJson struct {
+// JSON is the actual notification payload
+type JSON struct {
 	Text string `json:"content"`
 }
 
-func CreateJsonToSend(message string) ([]byte, error) {
+// CreateJSONToSend creates a JSON payload to be sent to the discord webhook API
+func CreateJSONToSend(message string) ([]byte, error) {
 	if message == "" {
 		return nil, errors.New("message was empty")
 	}
 	if len(message) > maxlength {
 		return nil, errors.New("the supplied message exceeds the max length for discord")
 	}
-	return json.Marshal(DiscordJson {
+	return json.Marshal(JSON{
 		Text: message,
 	})
 }

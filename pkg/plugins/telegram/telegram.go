@@ -2,10 +2,10 @@ package telegram
 
 import (
 	"bytes"
-	json2 "encoding/json"
+	"encoding/json"
 	"errors"
 	"fmt"
-	. "github.com/containrrr/shoutrrr/pkg/plugins"
+	"github.com/containrrr/shoutrrr/pkg/plugins"
 	"net/http"
 )
 
@@ -15,10 +15,11 @@ const (
 )
 
 
-// TelegramPlugin sends notifications to a given telegram chat
-type TelegramPlugin struct {}
+// Plugin sends notifications to a given telegram chat
+type Plugin struct {}
 
-func (plugin *TelegramPlugin) Send(url string, message string) error {
+// Send notification to Telegram
+func (plugin *Plugin) Send(url string, message string) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
@@ -27,36 +28,37 @@ func (plugin *TelegramPlugin) Send(url string, message string) error {
 		return err
 	}
 
-	return sendMessageForChatIds(config, message)
+	return sendMessageForChatIDs(config, message)
 }
 
-func sendMessageForChatIds(config *TelegramConfig, message string) error {
+func sendMessageForChatIDs(config *Config, message string) error {
 	for _, channel := range config.Channels {
-		if err := sendMessageToApi(message, channel, config.ApiToken); err != nil {
+		if err := sendMessageToAPI(message, channel, config.Token); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func sendMessageToApi(message string, channel string, apiToken string) error {
-	postUrl := fmt.Sprintf("%s%s/sendMessage", url, apiToken)
-	json, _ := json2.Marshal(
-		TelegramJson {
+func sendMessageToAPI(message string, channel string, apiToken string) error {
+	postURL := fmt.Sprintf("%s%s/sendMessage", url, apiToken)
+	jsonData, _ := json.Marshal(
+		JSON{
 			Text: message,
-			Id: channel,
+			ID:   channel,
 		})
 
-	res, err := http.Post(postUrl, "application/json", bytes.NewBuffer(json))
+	res, err := http.Post(postURL, "application/jsonData", bytes.NewBuffer(jsonData))
 	if res.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("failed to send notification to \"%s\", response status code %s", channel, res.Status))
+		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", channel, res.Status)
 	}
 	return err
 }
 
 
-func (plugin *TelegramPlugin) CreateConfigFromURL(url string) (*TelegramConfig, error) {
-	arguments, err := ExtractArguments(url)
+// CreateConfigFromURL to use within the telegram plugin
+func (plugin *Plugin) CreateConfigFromURL(url string) (*Config, error) {
+	arguments, err := plugins.ExtractArguments(url)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +68,8 @@ func (plugin *TelegramPlugin) CreateConfigFromURL(url string) (*TelegramConfig, 
 	if !IsTokenValid(arguments[0]) {
 		return nil, errors.New("invalid telegram token")
 	}
-	return &TelegramConfig{
-		ApiToken: arguments[0],
+	return &Config{
+		Token:    arguments[0],
 		Channels: arguments[1:],
 	}, nil
 }

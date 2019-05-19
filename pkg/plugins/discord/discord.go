@@ -8,61 +8,62 @@ import (
 	"net/http"
 )
 
-type DiscordPlugin struct {}
+// Plugin providing Discord as a notification service
+type Plugin struct {}
 
 const (
-	hookUrl = "https://discordapp.com/api/webhooks"
+	hookURL   = "https://discordapp.com/api/webhooks"
 	maxlength = 2000
 )
 
 // Send a notification message to discord
-func (plugin *DiscordPlugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url string, message string) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
 
-	payload, err := CreateJsonToSend(message)
+	payload, err := CreateJSONToSend(message)
 	if err != nil {
 		return err
 	}
 	fmt.Println(string(payload))
 
-	apiUrl := CreateApiURLFromConfig(config)
-	fmt.Println(apiUrl)
+	postURL := CreateAPIURLFromConfig(config)
+	fmt.Println(postURL)
 
-	return doSend(payload, apiUrl)
+	return doSend(payload, postURL)
 }
 
-// CreateApiURLFromConfig takes a discord config object and creates a post url
-func CreateApiURLFromConfig(config DiscordConfig) string {
+// CreateAPIURLFromConfig takes a discord config object and creates a post url
+func CreateAPIURLFromConfig(config Config) string {
 	return fmt.Sprintf(
 		"%s/%s/%s",
-		hookUrl,
+		hookURL,
 		config.Channel,
 		config.Token)
 }
 
-// CreateConfigFromURL creates a DiscordConfig struct given a valid discord notification url
-func (plugin *DiscordPlugin) CreateConfigFromURL(url string) (DiscordConfig, error) {
+// CreateConfigFromURL creates a Config struct given a valid discord notification url
+func (plugin *Plugin) CreateConfigFromURL(url string) (Config, error) {
 	args, err := plugins.ExtractArguments(url)
 	if err != nil {
-		return DiscordConfig{}, err
+		return Config{}, err
 	}
 	if len(args) != 2 {
-		return DiscordConfig{}, errors.New("the discord plugin expects exactly two url path arguments")
+		return Config{}, errors.New("the discord plugin expects exactly two url path arguments")
 	}
 
-	return DiscordConfig{
+	return Config{
 		Channel: args[0],
 		Token: args[1],
 	}, nil
 }
 
-func doSend(payload []byte, postUrl string) error {
-	res, err := http.Post(postUrl, "application/json", bytes.NewBuffer(payload))
+func doSend(payload []byte, postURL string) error {
+	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 	if res.StatusCode != http.StatusNoContent {
-		return errors.New(fmt.Sprintf("failed to send notification to discord, response status code %s", res.Status))
+		return fmt.Errorf("failed to send notification to discord, response status code %s", res.Status)
 	}
 	return err
 }

@@ -14,9 +14,9 @@ func Send(url string, message string) error {
 
 // SendEnv lets you send shoutrrr notifications using an url stored in your env variables and a supplied message
 func SendEnv(message string) error {
-	envUrl := os.Getenv("SHOUTRRR_URL")
-	if envUrl == "" {
+	envURL := os.Getenv("SHOUTRRR_URL")
+	if envURL == "" {
 		return errors.New("trying to use SendEnv but SHOUTRRR_URL is not set")
 	}
-	return Send(envUrl, message)
+	return Send(envURL, message)
 }

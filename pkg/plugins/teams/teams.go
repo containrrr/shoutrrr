@@ -8,21 +8,22 @@ import (
 	"net/http"
 )
 
-type TeamsPlugin struct{}
+// Plugin providing teams as a notification service
+type Plugin struct{}
 
 // Send a notification message to Microsoft Teams
-func (plugin *TeamsPlugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url string, message string) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
 
-	postUrl := buildURL(config)
-	return plugin.doSend(postUrl, message)
+	postURL := buildURL(config)
+	return plugin.doSend(postURL, message)
 }
 
-func (plugin *TeamsPlugin) doSend(postUrl string, message string) error {
-	body := TeamsJson{
+func (plugin *Plugin) doSend(postURL string, message string) error {
+	body := JSON{
 		CardType: "MessageCard",
 		Context:  "http://schema.org/extensions",
 		Markdown: true,
@@ -34,7 +35,7 @@ func (plugin *TeamsPlugin) doSend(postUrl string, message string) error {
 		return err
 	}
 
-	res, err := http.Post(postUrl, "application/json", bytes.NewBuffer(jsonBody))
+	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonBody))
 	if res.StatusCode != http.StatusOK {
 		msg := fmt.Sprintf("failed to send notification to teams, response status code %s", res.Status)
 		return errors.New(msg)
@@ -42,11 +43,11 @@ func (plugin *TeamsPlugin) doSend(postUrl string, message string) error {
 	return nil
 }
 
-func buildURL(config *TeamsConfig) string {
-	var baseUrl = "https://outlook.office.com/webhook"
+func buildURL(config *Config) string {
+	var baseURL = "https://outlook.office.com/webhook"
 	return fmt.Sprintf(
 		"%s/%s/IncomingWebhook/%s/%s",
-		baseUrl,
+		baseURL,
 		config.Token.A,
 		config.Token.B,
 		config.Token.C)

@@ -9,21 +9,23 @@ import (
 	"strings"
 )
 
-type PushoverConfig struct {
+// Config for the Pushover notification service plugin
+type Config struct {
 	Token   string
 	User    string
 	Devices []string
 }
 
 const (
-	hookUrl     = "https://api.pushover.net/1/messages.json"
+	hookURL     = "https://api.pushover.net/1/messages.json"
 	contentType = "application/x-www-form-urlencoded"
 )
 
-type PushoverPlugin struct{}
+// Plugin providing the notification service Pushover
+type Plugin struct{}
 
 // Send a notification message to Pushover
-func (plugin *PushoverPlugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url string, message string) error {
 	config, _ := CreateConfigFromURL(url)
 	data := netUrl.Values{}
 	data.Set("device", config.Devices[0])
@@ -33,24 +35,25 @@ func (plugin *PushoverPlugin) Send(url string, message string) error {
 	fmt.Println(data.Encode())
 
 	res, err := http.Post(
-		hookUrl,
+		hookURL,
 		contentType,
 		strings.NewReader(data.Encode()))
 	if res.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("failed to send notification to pushover, response status code %s", res.Status))
+		return fmt.Errorf("failed to send notification to pushover, response status code %s", res.Status)
 	}
 	return err
 }
 
-func CreateConfigFromURL(url string) (PushoverConfig, error) {
+// CreateConfigFromURL to be used with the Pushover notification service plugin
+func CreateConfigFromURL(url string) (Config, error) {
 	args, err := plugins.ExtractArguments(url)
 	if err != nil {
-		return PushoverConfig{}, err
+		return Config{}, err
 	}
 	if len(args) < 2 {
-		return PushoverConfig{}, errors.New("the minimum amount of arguments for pushover is 2")
+		return Config{}, errors.New("the minimum amount of arguments for pushover is 2")
 	}
-	return PushoverConfig{
+	return Config{
 		Token:   args[0],
 		User:    args[1],
 		Devices: args[2:],

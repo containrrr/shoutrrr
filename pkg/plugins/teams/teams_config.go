@@ -2,22 +2,24 @@ package teams
 
 import (
 	"errors"
-	. "github.com/containrrr/shoutrrr/pkg/plugins"
+	"github.com/containrrr/shoutrrr/pkg/plugins"
 )
 
-type TeamsConfig struct {
-	Token TeamsToken
+// Config for use within the teams plugin
+type Config struct {
+	Token Token
 }
 
-func (plugin *TeamsPlugin) CreateConfigFromURL(url string) (*TeamsConfig, error) {
-	arguments, err := ExtractArguments(url);
+// CreateConfigFromURL for use within the teams plugin
+func (plugin *Plugin) CreateConfigFromURL(url string) (*Config, error) {
+	arguments, err := plugins.ExtractArguments(url);
 	if err != nil {
 		return nil, err
 	} else if !isTokenValid(arguments) {
 		return nil, errors.New("invalid service url. malformed tokens")
 	}
-	return &TeamsConfig{
-		Token:TeamsToken{
+	return &Config{
+		Token: Token{
 			A: arguments[0],
 			B: arguments[1],
 			C: arguments[2],

@@ -14,14 +14,14 @@ func TestShoutrrr(t *testing.T) {
 }
 
 var (
-	plugin      *SlackPlugin
+	plugin      *Plugin
 	envSlackURL string
 )
 
 var _ = Describe("the slack plugin", func() {
 
 	BeforeSuite(func() {
-		plugin = &SlackPlugin{}
+		plugin = &Plugin{}
 		envSlackURL = os.Getenv("SHOUTRRR_SLACK_URL")
 
 	})
@@ -77,7 +77,7 @@ var _ = Describe("the slack plugin", func() {
 				url := "slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
 				config, configError := CreateConfigFromURL(url)
 
-				Expect(config.Botname).To(Equal(DefaultUser))
+				Expect(config.BotName).To(Equal(DefaultUser))
 				Expect(configError).NotTo(HaveOccurred())
 
 			})
@@ -86,7 +86,7 @@ var _ = Describe("the slack plugin", func() {
 				config, configError := CreateConfigFromURL(url)
 
 				Expect(configError).NotTo(HaveOccurred())
-				Expect(config.Botname).To(Equal("testbot"))
+				Expect(config.BotName).To(Equal("testbot"))
 			})
 			It("should return an error if the argument list is shorter than three", func() {
 				url := "slack://AAAAAAAA"

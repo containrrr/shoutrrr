@@ -3,20 +3,23 @@ package slack
 import (
 	"errors"
 	"fmt"
-	. "github.com/containrrr/shoutrrr/pkg/plugins"
+	"github.com/containrrr/shoutrrr/pkg/plugins"
 	)
 
-type SlackConfig struct {
-	Botname string
+// Config for the slack plugin
+type Config struct {
+	BotName string
 	Token   Token
 }
 
 const (
+	// DefaultUser for sending notifications to slack
 	DefaultUser = "Shoutrrr"
 )
 
-func CreateConfigFromURL(url string ) (*SlackConfig, error) {
-	arguments, err := ExtractArguments(url)
+// CreateConfigFromURL to use within the slack plugin
+func CreateConfigFromURL(url string ) (*Config, error) {
+	arguments, err := plugins.ExtractArguments(url)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +29,8 @@ func CreateConfigFromURL(url string ) (*SlackConfig, error) {
 	}
 
 	if len(arguments) < 4 {
-		return &SlackConfig{
-			Botname: DefaultUser,
+		return &Config{
+			BotName: DefaultUser,
 			Token: Token{
 				A: arguments[0],
 				B: arguments[1],
@@ -36,8 +39,8 @@ func CreateConfigFromURL(url string ) (*SlackConfig, error) {
 		}, nil
 	}
 
-	return &SlackConfig{
-		Botname: arguments[0],
+	return &Config{
+		BotName: arguments[0],
 		Token: Token{
 			A: arguments[1],
 			B: arguments[2],
