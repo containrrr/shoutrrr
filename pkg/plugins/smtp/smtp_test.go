@@ -15,20 +15,20 @@ func TestSMTP(t *testing.T) {
 
 var (
 	plugin        *Plugin
-	envSmtpURL string
+	envSMTPURL string
 )
 
 var _ = Describe("the SMTP plugin", func() {
 	BeforeSuite(func() {
 		plugin = &Plugin{}
-		envSmtpURL = os.Getenv("SHOUTRRR_SMTP_URL")
+		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 	})
 	When("running integration tests", func() {
 		It("should work without errors", func() {
-			if envSmtpURL == "" {
+			if envSMTPURL == "" {
 				return
 			}
-			err := plugin.Send(envSmtpURL, "this is an integration test")
+			err := plugin.Send(envSMTPURL, "this is an integration test")
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

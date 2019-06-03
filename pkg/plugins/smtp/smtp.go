@@ -3,10 +3,14 @@ package smtp
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/smtp"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
+// Plugin sends notifications to a given e-mail addresses via SMTP
 type Plugin struct {}
 
 // Send a notification message to discord
@@ -48,12 +52,13 @@ func (plugin *Plugin) CreateConfigFromURL(url string) (Config, error) {
 		Port: uint16(port),
 		FromAddress: args[4],
 		FromName: args[5],
+		ToAddresses: strings.Split(args[6], "/"),
 	}, nil
 }
 
 // ExtractArguments extracts the arguments from a notification url, i.e everything following the initial ://
 func ExtractArguments(url string) ([]string, error) {
-	regex, err := regexp.Compile("^smtp://([^:]+):([^@]+)@([^:]+):([1-9][0-9]*)$")
+	regex, err := regexp.Compile("^smtp://([^:]+):([^@]+)@([^:]+):([1-9][0-9]*)/([a-z]+@[a-z|\\-|\\.])\\(([^\\)])\\)/(.*)$")
 		if err != nil {
 		return nil, errors.New("could not compile regex")
 	}
@@ -66,11 +71,48 @@ func ExtractArguments(url string) ([]string, error) {
 	return match, nil
 }
 
-func doSend(payload string, config Config) error {
+func doSend(message string, config Config) error {
 
 
 	fmt.Println(config)
 
+	for _, toAddress := range config.ToAddresses {
 
-	return errors.New("not implemented")
+		client, err := smtp.Dial(fmt.Sprintf("%s:%d", config.Host, config.Port)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Set the sender and recipient first
+		if err := client.Mail(config.FromAddress); err != nil {
+			log.Fatal(err)
+		}
+		if err := client.Rcpt(toAddress); err != nil {
+			log.Fatal(err)
+		}
+
+		// Send the email body.
+		wc, err := client.Data()
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = fmt.Fprintf(wc, message)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = wc.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Send the QUIT command and close the connection.
+		err = client.Quit()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+
+
+	return nil
 }

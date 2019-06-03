@@ -8,4 +8,5 @@ type Config struct {
 	Port uint16
 	FromAddress string
 	FromName string
+	ToAddresses []string
 }
