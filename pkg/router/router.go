@@ -7,6 +7,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/plugins/slack"
 	"github.com/containrrr/shoutrrr/pkg/plugins/teams"
 	"github.com/containrrr/shoutrrr/pkg/plugins/telegram"
+	"github.com/containrrr/shoutrrr/pkg/plugins/smtp"
 	"regexp"
 	"strings"
 )
@@ -47,6 +48,8 @@ func (router *ServiceRouter) Route(url string, message string) error {
 		return (&teams.Plugin{}).Send(url, message)
 	case "telegram":
 		return (&telegram.Plugin{}).Send(url, message)
+	case "smtp":
+		return (&smtp.Plugin{}).Send(url, message)
 	}
 	return errors.New("unknown service")
 }
