@@ -1,17 +1,17 @@
 package smtp
 
 import (
-	"errors"
+	"crypto/tls"
 	"fmt"
+	"io"
 	"log"
 	"net/smtp"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 // Plugin sends notifications to a given e-mail addresses via SMTP
 type Plugin struct {}
+
+const debugMode = false
 
 // Send a notification message to discord
 func (plugin *Plugin) Send(url string, message string) error {
@@ -23,96 +23,99 @@ func (plugin *Plugin) Send(url string, message string) error {
 	return doSend(message, config)
 }
 
-// CreateAPIURLFromConfig takes a discord config object and creates a post url
-func CreateAPIURLFromConfig(config Config) string {
-	return fmt.Sprintf(
-		"smtp://%s:%s@%s:%d",
-		config.Username,
-		config.Password,
-		config.Host,
-		config.Port)
-}
-
-// CreateConfigFromURL creates a Config struct given a valid discord notification url
-func (plugin *Plugin) CreateConfigFromURL(url string) (Config, error) {
-	args, err := ExtractArguments(url)
-	if err != nil {
-		return Config{}, err
-	}
-	if len(args) != 2 {
-		return Config{}, errors.New("invalid SMTP configuration URL")
-	}
-
-	port, err := strconv.ParseUint(args[3], 10, 16)
-
-	return Config{
-		Username: args[0],
-		Password: args[1],
-		Host: args[2],
-		Port: uint16(port),
-		FromAddress: args[4],
-		FromName: args[5],
-		ToAddresses: strings.Split(args[6], "/"),
-	}, nil
-}
-
-// ExtractArguments extracts the arguments from a notification url, i.e everything following the initial ://
-func ExtractArguments(url string) ([]string, error) {
-	regex, err := regexp.Compile("^smtp://([^:]+):([^@]+)@([^:]+):([1-9][0-9]*)/([a-z]+@[a-z|\\-|\\.])\\(([^\\)])\\)/(.*)$")
-		if err != nil {
-		return nil, errors.New("could not compile regex")
-	}
-	match := regex.FindStringSubmatch(url)
-	println(match)
-
-	if len(match[1]) <= 0 {
-		return nil, errors.New("could not extract any arguments")
-	}
-	return match, nil
-}
 
 func doSend(message string, config Config) error {
 
-
-	fmt.Println(config)
-
 	for _, toAddress := range config.ToAddresses {
 
-		client, err := smtp.Dial(fmt.Sprintf("%s:%d", config.Host, config.Port)
+		client, err := smtp.Dial(fmt.Sprintf("%s:%d", config.Host, config.Port))
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("error connecting to server: %s", err)
 		}
+
+		if config.UseStartTLS {
+			if err := client.StartTLS(&tls.Config{
+				ServerName: config.Host,
+			}); err != nil {
+				return fmt.Errorf("error enabling StartTLS message: %s", err)
+			}
+		}
+
+		if auth := getAuth(config); auth != nil {
+			if err := client.Auth(auth); err != nil {
+				return fmt.Errorf("error authenticating: %s", err)
+			}
+		}
+
 
 		// Set the sender and recipient first
 		if err := client.Mail(config.FromAddress); err != nil {
-			log.Fatal(err)
+			log.Fatalf("error creating new message: %s", err)
 		}
 		if err := client.Rcpt(toAddress); err != nil {
-			log.Fatal(err)
+			log.Fatalf("error setting RCPT: %s", err)
 		}
 
 		// Send the email body.
 		wc, err := client.Data()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("error creating message stream: %s", err)
 		}
-		_, err = fmt.Fprintf(wc, message)
-		if err != nil {
-			log.Fatal(err)
+
+		if err := writeHeaders(&wc, map[string]string {
+			"Subject": config.Subject,
+			"To": toAddress,
+			"From": fmt.Sprintf("%s <%s>", config.FromName, config.FromAddress),
+			"MIME-version": "1.0;",
+			"Content-Type": "text/html; charset=\"UTF-8\"",
+		}); err != nil {
+			return fmt.Errorf("error writing message headers: %s", err)
 		}
-		err = wc.Close()
-		if err != nil {
-			log.Fatal(err)
+
+		if _, err = fmt.Fprintf(wc, message); err != nil {
+			return fmt.Errorf("error writing message: %s", err)
+		}
+
+		if err = wc.Close(); err != nil {
+			return fmt.Errorf("error closing message stream: %s", err)
 		}
 
 		// Send the QUIT command and close the connection.
 		err = client.Quit()
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("error closing session: %s", err)
 		}
 
+		if debugMode {
+			fmt.Printf("Mail successfully sent to \"%s\"!\n", toAddress)
+		}
 	}
 
-
 	return nil
+}
+
+func getAuth(config Config) smtp.Auth {
+
+		switch config.Auth {
+			case Auth.None:
+				return nil
+			case Auth.Plain:
+				return smtp.PlainAuth("", config.Username, config.Password, config.Host)
+			case Auth.CRAMMD5:
+				return smtp.CRAMMD5Auth(config.Username, config.Password)
+			default:
+				panic("invalid authorization method")
+		}
+
+}
+
+func writeHeaders(wc *io.WriteCloser, headers map[string]string) error {
+	for key, val := range headers {
+		if _, err := fmt.Fprintf(*wc, "%s: %s\n", key, val); err != nil {
+			return err
+		}
+	}
+
+	_, err := fmt.Fprintln(*wc)
+	return err
 }

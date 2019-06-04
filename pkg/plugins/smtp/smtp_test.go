@@ -14,7 +14,7 @@ func TestSMTP(t *testing.T) {
 }
 
 var (
-	plugin        *Plugin
+	plugin     *Plugin
 	envSMTPURL string
 )
 
@@ -30,6 +30,32 @@ var _ = Describe("the SMTP plugin", func() {
 			}
 			err := plugin.Send(envSMTPURL, "this is an integration test")
 			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+	When("parsing the configuration URL", func() {
+		It("should be identical after de-/serialization", func() {
+			testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com&fromName=Sender&toAddresses=rec1@example.com,rec2@example.com"
+
+			config, err := plugin.CreateConfigFromURL(testURL)
+			Expect(err).NotTo(HaveOccurred())
+
+			outputURL := CreateAPIURLFromConfig(config)
+
+			Expect(outputURL).To(Equal(testURL))
+
+		})
+		It("should return an error", func() {
+			When("fromAddress is missing", func() {
+				testURL := "smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com"
+				_, err := plugin.CreateConfigFromURL(testURL)
+				Expect(err).To(HaveOccurred())
+			})
+			When("toAddresses are missing", func() {
+				testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com"
+				_, err := plugin.CreateConfigFromURL(testURL)
+				Expect(err).To(HaveOccurred())
+			})
+
 		})
 	})
 })

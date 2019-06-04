@@ -20,3 +20,4 @@ func SendEnv(message string) error {
 	}
 	return Send(envURL, message)
 }
+
