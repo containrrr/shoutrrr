@@ -4,7 +4,9 @@ import (
     "bytes"
     "errors"
     "fmt"
+    "github.com/containrrr/shoutrrr/pkg/plugin"
     "net/http"
+    netUrl "net/url"
 )
 
 // Plugin sends notifications to a pre-configured channel or user
@@ -17,7 +19,7 @@ const (
 
 
 // Send a notification message to Slack
-func (plugin *Plugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url netUrl.URL, message string, opts plugin.PluginOpts) error {
     config, err := CreateConfigFromURL(url)
     if err != nil {
         return err
@@ -30,6 +32,10 @@ func (plugin *Plugin) Send(url string, message string) error {
     }
 
     return plugin.doSend(config, message)
+}
+
+func (plugin *Plugin) GetConfig() plugin.PluginConfig {
+    return &Config{}
 }
 
 func (plugin *Plugin) doSend(config *Config, message string) error {

@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/plugin"
 	"github.com/containrrr/shoutrrr/pkg/plugins"
 	"net/http"
+	"net/url"
 )
 
 // Plugin providing Discord as a notification service
@@ -17,7 +19,7 @@ const (
 )
 
 // Send a notification message to discord
-func (plugin *Plugin) Send(url string, message string) error {
+func (plugin *Plugin) send(url string, message string) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
@@ -33,6 +35,20 @@ func (plugin *Plugin) Send(url string, message string) error {
 	fmt.Println(postURL)
 
 	return doSend(payload, postURL)
+}
+
+func (plugin *Plugin) Send(serviceUrl url.URL, message string, opts plugin.PluginOpts) error {
+	return plugin.send(serviceUrl.String(), message)
+}
+
+func (plugin *Plugin) URLToStringMap(url url.URL) (map[string]string, error) {
+	return map[string]string {
+
+	}, nil
+}
+
+func (plugin *Plugin) GetConfig() plugin.PluginConfig {
+	return Config{}
 }
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url

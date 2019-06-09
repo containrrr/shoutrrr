@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/plugins"
+	"github.com/containrrr/shoutrrr/pkg/plugin"
 	"net/http"
+	"net/url"
 )
 
 const (
-	url = "https://api.telegram.org/bot"
+	apiBase = "https://api.telegram.org/bot"
 	maxlength = 4096
 )
 
@@ -19,7 +20,7 @@ const (
 type Plugin struct {}
 
 // Send notification to Telegram
-func (plugin *Plugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url url.URL, message string, opts plugin.PluginOpts) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
@@ -29,6 +30,10 @@ func (plugin *Plugin) Send(url string, message string) error {
 	}
 
 	return sendMessageForChatIDs(config, message)
+}
+
+func (plugin *Plugin) GetConfig() plugin.PluginConfig {
+	return Config{}
 }
 
 func sendMessageForChatIDs(config *Config, message string) error {
@@ -41,7 +46,7 @@ func sendMessageForChatIDs(config *Config, message string) error {
 }
 
 func sendMessageToAPI(message string, channel string, apiToken string) error {
-	postURL := fmt.Sprintf("%s%s/sendMessage", url, apiToken)
+	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, apiToken)
 	jsonData, _ := json.Marshal(
 		JSON{
 			Text: message,
@@ -57,19 +62,8 @@ func sendMessageToAPI(message string, channel string, apiToken string) error {
 
 
 // CreateConfigFromURL to use within the telegram plugin
-func (plugin *Plugin) CreateConfigFromURL(url string) (*Config, error) {
-	arguments, err := plugins.ExtractArguments(url)
-	if err != nil {
-		return nil, err
-	}
-	if len(arguments) < 2 {
-		return nil, errors.New("the telegram plugin expects at least two arguments")
-	}
-	if !IsTokenValid(arguments[0]) {
-		return nil, errors.New("invalid telegram token")
-	}
-	return &Config{
-		Token:    arguments[0],
-		Channels: arguments[1:],
-	}, nil
+func (plugin *Plugin) CreateConfigFromURL(url url.URL) (*Config, error) {
+	config := Config{}
+	err := config.SetURL(url)
+	return &config, err
 }

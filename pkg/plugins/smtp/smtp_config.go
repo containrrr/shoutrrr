@@ -1,190 +1,178 @@
 package smtp
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/plugin"
 	"net/url"
 	"strconv"
 	"strings"
-	"errors"
 )
 
 // Config is the configuration needed to send discord notifications
 type Config struct {
-	Host        string
-	Username    string
-	Password    string
-	Port        uint16
-	FromAddress string
-	FromName    string
-	ToAddresses []string
-	Subject     string
-	Auth        AuthType
-	UseStartTLS bool
+	Host        string `desc:"SMTP server hostname or IP address"`
+	Username    string `desc:"authentication username"`
+	Password    string `desc:"authentication password or hash"`
+	Port        uint16 `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default: "25"`
+	FromAddress string `desc:"e-mail address that the mail are sent from"`
+	FromName    string `desc:"name of the sender" optional: "yes"`
+	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
+	Subject     string `desc:"the subject of the sent mail"`
+	Auth        AuthType `desc:"SMTP authentication method"`
+	UseStartTLS bool `desc:"attempt to use SMTP StartTLS encryption" default: "true"`
+	UseHTML     bool `desc:"whether the message being sent is in HTML" default: "false"`
 }
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url
-func CreateAPIURLFromConfig(config Config) string {
-	return fmt.Sprintf(
-		URLFormat,
-		config.Username,
-		config.Password,
-		config.Host,
-		config.Port,
-		config.FromAddress,
-		config.FromName,
-		strings.Join(config.ToAddresses, ","),
-	)
-}
+func (config *Config) GetURL() url.URL {
 
-// CreateConfigFromURL creates a Config struct given a valid discord notification url
-func (plugin *Plugin) CreateConfigFromURL(rawURL string) (Config, error) {
-	// args, err := ExtractArguments(url)
-
-	url, err := url.Parse(rawURL)
-
-
-	if err != nil {
-		return Config{}, err
+	return url.URL{
+		User: url.UserPassword(config.Username, config.Password),
+		Host: fmt.Sprintf("%s:%d", config.Host, config.Port),
+		Path: "/",
+		Scheme: Scheme,
+		ForceQuery: true,
+		RawQuery: plugin.FormatQuery(config),
 	}
 
+}
+
+func (config *Config) SetURL(url url.URL) error {
 	hostParts := strings.Split(url.Host, ":")
 	host := hostParts[0]
 	port, err := strconv.ParseUint(hostParts[1], 10, 16)
+	if err != nil {
+		return err
+	}
 	password, _ := url.User.Password()
 
-	config := Config{
-		Username: url.User.Username(),
-		Password: password,
-		Host: host,
-		Port: uint16(port),
-		FromAddress: "",
-		FromName: "Shoutrrr",
-		ToAddresses: make([]string, 0),
-		Subject: "A message from Shoutrrr",
-		UseStartTLS: true,
-	}
+	config.Username = url.User.Username()
+	config.Password = password
+	config.Host = host
+	config.Port = uint16(port)
 
-	if err := config.UpdateFromValues(url.Query()); err != nil {
-		return Config{}, err
+	for key, vals := range url.Query() {
+		//fmt.Printf("%s: %+v\n", key, vals)
+		 if err := config.Set(key, vals[0]); err != nil {
+			return err
+		}
 	}
-
-	if debugMode {
-		log.Printf("Username: %s", config.Username)
-		log.Printf("Password: %s", config.Password)
-		log.Printf("Host: %s", config.Host)
-		log.Printf("Auth: %s", String(config.Auth))
-		log.Printf("UseStartTLS: %t", config.UseStartTLS)
-		log.Printf("FromName: %s", config.FromName)
-		log.Printf("FromAddress: %s", config.FromAddress)
-		log.Printf("Subject: %s", config.Subject)
-	}
-
 
 	if len(config.FromAddress) < 1 {
-		return Config{}, errors.New("fromAddress missing from config URL")
+		return errors.New("fromAddress missing from config URL")
 	}
 
 	if len(config.ToAddresses) < 1 {
-		return Config{}, errors.New("toAddress missing from config URL")
+		return errors.New("toAddress missing from config URL")
 	}
 
-	return config, nil
+	return nil
 }
 
-func (config *Config) UpdateFromValues(values url.Values) error {
+func (config *Config) QueryFields() []string {
+	return []string {
+	"fromAddress",
+	"fromName",
+	"toAddresses",
+	"auth",
+	"subject",
+	"startTls",
+	"useHTML",
+	}
+}
 
-	for key, vals := range values {
+func (config *Config) Get(key string) (string, error) {
+	switch key {
+	case "fromAddress":
+		return config.FromAddress, nil
+	case "fromName":
+		return config.FromName, nil
+	case "toAddresses":
+		return strings.Join(config.ToAddresses, ","), nil
+	case "auth":
+		return config.Auth.String(), nil
+	case "subject":
+		return config.Subject, nil
+	case "startTls":
+		return format.PrintBool(config.UseStartTLS), nil
+	case "useHTML":
+		return format.PrintBool(config.UseHTML), nil
+	}
+	return "", fmt.Errorf("invalid query key \"%s\"", key)
+}
 
-		if len(vals) > 1 {
-			fmt.Printf("warning: %s additional value ignored!: %s\n", key, vals[1])
-		}
-		val := vals[0]
-
-		if debugMode {
-			fmt.Printf("Query \"%s\" => \"%s\"\n", key, val)
-		}
-
-		switch key {
-		case "fromAddress":
-			fallthrough
-		case "from":
-			config.FromAddress = val
-		case "fromName":
-			config.FromName = val
-		case "toAddresses":
-			fallthrough
-		case "to":
-			config.ToAddresses = strings.Split(val, ",")
-		case "auth":
-			switch strings.ToLower(val) {
-			case "none":
-				config.Auth = Auth.None
-			case "plain":
-				config.Auth = Auth.Plain
-			case "crammd5":
-				config.Auth = Auth.CRAMMD5
-			}
-		case "subject":
-			config.Subject = val
-		case "startTls":
-			switch strings.ToLower(val) {
-			case "true":
-				fallthrough
-			case "1":
-				config.UseStartTLS = true
-			case "false":
-				fallthrough
-			case "0":
-				config.UseStartTLS = false
-			default:
-
-			}
-		default:
-			return fmt.Errorf("invalid query key \"%s\"", key)
-		}
+func (config *Config) Set(key string, value string) error {
+	switch key {
+	case "fromAddress":
+		config.FromAddress = value
+	case "fromName":
+		config.FromName = value
+	case "toAddresses":
+		config.ToAddresses = strings.Split(value, ",")
+	case "auth":
+		config.Auth = ParseAuth(value)
+	case "subject":
+		config.Subject = value
+	case "startTls":
+		config.UseStartTLS = format.ParseBool(value, true)
+	case "useHTML":
+		config.UseHTML = format.ParseBool(value, false)
+	default:
+		return fmt.Errorf("invalid query key \"%s\"", key)
 	}
 	return nil
 }
 
-type urlParts struct {
-	Host uint8
-	Username uint8
-	Password uint8
-	Port uint8
-	Query uint8
+// CreateConfigFromURL creates a Config struct given a valid discord notification url
+func (plugin *Plugin) CreateConfigFromURL(url url.URL) (*Config, error) {
+
+	config := &Config{}
+	err := config.SetURL(url)
+
+	return config, err
 }
 
-var URLPart = &urlParts{
-	Username: 0,
-	Password: 1,
-	Host: 2,
-	Port: 3,
-	Query: 4,
+func (config Config) Enums() map[string]plugin.EnumFormatter {
+	return map[string]plugin.EnumFormatter{
+		"Auth": Auth.Enum,
+	}
 }
 
-type AuthType = uint8
+type AuthType int
 
 type authType struct {
-	None AuthType
-	Plain AuthType
+	None    AuthType
+	Plain   AuthType
 	CRAMMD5 AuthType
+	Unknown AuthType
+	Enum    plugin.EnumFormatter
 }
 
 var Auth = &authType{
 	None: 0,
 	Plain : 1,
 	CRAMMD5: 2,
+	Unknown: 3,
+	Enum: plugin.EnumFormatter{
+		Names: []string {
+			"None",
+			"Plain",
+			"CRAMMD5",
+			"Unknown",
+		},
+	},
 }
 
-func String(at AuthType) string {
-	switch at {
-		case Auth.None: return "None"
-		case Auth.Plain : return "Plain"
-		case Auth.CRAMMD5: return "CRAMMD5"
-		default: return "Unknown"
-	}
+func (at AuthType) String() string {
+	return Auth.Enum.Print(int(at))
+}
+
+func ParseAuth(s string) AuthType {
+	return AuthType(Auth.Enum.Parse(s))
 }
 
 const URLPattern = "^smtp://([^:]+):([^@]+)@([^:]+):([1-9][0-9]*)/\\?(.*)$"
 const URLFormat = "smtp://%s:%s@%s:%d/?fromAddress=%s&fromName=%s&toAddresses=%s"
+const Scheme = "smtp"

@@ -2,7 +2,9 @@ package slack
 
 import (
     "errors"
+    "fmt"
     "regexp"
+    "strings"
 )
 
 // Token is a three part string split into A, B and C
@@ -50,4 +52,17 @@ func matchesPattern(pattern string, part string) bool {
         return false
     }
     return true
+}
+
+func (t Token) String() string {
+    return fmt.Sprintf("%s-%s-%s", t.A, t.B, t.C)
+}
+
+func ParseToken(s string) Token {
+    parts := strings.Split(s,"-")
+    return Token{
+        A: parts[0],
+        B: parts[1],
+        C: parts[2],
+    }
 }

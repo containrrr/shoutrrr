@@ -18,3 +18,6 @@ func ExtractArguments(url string) ([]string, error) {
     }
     return strings.Split(match[1], "/"), nil
 }
+
+
+

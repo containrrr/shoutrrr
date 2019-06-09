@@ -5,14 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/plugin"
 	"net/http"
+	"net/url"
 )
 
 // Plugin providing teams as a notification service
 type Plugin struct{}
 
 // Send a notification message to Microsoft Teams
-func (plugin *Plugin) Send(url string, message string) error {
+func (plugin *Plugin) Send(url url.URL, message string, opts plugin.PluginOpts) error {
 	config, err := plugin.CreateConfigFromURL(url)
 	if err != nil {
 		return err
@@ -20,6 +22,10 @@ func (plugin *Plugin) Send(url string, message string) error {
 
 	postURL := buildURL(config)
 	return plugin.doSend(postURL, message)
+}
+
+func (plugin *Plugin) GetConfig() plugin.PluginConfig {
+	return Config{}
 }
 
 func (plugin *Plugin) doSend(postURL string, message string) error {

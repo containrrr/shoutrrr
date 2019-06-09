@@ -1,8 +1,10 @@
 package teams
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 var uuid4Pattern = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
@@ -36,4 +38,21 @@ func isTokenCValid(token string) bool {
 func matchesRegexp(pattern string, token string) bool {
 	matched, err := regexp.MatchString(pattern, token)
 	return !matched || err != nil
+}
+
+func (t Token) String() string {
+	return fmt.Sprintf("%s-%s-%s", t.A, t.B, t.C)
+}
+
+func ParseToken(s string) (Token, error) {
+	parts := strings.Split(s,"-")
+	if !isTokenValid(parts) {
+		return Token{}, errors.New("invalid service url. malformed tokens")
+	}
+
+	return Token{
+		A: parts[0],
+		B: parts[1],
+		C: parts[2],
+	}, nil
 }

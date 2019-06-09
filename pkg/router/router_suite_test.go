@@ -22,19 +22,19 @@ var _ = Describe("the router suite", func() {
     When("extract service name is given a url", func() {
         It("should extract the protocol/service part", func() {
             url := "slack://invalid-part"
-            serviceName, err := router.ExtractServiceName(url)
+            serviceName, _, err := router.ExtractServiceName(url)
             Expect(err).ToNot(HaveOccurred())
             Expect(serviceName).To(Equal("slack"))
         })
         It("should return an error if the protocol/service part is missing", func() {
             url := "://invalid-part"
-            serviceName, err := router.ExtractServiceName(url)
+            serviceName, _, err := router.ExtractServiceName(url)
             Expect(err).To(HaveOccurred())
             Expect(serviceName).To(Equal(""))
         })
-        It("should return an error if the protocol/service part is containing non-alphabetic letters", func() {
-            url := "a12d://invalid-part"
-            serviceName, err := router.ExtractServiceName(url)
+        It("should return an error if the protocol/service part is containing invalid letters", func() {
+            url := "a d://invalid-part"
+            serviceName, _, err := router.ExtractServiceName(url)
             Expect(err).To(HaveOccurred())
             Expect(serviceName).To(Equal(""))
         })

@@ -1,14 +1,15 @@
 package router
 
 import (
-	"errors"
+	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/plugin"
 	"github.com/containrrr/shoutrrr/pkg/plugins/discord"
 	"github.com/containrrr/shoutrrr/pkg/plugins/pushover"
 	"github.com/containrrr/shoutrrr/pkg/plugins/slack"
+	"github.com/containrrr/shoutrrr/pkg/plugins/smtp"
 	"github.com/containrrr/shoutrrr/pkg/plugins/teams"
 	"github.com/containrrr/shoutrrr/pkg/plugins/telegram"
-	"github.com/containrrr/shoutrrr/pkg/plugins/smtp"
-	"regexp"
+	"net/url"
 	"strings"
 )
 
@@ -17,39 +18,44 @@ import (
 type ServiceRouter struct {}
 
 // ExtractServiceName from a notification URL
-func (router *ServiceRouter) ExtractServiceName(url string) (string, error) {
-	regex, err := regexp.Compile("^([a-zA-Z]+)://")
-	if err != nil {
-		return "", errors.New("could not compile regex")
+func (router *ServiceRouter) ExtractServiceName(rawUrl string) (string, url.URL, error) {
+	if u, err := url.Parse(rawUrl); err != nil {
+		return "", url.URL{}, err
+	} else {
+		return u.Scheme, *u, nil
 	}
-	match := regex.FindStringSubmatch(url)
-	if len(match) <= 1 {
-		return "", errors.New("could not find any service part")
-	}
-	return match[1], nil
 }
 
 
 // Route a message to a specific notification service using the notification URL
-func (router *ServiceRouter) Route(url string, message string) error {
-	svc, err := router.ExtractServiceName(url)
+func (router *ServiceRouter) Route(rawUrl string, message string, opts plugin.PluginOpts) error {
+	svc, url, err := router.ExtractServiceName(rawUrl)
 	if err != nil {
 		return err
 	}
 
-	switch strings.ToLower(svc) {
-	case "discord":
-		return (&discord.Plugin{}).Send(url, message)
-	case "pushover":
-		return (&pushover.Plugin{}).Send(url, message)
-	case "slack":
-		return (&slack.Plugin{}).Send(url, message)
-	case "teams":
-		return (&teams.Plugin{}).Send(url, message)
-	case "telegram":
-		return (&telegram.Plugin{}).Send(url, message)
-	case "smtp":
-		return (&smtp.Plugin{}).Send(url, message)
+	if service, err := router.Locate(svc); err != nil {
+		return err
+	} else {
+		return service.Send(url, message, opts)
 	}
-	return errors.New("unknown service")
+}
+
+var plugins = map[string]plugin.Plugin {
+	"discord":	&discord.Plugin{},
+	"pushover":	&pushover.Plugin{},
+	"slack":	&slack.Plugin{},
+	"teams":	&teams.Plugin{},
+	"telegram":	&telegram.Plugin{},
+	"smtp":	&smtp.Plugin{},
+}
+
+func (router *ServiceRouter) Locate(serviceScheme string) (plugin.Plugin, error) {
+
+	service, valid := plugins[strings.ToLower(serviceScheme)]
+	if !valid {
+		return nil, fmt.Errorf("unknown service scheme '%s'", serviceScheme)
+	}
+
+	return service, nil
 }
