@@ -26,17 +26,11 @@
       alt="license"
       src="https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square"
     />
-    <a href="https://beerpay.io/containrrr/shoutrrr">
-      <img
-        alt="beerpay wish"
-        src="https://beerpay.io/containrrr/shoutrrr/make-wish.svg"
-      />
-    </a>
-      <a href="https://beerpay.io/containrrr/shoutrrr">
-      <img
-        alt="beerpay wish"
-        src="https://beerpay.io/containrrr/shoutrrr/badge.svg?style=flat-square"
-      />
+    <a href="https://godoc.org/github.com/containrrr/shoutrrr">
+        <img
+           src="https://godoc.org/github.com/containrrr/shoutrrr?status.svg"
+           alt="GoDoc"
+        />
     </a>
 </p>
 
