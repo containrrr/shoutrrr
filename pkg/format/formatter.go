@@ -2,13 +2,13 @@ package format
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/plugin"
+	"github.com/containrrr/shoutrrr/pkg/types"
     "github.com/fatih/color"
 	"reflect"
 	"strings"
 )
 
-func GetConfigMap(config plugin.PluginConfig) map[string]string {
+func GetConfigMap(config types.ServiceConfig) map[string]string {
 	formatter := Formatter{
 		EnumFormatters: config.Enums(),
 		MaxDepth: 10,
@@ -23,7 +23,7 @@ var colorizeNumber = color.New(color.FgHiCyan).SprintFunc()
 var colorizeString = color.New(color.FgHiYellow).SprintFunc()
 
 type Formatter struct {
-	EnumFormatters map[string]plugin.EnumFormatter
+	EnumFormatters map[string]types.EnumFormatter
 	MaxDepth uint8
 	Errors []error
 }
@@ -87,9 +87,9 @@ func (fmtr *Formatter) getFieldValueString(field reflect.Value, depth uint8) str
 		val := field.Bool()
 		if val {
 			return colorizeTrue(PrintBool(val))
-		} else {
-			return colorizeFalse(PrintBool(val))
 		}
+		return colorizeFalse(PrintBool(val))
+
 
 	case reflect.Slice:
 		fallthrough

@@ -25,9 +25,10 @@ func ParseBool(value string, defaultValue bool)  bool {
 }
 
 func PrintBool(value bool) string {
-    if(value) {
+    if value {
         return "Yes"
-    } else {
-        return "No"
     }
+
+    return "No"
+
 }

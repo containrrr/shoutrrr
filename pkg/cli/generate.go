@@ -32,15 +32,16 @@ func Generate() Action {
 
 			serviceRouter := router.ServiceRouter{}
 
-			if service, err := serviceRouter.Locate(serviceSchema); err != nil {
+			service, err := serviceRouter.Locate(serviceSchema)
+			if err != nil {
 				fmt.Printf("invalid service schema '%s'\n", serviceSchema)
 				return 2
-			} else {
-				config := service.GetConfig()
-				configFormat := format.GetConfigMap(config) // TODO: GetConfigFormat
-				for key, format := range configFormat {
-					fmt.Printf("%s: %s", key, format)
-				}
+			}
+
+			config := service.GetConfig()
+			configFormat := format.GetConfigMap(config) // TODO: GetConfigFormat
+			for key, format := range configFormat {
+				fmt.Printf("%s: %s", key, format)
 			}
 
 			return 1

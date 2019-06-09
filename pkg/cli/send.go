@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/containrrr/shoutrrr"
-	"github.com/containrrr/shoutrrr/pkg/plugin"
+	"github.com/containrrr/shoutrrr/pkg/services"
 	"log"
 	"os"
 	"strings"
@@ -36,15 +36,18 @@ func Send() Action {
 			fmt.Printf("Message: %s\n", message)
 
 
-			logger := plugin.DiscardLogger
+			var logger *log.Logger
+
 			if verbose {
 				logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
+			}  else {
+				logger = services.DiscardLogger
 			}
 
-			opts := plugin.PluginOpts{
-				Verbose: verbose,
-				Logger: logger,
-			}
+			opts := services.CreateServiceOpts(
+				logger,
+				verbose,
+				map[string]string {})
 
 			shoutrrr.Send(url, message, opts)
 
