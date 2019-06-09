@@ -3,7 +3,6 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"io"
 	"log"
@@ -31,29 +30,10 @@ func (plugin *Service) Send(serviceURL *url.URL, message string, opts types.Serv
 	return doSend(message, config)
 }
 
+// GetConfig returns an empty ServiceConfig for this Service
 func (plugin *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }
-
-func (plugin *Service) URLToStringMap(serviceURL *url.URL) (map[string]string, error) {
-	config, err := plugin.CreateConfigFromURL(serviceURL)
-	if err != nil {
-		return nil, err
-	}
-	return format.GetConfigMap(config), nil
-}
-
-func (plugin *Service) StringMapToURL(configMap map[string]string) (*url.URL, error) {
-	config := Config{}
-	for key, value := range configMap {
-		if key == "Auth" {
-			config.Auth = ParseAuth(value)
-		}
-	}
-	return config.GetURL(), nil
-}
-
-
 
 func doSend(message string, config *Config) error {
 
@@ -130,11 +110,11 @@ func doSend(message string, config *Config) error {
 func getAuth(config *Config) (smtp.Auth, error) {
 
 		switch config.Auth {
-			case Auth.None:
+			case authTypes.None:
 				return nil, nil
-			case Auth.Plain:
+			case authTypes.Plain:
 				return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
-			case Auth.CRAMMD5:
+			case authTypes.CRAMMD5:
 				return smtp.CRAMMD5Auth(config.Username, config.Password), nil
 			default:
 				return nil, fmt.Errorf("invalid authorization method '%s'", config.Auth.String())

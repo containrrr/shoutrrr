@@ -7,9 +7,9 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/router"
 )
 
-func Generate() Action {
+func generate() action {
 
-	action := Action {
+	action := action{
 		run: func(flags *flag.FlagSet) int {
 
 			if flags.NArg() < 1 {

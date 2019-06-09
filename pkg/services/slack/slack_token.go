@@ -58,6 +58,7 @@ func (t Token) String() string {
     return fmt.Sprintf("%s-%s-%s", t.A, t.B, t.C)
 }
 
+// ParseToken creates a Token from a sting representation
 func ParseToken(s string) Token {
     parts := strings.Split(s,"-")
     return Token{

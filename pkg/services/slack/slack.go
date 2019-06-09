@@ -34,6 +34,7 @@ func (plugin *Service) Send(serviceURL *url.URL, message string, opts types.Serv
     return plugin.doSend(config, message)
 }
 
+// GetConfig returns an empty ServiceConfig for this Service
 func (plugin *Service) GetConfig() types.ServiceConfig {
     return &Config{}
 }

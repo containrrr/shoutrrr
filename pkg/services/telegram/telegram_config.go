@@ -15,16 +15,19 @@ type Config struct {
 	Channels []string
 }
 
+// QueryFields returns the fields that are part of the Query of the service URL
 func (config *Config) QueryFields() []string {
 	return []string{
 		"channels",
 	}
 }
 
+// Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{}
 }
 
+// Get returns the value of a Query field
 func (config *Config) Get(key string) (string, error) {
 	switch key {
 	case "channels":
@@ -33,6 +36,7 @@ func (config *Config) Get(key string) (string, error) {
 	return "", fmt.Errorf("invalid query key \"%s\"", key)
 }
 
+// Set updates the value of a Query field
 func (config *Config) Set(key string, value string) error {
 	switch key {
 	case "channels":
@@ -43,6 +47,7 @@ func (config *Config) Set(key string, value string) error {
 	return nil
 }
 
+// GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 
 	return &url.URL{
@@ -55,6 +60,7 @@ func (config *Config) GetURL() *url.URL {
 
 }
 
+// SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
 
 	password, _ := url.User.Password()
@@ -77,6 +83,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
+// Scheme is the identifying part of this service's configuration URL
 const (
 	Scheme = "telegram"
 )

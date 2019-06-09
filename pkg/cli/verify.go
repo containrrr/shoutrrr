@@ -7,9 +7,9 @@ import (
 )
 
 
-func Verify() Action {
+func verify() action {
 
-	action := Action {
+	action := action{
 		run: func(flags *flag.FlagSet) int {
 
 			if flags.NArg() < 1 {

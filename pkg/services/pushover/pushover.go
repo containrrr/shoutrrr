@@ -38,6 +38,7 @@ func (plugin *Service) Send(url *netUrl.URL, message string, opts types.ServiceO
 	return err
 }
 
+// GetConfig returns an empty ServiceConfig for this Service
 func (plugin *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }

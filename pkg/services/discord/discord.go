@@ -35,10 +35,7 @@ func (plugin *Service) Send(rawURL *url.URL, message string, opts types.ServiceO
 	return doSend(payload, postURL)
 }
 
-func (plugin *Service) URLToStringMap(url url.URL) (map[string]string, error) {
-	return map[string]string {}, nil
-}
-
+// GetConfig returns an empty ServiceConfig for this Service
 func (plugin *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }

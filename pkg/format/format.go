@@ -10,7 +10,7 @@ const (
     Markdown NotifyFormat = 0
 )
 
-
+// ParseBool returns true for "1","true","yes" or false for "0","false","no" or defaultValue for any other value
 func ParseBool(value string, defaultValue bool)  bool {
     switch strings.ToLower(value) {
     case "true": fallthrough
@@ -24,6 +24,7 @@ func ParseBool(value string, defaultValue bool)  bool {
     }
 }
 
+// PrintBool returns "Yes" if value is true, otherwise returns "No"
 func PrintBool(value bool) string {
     if value {
         return "Yes"

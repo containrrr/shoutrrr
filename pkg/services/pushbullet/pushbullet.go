@@ -2,12 +2,14 @@ package pushbullet
 
 import "regexp"
 
+// Service providing Pushbullet as a notification service
 type Service struct {}
 
 var (
 	serviceURL = "https://api.pushbullet.com/v2/pushes"
 )
 
+// Send ...
 func (plugin *Service) Send(url string, message string) error {
 	config, err := CreateConfigFromURL(url)
 	if err != nil {
@@ -53,11 +55,14 @@ func getTargetType(target string) (TargetType, error) {
 	}
 }
 
-
+// TargetType ...
 type TargetType int
 
 const (
+	// EmailTarget ...
 	EmailTarget TargetType = 1
+	// ChannelTarget ...
 	ChannelTarget TargetType = 2
+	// DeviceTarget ...
 	DeviceTarget TargetType = 3
 )

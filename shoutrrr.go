@@ -20,6 +20,8 @@ func Send(rawURL string, message string, opts types.ServiceOpts) error {
 	}
 }
 
+
+// Verify lets you verify that a configuration URL is valid and see what configuration it would map to
 func Verify(rawURL string) error {
 
 	routing := router.ServiceRouter{}

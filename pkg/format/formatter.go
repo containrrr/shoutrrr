@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
+// GetConfigMap returns a string map of a given Config struct
 func GetConfigMap(config types.ServiceConfig) map[string]string {
-	formatter := Formatter{
+	formatter := formatter{
 		EnumFormatters: config.Enums(),
 		MaxDepth: 10,
 	}
@@ -22,13 +23,13 @@ var colorizeFalse = color.New(color.FgHiRed).SprintFunc()
 var colorizeNumber = color.New(color.FgHiCyan).SprintFunc()
 var colorizeString = color.New(color.FgHiYellow).SprintFunc()
 
-type Formatter struct {
+type formatter struct {
 	EnumFormatters map[string]types.EnumFormatter
 	MaxDepth uint8
 	Errors []error
 }
 
-func (fmtr *Formatter) getStructMap(structItem interface{}, depth uint8) map[string]string {
+func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) map[string]string {
 	values := reflect.ValueOf(structItem).Elem()
 	defs := reflect.TypeOf(structItem).Elem()
 	numFields := values.NumField()
@@ -60,7 +61,7 @@ func (fmtr *Formatter) getStructMap(structItem interface{}, depth uint8) map[str
 	return valueMap
 }
 
-func (fmtr *Formatter) getFieldValueString(field reflect.Value, depth uint8) string {
+func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) string {
 
 	nextDepth := depth + 1
 	kind := field.Kind()

@@ -52,6 +52,7 @@ var services = map[string]types.Service {
 	"smtp":	&smtp.Service{},
 }
 
+// Locate returns the service implementation that corresponds to the given scheme
 func (router *ServiceRouter) Locate(serviceScheme string) (types.Service, error) {
 
 	service, valid := services[strings.ToLower(serviceScheme)]

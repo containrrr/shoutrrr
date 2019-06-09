@@ -9,6 +9,7 @@ import (
 
 var actionWords = [...]string {"send", "verify", "generate"}
 
+// ExitCodeUsage is used to signify that the command was not properly invoked
 const ExitCodeUsage = 64
 const mainUsage = "%s <ActionVerb> [...]\n"
 
@@ -27,15 +28,15 @@ func main() {
 
 	actionResult := 1025
 	actionWord := os.Args[1]
-	var action Action
+	var action action
 
 	switch actionWord {
 	case "send":
-		action = Send()
+		action = send()
 	case "verify":
-		action = Verify()
+		action = verify()
 	case "generate":
-		action = Generate()
+		action = generate()
 	default:
 		showMainUsage()
 		return
@@ -65,12 +66,12 @@ func showMainUsage() {
 }
 
 
-type Action struct {
+type action struct {
 	run func(flags *flag.FlagSet) int
 	FlagSet flag.FlagSet
 	Usage string
 }
 
-func (a *Action) Run() int {
+func (a *action) Run() int {
 	return a.run(&a.FlagSet)
 }

@@ -10,22 +10,22 @@ import (
 	"strings"
 )
 
-// Config is the configuration needed to send discord notifications
+// Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
-	Host        string `desc:"SMTP server hostname or IP address"`
-	Username    string `desc:"authentication username"`
-	Password    string `desc:"authentication password or hash"`
-	Port        uint16 `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
-	FromAddress string `desc:"e-mail address that the mail are sent from"`
-	FromName    string `desc:"name of the sender" optional:"yes"`
+	Host        string   `desc:"SMTP server hostname or IP address"`
+	Username    string   `desc:"authentication username"`
+	Password    string   `desc:"authentication password or hash"`
+	Port        uint16   `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
+	FromAddress string   `desc:"e-mail address that the mail are sent from"`
+	FromName    string   `desc:"name of the sender" optional:"yes"`
 	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
-	Subject     string `desc:"the subject of the sent mail"`
-	Auth        AuthType `desc:"SMTP authentication method"`
-	UseStartTLS bool `desc:"attempt to use SMTP StartTLS encryption" default:"true"`
-	UseHTML     bool `desc:"whether the message being sent is in HTML" default:"false"`
+	Subject     string   `desc:"the subject of the sent mail"`
+	Auth        authType `desc:"SMTP authentication method"`
+	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"true"`
+	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"false"`
 }
 
-// GetURL takes a discord config object and creates a post url
+// GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 
 	return &url.URL{
@@ -39,6 +39,7 @@ func (config *Config) GetURL() *url.URL {
 
 }
 
+// SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
 	hostParts := strings.Split(url.Host, ":")
 	host := hostParts[0]
@@ -70,6 +71,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
+// QueryFields returns the fields that are part of the Query of the service URL
 func (config *Config) QueryFields() []string {
 	return []string {
 	"fromAddress",
@@ -82,6 +84,7 @@ func (config *Config) QueryFields() []string {
 	}
 }
 
+// Get returns the value of a Query field
 func (config *Config) Get(key string) (string, error) {
 	switch key {
 	case "fromAddress":
@@ -102,6 +105,7 @@ func (config *Config) Get(key string) (string, error) {
 	return "", fmt.Errorf("invalid query key \"%s\"", key)
 }
 
+// Set updates the value of a Query field
 func (config *Config) Set(key string, value string) error {
 	switch key {
 	case "fromAddress":
@@ -111,7 +115,7 @@ func (config *Config) Set(key string, value string) error {
 	case "toAddresses":
 		config.ToAddresses = strings.Split(value, ",")
 	case "auth":
-		config.Auth = ParseAuth(value)
+		config.Auth = parseAuth(value)
 	case "subject":
 		config.Subject = value
 	case "startTls":
@@ -133,42 +137,12 @@ func (plugin *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
 	return config, err
 }
 
+// Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth": Auth.Enum,
+		"authTypes": authTypes.Enum,
 	}
 }
 
-type AuthType int
-
-type authType struct {
-	None    AuthType
-	Plain   AuthType
-	CRAMMD5 AuthType
-	Unknown AuthType
-	Enum    types.EnumFormatter
-}
-
-var Auth = &authType{
-	None: 0,
-	Plain : 1,
-	CRAMMD5: 2,
-	Unknown: 3,
-	Enum: format.CreateEnumFormatter(
-		[]string {
-			"None",
-			"Plain",
-			"CRAMMD5",
-			"Unknown",
-		}),
-}
-
-func (at AuthType) String() string {
-	return Auth.Enum.Print(int(at))
-}
-
-func ParseAuth(s string) AuthType {
-	return AuthType(Auth.Enum.Parse(s))
-}
-
+// Scheme is the identifying part of this service's configuration URL
 const Scheme = "smtp"

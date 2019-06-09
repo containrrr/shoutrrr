@@ -44,6 +44,7 @@ func (t Token) String() string {
 	return fmt.Sprintf("%s-%s-%s", t.A, t.B, t.C)
 }
 
+// ParseToken creates a token from a string representation
 func ParseToken(s string) (Token, error) {
 	parts := strings.Split(s,"-")
 	if !isTokenValid(parts) {

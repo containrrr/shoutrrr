@@ -12,10 +12,10 @@ import (
 
 var verbose bool
 
-func Send() Action {
+func send() action {
 
 
-	action := Action {
+	action := action{
 		run: func(flags *flag.FlagSet) int {
 
 			if flags.NArg() < 2 {
