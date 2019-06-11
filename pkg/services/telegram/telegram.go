@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
 	"net/url"
@@ -17,10 +18,12 @@ const (
 
 
 // Service sends notifications to a given telegram chat
-type Service struct {}
+type Service struct {
+	standard.Standard
+}
 
 // Send notification to Telegram
-func (plugin *Service) Send(url *url.URL, message string, opts types.ServiceOpts) error {
+func (plugin *Service) Send(url *url.URL, message string, params *map[string]string) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}

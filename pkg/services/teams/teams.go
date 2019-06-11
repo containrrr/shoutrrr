@@ -5,31 +5,34 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
 	"net/url"
 )
 
 // Service providing teams as a notification service
-type Service struct{}
+type Service struct{
+	standard.Standard
+}
 
 // Send a notification message to Microsoft Teams
-func (plugin *Service) Send(url *url.URL, message string, opts types.ServiceOpts) error {
-	config, err := plugin.CreateConfigFromURL(url)
+func (service *Service) Send(url *url.URL, message string, params *map[string]string) error {
+	config, err := service.CreateConfigFromURL(url)
 	if err != nil {
 		return err
 	}
 
 	postURL := buildURL(config)
-	return plugin.doSend(postURL, message)
+	return service.doSend(postURL, message)
 }
 
 // GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+func (service *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }
 
-func (plugin *Service) doSend(postURL string, message string) error {
+func (service *Service) doSend(postURL string, message string) error {
 	body := JSON{
 		CardType: "MessageCard",
 		Context:  "http://schema.org/extensions",

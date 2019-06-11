@@ -1,7 +1,10 @@
 package pushbullet
 
+import "github.com/containrrr/shoutrrr/pkg/services/standard"
+
 // Config ...
 type Config struct {
+	standard.QuerylessConfig
 	Targets []string
 	Token   string
 }

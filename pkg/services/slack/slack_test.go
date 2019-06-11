@@ -1,7 +1,6 @@
 package slack_test
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services"
 	. "github.com/containrrr/shoutrrr/pkg/services/slack"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -36,7 +35,7 @@ var _ = Describe("the slack service", func() {
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
 
-			err := service.Send(serviceURL, "This is an integration test message", services.GetDefaultOpts())
+			err := service.Send(serviceURL, "This is an integration test message",nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -115,7 +114,7 @@ var _ = Describe("the slack service", func() {
 })
 
 func expectErrorMessageGivenUrl(msg ErrorMessage, slackUrl *url.URL) {
-	err := service.Send(slackUrl, "Hello", services.GetDefaultOpts())
+	err := service.Send(slackUrl, "Hello", nil)
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(Equal(string(msg)))
 }

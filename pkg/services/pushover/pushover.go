@@ -2,6 +2,7 @@ package pushover
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
 	netUrl "net/url"
@@ -15,10 +16,12 @@ const (
 )
 
 // Service providing the notification service Pushover
-type Service struct{}
+type Service struct{
+	standard.Standard
+}
 
 // Send a notification message to Pushover
-func (plugin *Service) Send(url *netUrl.URL, message string, opts types.ServiceOpts) error {
+func (service *Service) Send(url *netUrl.URL, message string, params *map[string]string) error {
 	config := Config{}
 	config.SetURL(url)
 	data := netUrl.Values{}
@@ -26,7 +29,7 @@ func (plugin *Service) Send(url *netUrl.URL, message string, opts types.ServiceO
 	data.Set("user", config.User)
 	data.Set("token", config.Token)
 	data.Set("message", message)
-	opts.Logger().Println(data.Encode())
+	service.Logln(data.Encode())
 
 	res, err := http.Post(
 		hookURL,
@@ -39,6 +42,6 @@ func (plugin *Service) Send(url *netUrl.URL, message string, opts types.ServiceO
 }
 
 // GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+func (service *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }

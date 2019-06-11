@@ -3,13 +3,16 @@ package discord
 import (
 	"bytes"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
 	"net/url"
 )
 
 // Service providing Discord as a notification service
-type Service struct {}
+type Service struct {
+	standard.Standard
+}
 
 const (
 	hookURL   = "https://discordapp.com/api/webhooks"
@@ -17,7 +20,7 @@ const (
 )
 
 // Send a notification message to discord
-func (plugin *Service) Send(rawURL *url.URL, message string, opts types.ServiceOpts) error {
+func (plugin *Service) Send(rawURL *url.URL, message string, params *map[string]string) error {
 	config, err := plugin.CreateConfigFromURL(rawURL)
 	if err != nil {
 		return err

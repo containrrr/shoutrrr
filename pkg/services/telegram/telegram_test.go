@@ -2,7 +2,6 @@ package telegram_test
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services"
 	"net/url"
 	"os"
 	"strings"
@@ -35,7 +34,7 @@ var _ = Describe("the telegram plugin", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envTelegramUrl)
-			err := telegram.Send(serviceURL, "This is an integration test message", services.GetDefaultOpts())
+			err := telegram.Send(serviceURL, "This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 		When("given a message that exceeds the max length", func() {
@@ -50,7 +49,7 @@ var _ = Describe("the telegram plugin", func() {
 					builder.WriteString(hundredChars)
 				}
 
-				err := telegram.Send(serviceURL, builder.String(), services.GetDefaultOpts())
+				err := telegram.Send(serviceURL, builder.String(), nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -61,7 +60,7 @@ var _ = Describe("the telegram plugin", func() {
 			It("should generate a 401", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
 				message := "this is a perfectly valid message"
-				err := telegram.Send(serviceURL, message, services.GetDefaultOpts())
+				err := telegram.Send(serviceURL, message, nil)
 				Expect(err).To(HaveOccurred())
 				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())

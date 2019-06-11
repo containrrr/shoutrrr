@@ -2,34 +2,15 @@ package discord
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 )
 
 // Config is the configuration needed to send discord notifications
 type Config struct {
+	standard.QuerylessConfig
 	Channel string
 	Token string
-}
-
-// QueryFields returns the fields that are part of the Query of the service URL
-func (config Config) QueryFields() []string {
-	return []string{}
-}
-
-// Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config Config) Enums() map[string]types.EnumFormatter {
-	return map[string]types.EnumFormatter{}
-}
-
-// Get returns the value of a Query field
-func (config Config) Get(string) (string, error) {
-	return "", nil
-}
-
-// Set updates the value of a Query field
-func (config Config) Set(string, string) error {
-	return nil
 }
 
 // GetURL returns a URL representation of it's current field values

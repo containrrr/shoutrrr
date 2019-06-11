@@ -9,13 +9,20 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"log"
 	"net/url"
 	"strings"
 )
 
-
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
-type ServiceRouter struct {}
+type ServiceRouter struct {
+	logger *log.Logger
+}
+
+// SetLogger sets the logger that the services will use to write progress logs
+func (router *ServiceRouter) SetLogger(logger *log.Logger) {
+	router.logger = logger
+}
 
 // ExtractServiceName from a notification URL
 func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL, error) {
@@ -40,10 +47,10 @@ func (router *ServiceRouter) Route(rawURL string, message string, opts types.Ser
 		return err
 	}
 
-	return service.Send(url, message, opts)
+	return service.Send(url, message, nil)
 }
 
-var services = map[string]types.Service {
+var serviceMap = map[string]types.Service {
 	"discord":	&discord.Service{},
 	"pushover":	&pushover.Service{},
 	"slack":	&slack.Service{},
@@ -52,13 +59,15 @@ var services = map[string]types.Service {
 	"smtp":	&smtp.Service{},
 }
 
-// Locate returns the service implementation that corresponds to the given scheme
+// Locate returns the service implementation that corresponds to the given
 func (router *ServiceRouter) Locate(serviceScheme string) (types.Service, error) {
 
-	service, valid := services[strings.ToLower(serviceScheme)]
+	service, valid := serviceMap[strings.ToLower(serviceScheme)]
 	if !valid {
 		return nil, fmt.Errorf("unknown service scheme '%s'", serviceScheme)
 	}
+
+	service.SetLogger(router.logger)
 
 	return service, nil
 }

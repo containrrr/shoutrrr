@@ -2,35 +2,16 @@ package slack
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 	"strings"
 )
 
 // Config for the slack service
 type Config struct {
+	standard.QuerylessConfig
 	BotName string
 	Token   Token
-}
-
-// QueryFields returns the fields that are part of the Query of the service URL
-func (config *Config) QueryFields() []string {
-	return []string{}
-}
-
-// Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config *Config) Enums() map[string]types.EnumFormatter {
-	return map[string]types.EnumFormatter{}
-}
-
-// Get returns the value of a Query field
-func (config *Config) Get(string) (string, error) {
-	return "", nil
-}
-
-// Set updates the value of a Query field
-func (config *Config) Set(string, string) error {
-	return nil
 }
 
 // GetURL returns a URL representation of it's current field values

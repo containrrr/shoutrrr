@@ -1,7 +1,6 @@
 package pushover_test
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"net/url"
 	"os"
@@ -31,7 +30,7 @@ var _ = Describe("the pushover service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envPushoverURL.String())
-			err := service.Send(serviceURL, "this is an integration test", services.GetDefaultOpts())
+			err := service.Send(serviceURL, "this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

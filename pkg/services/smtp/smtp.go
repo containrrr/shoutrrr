@@ -3,39 +3,35 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"io"
-	"log"
 	"net/smtp"
 	"net/url"
 )
 
 // Service sends notifications to a given e-mail addresses via SMTP
 type Service struct {
-
+	standard.Standard
 }
 
-var verbose = false
-var logger *log.Logger
-
 // Send a notification message to discord
-func (plugin *Service) Send(serviceURL *url.URL, message string, opts types.ServiceOpts) error {
-	verbose = opts.Verbose()
-	logger = opts.Logger()
-	config, err := plugin.CreateConfigFromURL(serviceURL)
+func (service *Service) Send(serviceURL *url.URL, message string, params *map[string]string) error {
+
+	config, err := service.CreateConfigFromURL(serviceURL)
 	if err != nil {
 		return err
 	}
 
-	return doSend(message, config)
+	return service.doSend(message, config)
 }
 
 // GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+func (service *Service) GetConfig() types.ServiceConfig {
 	return &Config{}
 }
 
-func doSend(message string, config *Config) error {
+func (service *Service) doSend(message string, config *Config) error {
 
 	for _, toAddress := range config.ToAddresses {
 
@@ -99,9 +95,7 @@ func doSend(message string, config *Config) error {
 			return fmt.Errorf("error closing session: %s", err)
 		}
 
-		if verbose {
-			logger.Printf("Mail successfully sent to \"%s\"!\n", toAddress)
-		}
+		service.Logf("Mail successfully sent to \"%s\"!\n", toAddress)
 	}
 
 	return nil

@@ -1,7 +1,6 @@
 package discord_test
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services"
 	. "github.com/containrrr/shoutrrr/pkg/services/discord"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,11 +32,10 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
-			opts := services.GetDefaultOpts()
 			err := service.Send(
 				serviceURL,
 				"this is an integration test",
-				opts,
+				nil,
 				)
 			Expect(err).NotTo(HaveOccurred())
 		})

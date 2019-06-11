@@ -4,13 +4,16 @@ import (
     "bytes"
     "errors"
     "fmt"
+    "github.com/containrrr/shoutrrr/pkg/services/standard"
     "github.com/containrrr/shoutrrr/pkg/types"
     "net/http"
     "net/url"
 )
 
 // Service sends notifications to a pre-configured channel or user
-type Service struct {}
+type Service struct {
+    standard.Standard
+}
 
 const (
     apiURL    = "https://hooks.slack.com/services"
@@ -19,7 +22,7 @@ const (
 
 
 // Send a notification message to Slack
-func (plugin *Service) Send(serviceURL *url.URL, message string, opts types.ServiceOpts) error {
+func (service *Service) Send(serviceURL *url.URL, message string, params *map[string]string) error {
     config, err := CreateConfigFromURL(serviceURL)
     if err != nil {
         return err
@@ -31,16 +34,16 @@ func (plugin *Service) Send(serviceURL *url.URL, message string, opts types.Serv
         return errors.New("message exceeds max length")
     }
 
-    return plugin.doSend(config, message)
+    return service.doSend(config, message)
 }
 
 // GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+func (service *Service) GetConfig() types.ServiceConfig {
     return &Config{}
 }
 
-func (plugin *Service) doSend(config *Config, message string) error {
-    url := plugin.getURL(config)
+func (service *Service) doSend(config *Config, message string) error {
+    url := service.getURL(config)
     json, _ := CreateJSONPayload(config, message)
     res, err := http.Post(url, "application/json", bytes.NewReader(json))
 
@@ -50,7 +53,7 @@ func (plugin *Service) doSend(config *Config, message string) error {
     return err
 }
 
-func (plugin *Service) getURL(config *Config) string {
+func (service *Service) getURL(config *Config) string {
     return fmt.Sprintf(
         "%s/%s/%s/%s",
         apiURL,

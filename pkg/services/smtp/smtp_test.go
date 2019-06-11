@@ -2,7 +2,6 @@ package smtp_test
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services"
 	. "github.com/containrrr/shoutrrr/pkg/services/smtp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +19,6 @@ func TestSMTP(t *testing.T) {
 var (
 	service    *Service
 	envSMTPURL string
-	opts       *services.ServiceOpts
 	config     *Config
 )
 
@@ -29,11 +27,8 @@ var _ = Describe("the SMTP service", func() {
 	BeforeSuite(func() {
 		service = &Service{}
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
-		opts = services.CreateServiceOpts(
-				log.New(GinkgoWriter, "Test", log.LstdFlags),
-				true,
-				map[string]string {},
-			)
+		logger := log.New(GinkgoWriter, "Test", log.LstdFlags)
+		service.SetLogger(logger)
 	})
 	BeforeEach(func() {
 		config = &Config{}
@@ -46,7 +41,7 @@ var _ = Describe("the SMTP service", func() {
 			serviceURL, err := url.Parse(envSMTPURL)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = service.Send(serviceURL, "this is an integration test", opts)
+			err = service.Send(serviceURL, "this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

@@ -44,12 +44,8 @@ func send() action {
 				logger = services.DiscardLogger
 			}
 
-			opts := services.CreateServiceOpts(
-				logger,
-				verbose,
-				map[string]string {})
-
-			shoutrrr.Send(url, message, opts)
+			shoutrrr.SetLogger(logger)
+			shoutrrr.Send(url, message, nil)
 
 			return 1
 		},
