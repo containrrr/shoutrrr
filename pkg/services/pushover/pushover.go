@@ -5,7 +5,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
-	netUrl "net/url"
+	"net/url"
 	"strings"
 )
 
@@ -18,13 +18,14 @@ const (
 // Service providing the notification service Pushover
 type Service struct{
 	standard.Standard
+	configURL *url.URL
 }
 
 // Send a notification message to Pushover
-func (service *Service) Send(url *netUrl.URL, message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *map[string]string) error {
 	config := Config{}
-	config.SetURL(url)
-	data := netUrl.Values{}
+	config.SetURL(service.configURL)
+	data := url.Values{}
 	data.Set("device", config.Devices[0])
 	data.Set("user", config.User)
 	data.Set("token", config.Token)
@@ -41,7 +42,7 @@ func (service *Service) Send(url *netUrl.URL, message string, params *map[string
 	return err
 }
 
-// GetConfig returns an empty ServiceConfig for this Service
-func (service *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (service *Service) NewConfig() types.ServiceConfig {
 	return &Config{}
 }

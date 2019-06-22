@@ -6,12 +6,12 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
-	"net/url"
 )
 
 // Service providing Discord as a notification service
 type Service struct {
 	standard.Standard
+	config *Config
 }
 
 const (
@@ -20,11 +20,7 @@ const (
 )
 
 // Send a notification message to discord
-func (plugin *Service) Send(rawURL *url.URL, message string, params *map[string]string) error {
-	config, err := plugin.CreateConfigFromURL(rawURL)
-	if err != nil {
-		return err
-	}
+func (plugin *Service) Send(message string, params *map[string]string) error {
 
 	payload, err := CreateJSONToSend(message)
 	if err != nil {
@@ -32,14 +28,14 @@ func (plugin *Service) Send(rawURL *url.URL, message string, params *map[string]
 	}
 	fmt.Println(string(payload))
 
-	postURL := CreateAPIURLFromConfig(config)
+	postURL := CreateAPIURLFromConfig(plugin.config)
 	fmt.Println(postURL)
 
 	return doSend(payload, postURL)
 }
 
-// GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (plugin *Service) NewConfig() types.ServiceConfig {
 	return &Config{}
 }
 
@@ -52,12 +48,7 @@ func CreateAPIURLFromConfig(config *Config) string {
 		config.Token)
 }
 
-// CreateConfigFromURL creates a Config struct given a valid discord notification url
-func (plugin *Service) CreateConfigFromURL(rawURL *url.URL) (*Config, error) {
-	config := Config{}
-	err := config.SetURL(rawURL)
-	return &config, err
-}
+
 
 func doSend(payload []byte, postURL string) error {
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))

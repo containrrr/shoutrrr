@@ -8,7 +8,6 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/http"
-	"net/url"
 )
 
 const (
@@ -20,29 +19,26 @@ const (
 // Service sends notifications to a given telegram chat
 type Service struct {
 	standard.Standard
+	config *Config
 }
 
 // Send notification to Telegram
-func (plugin *Service) Send(url *url.URL, message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *map[string]string) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
-	config, err := plugin.CreateConfigFromURL(url)
-	if err != nil {
-		return err
-	}
 
-	return sendMessageForChatIDs(config, message)
+	return service.sendMessageForChatIDs(message)
 }
 
-// GetConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (service *Service) NewConfig() types.ServiceConfig {
 	return &Config{}
 }
 
-func sendMessageForChatIDs(config *Config, message string) error {
-	for _, channel := range config.Channels {
-		if err := sendMessageToAPI(message, channel, config.Token); err != nil {
+func (service *Service) sendMessageForChatIDs(message string) error {
+	for _, channel := range service.config.Channels {
+		if err := sendMessageToAPI(message, channel, service.config.Token); err != nil {
 			return err
 		}
 	}
@@ -62,14 +58,4 @@ func sendMessageToAPI(message string, channel string, apiToken string) error {
 		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", channel, res.Status)
 	}
 	return err
-}
-
-
-// CreateConfigFromURL to use within the telegram plugin
-func (plugin *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
-	config := Config{}
-	if err := config.SetURL(url); err != nil {
-		return &Config{}, err
-	}
-	return &config, nil
 }

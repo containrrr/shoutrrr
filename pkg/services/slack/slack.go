@@ -13,6 +13,7 @@ import (
 // Service sends notifications to a pre-configured channel or user
 type Service struct {
     standard.Standard
+    configURL *url.URL
 }
 
 const (
@@ -22,8 +23,8 @@ const (
 
 
 // Send a notification message to Slack
-func (service *Service) Send(serviceURL *url.URL, message string, params *map[string]string) error {
-    config, err := CreateConfigFromURL(serviceURL)
+func (service *Service) Send(message string, params *map[string]string) error {
+    config, err := CreateConfigFromURL(service.configURL)
     if err != nil {
         return err
     }
@@ -37,8 +38,8 @@ func (service *Service) Send(serviceURL *url.URL, message string, params *map[st
     return service.doSend(config, message)
 }
 
-// GetConfig returns an empty ServiceConfig for this Service
-func (service *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (service *Service) NewConfig() types.ServiceConfig {
     return &Config{}
 }
 

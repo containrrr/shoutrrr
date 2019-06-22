@@ -7,55 +7,45 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"io"
 	"net/smtp"
-	"net/url"
 )
 
 // Service sends notifications to a given e-mail addresses via SMTP
 type Service struct {
 	standard.Standard
+	config *Config
 }
 
-// Send a notification message to discord
-func (service *Service) Send(serviceURL *url.URL, message string, params *map[string]string) error {
-
-	config, err := service.CreateConfigFromURL(serviceURL)
-	if err != nil {
-		return err
-	}
-
-	return service.doSend(message, config)
-}
-
-// GetConfig returns an empty ServiceConfig for this Service
-func (service *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (service *Service) NewConfig() types.ServiceConfig {
 	return &Config{}
 }
 
-func (service *Service) doSend(message string, config *Config) error {
+// Send a notification message to discord
+func (service *Service) Send(message string, params *map[string]string) error {
+	config := service.config
+
+	client, err := smtp.Dial(fmt.Sprintf("%s:%d", config.Host, config.Port))
+	if err != nil {
+		return fmt.Errorf("error connecting to server: %s", err)
+	}
+
+	if config.UseStartTLS {
+		if err := client.StartTLS(&tls.Config{
+			ServerName: config.Host,
+		}); err != nil {
+			return fmt.Errorf("error enabling StartTLS message: %s", err)
+		}
+	}
+
+	if auth, err := service.getAuth(); err != nil {
+		return err
+	} else if auth != nil {
+		if err := client.Auth(auth); err != nil {
+			return fmt.Errorf("error authenticating: %s", err)
+		}
+	}
 
 	for _, toAddress := range config.ToAddresses {
-
-		client, err := smtp.Dial(fmt.Sprintf("%s:%d", config.Host, config.Port))
-		if err != nil {
-			return fmt.Errorf("error connecting to server: %s", err)
-		}
-
-		if config.UseStartTLS {
-			if err := client.StartTLS(&tls.Config{
-				ServerName: config.Host,
-			}); err != nil {
-				return fmt.Errorf("error enabling StartTLS message: %s", err)
-			}
-		}
-
-		if auth, err := getAuth(config); err != nil {
-			return err
-		} else if auth != nil {
-			if err := client.Auth(auth); err != nil {
-				return fmt.Errorf("error authenticating: %s", err)
-			}
-		}
-
 
 		// Set the sender and recipient first
 		if err := client.Mail(config.FromAddress); err != nil {
@@ -89,19 +79,22 @@ func (service *Service) doSend(message string, config *Config) error {
 			return fmt.Errorf("error closing message stream: %s", err)
 		}
 
-		// Send the QUIT command and close the connection.
-		err = client.Quit()
-		if err != nil {
-			return fmt.Errorf("error closing session: %s", err)
-		}
-
 		service.Logf("Mail successfully sent to \"%s\"!\n", toAddress)
+	}
+
+
+	// Send the QUIT command and close the connection.
+	err = client.Quit()
+	if err != nil {
+		return fmt.Errorf("error closing session: %s", err)
 	}
 
 	return nil
 }
 
-func getAuth(config *Config) (smtp.Auth, error) {
+func (service *Service) getAuth() (smtp.Auth, error) {
+
+		config := service.config
 
 		switch config.Auth {
 			case authTypes.None:

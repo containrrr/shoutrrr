@@ -45,7 +45,7 @@ func send() action {
 			}
 
 			shoutrrr.SetLogger(logger)
-			shoutrrr.Send(url, message, nil)
+			shoutrrr.Send(url, message)
 
 			return 1
 		},

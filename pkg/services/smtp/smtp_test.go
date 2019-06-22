@@ -20,6 +20,7 @@ var (
 	service    *Service
 	envSMTPURL string
 	config     *Config
+	logger     *log.Logger
 )
 
 var _ = Describe("the SMTP service", func() {
@@ -27,8 +28,7 @@ var _ = Describe("the SMTP service", func() {
 	BeforeSuite(func() {
 		service = &Service{}
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
-		logger := log.New(GinkgoWriter, "Test", log.LstdFlags)
-		service.SetLogger(logger)
+		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
 	BeforeEach(func() {
 		config = &Config{}
@@ -38,10 +38,13 @@ var _ = Describe("the SMTP service", func() {
 			if envSMTPURL == "" {
 				return
 			}
+
 			serviceURL, err := url.Parse(envSMTPURL)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = service.Send(serviceURL, "this is an integration test", nil)
+			service.Initialize(config, serviceURL, logger)
+
+			err = service.Send( "this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -73,7 +76,7 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err).To(HaveOccurred(), "verifying")
 			})
 		})
-		When("toAddresses are missing", func(){
+		When("toAddresses are missing", func() {
 			It("should return an error", func() {
 				testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com"
 

@@ -37,37 +37,52 @@ func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL
 
 // Route a message to a specific notification service using the notification URL
 func (router *ServiceRouter) Route(rawURL string, message string, opts types.ServiceOpts) error {
-	svc, url, err := router.ExtractServiceName(rawURL)
+
+	service, err := router.Locate(rawURL)
 	if err != nil {
 		return err
 	}
 
-	service, err := router.Locate(svc)
+	return service.Send(message, nil)
+}
+
+var serviceMap = map[string]func() types.Service {
+	"discord":	func() types.Service { return &discord.Service{} },
+	"pushover":	func() types.Service { return &pushover.Service{}},
+	"slack":	func() types.Service { return &slack.Service{}},
+	"teams":	func() types.Service { return &teams.Service{}},
+	"telegram":	func() types.Service { return &telegram.Service{}},
+	"smtp":	    func() types.Service { return &smtp.Service{}},
+}
+
+func (router *ServiceRouter) initService(rawURL string) (types.Service, types.ServiceConfig, error) {
+	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
-	return service.Send(url, message, nil)
-}
-
-var serviceMap = map[string]types.Service {
-	"discord":	&discord.Service{},
-	"pushover":	&pushover.Service{},
-	"slack":	&slack.Service{},
-	"teams":	&teams.Service{},
-	"telegram":	&telegram.Service{},
-	"smtp":	&smtp.Service{},
-}
-
-// Locate returns the service implementation that corresponds to the given
-func (router *ServiceRouter) Locate(serviceScheme string) (types.Service, error) {
-
-	service, valid := serviceMap[strings.ToLower(serviceScheme)]
+	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
 	if !valid {
-		return nil, fmt.Errorf("unknown service scheme '%s'", serviceScheme)
+		return nil, nil, fmt.Errorf("unknown service scheme '%s'", scheme)
 	}
 
-	service.SetLogger(router.logger)
+	service := serviceFactory()
 
-	return service, nil
+	config := service.NewConfig()
+
+	service.Initialize(config, configURL, router.logger)
+
+	return service, config, nil
+}
+
+// Locate returns the service implementation that corresponds to the given service URL
+func (router *ServiceRouter) Locate(rawURL string) (types.Service, error) {
+	service, _, err := router.initService(rawURL)
+	return service, err
+}
+
+// Parse returns the service implementation config that corresponds to the given service URL
+func (router *ServiceRouter) Parse(rawURL string) (types.ServiceConfig, error) {
+	_, config, err := router.initService(rawURL)
+	return config, err
 }

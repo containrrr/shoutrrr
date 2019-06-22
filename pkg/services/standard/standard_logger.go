@@ -1,7 +1,6 @@
 package standard
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services"
 	"log"
 )
 
@@ -10,14 +9,7 @@ type Logger struct {
 	logger *log.Logger
 }
 
-// SetLogger sets the logger interface for the service to the specified logger, or if nil to a discarding logger
-func (sl *Logger) SetLogger(logger *log.Logger) {
-	if logger == nil {
-		sl.logger = services.DiscardLogger
-	} else {
-		sl.logger = logger
-	}
-}
+
 
 // Logf maps to the service loggers Logger.Printf function
 func (sl *Logger) Logf(format string, v ...interface{}) {

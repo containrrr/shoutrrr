@@ -4,4 +4,5 @@ package standard
 type Standard struct {
 	Logger
 	Templater
+	Initializer
 }

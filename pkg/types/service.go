@@ -8,8 +8,8 @@ import (
 
 // Service is the common interface for all notification services
 type Service interface {
-	Send(serviceURL *url.URL, message string, params *map[string]string) error
-	GetConfig() ServiceConfig
-	SetLogger(logger *log.Logger)
+	Send(message string, params *map[string]string) error
+	NewConfig() ServiceConfig
+	Initialize(config ServiceConfig, serviceURL *url.URL, logger *log.Logger) error
 	ApplyTemplate(template string, params *map[string]string) (string, error)
 }

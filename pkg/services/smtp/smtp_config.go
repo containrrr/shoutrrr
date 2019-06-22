@@ -19,10 +19,10 @@ type Config struct {
 	FromAddress string   `desc:"e-mail address that the mail are sent from"`
 	FromName    string   `desc:"name of the sender" optional:"yes"`
 	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
-	Subject     string   `desc:"the subject of the sent mail"`
+	Subject     string   `desc:"the subject of the sent mail" tpl:"subject" default:"Shoutrrr Notification"`
 	Auth        authType `desc:"SMTP authentication method"`
-	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"true"`
-	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"false"`
+	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"Yes"`
+	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"No"`
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -119,9 +119,9 @@ func (config *Config) Set(key string, value string) error {
 	case "subject":
 		config.Subject = value
 	case "startTls":
-		config.UseStartTLS = format.ParseBool(value, true)
+		config.UseStartTLS, _ = format.ParseBool(value, true)
 	case "useHTML":
-		config.UseHTML = format.ParseBool(value, false)
+		config.UseHTML, _ = format.ParseBool(value, false)
 	default:
 		return fmt.Errorf("invalid query key \"%s\"", key)
 	}
@@ -140,7 +140,7 @@ func (plugin *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"authTypes": authTypes.Enum,
+		"Auth": authTypes.Enum,
 	}
 }
 

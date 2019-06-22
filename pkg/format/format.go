@@ -1,6 +1,9 @@
 package format
 
-import "strings"
+import (
+    "strconv"
+    "strings"
+)
 
 // NotifyFormat describes the format used in the notification body
 type NotifyFormat int
@@ -11,16 +14,16 @@ const (
 )
 
 // ParseBool returns true for "1","true","yes" or false for "0","false","no" or defaultValue for any other value
-func ParseBool(value string, defaultValue bool)  bool {
+func ParseBool(value string, defaultValue bool)  (bool, bool) {
     switch strings.ToLower(value) {
     case "true": fallthrough
     case "1": fallthrough
-    case "yes": return true
+    case "yes": return true, true
     case "false": fallthrough
     case "0": fallthrough
-    case "no": return false
+    case "no": return false, true
     default:
-        return  defaultValue
+        return  defaultValue, false
     }
 }
 
@@ -32,4 +35,9 @@ func PrintBool(value bool) string {
 
     return "No"
 
+}
+
+func IsNumber(value string) bool {
+    _, err := strconv.ParseFloat(value, 64)
+    return err == nil
 }

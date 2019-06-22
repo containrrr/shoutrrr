@@ -2,6 +2,7 @@ package telegram_test
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -20,11 +21,15 @@ func TestTelegram(t *testing.T) {
 var _ = Describe("the telegram plugin", func() {
 	var telegram *Service
 	var envTelegramUrl string
+	var logger *log.Logger
 
 	BeforeSuite(func() {
-		telegram = &Service{}
 		envTelegramUrl = os.Getenv("SHOUTRRR_TELEGRAM_URL")
+		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
+	})
 
+	BeforeEach(func() {
+		telegram = &Service{}
 	})
 
 
@@ -34,7 +39,8 @@ var _ = Describe("the telegram plugin", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envTelegramUrl)
-			err := telegram.Send(serviceURL, "This is an integration test message", nil)
+			telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+			err := telegram.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 		When("given a message that exceeds the max length", func() {
@@ -49,7 +55,8 @@ var _ = Describe("the telegram plugin", func() {
 					builder.WriteString(hundredChars)
 				}
 
-				err := telegram.Send(serviceURL, builder.String(), nil)
+				telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+				err := telegram.Send(builder.String(), nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -60,7 +67,9 @@ var _ = Describe("the telegram plugin", func() {
 			It("should generate a 401", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
 				message := "this is a perfectly valid message"
-				err := telegram.Send(serviceURL, message, nil)
+
+				telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+				err := telegram.Send( message, nil)
 				Expect(err).To(HaveOccurred())
 				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
@@ -71,13 +80,13 @@ var _ = Describe("the telegram plugin", func() {
 	Describe("creating configurations", func() {
 		When("given an url", func() {
 			It("should return an error if no arguments where supplied", func() {
-				expectErrorAndEmptyObject(telegram, "telegram://")
+				expectErrorAndEmptyObject(telegram, "telegram://", logger)
 			})
 			It("should return an error if the token has an invalid format", func() {
-				expectErrorAndEmptyObject(telegram, "telegram://invalid-token")
+				expectErrorAndEmptyObject(telegram, "telegram://invalid-token", logger)
 			})
 			It("should return an error if only the api token where supplied", func() {
-				expectErrorAndEmptyObject(telegram, "telegram://12345:mock-token@telegram")
+				expectErrorAndEmptyObject(telegram, "telegram://12345:mock-token@telegram", logger)
 			})
 			When("the url is valid", func() {
 				var config *Config
@@ -85,7 +94,8 @@ var _ = Describe("the telegram plugin", func() {
 
 				BeforeEach(func() {
 					serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
-					config, err = telegram.CreateConfigFromURL(serviceURL)
+					config := telegram.NewConfig()
+					err = telegram.Initialize(config, serviceURL, logger)
 				})
 
 				It("should create a config object", func() {
@@ -110,9 +120,10 @@ var _ = Describe("the telegram plugin", func() {
 	})
 })
 
-func expectErrorAndEmptyObject(telegram *Service, rawURL string) {
+func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Logger) {
 	serviceURL, _ := url.Parse(rawURL)
-	config, err := telegram.CreateConfigFromURL(serviceURL)
+	config := new(Config)
+	err := telegram.Initialize(config, serviceURL, logger)
 	Expect(err).To(HaveOccurred())
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Channels)).To(BeZero())

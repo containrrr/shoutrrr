@@ -38,8 +38,8 @@ func generate() action {
 				return 2
 			}
 
-			config := service.GetConfig()
-			configFormat := format.GetConfigMap(config) // TODO: GetConfigFormat
+			config := service.NewConfig()
+			configFormat, _ := format.GetConfigMap(config) // TODO: GetConfigFormat
 			for key, format := range configFormat {
 				fmt.Printf("%s: %s", key, format)
 			}

@@ -5,6 +5,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"log"
+	"strings"
 )
 
 var routing = router.ServiceRouter{}
@@ -15,39 +16,26 @@ func SetLogger(logger *log.Logger) {
 }
 
 // Send lets you send shoutrrr notifications using a supplied url and message
-func Send(rawURL string, message string, params *map[string]string) error {
-	if scheme, url, err := routing.ExtractServiceName(rawURL); err != nil {
-		return err
-	} else if plugin, err := routing.Locate(scheme); err != nil {
+func Send(rawURL string, message string) error {
+	if plugin, err := routing.Locate(rawURL); err != nil {
 		return err
 	} else {
-		return plugin.Send(url, message, params)
+		return plugin.Send(message, nil)
 	}
 }
 
 // Verify lets you verify that a configuration URL is valid and see what configuration it would map to
 func Verify(rawURL string) error {
 
-	routing := router.ServiceRouter{}
-
-	svc, url, err := routing.ExtractServiceName(rawURL)
+	config, err := routing.Parse(rawURL)
 	if err != nil {
 		return err
 	}
 
-	plugin, err := routing.Locate(svc)
-	if err != nil {
-		return err
-	}
-
-	config := plugin.GetConfig()
-	if err := config.SetURL(url); err != nil {
-		return err
-	}
-
-	configMap := format.GetConfigMap(config)
+	configMap, maxKeyLen := format.GetConfigMap(config)
 	for key, value := range configMap {
-		fmt.Printf("%s: %s\n", key, value)
+		pad := strings.Repeat(" ", maxKeyLen -len(key))
+		fmt.Printf("%s%s: %s\n", pad, key, value)
 	}
 
 	return nil

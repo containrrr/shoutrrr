@@ -14,11 +14,12 @@ import (
 // Service providing teams as a notification service
 type Service struct{
 	standard.Standard
+	configURL *url.URL
 }
 
 // Send a notification message to Microsoft Teams
-func (service *Service) Send(url *url.URL, message string, params *map[string]string) error {
-	config, err := service.CreateConfigFromURL(url)
+func (service *Service) Send(message string, params *map[string]string) error {
+	config, err := service.CreateConfigFromURL(service.configURL)
 	if err != nil {
 		return err
 	}
@@ -27,8 +28,8 @@ func (service *Service) Send(url *url.URL, message string, params *map[string]st
 	return service.doSend(postURL, message)
 }
 
-// GetConfig returns an empty ServiceConfig for this Service
-func (service *Service) GetConfig() types.ServiceConfig {
+// NewConfig returns an empty ServiceConfig for this Service
+func (service *Service) NewConfig() types.ServiceConfig {
 	return &Config{}
 }
 
