@@ -10,6 +10,7 @@ import (
 // Config for the slack service
 type Config struct {
 	standard.QuerylessConfig
+	standard.EnumlessConfig
 	BotName string
 	Token   Token
 }

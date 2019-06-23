@@ -9,6 +9,7 @@ import (
 // Config is the configuration needed to send discord notifications
 type Config struct {
 	standard.QuerylessConfig
+	standard.EnumlessConfig
 	Channel string
 	Token string
 }
