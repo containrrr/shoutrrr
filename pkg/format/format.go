@@ -37,6 +37,7 @@ func PrintBool(value bool) string {
 
 }
 
+// IsNumber returns whether the specified string is number-like
 func IsNumber(value string) bool {
     _, err := strconv.ParseFloat(value, 64)
     return err == nil

@@ -1,18 +1,19 @@
 package standard
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"log"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Logger is the standard implementation of SetLogger and provides the utility methods Log* that maps to Logger.Print*
+// Initializer is the standard implementation of Service.Initialize
 type Initializer struct {
 	logger *log.Logger
 }
 
-// SetLogger sets the logger interface for the service to the specified logger, or if nil to a discarding logger
+// Initialize sets the logger interface for the service to the specified logger and mutates config according to configURL
 func (si *Initializer) Initialize(config types.ServiceConfig, configURL *url.URL, logger *log.Logger) error {
 	if logger == nil {
 		si.logger = services.DiscardLogger

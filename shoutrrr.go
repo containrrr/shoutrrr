@@ -17,11 +17,12 @@ func SetLogger(logger *log.Logger) {
 
 // Send lets you send shoutrrr notifications using a supplied url and message
 func Send(rawURL string, message string) error {
-	if plugin, err := routing.Locate(rawURL); err != nil {
+	service, err := routing.Locate(rawURL);
+	if err != nil {
 		return err
-	} else {
-		return plugin.Send(message, nil)
 	}
+
+	return service.Send(message, nil)
 }
 
 // Verify lets you verify that a configuration URL is valid and see what configuration it would map to
