@@ -3,6 +3,8 @@ package smtp_test
 import (
 	"fmt"
 	. "github.com/containrrr/shoutrrr/pkg/services/smtp"
+	"github.com/containrrr/shoutrrr/pkg/util"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"log"
@@ -28,7 +30,7 @@ var _ = Describe("the SMTP service", func() {
 	BeforeSuite(func() {
 		service = &Service{}
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
-		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
+		logger = util.TestLogger()
 	})
 	BeforeEach(func() {
 		config = &Config{}

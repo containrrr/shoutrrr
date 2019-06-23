@@ -94,7 +94,7 @@ var _ = Describe("the telegram plugin", func() {
 
 				BeforeEach(func() {
 					serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
-					config := telegram.NewConfig()
+					config = new(Config)
 					err = telegram.Initialize(config, serviceURL, logger)
 				})
 
@@ -125,6 +125,7 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	config := new(Config)
 	err := telegram.Initialize(config, serviceURL, logger)
 	Expect(err).To(HaveOccurred())
+	fmt.Printf("Token: \"%+v\" \"%s\" \n", config.Token, config.Token)
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Channels)).To(BeZero())
 }

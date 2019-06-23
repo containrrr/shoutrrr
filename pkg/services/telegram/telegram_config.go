@@ -65,10 +65,11 @@ func (config *Config) SetURL(url *url.URL) error {
 
 	password, _ := url.User.Password()
 
-	config.Token = url.User.Username() + ":" + password
-	if !IsTokenValid(config.Token) {
-		return fmt.Errorf("invalid telegram token %s", config.Token)
+	token := url.User.Username() + ":" + password
+	if !IsTokenValid(token) {
+		return fmt.Errorf("invalid telegram token %s", token)
 	}
+
 
 	for key, vals := range url.Query() {
 		if err := config.Set(key, vals[0]); err != nil {
@@ -79,6 +80,8 @@ func (config *Config) SetURL(url *url.URL) error {
 	if len(config.Channels) < 1 {
 		return errors.New("no channels defined in config URL")
 	}
+
+	config.Token = token
 
 	return nil
 }

@@ -2,6 +2,8 @@ package discord_test
 
 import (
 	. "github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/util"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/url"
@@ -32,8 +34,8 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
+			service.Initialize(service.NewConfig(),serviceURL,util.TestLogger())
 			err := service.Send(
-				serviceURL,
 				"this is an integration test",
 				nil,
 				)
@@ -44,17 +46,17 @@ var _ = Describe("the discord service", func() {
 		When("given an url and a message", func() {
 			It("should return an error if no arguments where supplied", func() {
 				serviceURL, _ := url.Parse("discord://")
-				_, err := service.CreateConfigFromURL(serviceURL)
+				err := service.Initialize(service.NewConfig(), serviceURL, nil)
 				Expect(err).To(HaveOccurred())
 			})
 			It("should not return an error if exactly two arguments are given", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel")
-				_, err := service.CreateConfigFromURL(serviceURL)
+				err := service.Initialize(service.NewConfig(), serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
 			It("should return an error if more than two arguments are given", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/illegal-argument")
-				_, err := service.CreateConfigFromURL(serviceURL)
+				err := service.Initialize(service.NewConfig(), serviceURL, nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})
