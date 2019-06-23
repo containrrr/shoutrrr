@@ -2,9 +2,11 @@ package util_test
 
 import (
 	"testing"
-	. "github.com/containrrr/shoutrrr/pkg/util"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	. "github.com/containrrr/shoutrrr/pkg/util"
 )
 
 func TestUtil(t *testing.T) {
@@ -29,6 +31,15 @@ var _ = Describe("the util package", func() {
 			max := Max(a, b)
 
 			Expect(max).To(Equal(b))
+		})
+	})
+
+	When("calling function TestLogger", func() {
+		It("should not return nil", func() {
+			Expect(TestLogger()).NotTo(Equal(nil))
+		})
+		It("should have the prefix \"Test\"", func() {
+			Expect(TestLogger().Prefix()).To(Equal("Test"))
 		})
 	})
 })

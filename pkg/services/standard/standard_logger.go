@@ -4,12 +4,10 @@ import (
 	"log"
 )
 
-// Logger is the standard implementation of SetLogger and provides the utility methods Log* that maps to Logger.Print*
+// Logger provides the utility methods Log* that maps to Logger.Print*
 type Logger struct {
 	logger *log.Logger
 }
-
-
 
 // Logf maps to the service loggers Logger.Printf function
 func (sl *Logger) Logf(format string, v ...interface{}) {
