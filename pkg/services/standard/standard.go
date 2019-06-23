@@ -5,4 +5,5 @@ type Standard struct {
 	Logger
 	Templater
 	Initializer
+	QueuedSender
 }
