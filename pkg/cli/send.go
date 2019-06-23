@@ -19,8 +19,6 @@ func send() action {
 		run: func(flags *flag.FlagSet) int {
 
 			if flags.NArg() < 2 {
-				fmt.Println(flags.NArg())
-				fmt.Println(flags.Args())
 				return ExitCodeUsage
 			}
 
@@ -45,9 +43,14 @@ func send() action {
 			}
 
 			shoutrrr.SetLogger(logger)
-			shoutrrr.Send(url, message)
+			err := shoutrrr.Send(url, message)
 
-			return 1
+			if err != nil {
+				fmt.Printf("error invoking send: %s", err)
+				return 1
+			}
+
+			return 0
 		},
 		FlagSet: *flag.NewFlagSet("send", flag.ExitOnError),
 		Usage: "%s send [OPTIONS] <URL> <Message [...]>\n",

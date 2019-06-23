@@ -1,4 +1,4 @@
-package smtp_test
+package smtp
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	. "github.com/onsi/ginkgo"
@@ -22,19 +21,19 @@ func TestSMTP(t *testing.T) {
 var (
 	service    *Service
 	envSMTPURL string
-	config     *Config
 	logger     *log.Logger
 )
 
 var _ = Describe("the SMTP service", func() {
 
 	BeforeSuite(func() {
-		service = &Service{}
+
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 		logger = util.TestLogger()
 	})
 	BeforeEach(func() {
-		config = &Config{}
+		service = &Service{}
+
 	})
 	When("running integration tests", func() {
 		It("should work without errors", func() {
@@ -45,7 +44,7 @@ var _ = Describe("the SMTP service", func() {
 			serviceURL, err := url.Parse(envSMTPURL)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = service.Initialize(config, serviceURL, logger)
+			err = service.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
 
@@ -60,6 +59,7 @@ var _ = Describe("the SMTP service", func() {
 			url, err := url.Parse(testURL)
 			Expect(err).NotTo(HaveOccurred(),"parsing")
 
+			config := &Config{}
 			err = config.SetURL(url)
 			Expect(err).NotTo(HaveOccurred(),"verifying")
 
@@ -77,6 +77,7 @@ var _ = Describe("the SMTP service", func() {
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
+				config := &Config{}
 				err = config.SetURL(url)
 				Expect(err).To(HaveOccurred(), "verifying")
 			})
@@ -88,7 +89,7 @@ var _ = Describe("the SMTP service", func() {
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
-
+				config := &Config{}
 				err = config.SetURL(url)
 				Expect(err).To(HaveOccurred(), "verifying")
 			})

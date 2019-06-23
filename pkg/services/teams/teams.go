@@ -5,32 +5,36 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"log"
 	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Service providing teams as a notification service
 type Service struct{
 	standard.Standard
-	configURL *url.URL
+	config *Config
 }
 
 // Send a notification message to Microsoft Teams
 func (service *Service) Send(message string, params *map[string]string) error {
-	config, err := service.CreateConfigFromURL(service.configURL)
-	if err != nil {
-		return err
-	}
+	config := service.config
 
 	postURL := buildURL(config)
 	return service.doSend(postURL, message)
 }
 
-// NewConfig returns an empty ServiceConfig for this Service
-func (service *Service) NewConfig() types.ServiceConfig {
-	return &Config{}
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (service *Service) doSend(postURL string, message string) error {

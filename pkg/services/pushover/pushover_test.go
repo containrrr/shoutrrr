@@ -32,7 +32,7 @@ var _ = Describe("the pushover service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envPushoverURL.String())
-			service.Initialize(service.NewConfig(),serviceURL, util.TestLogger())
+			service.Initialize(serviceURL, util.TestLogger())
 			err := service.Send("this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})

@@ -5,12 +5,10 @@ import (
 	"net/url"
 )
 
-
-// Service is the common interface for all notification services
+// Service is the public common interface for all notification services
 type Service interface {
+	Initialize(serviceURL *url.URL, logger *log.Logger) error
 	Send(message string, params *map[string]string) error
-	NewConfig() ServiceConfig
-	Initialize(config ServiceConfig, serviceURL *url.URL, logger *log.Logger) error
 
 	// Queue methods
 	Enqueuef(format string, v ...interface{})

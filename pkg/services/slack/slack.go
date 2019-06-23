@@ -4,16 +4,17 @@ import (
     "bytes"
     "errors"
     "fmt"
-    "github.com/containrrr/shoutrrr/pkg/services/standard"
-    "github.com/containrrr/shoutrrr/pkg/types"
+    "log"
     "net/http"
     "net/url"
+
+    "github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Service sends notifications to a pre-configured channel or user
 type Service struct {
     standard.Standard
-    configURL *url.URL
+    config *Config
 }
 
 const (
@@ -24,10 +25,8 @@ const (
 
 // Send a notification message to Slack
 func (service *Service) Send(message string, params *map[string]string) error {
-    config, err := CreateConfigFromURL(service.configURL)
-    if err != nil {
-        return err
-    }
+    config := service.config
+
     if err := validateToken(config.Token); err != nil {
         return err
     }
@@ -38,15 +37,21 @@ func (service *Service) Send(message string, params *map[string]string) error {
     return service.doSend(config, message)
 }
 
-// NewConfig returns an empty ServiceConfig for this Service
-func (service *Service) NewConfig() types.ServiceConfig {
-    return &Config{}
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+    service.Logger.SetLogger(logger)
+    service.config = &Config{}
+    if err := service.config.SetURL(configURL); err != nil {
+        return err
+    }
+
+    return nil
 }
 
 func (service *Service) doSend(config *Config, message string) error {
-    url := service.getURL(config)
+    apiURL := service.getURL(config)
     json, _ := CreateJSONPayload(config, message)
-    res, err := http.Post(url, "application/json", bytes.NewReader(json))
+    res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 
     if res.StatusCode != http.StatusOK {
         return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)

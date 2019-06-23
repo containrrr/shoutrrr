@@ -36,7 +36,7 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			service.Initialize(service.NewConfig(),serviceURL,util.TestLogger())
+			service.Initialize(serviceURL,util.TestLogger())
 			err := service.Send( "This is an integration test message",nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -122,7 +122,7 @@ var _ = Describe("the slack service", func() {
 })
 
 func expectErrorMessageGivenUrl(msg ErrorMessage, slackUrl *url.URL) {
-	err := service.Initialize(service.NewConfig(), slackUrl, util.TestLogger())
+	err := service.Initialize( slackUrl, util.TestLogger())
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(Equal(string(msg)))
 }

@@ -39,7 +39,7 @@ var _ = Describe("the telegram plugin", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envTelegramUrl)
-			telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+			telegram.Initialize( serviceURL, logger)
 			err := telegram.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -55,7 +55,7 @@ var _ = Describe("the telegram plugin", func() {
 					builder.WriteString(hundredChars)
 				}
 
-				telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+				telegram.Initialize( serviceURL, logger)
 				err := telegram.Send(builder.String(), nil)
 				Expect(err).To(HaveOccurred())
 			})
@@ -68,7 +68,7 @@ var _ = Describe("the telegram plugin", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
 				message := "this is a perfectly valid message"
 
-				telegram.Initialize(telegram.NewConfig(), serviceURL, logger)
+				telegram.Initialize( serviceURL, logger)
 				err := telegram.Send( message, nil)
 				Expect(err).To(HaveOccurred())
 				fmt.Println(err.Error())
@@ -94,8 +94,8 @@ var _ = Describe("the telegram plugin", func() {
 
 				BeforeEach(func() {
 					serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
-					config = new(Config)
-					err = telegram.Initialize(config, serviceURL, logger)
+					err = telegram.Initialize(serviceURL, logger)
+					config = telegram.GetConfig()
 				})
 
 				It("should create a config object", func() {
@@ -122,9 +122,9 @@ var _ = Describe("the telegram plugin", func() {
 
 func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Logger) {
 	serviceURL, _ := url.Parse(rawURL)
-	config := new(Config)
-	err := telegram.Initialize(config, serviceURL, logger)
+	err := telegram.Initialize(serviceURL, logger)
 	Expect(err).To(HaveOccurred())
+	config := telegram.GetConfig()
 	fmt.Printf("Token: \"%+v\" \"%s\" \n", config.Token, config.Token)
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Channels)).To(BeZero())

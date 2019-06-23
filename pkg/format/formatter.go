@@ -6,10 +6,16 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/util"
 	"reflect"
 	"strings"
+	"unsafe"
 )
 
 // GetConfigMap returns a string map of a given Config struct
-func GetConfigMap(config types.ServiceConfig) (map[string]string, int) {
+func GetConfigMap(service types.Service) (map[string]string, int) {
+
+	cr := reflect.ValueOf(service).Elem().FieldByName("config")
+	cr = reflect.NewAt(cr.Type(), unsafe.Pointer(cr.UnsafeAddr())).Elem()
+	config := cr.Interface().(types.ServiceConfig)
+
 	formatter := formatter{
 		EnumFormatters: config.Enums(),
 		MaxDepth: 10,
@@ -26,8 +32,14 @@ type formatter struct {
 }
 
 func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[string]string, int) {
-	values := reflect.ValueOf(structItem).Elem()
-	defs := reflect.TypeOf(structItem).Elem()
+	defs := reflect.TypeOf(structItem)
+	values := reflect.ValueOf(structItem)
+
+	if defs.Kind() == reflect.Ptr {
+		values = values.Elem()
+		defs = defs.Elem()
+	}
+
 	numFields := values.NumField()
 	valueMap := make(map[string]string, numFields)
 	nextDepth := depth + 1
@@ -35,9 +47,13 @@ func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[st
 
 	for i := 0; i < numFields; i++ {
 		fieldDef := defs.Field(i)
+		if fieldDef.Anonymous {
+			// This is an embedded field, which should not be part of the Config output
+			continue
+		}
+
 		value := fmt.Sprintf("(%s)", fieldDef.Type.Name())
 		valueLen := len(value)
-
 
 		ef, isEnum := fmtr.EnumFormatters[fieldDef.Name];
 		if isEnum {

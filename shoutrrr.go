@@ -17,7 +17,7 @@ func SetLogger(logger *log.Logger) {
 
 // Send lets you send shoutrrr notifications using a supplied url and message
 func Send(rawURL string, message string) error {
-	service, err := routing.Locate(rawURL);
+	service, err := routing.Locate(rawURL)
 	if err != nil {
 		return err
 	}
@@ -28,12 +28,12 @@ func Send(rawURL string, message string) error {
 // Verify lets you verify that a configuration URL is valid and see what configuration it would map to
 func Verify(rawURL string) error {
 
-	config, err := routing.Parse(rawURL)
+	service, err := routing.Locate(rawURL)
 	if err != nil {
 		return err
 	}
 
-	configMap, maxKeyLen := format.GetConfigMap(config)
+	configMap, maxKeyLen := format.GetConfigMap(service)
 	for key, value := range configMap {
 		pad := strings.Repeat(" ", maxKeyLen -len(key))
 		fmt.Printf("%s%s: %s\n", pad, key, value)

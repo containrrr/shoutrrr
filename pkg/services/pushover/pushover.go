@@ -2,11 +2,12 @@ package pushover
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 
@@ -18,13 +19,13 @@ const (
 // Service providing the notification service Pushover
 type Service struct{
 	standard.Standard
-	configURL *url.URL
+	config *Config
 }
 
 // Send a notification message to Pushover
 func (service *Service) Send(message string, params *map[string]string) error {
-	config := Config{}
-	config.SetURL(service.configURL)
+	config := service.config
+
 	data := url.Values{}
 	data.Set("device", config.Devices[0])
 	data.Set("user", config.User)
@@ -42,7 +43,13 @@ func (service *Service) Send(message string, params *map[string]string) error {
 	return err
 }
 
-// NewConfig returns an empty ServiceConfig for this Service
-func (service *Service) NewConfig() types.ServiceConfig {
-	return &Config{}
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
+
+	return nil
 }

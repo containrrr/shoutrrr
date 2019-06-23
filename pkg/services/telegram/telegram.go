@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"log"
 	"net/http"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 const (
@@ -31,9 +33,15 @@ func (service *Service) Send(message string, params *map[string]string) error {
 	return service.sendMessageForChatIDs(message)
 }
 
-// NewConfig returns an empty ServiceConfig for this Service
-func (service *Service) NewConfig() types.ServiceConfig {
-	return &Config{}
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (service *Service) sendMessageForChatIDs(message string) error {
@@ -43,6 +51,11 @@ func (service *Service) sendMessageForChatIDs(message string) error {
 		}
 	}
 	return nil
+}
+
+// GetConfig returns the Config for the service
+func (service *Service) GetConfig() *Config {
+	return service.config
 }
 
 func sendMessageToAPI(message string, channel string, apiToken string) error {

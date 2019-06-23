@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
@@ -53,36 +54,32 @@ var serviceMap = map[string]func() types.Service {
 	"teams":	func() types.Service { return &teams.Service{}},
 	"telegram":	func() types.Service { return &telegram.Service{}},
 	"smtp":	    func() types.Service { return &smtp.Service{}},
+	"ifttt":    func() types.Service { return &ifttt.Service{}},
 }
 
-func (router *ServiceRouter) initService(rawURL string) (types.Service, types.ServiceConfig, error) {
+func (router *ServiceRouter) initService(rawURL string) (types.Service, error) {
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
 	if !valid {
-		return nil, nil, fmt.Errorf("unknown service scheme '%s'", scheme)
+		return nil, fmt.Errorf("unknown service scheme '%s'", scheme)
 	}
 
 	service := serviceFactory()
 
-	config := service.NewConfig()
+	err = service.Initialize(configURL, router.logger)
+	if err != nil {
+		return service, err
+	}
 
-	service.Initialize(config, configURL, router.logger)
-
-	return service, config, nil
+	return service, nil
 }
 
 // Locate returns the service implementation that corresponds to the given service URL
 func (router *ServiceRouter) Locate(rawURL string) (types.Service, error) {
-	service, _, err := router.initService(rawURL)
+	service, err := router.initService(rawURL)
 	return service, err
-}
-
-// Parse returns the service implementation config that corresponds to the given service URL
-func (router *ServiceRouter) Parse(rawURL string) (types.ServiceConfig, error) {
-	_, config, err := router.initService(rawURL)
-	return config, err
 }

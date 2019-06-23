@@ -34,7 +34,7 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
-			service.Initialize(service.NewConfig(),serviceURL,util.TestLogger())
+			service.Initialize(serviceURL,util.TestLogger())
 			err := service.Send(
 				"this is an integration test",
 				nil,
@@ -46,17 +46,17 @@ var _ = Describe("the discord service", func() {
 		When("given an url and a message", func() {
 			It("should return an error if no arguments where supplied", func() {
 				serviceURL, _ := url.Parse("discord://")
-				err := service.Initialize(service.NewConfig(), serviceURL, nil)
+				err := service.Initialize(serviceURL, nil)
 				Expect(err).To(HaveOccurred())
 			})
 			It("should not return an error if exactly two arguments are given", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel")
-				err := service.Initialize(service.NewConfig(), serviceURL, nil)
+				err := service.Initialize(serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
 			It("should return an error if more than two arguments are given", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/illegal-argument")
-				err := service.Initialize(service.NewConfig(), serviceURL, nil)
+				err := service.Initialize(serviceURL, nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})

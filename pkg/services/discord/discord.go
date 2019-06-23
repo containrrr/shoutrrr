@@ -3,9 +3,11 @@ package discord
 import (
 	"bytes"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"log"
 	"net/http"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Service providing Discord as a notification service
@@ -20,7 +22,7 @@ const (
 )
 
 // Send a notification message to discord
-func (plugin *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *map[string]string) error {
 
 	payload, err := CreateJSONToSend(message)
 	if err != nil {
@@ -28,15 +30,21 @@ func (plugin *Service) Send(message string, params *map[string]string) error {
 	}
 	fmt.Println(string(payload))
 
-	postURL := CreateAPIURLFromConfig(plugin.config)
+	postURL := CreateAPIURLFromConfig(service.config)
 	fmt.Println(postURL)
 
 	return doSend(payload, postURL)
 }
 
-// NewConfig returns an empty ServiceConfig for this Service
-func (plugin *Service) NewConfig() types.ServiceConfig {
-	return &Config{}
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url
