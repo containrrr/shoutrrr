@@ -2,15 +2,16 @@ package smtp_test
 
 import (
 	"fmt"
+	"log"
+	"net/url"
+	"os"
+	"testing"
+
 	. "github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"log"
-	"net/url"
-	"os"
-	"testing"
 )
 
 func TestSMTP(t *testing.T) {
@@ -44,7 +45,9 @@ var _ = Describe("the SMTP service", func() {
 			serviceURL, err := url.Parse(envSMTPURL)
 			Expect(err).NotTo(HaveOccurred())
 
-			service.Initialize(config, serviceURL, logger)
+			err = service.Initialize(config, serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
 
 			err = service.Send( "this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())

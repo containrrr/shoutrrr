@@ -3,11 +3,12 @@ package smtp
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config is the configuration needed to send e-mail notifications over SMTP
@@ -19,7 +20,7 @@ type Config struct {
 	FromAddress string   `desc:"e-mail address that the mail are sent from"`
 	FromName    string   `desc:"name of the sender" optional:"yes"`
 	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
-	Subject     string   `desc:"the subject of the sent mail" tpl:"subject" default:"Shoutrrr Notification"`
+	Subject     string   `desc:"the subject of the sent mail" param:"subject" default:"Shoutrrr Notification"`
 	Auth        authType `desc:"SMTP authentication method"`
 	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"Yes"`
 	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"No"`
@@ -126,15 +127,6 @@ func (config *Config) Set(key string, value string) error {
 		return fmt.Errorf("invalid query key \"%s\"", key)
 	}
 	return nil
-}
-
-// CreateConfigFromURL creates a Config struct given a valid discord notification url
-func (plugin *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
-
-	config := &Config{}
-	err := config.SetURL(url)
-
-	return config, err
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
