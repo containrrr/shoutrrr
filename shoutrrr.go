@@ -1,11 +1,11 @@
 package shoutrrr
 
 import (
-	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/router"
 	"log"
-	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/queue"
 )
 
 var routing = router.ServiceRouter{}
@@ -25,19 +25,23 @@ func Send(rawURL string, message string) error {
 	return service.Send(message, nil)
 }
 
-// Verify lets you verify that a configuration URL is valid and see what configuration it would map to
-func Verify(rawURL string) error {
+// CreateSender returns a notification sender configured according to the supplied URL
+func CreateSender(rawURL string) (types.Service, error) {
+	return routing.Locate(rawURL)
+}
 
+// CreateQueue returns a notification queued sender configured according to the supplied URL
+func CreateQueue(rawURL string) (types.QueuedSender, error) {
 	service, err := routing.Locate(rawURL)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	configMap, maxKeyLen := format.GetConfigMap(service)
-	for key, value := range configMap {
-		pad := strings.Repeat(" ", maxKeyLen -len(key))
-		fmt.Printf("%s%s: %s\n", pad, key, value)
-	}
+	return queue.GetQueued(service), nil
+}
 
-	return nil
+// Verify lets you verify that a configuration URL is valid
+func VerifyURL(rawURL string) error {
+	_, err := routing.Locate(rawURL)
+	return err
 }

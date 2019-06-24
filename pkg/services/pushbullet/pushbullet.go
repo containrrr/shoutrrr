@@ -1,26 +1,46 @@
 package pushbullet
 
-import "regexp"
+import (
+	"log"
+	"net/url"
+	"regexp"
 
-// Service providing Pushbullet as a notification service
-type Service struct {}
-
-var (
-	serviceURL = "https://api.pushbullet.com/v2/pushes"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Send ...
-func (plugin *Service) Send(url string, message string) error {
-	config, err := CreateConfigFromURL(url)
-	if err != nil {
-		return err
-	}
+// Service providing Pushbullet as a notification service
+type Service struct {
+	standard.Standard
+	config *Config
+}
 
+const (
+	serviceURL = "https://api.pushbullet.com/v2/pushes"
+	Scheme = "pushbullet"
+)
+
+var _ types.Service = &Service{}
+
+// Send ...
+func (service *Service) Send(message string, params *map[string]string) error {
+	config := service.config
 	for _, target := range config.Targets {
 		if err := doSend(config.Token, target, message); err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
+
 	return nil
 }
 

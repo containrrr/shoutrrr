@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"errors"
+"errors"
 )
 
 // QuerylessConfig implements the ServiceConfig interface for services that does not use Query fields
@@ -20,5 +20,5 @@ func (qc *QuerylessConfig) Get(string) (string, error) {
 
 // Set is a dummy function that will return an error if called
 func (qc *QuerylessConfig) Set(string, string) error {
-	return errors.New("service config does not support Get")
+	return errors.New("service config does not support Set")
 }

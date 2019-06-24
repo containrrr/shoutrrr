@@ -22,6 +22,10 @@ func (templater *Templater) SetTemplateString (id string, body string) error {
 	if err != nil {
 		return err
 	}
+	if templater.templates == nil {
+		templater.templates = make(map[string]*template.Template, 1)
+	}
+
 	templater.templates[id] = tpl
 	return nil
 }

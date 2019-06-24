@@ -1,19 +1,32 @@
 package pushbullet
 
-import "github.com/containrrr/shoutrrr/pkg/services/standard"
+import (
+	"errors"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
+)
 
 // Config ...
 type Config struct {
 	standard.QuerylessConfig
-	Targets []string
-	Token   string
+	standard.EnumlessConfig
+	Targets[] string
+	Token string
 }
 
-var (
-	minimumArguments = 2
-)
+// GetURL returns a URL representation of it's current field values
+func (config *Config) GetURL() *url.URL {
+	return &url.URL{
+		Host: config.Token,
+		Scheme: Scheme,
+		ForceQuery: false,
+	}
+}
 
-// CreateConfigFromURL ...
-func CreateConfigFromURL(url string) (*Config, error) {
-	return &Config {}, nil
+// SetURL updates a ServiceConfig from a URL representation of it's field values
+func (config *Config) SetURL(url *url.URL) error {
+
+
+	return errors.New("not implemented")
 }

@@ -3,7 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
+
 	"github.com/containrrr/shoutrrr"
+	"github.com/containrrr/shoutrrr/pkg/format"
 )
 
 
@@ -16,12 +19,17 @@ func verify() action {
 				return ExitCodeUsage
 			}
 
-
-			if err := shoutrrr.Verify(url); err != nil {
+			service, err := shoutrrr.CreateSender(url)
+			if err != nil {
 				fmt.Printf("error verifying URL: %s", err)
 				return 1
 			}
 
+			configMap, maxKeyLen := format.GetConfigMap(service)
+			for key, value := range configMap {
+				pad := strings.Repeat(" ", maxKeyLen -len(key))
+				fmt.Printf("%s%s: %s\n", pad, key, value)
+			}
 
 			return 0
 		},

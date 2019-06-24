@@ -1,6 +1,7 @@
 package util
 
 import (
+	"io/ioutil"
 	"log"
 
 	"github.com/onsi/ginkgo"
@@ -26,3 +27,6 @@ func Max(a int, b int) int {
 func TestLogger() *log.Logger {
 	return log.New(ginkgo.GinkgoWriter, "Test", log.LstdFlags)
 }
+
+// DiscardLogger is a logger that discards any output written to it
+var DiscardLogger = log.New(ioutil.Discard, "", 0)

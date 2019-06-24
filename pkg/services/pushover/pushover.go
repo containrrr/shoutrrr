@@ -31,7 +31,7 @@ func (service *Service) Send(message string, params *map[string]string) error {
 	data.Set("user", config.User)
 	data.Set("token", config.Token)
 	data.Set("message", message)
-	service.Logln(data.Encode())
+	service.Log(data.Encode())
 
 	res, err := http.Post(
 		hookURL,
