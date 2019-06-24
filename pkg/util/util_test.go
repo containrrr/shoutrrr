@@ -20,17 +20,15 @@ const b = 20
 var _ = Describe("the util package", func() {
 	When("calling function Min", func() {
 		It("should return the smallest of two integers", func() {
-			min := Min(a, b)
-
-			Expect(min).To(Equal(a))
+			Expect(Min(a, b)).To(Equal(a))
+			Expect(Min(b, a)).To(Equal(a))
 		})
 	})
 
 	When("calling function Max", func() {
 		It("should return the largest of two integers", func() {
-			max := Max(a, b)
-
-			Expect(max).To(Equal(b))
+			Expect(Max(a, b)).To(Equal(b))
+			Expect(Max(b, a)).To(Equal(b))
 		})
 	})
 
