@@ -3,18 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/containrrr/shoutrrr"
-	"github.com/containrrr/shoutrrr/pkg/services"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/containrrr/shoutrrr"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 var verbose bool
 
 func send() action {
-
-
 	action := action{
 		run: func(flags *flag.FlagSet) int {
 
@@ -22,24 +21,18 @@ func send() action {
 				return ExitCodeUsage
 			}
 
-			fmt.Printf("Args: %d\n", flags.NArg())
-
-			// Arg #0 is always the action verb
 			url := flags.Arg(0)
-
 			fmt.Printf("Url: %s\n", url)
 
 			message := strings.Join(flags.Args()[1:], " ")
-
 			fmt.Printf("Message: %s\n", message)
-
 
 			var logger *log.Logger
 
 			if verbose {
 				logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
 			}  else {
-				logger = services.DiscardLogger
+				logger = util.DiscardLogger
 			}
 
 			shoutrrr.SetLogger(logger)

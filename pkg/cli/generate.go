@@ -20,16 +20,6 @@ func generate() action {
 
 			fmt.Printf("Service: %s\n", serviceSchema)
 
-			//logger := DiscardLogger
-			//if verbose {
-			//	logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
-			//}
-			//
-			//opts := PluginOpts {
-			//	Verbose: verbose,
-			//	Logger: logger,
-			//}
-
 			serviceRouter := router.ServiceRouter{}
 
 			service, err := serviceRouter.Locate(serviceSchema)
@@ -46,7 +36,7 @@ func generate() action {
 			return 1
 		},
 		FlagSet: *flag.NewFlagSet("generate", flag.ExitOnError),
-		Usage: "%s send [OPTIONS] <URL> <Message [...]>\n",
+		Usage: "%s generate [OPTIONS] <service>\n",
 	}
 
 	// action.FlagSet.BoolVar(&verbose, "verbose", false, "display additional output")

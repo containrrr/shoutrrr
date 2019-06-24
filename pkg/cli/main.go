@@ -20,7 +20,6 @@ func usage(syntax string) {
 
 func main() {
 
-
 	if len(os.Args) < 2 {
 		showMainUsage()
 		return

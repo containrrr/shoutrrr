@@ -2,11 +2,12 @@ package format
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"reflect"
 	"strings"
 	"unsafe"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // GetConfigMap returns a string map of a given Config struct

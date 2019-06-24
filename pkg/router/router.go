@@ -2,6 +2,10 @@ package router
 
 import (
 	"fmt"
+	"log"
+	"net/url"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
@@ -10,9 +14,6 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"log"
-	"net/url"
-	"strings"
 )
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
