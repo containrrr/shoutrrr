@@ -46,7 +46,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if part A is not 9 letters", func() {
 			slackURL, err := url.Parse("slack://lol@12345678/123456789/123456789123456789123456")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenAMalformed,
 				slackURL,
 			)
@@ -54,7 +54,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if part B is not 9 letters", func() {
 			slackURL, err := url.Parse("slack://lol@123456789/12345678/123456789123456789123456")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenBMalformed,
 				slackURL,
 			)
@@ -62,7 +62,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if part C is not 24 letters", func() {
 			slackURL, err := url.Parse("slack://123456789/123456789/12345678912345678912345")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenCMalformed,
 				slackURL,
 			)
@@ -72,7 +72,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if the missing part is A", func() {
 			slackURL, err := url.Parse("slack://lol@/123456789/123456789123456789123456")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenAMissing,
 				slackURL,
 			)
@@ -80,7 +80,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if the missing part is B", func() {
 			slackURL, err := url.Parse("slack://lol@123456789//123456789")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenBMissing,
 				slackURL,
 			)
@@ -89,7 +89,7 @@ var _ = Describe("the slack service", func() {
 		It("should return an error if the missing part is C", func() {
 			slackURL, err := url.Parse("slack://lol@123456789/123456789/")
 			Expect(err).NotTo(HaveOccurred())
-			expectErrorMessageGivenUrl(
+			expectErrorMessageGivenURL(
 				TokenCMissing,
 				slackURL,
 			)
@@ -121,8 +121,8 @@ var _ = Describe("the slack service", func() {
 	})
 })
 
-func expectErrorMessageGivenUrl(msg ErrorMessage, slackUrl *url.URL) {
-	err := service.Initialize( slackUrl, util.TestLogger())
+func expectErrorMessageGivenURL(msg ErrorMessage, slackURL *url.URL) {
+	err := service.Initialize(slackURL, util.TestLogger())
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(Equal(string(msg)))
 }

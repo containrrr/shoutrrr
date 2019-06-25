@@ -40,7 +40,7 @@ func CreateQueue(rawURL string) (types.QueuedSender, error) {
 	return queue.GetQueued(service), nil
 }
 
-// Verify lets you verify that a configuration URL is valid
+// VerifyURL lets you verify that a configuration URL is valid
 func VerifyURL(rawURL string) error {
 	_, err := routing.Locate(rawURL)
 	return err

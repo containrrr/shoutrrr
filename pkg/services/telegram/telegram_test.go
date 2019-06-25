@@ -20,11 +20,11 @@ func TestTelegram(t *testing.T) {
 
 var _ = Describe("the telegram plugin", func() {
 	var telegram *Service
-	var envTelegramUrl string
+	var envTelegramURL string
 	var logger *log.Logger
 
 	BeforeSuite(func() {
-		envTelegramUrl = os.Getenv("SHOUTRRR_TELEGRAM_URL")
+		envTelegramURL = os.Getenv("SHOUTRRR_TELEGRAM_URL")
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
 
@@ -35,17 +35,17 @@ var _ = Describe("the telegram plugin", func() {
 
 	When("running integration tests", func() {
 		It("should not error out", func() {
-			if envTelegramUrl == "" {
+			if envTelegramURL == "" {
 				return
 			}
-			serviceURL, _ := url.Parse(envTelegramUrl)
+			serviceURL, _ := url.Parse(envTelegramURL)
 			telegram.Initialize( serviceURL, logger)
 			err := telegram.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 		When("given a message that exceeds the max length", func() {
 			It("should generate an error", func() {
-				if envTelegramUrl == "" {
+				if envTelegramURL == "" {
 					return
 				}
 				hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
@@ -61,7 +61,7 @@ var _ = Describe("the telegram plugin", func() {
 			})
 		})
 		When("given a valid request with a faked token", func() {
-			if envTelegramUrl == "" {
+			if envTelegramURL == "" {
 				return
 			}
 			It("should generate a 401", func() {

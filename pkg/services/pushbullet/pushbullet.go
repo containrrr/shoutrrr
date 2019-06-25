@@ -17,6 +17,7 @@ type Service struct {
 
 const (
 	serviceURL = "https://api.pushbullet.com/v2/pushes"
+	// Scheme is the scheme part of the service configuration URL
 	Scheme = "pushbullet"
 )
 

@@ -22,7 +22,7 @@ func send() action {
 			}
 
 			url := flags.Arg(0)
-			fmt.Printf("Url: %s\n", url)
+			fmt.Printf("URL: %s\n", url)
 
 			message := strings.Join(flags.Args()[1:], " ")
 			fmt.Printf("Message: %s\n", message)

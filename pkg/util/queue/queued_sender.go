@@ -23,6 +23,7 @@ func (qs *queuedSender) Enqueue(message string) {
 	qs.queue = append(qs.queue, message)
 }
 
+// GetQueued creates a QueuedSender proxy for the given service and returns it
 func GetQueued(sender types.Service) types.QueuedSender {
 	qs := &queuedSender{
 		sender: sender,
