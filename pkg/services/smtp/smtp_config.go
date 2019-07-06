@@ -42,18 +42,16 @@ func (config *Config) GetURL() *url.URL {
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
-	hostParts := strings.Split(url.Host, ":")
-	host := hostParts[0]
-	port, err := strconv.ParseUint(hostParts[1], 10, 16)
-	if err != nil {
-		return err
-	}
+
 	password, _ := url.User.Password()
 
 	config.Username = url.User.Username()
 	config.Password = password
-	config.Host = host
-	config.Port = uint16(port)
+	config.Host = url.Hostname()
+
+	if port, err := strconv.ParseUint(url.Port(), 10, 16); err == nil {
+		config.Port = uint16(port)
+	}
 
 	for key, vals := range url.Query() {
 		if err := config.Set(key, vals[0]); err != nil {
@@ -87,20 +85,20 @@ func (config *Config) QueryFields() []string {
 
 // Get returns the value of a Query field
 func (config *Config) Get(key string) (string, error) {
-	switch key {
-	case "fromAddress":
+	switch strings.ToLower(key) {
+	case "fromaddress":
 		return config.FromAddress, nil
-	case "fromName":
+	case "fromname":
 		return config.FromName, nil
-	case "toAddresses":
+	case "toaddresses":
 		return strings.Join(config.ToAddresses, ","), nil
 	case "auth":
 		return config.Auth.String(), nil
 	case "subject":
 		return config.Subject, nil
-	case "startTls":
+	case "starttls":
 		return format.PrintBool(config.UseStartTLS), nil
-	case "useHTML":
+	case "usehtml":
 		return format.PrintBool(config.UseHTML), nil
 	}
 	return "", fmt.Errorf("invalid query key \"%s\"", key)
@@ -108,20 +106,20 @@ func (config *Config) Get(key string) (string, error) {
 
 // Set updates the value of a Query field
 func (config *Config) Set(key string, value string) error {
-	switch key {
-	case "fromAddress":
+	switch strings.ToLower(key) {
+	case "fromaddress":
 		config.FromAddress = value
-	case "fromName":
+	case "fromname":
 		config.FromName = value
-	case "toAddresses":
+	case "toaddresses":
 		config.ToAddresses = strings.Split(value, ",")
 	case "auth":
 		config.Auth = parseAuth(value)
 	case "subject":
 		config.Subject = value
-	case "startTls":
+	case "starttls":
 		config.UseStartTLS, _ = format.ParseBool(value, true)
-	case "useHTML":
+	case "usehtml":
 		config.UseHTML, _ = format.ParseBool(value, false)
 	default:
 		return fmt.Errorf("invalid query key \"%s\"", key)
