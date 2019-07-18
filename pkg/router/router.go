@@ -36,7 +36,6 @@ func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL
 	return serviceURL.Scheme, serviceURL, nil
 }
 
-
 // Route a message to a specific notification service using the notification URL
 func (router *ServiceRouter) Route(rawURL string, message string, opts types.ServiceOpts) error {
 
@@ -48,14 +47,14 @@ func (router *ServiceRouter) Route(rawURL string, message string, opts types.Ser
 	return service.Send(message, nil)
 }
 
-var serviceMap = map[string]func() types.Service {
-	"discord":	func() types.Service { return &discord.Service{} },
-	"pushover":	func() types.Service { return &pushover.Service{}},
-	"slack":	func() types.Service { return &slack.Service{}},
-	"teams":	func() types.Service { return &teams.Service{}},
-	"telegram":	func() types.Service { return &telegram.Service{}},
-	"smtp":	    func() types.Service { return &smtp.Service{}},
-	"ifttt":    func() types.Service { return &ifttt.Service{}},
+var serviceMap = map[string]func() types.Service{
+	"discord":  func() types.Service { return &discord.Service{} },
+	"pushover": func() types.Service { return &pushover.Service{} },
+	"slack":    func() types.Service { return &slack.Service{} },
+	"teams":    func() types.Service { return &teams.Service{} },
+	"telegram": func() types.Service { return &telegram.Service{} },
+	"smtp":     func() types.Service { return &smtp.Service{} },
+	"ifttt":    func() types.Service { return &ifttt.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (types.Service, error) {

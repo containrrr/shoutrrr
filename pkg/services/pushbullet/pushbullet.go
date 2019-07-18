@@ -52,14 +52,14 @@ func doSend(token string, target string, message string) error {
 	}
 
 	/*
-		payload format:
-		{
-			"type": "note",
-	        "title": title,
-			"body": message,
-			"x": target // replace x with email, channel_tag or device_iden based on target type
-		}
-	 */
+			payload format:
+			{
+				"type": "note",
+		        "title": title,
+				"body": message,
+				"x": target // replace x with email, channel_tag or device_iden based on target type
+			}
+	*/
 
 	return nil
 }

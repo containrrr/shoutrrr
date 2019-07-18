@@ -32,14 +32,13 @@ var _ = Describe("the telegram plugin", func() {
 		telegram = &Service{}
 	})
 
-
 	When("running integration tests", func() {
 		It("should not error out", func() {
 			if envTelegramURL == "" {
 				return
 			}
 			serviceURL, _ := url.Parse(envTelegramURL)
-			telegram.Initialize( serviceURL, logger)
+			telegram.Initialize(serviceURL, logger)
 			err := telegram.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -55,7 +54,7 @@ var _ = Describe("the telegram plugin", func() {
 					builder.WriteString(hundredChars)
 				}
 
-				telegram.Initialize( serviceURL, logger)
+				telegram.Initialize(serviceURL, logger)
 				err := telegram.Send(builder.String(), nil)
 				Expect(err).To(HaveOccurred())
 			})
@@ -68,8 +67,8 @@ var _ = Describe("the telegram plugin", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
 				message := "this is a perfectly valid message"
 
-				telegram.Initialize( serviceURL, logger)
-				err := telegram.Send( message, nil)
+				telegram.Initialize(serviceURL, logger)
+				err := telegram.Send(message, nil)
 				Expect(err).To(HaveOccurred())
 				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
@@ -109,7 +108,7 @@ var _ = Describe("the telegram plugin", func() {
 				})
 				It("should add every subsequent argument as a channel id", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(config.Channels).To(Equal([]string {
+					Expect(config.Channels).To(Equal([]string{
 						"channel-1",
 						"channel-2",
 						"channel-3",

@@ -10,14 +10,13 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
-
 const (
 	hookURL     = "https://api.pushover.net/1/messages.json"
 	contentType = "application/x-www-form-urlencoded"
 )
 
 // Service providing the notification service Pushover
-type Service struct{
+type Service struct {
 	standard.Standard
 	config *Config
 }

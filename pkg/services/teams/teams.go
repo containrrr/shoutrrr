@@ -13,7 +13,7 @@ import (
 )
 
 // Service providing teams as a notification service
-type Service struct{
+type Service struct {
 	standard.Standard
 	config *Config
 }

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var actionWords = [...]string {"send", "verify", "generate"}
+var actionWords = [...]string{"send", "verify", "generate"}
 
 // ExitCodeUsage is used to signify that the command was not properly invoked
 const ExitCodeUsage = 64
@@ -60,15 +60,14 @@ func main() {
 
 func showMainUsage() {
 	usage(mainUsage)
-	fmt.Printf("Possible actions: %s\n", strings.Join(actionWords[:	], ", "))
+	fmt.Printf("Possible actions: %s\n", strings.Join(actionWords[:], ", "))
 	os.Exit(ExitCodeUsage)
 }
 
-
 type action struct {
-	run func(flags *flag.FlagSet) int
+	run     func(flags *flag.FlagSet) int
 	FlagSet flag.FlagSet
-	Usage string
+	Usage   string
 }
 
 func (a *action) Run() int {

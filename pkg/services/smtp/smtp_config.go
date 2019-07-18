@@ -72,14 +72,14 @@ func (config *Config) SetURL(url *url.URL) error {
 
 // QueryFields returns the fields that are part of the Query of the service URL
 func (config *Config) QueryFields() []string {
-	return []string {
-	"fromAddress",
-	"fromName",
-	"toAddresses",
-	"auth",
-	"subject",
-	"startTls",
-	"useHTML",
+	return []string{
+		"fromAddress",
+		"fromName",
+		"toAddresses",
+		"auth",
+		"subject",
+		"startTls",
+		"useHTML",
 	}
 }
 

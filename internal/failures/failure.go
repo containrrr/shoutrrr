@@ -12,8 +12,8 @@ const (
 
 type failure struct {
 	message string
-	id FailureID
-	stack string
+	id      FailureID
+	stack   string
 }
 
 // Failure is an extended error that also includes an ID to be used to identify a specific error
@@ -31,7 +31,7 @@ func (f *failure) ID() FailureID {
 }
 
 // Wrap returns a failure with the given message and id, saving the message of wrappedError for appending to Error()
-func Wrap(message string,  id FailureID, wrappedError error, v ...interface{}) *failure {
+func Wrap(message string, id FailureID, wrappedError error, v ...interface{}) Failure {
 	var stack string
 	if wrappedError != nil {
 		stack = wrappedError.Error()
@@ -43,8 +43,8 @@ func Wrap(message string,  id FailureID, wrappedError error, v ...interface{}) *
 
 	return &failure{
 		message: message,
-		id: id,
-		stack: stack,
+		id:      id,
+		stack:   stack,
 	}
 }
 

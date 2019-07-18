@@ -70,7 +70,6 @@ func (config *Config) SetURL(url *url.URL) error {
 		return fmt.Errorf("invalid telegram token %s", token)
 	}
 
-
 	for key, vals := range url.Query() {
 		if err := config.Set(key, vals[0]); err != nil {
 			return err

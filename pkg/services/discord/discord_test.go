@@ -34,11 +34,11 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
-			service.Initialize(serviceURL,util.TestLogger())
+			service.Initialize(serviceURL, util.TestLogger())
 			err := service.Send(
 				"this is an integration test",
 				nil,
-				)
+			)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

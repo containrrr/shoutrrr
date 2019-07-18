@@ -17,13 +17,13 @@ import (
 type Service struct {
 	standard.Standard
 	standard.Templater
-	config *Config
+	config           *Config
 	multipartBoundry string
 }
 
 const (
-	contentHTML = "text/html; charset=\"UTF-8\""
-	contentPlain = "text/plain; charset=\"UTF-8\""
+	contentHTML      = "text/html; charset=\"UTF-8\""
+	contentPlain     = "text/plain; charset=\"UTF-8\""
 	contentMultipart = "multipart/alternative; boundary=%s"
 )
 
@@ -71,7 +71,7 @@ func getClientConnection(host string, port uint16) (*smtp.Client, error) {
 		return nil, fail(FailConnectToServer, err)
 	}
 
-	client, err :=  smtp.NewClient(conn, host)
+	client, err := smtp.NewClient(conn, host)
 	if err != nil {
 		return nil, fail(FailCreateSMTPClient, err)
 	}
@@ -125,18 +125,18 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 
 func (service *Service) getAuth() (smtp.Auth, failure) {
 
-		config := service.config
+	config := service.config
 
-		switch config.Auth {
-			case authTypes.None:
-				return nil, nil
-			case authTypes.Plain:
-				return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
-			case authTypes.CRAMMD5:
-				return smtp.CRAMMD5Auth(config.Username, config.Password), nil
-			default:
-				return nil, fail(FailAuthType, nil, config.Auth.String())
-		}
+	switch config.Auth {
+	case authTypes.None:
+		return nil, nil
+	case authTypes.Plain:
+		return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
+	case authTypes.CRAMMD5:
+		return smtp.CRAMMD5Auth(config.Username, config.Password), nil
+	default:
+		return nil, fail(FailAuthType, nil, config.Auth.String())
+	}
 
 }
 
@@ -195,10 +195,10 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 		contentType = contentPlain
 	}
 
-	return map[string]string {
-		"Subject": subject,
-		"To": toAddress,
-		"From": fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
+	return map[string]string{
+		"Subject":      subject,
+		"To":           toAddress,
+		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
 		"MIME-version": "1.0;",
 		"Content-Type": contentType,
 	}

@@ -19,11 +19,11 @@ const (
 // Config is the configuration needed to send IFTTT notifications
 type Config struct {
 	standard.EnumlessConfig
-	WebHookID string
-	Events []string
-	Value1 string
-	Value2 string
-	Value3 string
+	WebHookID         string
+	Events            []string
+	Value1            string
+	Value2            string
+	Value3            string
 	UseMessageAsValue uint8 `desc:"" default:"2"`
 }
 
@@ -31,10 +31,10 @@ type Config struct {
 func (config *Config) GetURL() *url.URL {
 
 	return &url.URL{
-		Host:       config.WebHookID,
-		Path:       "/",
-		Scheme:     Scheme,
-		RawQuery:   format.BuildQuery(config),
+		Host:     config.WebHookID,
+		Path:     "/",
+		Scheme:   Scheme,
+		RawQuery: format.BuildQuery(config),
 	}
 
 }
@@ -63,7 +63,7 @@ func (config *Config) SetURL(url *url.URL) error {
 
 // QueryFields returns the fields that are part of the Query of the service URL
 func (config *Config) QueryFields() []string {
-	return []string {
+	return []string{
 		"events",
 		"value1",
 		"value2",

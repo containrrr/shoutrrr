@@ -19,13 +19,13 @@ func TestStandard(t *testing.T) {
 }
 
 var (
-	logger *Logger
-	builder *strings.Builder
+	logger       *Logger
+	builder      *strings.Builder
 	stringLogger *log.Logger
 )
 
 var _ = Describe("the standard logging implementation", func() {
-	When("setlogger is called with nil", func(){
+	When("setlogger is called with nil", func() {
 		It("should provide the logging API without any errors", func() {
 			logger = &Logger{}
 			logger.SetLogger(nil)
@@ -35,13 +35,13 @@ var _ = Describe("the standard logging implementation", func() {
 		})
 
 	})
-	When("setlogger is called with a proper logger", func(){
+	When("setlogger is called with a proper logger", func() {
 		BeforeEach(func() {
 			logger = &Logger{}
 			builder = &strings.Builder{}
 			stringLogger = log.New(builder, "", 0)
 		})
-		When("when  logger.Log is called", func(){
+		When("when  logger.Log is called", func() {
 			It("should log messages", func() {
 
 				logger.SetLogger(stringLogger)
@@ -51,7 +51,7 @@ var _ = Describe("the standard logging implementation", func() {
 				Expect(builder.String()).To(Equal("foo\nbar\n"))
 			})
 		})
-		When("when  logger.Logf is called", func(){
+		When("when  logger.Logf is called", func() {
 			It("should log messages", func() {
 
 				logger.SetLogger(stringLogger)
@@ -64,7 +64,7 @@ var _ = Describe("the standard logging implementation", func() {
 })
 
 var _ = Describe("the standard template implementation", func() {
-	When("a template is being set from a file", func(){
+	When("a template is being set from a file", func() {
 		It("should load the template without any errors", func() {
 			file, err := ioutil.TempFile("", "")
 			if err != nil {
@@ -86,21 +86,21 @@ var _ = Describe("the standard template implementation", func() {
 		})
 
 	})
-	When("a template is being set from a file that does not exist", func(){
+	When("a template is being set from a file that does not exist", func() {
 		It("should return an error", func() {
 			templater := &Templater{}
 			err := templater.SetTemplateFile("foo", "filename_that_should_not_exist")
 			Expect(err).To(HaveOccurred())
 		})
 	})
-	When("a template is being set with a badly formatted string", func(){
+	When("a template is being set with a badly formatted string", func() {
 		It("should return an error", func() {
 			templater := &Templater{}
 			err := templater.SetTemplateString("foo", "template {{ missing end tag")
 			Expect(err).To(HaveOccurred())
 		})
 	})
-	When("a template is being retrieved with a present ID", func(){
+	When("a template is being retrieved with a present ID", func() {
 		It("should return the corresponding template", func() {
 			templater := &Templater{}
 			err := templater.SetTemplateString("bar", "template body")
@@ -111,7 +111,7 @@ var _ = Describe("the standard template implementation", func() {
 			Expect(found).To(BeTrue())
 		})
 	})
-	When("a template is being retrieved with an invalid ID", func(){
+	When("a template is being retrieved with an invalid ID", func() {
 		It("should return an error", func() {
 			templater := &Templater{}
 			err := templater.SetTemplateString("bar", "template body")
@@ -126,7 +126,7 @@ var _ = Describe("the standard template implementation", func() {
 
 var _ = Describe("the standard enumless config implementation", func() {
 	When("it's enum method is called", func() {
-		It("should return an empty map", func(){
+		It("should return an empty map", func() {
 			Expect((&EnumlessConfig{}).Enums()).To(BeEmpty())
 		})
 	})
@@ -134,19 +134,19 @@ var _ = Describe("the standard enumless config implementation", func() {
 
 var _ = Describe("the standard queryless config implementation", func() {
 	When("it's queryfields method is called", func() {
-		It("should return an empty slice", func(){
+		It("should return an empty slice", func() {
 			Expect((&QuerylessConfig{}).QueryFields()).To(BeEmpty())
 		})
 	})
 	When("it's get method is called", func() {
-		It("should return an error and no value", func(){
+		It("should return an error and no value", func() {
 			val, err := (&QuerylessConfig{}).Get("foo")
 			Expect(val).To(BeEmpty())
 			Expect(err).To(HaveOccurred())
 		})
 	})
 	When("it's set method is called", func() {
-		It("should return an error", func(){
+		It("should return an error", func() {
 			err := (&QuerylessConfig{}).Set("foo", "bar")
 			Expect(err).To(HaveOccurred())
 		})

@@ -82,7 +82,8 @@ func fail(failureID failures.FailureID, err error, v ...interface{}) failure {
 		msg = "error writing message headers"
 	case FailCloseDataStream:
 		msg = "error closing message stream"
-	case FailUnknown: fallthrough
+	case FailUnknown:
+		fallthrough
 	default:
 		msg = "an unknown error occurred"
 	}

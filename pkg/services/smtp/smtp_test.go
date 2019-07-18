@@ -45,11 +45,11 @@ var _ = Describe("the SMTP service", func() {
 			testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com&fromName=Sender&toAddresses=rec1@example.com,rec2@example.com&auth=None&subject=Subject&startTls=No&useHTML=No"
 
 			url, err := url.Parse(testURL)
-			Expect(err).NotTo(HaveOccurred(),"parsing")
+			Expect(err).NotTo(HaveOccurred(), "parsing")
 
 			config := &Config{}
 			err = config.SetURL(url)
-			Expect(err).NotTo(HaveOccurred(),"verifying")
+			Expect(err).NotTo(HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
 
@@ -93,7 +93,7 @@ var _ = Describe("the SMTP service", func() {
 	})
 
 	When("the service is not configured correctly", func() {
-		It("should fail to send messages", func(){
+		It("should fail to send messages", func() {
 			service := Service{
 				config: &Config{},
 			}
@@ -105,11 +105,11 @@ var _ = Describe("the SMTP service", func() {
 	When("the underlying stream stops working", func() {
 		var service Service
 		var params map[string]string
-		BeforeEach(func(){
+		BeforeEach(func() {
 			service = Service{}
 			params = make(map[string]string, 0)
 		})
-		It("should fail when writing multipart plain header", func(){
+		It("should fail when writing multipart plain header", func() {
 			writer := testutils.CreateFailWriter(1)
 			err := service.writeMultipartMessage(writer, &params)
 			fmt.Printf("%+v\n", err)
@@ -117,7 +117,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailPlainHeader))
 		})
 
-		It("should fail when writing multipart plain message", func(){
+		It("should fail when writing multipart plain message", func() {
 			writer := testutils.CreateFailWriter(2)
 			err := service.writeMultipartMessage(writer, &params)
 			fmt.Printf("%+v\n", err)
@@ -125,7 +125,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailMessageRaw))
 		})
 
-		It("should fail when writing multipart HTML header", func(){
+		It("should fail when writing multipart HTML header", func() {
 			writer := testutils.CreateFailWriter(4)
 			err := service.writeMultipartMessage(writer, &params)
 			fmt.Printf("%+v\n", err)
@@ -133,7 +133,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailHTMLHeader))
 		})
 
-		It("should fail when writing multipart HTML message", func(){
+		It("should fail when writing multipart HTML message", func() {
 			writer := testutils.CreateFailWriter(5)
 			err := service.writeMultipartMessage(writer, &params)
 			fmt.Printf("%+v\n", err)
@@ -141,7 +141,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailMessageRaw))
 		})
 
-		It("should fail when writing multipart end header", func(){
+		It("should fail when writing multipart end header", func() {
 			writer := testutils.CreateFailWriter(6)
 			err := service.writeMultipartMessage(writer, &params)
 			fmt.Printf("%+v\n", err)
@@ -149,7 +149,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailMultiEndHeader))
 		})
 
-		It("should fail when writing message template", func(){
+		It("should fail when writing message template", func() {
 			writer := testutils.CreateFailWriter(0)
 			e := service.SetTemplateString("dummy", "dummy template content")
 			Expect(e).ToNot(HaveOccurred())
@@ -161,7 +161,6 @@ var _ = Describe("the SMTP service", func() {
 		})
 
 	})
-
 
 	When("running E2E tests", func() {
 
@@ -177,8 +176,7 @@ var _ = Describe("the SMTP service", func() {
 			err = service.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-
-			err = service.Send( "this is an integration test", nil)
+			err = service.Send("this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -189,7 +187,7 @@ var _ = Describe("the SMTP service", func() {
 
 			It("should send notifications without any errors", func() {
 				testURL := "smtp://user:password@example.com:2225/?startTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com,rec2@example.com&useHTML=yes"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -217,7 +215,7 @@ var _ = Describe("the SMTP service", func() {
 
 			It("should send notifications without any errors", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -238,9 +236,9 @@ var _ = Describe("the SMTP service", func() {
 
 		When("server communication fails", func() {
 
-			It("should fail when not being able to enable StartTLS", func(){
+			It("should fail when not being able to enable StartTLS", func() {
 				testURL := "smtp://example.com:2225/?startTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -255,9 +253,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailEnableStartTLS))
 			})
 
-			It("should fail when authentication type is invalid", func(){
+			It("should fail when authentication type is invalid", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=bad&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {}, "", "")
+				err := testIntegration(testURL, []string{}, "", "")
 				if msg, test := failures.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
@@ -266,9 +264,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailAuthType))
 			})
 
-			It("should fail when not being able to use authentication type", func(){
+			It("should fail when not being able to use authentication type", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=crammd5&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -283,9 +281,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailAuthenticating))
 			})
 
-			It("should fail when not being able to send to recipient", func(){
+			It("should fail when not being able to send to recipient", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -300,9 +298,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailSendRecipient))
 			})
 
-			It("should fail when the recipient is not accepted", func(){
+			It("should fail when the recipient is not accepted", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testSendRecipient(testURL, []string {
+				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
 					"553 She doesn't want to be disturbed",
@@ -315,9 +313,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailSetRecipient))
 			})
 
-			It("should fail when the server does not accept the data stream", func(){
+			It("should fail when the server does not accept the data stream", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testSendRecipient(testURL, []string {
+				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
 					"250 Receiver OK",
@@ -331,9 +329,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailOpenDataStream))
 			})
 
-			It("should fail when the server does not accept the data stream content", func(){
+			It("should fail when the server does not accept the data stream content", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testSendRecipient(testURL, []string {
+				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
 					"250 Receiver OK",
@@ -348,9 +346,9 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err.ID()).To(Equal(FailCloseDataStream))
 			})
 
-			It("should fail when the server does not close the connection gracefully", func(){
+			It("should fail when the server does not close the connection gracefully", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
-				err := testIntegration(testURL, []string {
+				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
@@ -387,7 +385,6 @@ func testSendRecipient(testURL string, responses []string) failure {
 	if err := service.SetTemplateString("plain", "{{.message}}"); err != nil {
 		return failures.Wrap("error setting plain template", failures.FailTestSetup, err)
 	}
-
 
 	textCon, tcfaker := testutils.CreateTextConFaker(responses, "\r\n")
 

@@ -9,7 +9,7 @@ import (
 
 // QueuedSender implements the standard queue sender interface
 type queuedSender struct {
-	queue []string
+	queue  []string
 	sender types.Service
 }
 

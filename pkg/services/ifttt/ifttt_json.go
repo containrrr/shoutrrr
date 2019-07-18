@@ -33,9 +33,12 @@ func createJSONToSend(config *Config, message string, params *map[string]string)
 	}
 
 	switch config.UseMessageAsValue {
-		case 1: payload.Value1 = message
-		case 2: payload.Value2 = message
-		case 3: payload.Value3 = message
+	case 1:
+		payload.Value1 = message
+	case 2:
+		payload.Value2 = message
+	case 3:
+		payload.Value3 = message
 	}
 
 	return json.Marshal(payload)

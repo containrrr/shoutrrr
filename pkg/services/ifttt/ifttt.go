@@ -48,7 +48,6 @@ func (service *Service) Send(message string, params *map[string]string) error {
 	return nil
 }
 
-
 // CreateAPIURLForEvent creates a IFTTT webhook URL for the given event
 func (service *Service) createAPIURLForEvent(event string) string {
 	return fmt.Sprintf(
@@ -57,8 +56,6 @@ func (service *Service) createAPIURLForEvent(event string) string {
 		service.config.WebHookID,
 	)
 }
-
-
 
 func doSend(payload []byte, postURL string) error {
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))

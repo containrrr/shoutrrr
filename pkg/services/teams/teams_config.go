@@ -15,9 +15,9 @@ type Config struct {
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		User: url.UserPassword("Token", config.Token.String()),
-		Host: "Teams",
-		Scheme: Scheme,
+		User:       url.UserPassword("Token", config.Token.String()),
+		Host:       "Teams",
+		Scheme:     Scheme,
 		ForceQuery: false,
 	}
 }

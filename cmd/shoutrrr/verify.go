@@ -9,7 +9,6 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 )
 
-
 func verify() action {
 	return action{
 		run: func(flags *flag.FlagSet) int {
@@ -27,7 +26,7 @@ func verify() action {
 
 			configMap, maxKeyLen := format.GetConfigMap(service)
 			for key, value := range configMap {
-				pad := strings.Repeat(" ", maxKeyLen -len(key))
+				pad := strings.Repeat(" ", maxKeyLen-len(key))
 				fmt.Printf("%s%s: %s\n", pad, key, value)
 			}
 

@@ -5,7 +5,7 @@ import (
 )
 
 // EnumlessConfig implements the ServiceConfig interface for services that does not use Enum fields
-type EnumlessConfig struct {}
+type EnumlessConfig struct{}
 
 // Enums returns an empty map
 func (ec *EnumlessConfig) Enums() map[string]types.EnumFormatter {

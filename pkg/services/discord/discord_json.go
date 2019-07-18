@@ -5,7 +5,6 @@ import (
 	"errors"
 )
 
-
 // JSON is the actual notification payload
 type JSON struct {
 	Text string `json:"content"`

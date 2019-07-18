@@ -19,17 +19,15 @@ func GetConfigMap(service types.Service) (map[string]string, int) {
 
 	formatter := formatter{
 		EnumFormatters: config.Enums(),
-		MaxDepth: 10,
+		MaxDepth:       10,
 	}
 	return formatter.getStructMap(config, 0)
 }
 
-
-
 type formatter struct {
 	EnumFormatters map[string]types.EnumFormatter
-	MaxDepth uint8
-	Errors []error
+	MaxDepth       uint8
+	Errors         []error
 }
 
 func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[string]string, int) {
@@ -56,9 +54,9 @@ func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[st
 		value := fmt.Sprintf("(%s)", fieldDef.Type.Name())
 		valueLen := len(value)
 
-		ef, isEnum := fmtr.EnumFormatters[fieldDef.Name];
+		ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]
 		if isEnum {
-			fieldVal := values.Field(i);
+			fieldVal := values.Field(i)
 			kind := fieldVal.Kind()
 			if kind == reflect.Int {
 				valueStr := ef.Print(int(fieldVal.Int()))
@@ -74,8 +72,8 @@ func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[st
 
 		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
 
-			prePad := strings.Repeat(" ", util.Max(40 - valueLen, 1))
-			postPad := strings.Repeat(" ", util.Max(60 - len(tag), 1))
+			prePad := strings.Repeat(" ", util.Max(40-valueLen, 1))
+			postPad := strings.Repeat(" ", util.Max(60-len(tag), 1))
 
 			value += " " + prePad + ColorizeDesc(tag) + postPad
 		}
@@ -91,7 +89,6 @@ func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[st
 		if isEnum {
 			value += fmt.Sprintf(" [%s]", strings.Join(ef.Names(), ", "))
 		}
-
 
 		valueMap[fieldDef.Name] = value
 		keyLen := len(fieldDef.Name)
@@ -113,18 +110,26 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		strVal := field.String()
 		return ColorizeString(strVal), len(strVal)
 
-	case reflect.Int8: fallthrough
-	case reflect.Int16: fallthrough
-	case reflect.Int32: fallthrough
-	case reflect.Int64: fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		fallthrough
 	case reflect.Int:
 		strVal := fmt.Sprintf("%d", field.Int())
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
 
-	case reflect.Uint8: fallthrough
-	case reflect.Uint16: fallthrough
-	case reflect.Uint32: fallthrough
-	case reflect.Uint64: fallthrough
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
+		fallthrough
 	case reflect.Uint:
 		strVal := fmt.Sprintf("%d", field.Uint())
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
@@ -135,7 +140,6 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 			return ColorizeTrue(PrintBool(val)), 3
 		}
 		return ColorizeFalse(PrintBool(val)), 2
-
 
 	case reflect.Slice:
 		fallthrough
@@ -166,7 +170,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		return fmt.Sprintf("{ %s }", strings.Join(items, ", ")), totalLen
 
 	case reflect.Struct:
-		structMap, _ := fmtr.getStructMap(field, depth + 1)
+		structMap, _ := fmtr.getStructMap(field, depth+1)
 		structFieldCount := len(structMap)
 		items := make([]string, structFieldCount)
 		index := 0

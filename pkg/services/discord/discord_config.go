@@ -11,15 +11,15 @@ type Config struct {
 	standard.QuerylessConfig
 	standard.EnumlessConfig
 	Channel string
-	Token string
+	Token   string
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config Config) GetURL() *url.URL {
 	return &url.URL{
-		User: url.User(config.Token),
-		Host: config.Channel,
-		Scheme: Scheme,
+		User:       url.User(config.Token),
+		Host:       config.Channel,
+		Scheme:     Scheme,
 		ForceQuery: false,
 	}
 }

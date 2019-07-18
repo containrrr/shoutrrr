@@ -19,8 +19,8 @@ func TestIFTTT(t *testing.T) {
 }
 
 var (
-	service *Service
-	logger *log.Logger
+	service    *Service
+	logger     *log.Logger
 	envTestURL string
 )
 
@@ -100,8 +100,8 @@ var _ = Describe("the ifttt package", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
 				config := Config{
-					Events: []string{ "foo", "bar", "baz" },
-					WebHookID: "dummyID",
+					Events:            []string{"foo", "bar", "baz"},
+					WebHookID:         "dummyID",
 					UseMessageAsValue: 0,
 				}
 				resultURL := config.GetURL().String()
@@ -113,9 +113,9 @@ var _ = Describe("the ifttt package", func() {
 		When("given config values \"a\", \"b\" and \"c\"", func() {
 			It("should return a valid jsonPayload string with values \"a\", \"b\" and \"c\"", func() {
 				bytes, err := createJSONToSend(&Config{
-					Value1: "a",
-					Value2: "b",
-					Value3: "c",
+					Value1:            "a",
+					Value2:            "b",
+					Value3:            "c",
 					UseMessageAsValue: 0,
 				}, "d", nil)
 				Expect(err).ToNot(HaveOccurred())
@@ -150,7 +150,7 @@ var _ = Describe("the ifttt package", func() {
 						Expect(payload.Value1).To(Equal("d"))
 					} else if i == 2 {
 						Expect(payload.Value2).To(Equal("d"))
-					}else if i == 3 {
+					} else if i == 3 {
 						Expect(payload.Value3).To(Equal("d"))
 					}
 
@@ -160,15 +160,14 @@ var _ = Describe("the ifttt package", func() {
 		When("given a param overrides for value1, value2 and value3", func() {
 			It("should return a jsonPayload string with value1, value2 and value3 overriden", func() {
 				bytes, err := createJSONToSend(&Config{
-					Value1: "a",
-					Value2: "b",
-					Value3: "c",
+					Value1:            "a",
+					Value2:            "b",
+					Value3:            "c",
 					UseMessageAsValue: 0,
 				}, "d", &map[string]string{
 					"value1": "e",
 					"value2": "f",
 					"value3": "g",
-
 				})
 				Expect(err).ToNot(HaveOccurred())
 

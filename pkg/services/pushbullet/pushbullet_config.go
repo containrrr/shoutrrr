@@ -11,22 +11,21 @@ import (
 type Config struct {
 	standard.QuerylessConfig
 	standard.EnumlessConfig
-	Targets[] string
-	Token string
+	Targets []string
+	Token   string
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		Host: config.Token,
-		Scheme: Scheme,
+		Host:       config.Token,
+		Scheme:     Scheme,
 		ForceQuery: false,
 	}
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
-
 
 	return errors.New("not implemented")
 }

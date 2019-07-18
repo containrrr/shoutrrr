@@ -56,8 +56,6 @@ func CreateAPIURLFromConfig(config *Config) string {
 		config.Token)
 }
 
-
-
 func doSend(payload []byte, postURL string) error {
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 	if res.StatusCode != http.StatusNoContent {

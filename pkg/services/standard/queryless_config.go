@@ -1,12 +1,11 @@
 package standard
 
 import (
-"errors"
+	"errors"
 )
 
 // QuerylessConfig implements the ServiceConfig interface for services that does not use Query fields
-type QuerylessConfig struct {}
-
+type QuerylessConfig struct{}
 
 // QueryFields returns an empty list of Query fields
 func (qc *QuerylessConfig) QueryFields() []string {

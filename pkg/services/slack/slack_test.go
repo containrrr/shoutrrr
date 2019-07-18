@@ -36,8 +36,8 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			service.Initialize(serviceURL,util.TestLogger())
-			err := service.Send( "This is an integration test message",nil)
+			service.Initialize(serviceURL, util.TestLogger())
+			err := service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

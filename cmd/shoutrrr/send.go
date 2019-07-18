@@ -32,7 +32,7 @@ func send() action {
 
 			if verbose {
 				logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
-			}  else {
+			} else {
 				logger = util.DiscardLogger
 			}
 

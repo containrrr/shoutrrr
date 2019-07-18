@@ -18,10 +18,10 @@ type Config struct {
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		User: url.UserPassword(config.BotName, config.Token.String()),
-		Host: config.Token.A,
-		Path: fmt.Sprintf("/%s/%s", config.Token.B, config.Token.C),
-		Scheme: Scheme,
+		User:       url.UserPassword(config.BotName, config.Token.String()),
+		Host:       config.Token.A,
+		Path:       fmt.Sprintf("/%s/%s", config.Token.B, config.Token.C),
+		Scheme:     Scheme,
 		ForceQuery: false,
 	}
 }
@@ -38,8 +38,8 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 
 	path := strings.Split(serviceURL.Path, "/")
 
-	if len(path) <2 {
-		path = []string { "", "", "" }
+	if len(path) < 2 {
+		path = []string{"", "", ""}
 	}
 
 	config.BotName = botName

@@ -13,10 +13,9 @@ import (
 )
 
 const (
-	apiBase = "https://api.telegram.org/bot"
+	apiBase   = "https://api.telegram.org/bot"
 	maxlength = 4096
 )
-
 
 // Service sends notifications to a given telegram chat
 type Service struct {

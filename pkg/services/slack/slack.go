@@ -1,69 +1,68 @@
 package slack
 
 import (
-    "bytes"
-    "errors"
-    "fmt"
-    "log"
-    "net/http"
-    "net/url"
+	"bytes"
+	"errors"
+	"fmt"
+	"log"
+	"net/http"
+	"net/url"
 
-    "github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Service sends notifications to a pre-configured channel or user
 type Service struct {
-    standard.Standard
-    config *Config
+	standard.Standard
+	config *Config
 }
 
 const (
-    apiURL    = "https://hooks.slack.com/services"
-    maxlength = 1000
+	apiURL    = "https://hooks.slack.com/services"
+	maxlength = 1000
 )
-
 
 // Send a notification message to Slack
 func (service *Service) Send(message string, params *map[string]string) error {
-    config := service.config
+	config := service.config
 
-    if err := validateToken(config.Token); err != nil {
-        return err
-    }
-    if len(message) > maxlength {
-        return errors.New("message exceeds max length")
-    }
+	if err := validateToken(config.Token); err != nil {
+		return err
+	}
+	if len(message) > maxlength {
+		return errors.New("message exceeds max length")
+	}
 
-    return service.doSend(config, message)
+	return service.doSend(config, message)
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
-    service.Logger.SetLogger(logger)
-    service.config = &Config{}
-    if err := service.config.SetURL(configURL); err != nil {
-        return err
-    }
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	if err := service.config.SetURL(configURL); err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (service *Service) doSend(config *Config, message string) error {
-    apiURL := service.getURL(config)
-    json, _ := CreateJSONPayload(config, message)
-    res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
+	apiURL := service.getURL(config)
+	json, _ := CreateJSONPayload(config, message)
+	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 
-    if res.StatusCode != http.StatusOK {
-        return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
-    }
-    return err
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
+	}
+	return err
 }
 
 func (service *Service) getURL(config *Config) string {
-    return fmt.Sprintf(
-        "%s/%s/%s/%s",
-        apiURL,
-        config.Token.A,
-        config.Token.B,
-        config.Token.C)
+	return fmt.Sprintf(
+		"%s/%s/%s/%s",
+		apiURL,
+		config.Token.A,
+		config.Token.B,
+		config.Token.C)
 }
