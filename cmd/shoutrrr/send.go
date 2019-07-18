@@ -12,6 +12,7 @@ import (
 )
 
 var verbose bool
+var usageExample = "%s send [OPTIONS] <URL> <Message [...]>\n"
 
 func send() action {
 	action := action{
@@ -46,7 +47,7 @@ func send() action {
 			return 0
 		},
 		FlagSet: *flag.NewFlagSet("send", flag.ExitOnError),
-		Usage: "%s send [OPTIONS] <URL> <Message [...]>\n",
+		Usage:   usageExample,
 	}
 
 	action.FlagSet.BoolVar(&verbose, "verbose", false, "display additional output")

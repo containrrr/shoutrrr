@@ -36,7 +36,7 @@ func generate() action {
 			return 1
 		},
 		FlagSet: *flag.NewFlagSet("generate", flag.ExitOnError),
-		Usage: "%s generate [OPTIONS] <service>\n",
+		Usage:   "%s generate [OPTIONS] <service>\n",
 	}
 
 	// action.FlagSet.BoolVar(&verbose, "verbose", false, "display additional output")

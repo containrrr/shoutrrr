@@ -34,6 +34,6 @@ func verify() action {
 			return 0
 		},
 		FlagSet: *flag.NewFlagSet("verify", flag.ExitOnError),
-		Usage: "%s send [OPTIONS] <URL> <Message [...]>\n",
+		Usage:   "%s send [OPTIONS] <URL> <Message [...]>\n",
 	}
 }

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/containrrr/shoutrrr/pkg/failures"
-	"github.com/containrrr/shoutrrr/pkg/testutils"
+	"github.com/containrrr/shoutrrr/internal/failures"
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	. "github.com/onsi/ginkgo"
