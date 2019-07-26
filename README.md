@@ -9,7 +9,7 @@
     Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
 </p>
 <p align="center">
-    <a href="https://app.codacy.com/project/containrrr/shoutrrr">
+    <a href="https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard">
         <img
           alt="codacy coverage"
           src="https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square"
@@ -21,7 +21,7 @@
           src="https://img.shields.io/circleci/project/github/containrrr/shoutrrr/master.svg?style=flat-square"
         />
     </a>
-    <a href="https://circleci.com/gh/containrrr/shoutrrr">
+    <a href="https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard">
         <img
           alt="codacy grade"
           src="https://img.shields.io/codacy/grade/30ce077eecde418ca328f4f7868f70c8/master.svg?style=flat-square"
@@ -44,8 +44,6 @@
 </p>
 
 ### Using Shoutrrr
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ce077eecde418ca328f4f7868f70c8)](https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard)
 
 #### As a package
 
