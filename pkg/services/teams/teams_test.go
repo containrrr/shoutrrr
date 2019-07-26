@@ -23,7 +23,7 @@ var _ = Describe("the teams plugin", func() {
 		}
 		// testutils.TestConfigSetInvalidQueryValue(&Config{}, "teams://88888888-4444-333-333-cccccccccccc:11111111112222222222333333333344@88888888-4444-333-333-cccccccccccc/?foo=bar")
 		apiURL := buildURL(&config)
-		expectedApiURL := "https://outlook.office.com/webhook/88888888-4444-333-333-cccccccccccc/IncomingWebhook/11111111112222222222333333333344/88888888-4444-333-333-cccccccccccc"
-		Expect(apiURL).To(Equal(expectedApiURL))
+		expectedURL := "https://outlook.office.com/webhook/88888888-4444-333-333-cccccccccccc/IncomingWebhook/11111111112222222222333333333344/88888888-4444-333-333-cccccccccccc"
+		Expect(apiURL).To(Equal(expectedURL))
 	})
 })

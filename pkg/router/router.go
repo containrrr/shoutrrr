@@ -15,17 +15,19 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
-	. "github.com/containrrr/shoutrrr/pkg/types"
+	t "github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
 type ServiceRouter struct {
 	logger   *log.Logger
-	services []Service
+	services []t.Service
 	queue    []string
 	Timeout  time.Duration
 }
 
+
+// New creates a new service router using the specified logger and service URLs
 func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
 	router := ServiceRouter{
 		logger:  logger,
@@ -41,13 +43,14 @@ func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
 	return &router, nil
 }
 
-func (router *ServiceRouter) Send(message string, params *Params) []error {
+// Send sends the specified message using the routers underlying services
+func (router *ServiceRouter) Send(message string, params *t.Params) []error {
 	serviceCount := len(router.services)
 	errors := make([]error, serviceCount)
 	results := make(chan error, serviceCount)
 
 	if params == nil {
-		params = &Params{}
+		params = &t.Params{}
 	}
 	for _, service := range router.services {
 		go sendToService(service, results, router.Timeout, message, *params)
@@ -63,7 +66,7 @@ func (router *ServiceRouter) Send(message string, params *Params) []error {
 	return errors
 }
 
-func sendToService(service Service, results chan error, timeout time.Duration, message string, params Params) {
+func sendToService(service t.Service, results chan error, timeout time.Duration, message string, params t.Params) {
 	// TODO: There really ought to be a way to tell what service generated the error
 	result := make(chan error, 1)
 
@@ -87,7 +90,7 @@ func (router *ServiceRouter) Enqueue(message string, v ...interface{}) {
 }
 
 // Flush sends all messages that have been queued up as a combined message. This method should be deferred!
-func (router *ServiceRouter) Flush(params *Params) {
+func (router *ServiceRouter) Flush(params *t.Params) {
 	// Since this method is supposed to be deferred we just have to ignore errors
 	_ = router.Send(strings.Join(router.queue, "\n"), params)
 	router.queue = []string{}
@@ -119,18 +122,18 @@ func (router *ServiceRouter) Route(rawURL string, message string) error {
 	return service.Send(message, nil)
 }
 
-var serviceMap = map[string]func() Service{
-	"discord":  func() Service { return &discord.Service{} },
-	"pushover": func() Service { return &pushover.Service{} },
-	"slack":    func() Service { return &slack.Service{} },
-	"teams":    func() Service { return &teams.Service{} },
-	"telegram": func() Service { return &telegram.Service{} },
-	"smtp":     func() Service { return &smtp.Service{} },
-	"ifttt":    func() Service { return &ifttt.Service{} },
-	"logger":   func() Service { return &logger.Service{} },
+var serviceMap = map[string]func() t.Service{
+	"discord":  func() t.Service { return &discord.Service{} },
+	"pushover": func() t.Service { return &pushover.Service{} },
+	"slack":    func() t.Service { return &slack.Service{} },
+	"teams":    func() t.Service { return &teams.Service{} },
+	"telegram": func() t.Service { return &telegram.Service{} },
+	"smtp":     func() t.Service { return &smtp.Service{} },
+	"ifttt":    func() t.Service { return &ifttt.Service{} },
+	"logger":   func() t.Service { return &logger.Service{} },
 }
 
-func (router *ServiceRouter) initService(rawURL string) (Service, error) {
+func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
 		return nil, err
@@ -152,7 +155,7 @@ func (router *ServiceRouter) initService(rawURL string) (Service, error) {
 }
 
 // Locate returns the service implementation that corresponds to the given service URL
-func (router *ServiceRouter) Locate(rawURL string) (Service, error) {
+func (router *ServiceRouter) Locate(rawURL string) (t.Service, error) {
 	service, err := router.initService(rawURL)
 	return service, err
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
+// Config is the configuration object for the Logger Service
 type Config struct {
 	standard.QuerylessConfig
 	standard.EnumlessConfig

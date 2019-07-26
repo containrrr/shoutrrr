@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type TextConFaker struct {
+type textConFaker struct {
 	inputBuffer  *bytes.Buffer
 	inputWriter  *bufio.Writer
 	outputReader *bufio.Reader
@@ -16,13 +16,13 @@ type TextConFaker struct {
 	delim        string
 }
 
-func (tcf *TextConFaker) GetInput() string {
+func (tcf *textConFaker) GetInput() string {
 	_ = tcf.inputWriter.Flush()
 	return tcf.inputBuffer.String()
 }
 
 // GetConversation returns the input and output streams as a conversation
-func (tcf *TextConFaker) GetConversation(includeGreeting bool) string {
+func (tcf *textConFaker) GetConversation(includeGreeting bool) string {
 	conv := ""
 	inSequence := false
 	input := strings.Split(tcf.GetInput(), tcf.delim)
@@ -61,11 +61,11 @@ func (tcf *TextConFaker) GetConversation(includeGreeting bool) string {
 }
 
 // CreateReadWriter returns a ReadWriter from the textConFakers internal reader and writer
-func (tcf *TextConFaker) CreateReadWriter() *bufio.ReadWriter {
+func (tcf *textConFaker) CreateReadWriter() *bufio.ReadWriter {
 	return bufio.NewReadWriter(tcf.outputReader, tcf.inputWriter)
 }
 
-func (tcf *TextConFaker) init() {
+func (tcf *textConFaker) init() {
 	tcf.inputBuffer = &bytes.Buffer{}
 	stringReader := strings.NewReader(strings.Join(tcf.responses, tcf.delim))
 	tcf.outputReader = bufio.NewReader(stringReader)
@@ -75,7 +75,7 @@ func (tcf *TextConFaker) init() {
 // CreateTextConFaker returns a textproto.Conn to fake textproto based connections
 func CreateTextConFaker(responses []string, delim string) (*textproto.Conn, Eavesdropper) {
 
-	tcfaker := TextConFaker{
+	tcfaker := textConFaker{
 		responses: responses,
 		delim:     delim,
 	}

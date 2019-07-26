@@ -10,6 +10,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
+// Service is the Logger service struct
 type Service struct {
 	standard.Standard
 	config *Config
