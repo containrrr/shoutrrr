@@ -8,7 +8,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/telegram"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -116,6 +118,14 @@ var _ = Describe("the telegram plugin", func() {
 				})
 			})
 		})
+	})
+
+	It("should implement basic service API methods correctly", func() {
+		testutils.TestConfigGetInvalidQueryValue(&Config{})
+		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?channels=channel-1&foo=bar")
+
+		testutils.TestConfigGetEnumsCount(&Config{}, 0)
+		testutils.TestConfigGetFieldsCount(&Config{}, 1)
 	})
 })
 

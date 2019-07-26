@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Service providing teams as a notification service
@@ -19,7 +20,7 @@ type Service struct {
 }
 
 // Send a notification message to Microsoft Teams
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
 	postURL := buildURL(config)

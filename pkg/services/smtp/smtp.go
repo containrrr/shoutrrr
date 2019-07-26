@@ -11,6 +11,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Service sends notifications to a given e-mail addresses via SMTP
@@ -54,9 +55,9 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 // Send a notification message to e-mail recipients
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	if params == nil {
-		params = &map[string]string{}
+		params = &types.Params{}
 	}
 	client, err := getClientConnection(service.config.Host, service.config.Port)
 	if err != nil {

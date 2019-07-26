@@ -4,19 +4,18 @@ import (
 	"log"
 
 	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-var routing = router.ServiceRouter{}
+var defaultRouter = router.ServiceRouter{}
 
 // SetLogger sets the logger that the services will use to write progress logs
 func SetLogger(logger *log.Logger) {
-	routing.SetLogger(logger)
+	defaultRouter.SetLogger(logger)
 }
 
 // Send notifications using a supplied url and message
 func Send(rawURL string, message string) error {
-	service, err := routing.Locate(rawURL)
+	service, err := defaultRouter.Locate(rawURL)
 	if err != nil {
 		return err
 	}
@@ -25,6 +24,6 @@ func Send(rawURL string, message string) error {
 }
 
 // CreateSender returns a notification sender configured according to the supplied URL
-func CreateSender(rawURL string) (types.Service, error) {
-	return routing.Locate(rawURL)
+func CreateSender(rawURLs ...string) (*router.ServiceRouter, error) {
+	return router.New(nil, rawURLs...)
 }

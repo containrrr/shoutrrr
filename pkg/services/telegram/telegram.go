@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 const (
@@ -24,7 +25,7 @@ type Service struct {
 }
 
 // Send notification to Telegram
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}

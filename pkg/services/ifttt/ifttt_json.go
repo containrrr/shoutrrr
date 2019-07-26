@@ -2,6 +2,8 @@ package ifttt
 
 import (
 	"encoding/json"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // jsonPayload is the actual notification payload
@@ -12,7 +14,7 @@ type jsonPayload struct {
 }
 
 // createJSONToSend creates a jsonPayload payload to be sent to the IFTTT webhook API
-func createJSONToSend(config *Config, message string, params *map[string]string) ([]byte, error) {
+func createJSONToSend(config *Config, message string, params *types.Params) ([]byte, error) {
 
 	payload := jsonPayload{
 		Value1: config.Value1,

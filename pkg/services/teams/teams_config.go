@@ -1,8 +1,9 @@
 package teams
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for use within the teams plugin
@@ -15,8 +16,8 @@ type Config struct {
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		User:       url.UserPassword("Token", config.Token.String()),
-		Host:       "Teams",
+		User:       url.UserPassword(config.Token.A, config.Token.B),
+		Host:       config.Token.C,
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}
@@ -25,16 +26,15 @@ func (config *Config) GetURL() *url.URL {
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
 
-	password, _ := url.User.Password()
+	tokenA := url.User.Username()
+	tokenB, _ := url.User.Password()
+	tokenC := url.Hostname()
 
-	var err error
-	var token Token
-
-	if token, err = ParseToken(password); err != nil {
-		return err
+	config.Token = Token{
+		A: tokenA,
+		B: tokenB,
+		C: tokenC,
 	}
-
-	config.Token = token
 	return nil
 }
 

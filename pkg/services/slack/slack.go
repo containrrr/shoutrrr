@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Service sends notifications to a pre-configured channel or user
@@ -23,7 +24,7 @@ const (
 )
 
 // Send a notification message to Slack
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
 	if err := validateToken(config.Token); err != nil {

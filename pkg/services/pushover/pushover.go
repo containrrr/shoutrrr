@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 const (
@@ -22,7 +23,7 @@ type Service struct {
 }
 
 // Send a notification message to Pushover
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
 	data := url.Values{}

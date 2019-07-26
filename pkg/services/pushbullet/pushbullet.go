@@ -24,7 +24,7 @@ const (
 var _ types.Service = &Service{}
 
 // Send ...
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	for _, target := range config.Targets {
 		if err := doSend(config.Token, target, message); err != nil {

@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 const (
@@ -32,7 +33,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 // Send a notification message to a IFTTT webhook
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	payload, err := createJSONToSend(service.config, message, params)
 	fmt.Printf("%+v", payload)
 	if err != nil {

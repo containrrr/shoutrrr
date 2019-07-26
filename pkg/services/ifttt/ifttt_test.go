@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
@@ -164,11 +165,11 @@ var _ = Describe("the ifttt package", func() {
 					Value2:            "b",
 					Value3:            "c",
 					UseMessageAsValue: 0,
-				}, "d", &map[string]string{
+				}, "d", (*types.Params)(&map[string]string{
 					"value1": "e",
 					"value2": "f",
 					"value3": "g",
-				})
+				}))
 				Expect(err).ToNot(HaveOccurred())
 
 				payload := &jsonPayload{}

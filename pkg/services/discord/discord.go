@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Service providing Discord as a notification service
@@ -22,7 +23,7 @@ const (
 )
 
 // Send a notification message to discord
-func (service *Service) Send(message string, params *map[string]string) error {
+func (service *Service) Send(message string, params *types.Params) error {
 
 	payload, err := CreateJSONToSend(message)
 	if err != nil {

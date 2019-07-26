@@ -3,10 +3,11 @@ package telegram
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config for use within the telegram plugin

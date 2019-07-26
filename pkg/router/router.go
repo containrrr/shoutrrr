@@ -5,20 +5,92 @@ import (
 	"log"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
+	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	. "github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
 type ServiceRouter struct {
-	logger *log.Logger
+	logger   *log.Logger
+	services []Service
+	queue    []string
+	Timeout  time.Duration
+}
+
+func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
+	router := ServiceRouter{
+		logger:  logger,
+		Timeout: 10 * time.Second,
+	}
+	for _, serviceURL := range serviceURLs {
+		service, err := router.initService(serviceURL)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing router services: %s", err)
+		}
+		router.services = append(router.services, service)
+	}
+	return &router, nil
+}
+
+func (router *ServiceRouter) Send(message string, params *Params) []error {
+	serviceCount := len(router.services)
+	errors := make([]error, serviceCount)
+	results := make(chan error, serviceCount)
+
+	if params == nil {
+		params = &Params{}
+	}
+	for _, service := range router.services {
+		go sendToService(service, results, router.Timeout, message, *params)
+	}
+	for i := range router.services {
+		select {
+		case res := <-results:
+			errors[i] = res
+		case <-time.After(10 * time.Second):
+			fmt.Println("timeout 1")
+		}
+	}
+	return errors
+}
+
+func sendToService(service Service, results chan error, timeout time.Duration, message string, params Params) {
+	// TODO: There really ought to be a way to tell what service generated the error
+	result := make(chan error, 1)
+
+	go func() { result <- service.Send(message, &params) }()
+
+	select {
+	case res := <-result:
+		results <- res
+	case <-time.After(timeout):
+		results <- fmt.Errorf("timed out")
+	}
+	close(result)
+}
+
+// Enqueue adds the message to an internal queue and sends it when Flush is invoked
+func (router *ServiceRouter) Enqueue(message string, v ...interface{}) {
+	if len(v) > 0 {
+		message = fmt.Sprintf(message, v...)
+	}
+	router.queue = append(router.queue, message)
+}
+
+// Flush sends all messages that have been queued up as a combined message. This method should be deferred!
+func (router *ServiceRouter) Flush(params *Params) {
+	// Since this method is supposed to be deferred we just have to ignore errors
+	_ = router.Send(strings.Join(router.queue, "\n"), params)
+	router.queue = []string{}
 }
 
 // SetLogger sets the logger that the services will use to write progress logs
@@ -37,7 +109,7 @@ func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL
 }
 
 // Route a message to a specific notification service using the notification URL
-func (router *ServiceRouter) Route(rawURL string, message string, opts types.ServiceOpts) error {
+func (router *ServiceRouter) Route(rawURL string, message string) error {
 
 	service, err := router.Locate(rawURL)
 	if err != nil {
@@ -47,17 +119,18 @@ func (router *ServiceRouter) Route(rawURL string, message string, opts types.Ser
 	return service.Send(message, nil)
 }
 
-var serviceMap = map[string]func() types.Service{
-	"discord":  func() types.Service { return &discord.Service{} },
-	"pushover": func() types.Service { return &pushover.Service{} },
-	"slack":    func() types.Service { return &slack.Service{} },
-	"teams":    func() types.Service { return &teams.Service{} },
-	"telegram": func() types.Service { return &telegram.Service{} },
-	"smtp":     func() types.Service { return &smtp.Service{} },
-	"ifttt":    func() types.Service { return &ifttt.Service{} },
+var serviceMap = map[string]func() Service{
+	"discord":  func() Service { return &discord.Service{} },
+	"pushover": func() Service { return &pushover.Service{} },
+	"slack":    func() Service { return &slack.Service{} },
+	"teams":    func() Service { return &teams.Service{} },
+	"telegram": func() Service { return &telegram.Service{} },
+	"smtp":     func() Service { return &smtp.Service{} },
+	"ifttt":    func() Service { return &ifttt.Service{} },
+	"logger":   func() Service { return &logger.Service{} },
 }
 
-func (router *ServiceRouter) initService(rawURL string) (types.Service, error) {
+func (router *ServiceRouter) initService(rawURL string) (Service, error) {
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
 		return nil, err
@@ -79,7 +152,7 @@ func (router *ServiceRouter) initService(rawURL string) (types.Service, error) {
 }
 
 // Locate returns the service implementation that corresponds to the given service URL
-func (router *ServiceRouter) Locate(rawURL string) (types.Service, error) {
+func (router *ServiceRouter) Locate(rawURL string) (Service, error) {
 	service, err := router.initService(rawURL)
 	return service, err
 }

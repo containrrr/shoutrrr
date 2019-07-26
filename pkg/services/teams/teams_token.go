@@ -46,7 +46,7 @@ func (t Token) String() string {
 
 // ParseToken creates a token from a string representation
 func ParseToken(s string) (Token, error) {
-	parts := strings.Split(s, "-")
+	parts := strings.Split(s, "_")
 	if !isTokenValid(parts) {
 		return Token{}, errors.New("invalid service url. malformed tokens")
 	}

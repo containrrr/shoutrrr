@@ -22,12 +22,12 @@ func (tcf *TextConFaker) GetInput() string {
 }
 
 // GetConversation returns the input and output streams as a conversation
-func (tcf *TextConFaker) GetConversation(serverGreet bool) string {
+func (tcf *TextConFaker) GetConversation(includeGreeting bool) string {
 	conv := ""
 	inSequence := false
 	input := strings.Split(tcf.GetInput(), tcf.delim)
 	ri := 0
-	if serverGreet {
+	if includeGreeting {
 		conv += fmt.Sprintf("    %-55s << %-50s\n", "(server greeting)", tcf.responses[0])
 		ri = 1
 	}
@@ -73,7 +73,7 @@ func (tcf *TextConFaker) init() {
 }
 
 // CreateTextConFaker returns a textproto.Conn to fake textproto based connections
-func CreateTextConFaker(responses []string, delim string) (*textproto.Conn, TextConFaker) {
+func CreateTextConFaker(responses []string, delim string) (*textproto.Conn, Eavesdropper) {
 
 	tcfaker := TextConFaker{
 		responses: responses,
@@ -88,5 +88,5 @@ func CreateTextConFaker(responses []string, delim string) (*textproto.Conn, Text
 		ReadWriter: tcfaker.CreateReadWriter(),
 	}
 
-	return textproto.NewConn(faker), tcfaker
+	return textproto.NewConn(faker), &tcfaker
 }

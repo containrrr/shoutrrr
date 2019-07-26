@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/containrrr/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/router"
 )
 
 func verify() action {
@@ -18,7 +18,9 @@ func verify() action {
 				return ExitCodeUsage
 			}
 
-			service, err := shoutrrr.CreateSender(url)
+			sr := router.ServiceRouter{}
+
+			service, err := sr.Locate(url)
 			if err != nil {
 				fmt.Printf("error verifying URL: %s", err)
 				return 1
