@@ -45,6 +45,8 @@
 
 ### Using Shoutrrr
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ce077eecde418ca328f4f7868f70c8)](https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard)
+
 #### As a package
 
 Using shoutrrr is easy! There is currently two ways of using it as a package.
