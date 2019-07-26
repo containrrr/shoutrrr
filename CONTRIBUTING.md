@@ -13,7 +13,7 @@ You can check your current version of the go language as follows:
 Do not place your code in the go source path.
 ```bash
 git clone git@github.com:<yourfork>/shoutrrr.git
-cd watchtower
+cd shoutrrr
 ```
 
 ## Building and testing
