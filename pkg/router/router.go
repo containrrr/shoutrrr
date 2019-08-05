@@ -16,6 +16,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 	t "github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/xmpp"
 )
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
@@ -25,7 +26,6 @@ type ServiceRouter struct {
 	queue    []string
 	Timeout  time.Duration
 }
-
 
 // New creates a new service router using the specified logger and service URLs
 func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
@@ -131,6 +131,7 @@ var serviceMap = map[string]func() t.Service{
 	"smtp":     func() t.Service { return &smtp.Service{} },
 	"ifttt":    func() t.Service { return &ifttt.Service{} },
 	"logger":   func() t.Service { return &logger.Service{} },
+	"xmpp":     func() t.Service { return &xmpp.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
