@@ -40,11 +40,15 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 
 	service.client = client
 
-	return client.Connect()
+	return nil
 }
 
 // Send a notification message to the configured recipient
 func (service *Service) Send(message string, params *types.Params) error {
+	if err := service.client.Connect(); err != nil {
+		return err
+	}
+
 	if params == nil {
 		params = &types.Params{}
 	}
