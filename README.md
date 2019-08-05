@@ -35,7 +35,7 @@ Using shoutrrr is easy! There is currently two ways of using it as a package.
 ```go
   url := "slack://token-a/token-b/token-c"
   err := shoutrrr.Send(url, "Hello world (or slack channel) !")
-   
+
 ```
 
 ##### Using a sender
@@ -47,7 +47,7 @@ Using shoutrrr is easy! There is currently two ways of using it as a package.
 
 #### Through the CLI
 
-Start by running the `build.sh` script. 
+Start by running the `build.sh` script.
 You may then run the shoutrrr executable:
 
 ```shell
@@ -68,7 +68,7 @@ Usage:
 OPTIONS:
   -verbose
         display additional output
-``` 
+```
 
 ```shell
 $ ./shoutrrr verify
@@ -95,3 +95,4 @@ the service urls below.
 | Slack     | `slack://token-a/token-b/token-c`<br/>`slack://botname/token-a/token-b/token-c`              |
 | Teams     | `teams://token-a/token-b/token-c`                                                            |
 | Telegram  | `telegram://api-token/channel`<br/>`telegram://api-token/channel-a/channel-b/channel-c/...`  |
+| Gotify    | `gotify://gotify-host/token`                                                                 |
