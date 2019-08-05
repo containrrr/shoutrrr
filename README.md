@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://0x12b.com/shoutrrr.png" width="450" />
+    <img src="https://raw.githubusercontent.com/containrrr/shoutrrr/gh-pages/res/shoutrrr.jpg" width="450" />
 </p>
 <h1 align="center">
     Shoutrrr
