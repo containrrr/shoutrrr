@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
@@ -130,6 +131,7 @@ var serviceMap = map[string]func() t.Service{
 	"telegram": func() t.Service { return &telegram.Service{} },
 	"smtp":     func() t.Service { return &smtp.Service{} },
 	"ifttt":    func() t.Service { return &ifttt.Service{} },
+	"gotify":   func() t.Service { return &gotify.Service{} },
 	"logger":   func() t.Service { return &logger.Service{} },
 	"xmpp":     func() t.Service { return &xmpp.Service{} },
 }
