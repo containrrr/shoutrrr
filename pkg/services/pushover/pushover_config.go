@@ -76,11 +76,11 @@ func (config *Config) SetURL(url *url.URL) error {
 	}
 
 	if len(config.User) < 1 {
-		return errors.New("user missing from config URL")
+		return errors.New(string(UserMissing))
 	}
 
 	if len(config.Token) < 1 {
-		return errors.New("token missing from config URL")
+		return errors.New(string(TokenMissing))
 	}
 
 	return nil
