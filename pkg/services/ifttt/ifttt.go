@@ -43,7 +43,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		apiURL := service.createAPIURLForEvent(event)
 		err := doSend(payload, apiURL)
 		if err != nil {
-			service.Logf("failed to send IFTTT event \"%s\": %s", event, err)
+			return fmt.Errorf("failed to send IFTTT event \"%s\": %s", event, err)
 		}
 	}
 	return nil

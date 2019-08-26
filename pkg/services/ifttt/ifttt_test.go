@@ -2,6 +2,7 @@ package ifttt
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
 )
 
 func TestIFTTT(t *testing.T) {
@@ -100,14 +102,45 @@ var _ = Describe("the ifttt package", func() {
 	When("serializing a config to URL", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
+				expectedURL := "ifttt://dummyID/?events=foo,bar,baz&value1=&value2=&value3=&messagevalue=0"
 				config := Config{
 					Events:            []string{"foo", "bar", "baz"},
 					WebHookID:         "dummyID",
 					UseMessageAsValue: 0,
 				}
 				resultURL := config.GetURL().String()
-				Expect(resultURL).To(Equal("ifttt://dummyID/?events=foo,bar,baz&value1=&value2=&value3=&messagevalue=0"))
+				Expect(resultURL).To(Equal(expectedURL))
 			})
+		})
+	})
+	When("sending a message", func() {
+		It("should error if the response code is not 204 no content", func() {
+			httpmock.Activate()
+			defer httpmock.DeactivateAndReset()
+			setupResponder("foo", "dummy", 404, "")
+			
+			URL, _ := url.Parse("ifttt://dummy/?events=foo")
+			
+			if err := service.Initialize(URL, logger); err != nil {
+				Fail("errored during initialization")
+			}
+			
+			err := service.Send("hello", nil)
+			Expect(err).To(HaveOccurred())
+		})
+		It("should not error if the response code is 204", func() {
+			httpmock.Activate()
+			defer httpmock.DeactivateAndReset()
+			setupResponder("foo", "dummy", 204, "")
+			
+			URL, _ := url.Parse("ifttt://dummy/?events=foo")
+			
+			if err := service.Initialize(URL, logger); err != nil {
+				Fail("errored during initialization")
+			}
+			
+			err := service.Send("hello", nil)
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 	When("creating a json payload", func() {
@@ -183,3 +216,8 @@ var _ = Describe("the ifttt package", func() {
 		})
 	})
 })
+
+func setupResponder(event string, key string, code int, body string) {
+	url := fmt.Sprintf("https://maker.ifttt.com/trigger/%s/with/key/%s", event, key)
+	httpmock.RegisterResponder("POST", url, httpmock.NewStringResponder(code, body))
+}
