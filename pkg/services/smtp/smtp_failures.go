@@ -44,48 +44,31 @@ const (
 )
 
 func fail(failureID failures.FailureID, err error, v ...interface{}) failure {
-	var msg string
-	switch failureID {
-	case FailGetSMTPClient:
-		msg = "error getting SMTP client"
-	case FailConnectToServer:
-		msg = "error connecting to server"
-	case FailCreateSMTPClient:
-		msg = "error creating smtp client"
-	case FailEnableStartTLS:
-		msg = "error enabling StartTLS"
-	case FailAuthenticating:
-		msg = "error authenticating"
-	case FailAuthType:
-		msg = "invalid authorization method '%s'"
-	case FailSendRecipient:
-		msg = "error sending message to recipient"
-	case FailClosingSession:
-		msg = "error closing session"
-	case FailPlainHeader:
-		msg = "error writing plain header"
-	case FailHTMLHeader:
-		msg = "error writing HTML header"
-	case FailMultiEndHeader:
-		msg = "error writing multipart end header"
-	case FailMessageTemplate:
-		msg = "error applying message template"
-	case FailMessageRaw:
-		msg = "error writing message"
-	case FailSetSender:
-		msg = "error creating new message"
-	case FailSetRecipient:
-		msg = "error setting RCPT"
-	case FailOpenDataStream:
-		msg = "error creating message stream"
-	case FailWriteHeaders:
-		msg = "error writing message headers"
-	case FailCloseDataStream:
-		msg = "error closing message stream"
-	case FailUnknown:
-		fallthrough
-	default:
-		msg = "an unknown error occurred"
+	messages := map[int]string{
+		int(FailGetSMTPClient):    "error getting SMTP client",
+		int(FailConnectToServer):  "error connecting to server",
+		int(FailCreateSMTPClient): "error creating smtp client",
+		int(FailEnableStartTLS):   "error enabling StartTLS",
+		int(FailAuthenticating):   "error authenticating",
+		int(FailAuthType):         "invalid authorization method '%s'",
+		int(FailSendRecipient):    "error sending message to recipient",
+		int(FailClosingSession):   "error closing session",
+		int(FailPlainHeader):      "error writing plain header",
+		int(FailHTMLHeader):       "error writing HTML header",
+		int(FailMultiEndHeader):   "error writing multipart end header",
+		int(FailMessageTemplate):  "error applying message template",
+		int(FailMessageRaw):       "error writing message",
+		int(FailSetSender):        "error creating new message",
+		int(FailSetRecipient):     "error setting RCPT",
+		int(FailOpenDataStream):   "error creating message stream",
+		int(FailWriteHeaders):     "error writing message headers",
+		int(FailCloseDataStream):  "error closing message stream",
+		int(FailUnknown):          "an unknown error occurred",
+	}
+
+	msg := messages[int(failureID)]
+	if msg == "" {
+		msg = messages[int(FailUnknown)]
 	}
 
 	return failures.Wrap(msg, failureID, err, v...)
