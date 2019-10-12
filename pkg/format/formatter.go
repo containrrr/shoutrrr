@@ -105,45 +105,28 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 	nextDepth := depth + 1
 	kind := field.Kind()
 
-	switch kind {
-	case reflect.String:
-		strVal := field.String()
-		return ColorizeString(strVal), len(strVal)
-
-	case reflect.Int8:
-		fallthrough
-	case reflect.Int16:
-		fallthrough
-	case reflect.Int32:
-		fallthrough
-	case reflect.Int64:
-		fallthrough
-	case reflect.Int:
-		strVal := fmt.Sprintf("%d", field.Int())
-		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
-
-	case reflect.Uint8:
-		fallthrough
-	case reflect.Uint16:
-		fallthrough
-	case reflect.Uint32:
-		fallthrough
-	case reflect.Uint64:
-		fallthrough
-	case reflect.Uint:
+	if util.IsUnsignedDecimal(kind) {
 		strVal := fmt.Sprintf("%d", field.Uint())
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
-
-	case reflect.Bool:
+	}
+	if util.IsSignedDecimal(kind) {
+		strVal := fmt.Sprintf("%d", field.Int())
+		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
+	}
+	if kind == reflect.String {
+		strVal := field.String()
+		return ColorizeString(strVal), len(strVal)
+	}
+	if kind == reflect.Bool {
 		val := field.Bool()
 		if val {
 			return ColorizeTrue(PrintBool(val)), 3
 		}
 		return ColorizeFalse(PrintBool(val)), 2
 
-	case reflect.Slice:
-		fallthrough
-	case reflect.Array:
+	}
+
+	if util.IsCollection(kind) {
 		len := field.Len()
 		items := make([]string, len)
 		totalLen := 4
@@ -153,8 +136,9 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 			totalLen += itemLen
 		}
 		return fmt.Sprintf("[ %s ]", strings.Join(items, ", ")), totalLen
+	}
 
-	case reflect.Map:
+	if kind == reflect.Map {
 		items := make([]string, field.Len())
 		iter := field.MapRange()
 		index := 0
@@ -168,8 +152,8 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		}
 
 		return fmt.Sprintf("{ %s }", strings.Join(items, ", ")), totalLen
-
-	case reflect.Struct:
+	}
+	if kind == reflect.Struct {
 		structMap, _ := fmtr.getStructMap(field, depth+1)
 		structFieldCount := len(structMap)
 		items := make([]string, structFieldCount)
@@ -181,9 +165,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 			totalLen += len(key) + 2 + len(value)
 		}
 		return fmt.Sprintf("< %s >", strings.Join(items, ", ")), totalLen
-
-	default:
-		strVal := kind.String()
-		return fmt.Sprintf("<?%s>", strVal), len(strVal) + 5
 	}
+	strVal := kind.String()
+	return fmt.Sprintf("<?%s>", strVal), len(strVal) + 5
 }
