@@ -11,6 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
+	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
@@ -124,16 +125,17 @@ func (router *ServiceRouter) Route(rawURL string, message string) error {
 }
 
 var serviceMap = map[string]func() t.Service{
-	"discord":  func() t.Service { return &discord.Service{} },
-	"pushover": func() t.Service { return &pushover.Service{} },
-	"slack":    func() t.Service { return &slack.Service{} },
-	"teams":    func() t.Service { return &teams.Service{} },
-	"telegram": func() t.Service { return &telegram.Service{} },
-	"smtp":     func() t.Service { return &smtp.Service{} },
-	"ifttt":    func() t.Service { return &ifttt.Service{} },
-	"gotify":   func() t.Service { return &gotify.Service{} },
-	"logger":   func() t.Service { return &logger.Service{} },
-	"xmpp":     func() t.Service { return &xmpp.Service{} },
+	"discord":    func() t.Service { return &discord.Service{} },
+	"pushover":   func() t.Service { return &pushover.Service{} },
+	"slack":      func() t.Service { return &slack.Service{} },
+	"teams":      func() t.Service { return &teams.Service{} },
+	"telegram":   func() t.Service { return &telegram.Service{} },
+	"smtp":       func() t.Service { return &smtp.Service{} },
+	"ifttt":      func() t.Service { return &ifttt.Service{} },
+	"gotify":     func() t.Service { return &gotify.Service{} },
+	"logger":     func() t.Service { return &logger.Service{} },
+	"xmpp":       func() t.Service { return &xmpp.Service{} },
+	"pushbullet": func() t.Service { return &pushbullet.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
