@@ -64,6 +64,7 @@ func tokenHasCorrectSize(token string) error {
 	return nil
 }
 
+//ErrorMessage for error events within the pushbullet service
 type ErrorMessage string
 
 const (
