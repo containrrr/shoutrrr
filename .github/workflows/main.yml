@@ -17,11 +17,8 @@ jobs:
       - name: Build
         run: go build -v .
         
-      - name: Test
+      - name: Install godacov
         run: go get github.com/schrej/godacov
 
       - name: Test
         run: go test -v -coverprofile=coverage.out ./...
-        
-      - name: Publish test coverage on Codacy
-        run: ~/.go/bin/godacov -t $CODACY_TOKEN -r ./coverage.out -c $CIRCLE_SHA1
