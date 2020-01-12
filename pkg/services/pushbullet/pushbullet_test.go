@@ -42,7 +42,7 @@ var _ = Describe("the pushbullet service", func() {
 		})
 	})
 
-	Describe("the slack config", func() {
+	Describe("the pushbullet config", func() {
 		When("generating a config object", func() {
 			It("should set token", func() {
 				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke")

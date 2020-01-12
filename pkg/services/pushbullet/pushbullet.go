@@ -79,11 +79,13 @@ func getTargetType(target string) (TargetType, error) {
 
 	if matchesEmail && err == nil {
 		return EmailTarget, nil
-	} else if len(target) > 0 && string(target[0]) == "#" {
-		return ChannelTarget, nil
-	} else {
-		return DeviceTarget, nil
 	}
+
+	if len(target) > 0 && string(target[0]) == "#" {
+		return ChannelTarget, nil
+	}
+
+	return DeviceTarget, nil
 }
 
 // TargetType ...
