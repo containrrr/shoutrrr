@@ -1,7 +1,10 @@
 package pushbullet
 
 import (
+	"bytes"
+	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"regexp"
 
@@ -15,25 +18,6 @@ type Service struct {
 	config *Config
 }
 
-const (
-	serviceURL = "https://api.pushbullet.com/v2/pushes"
-	// Scheme is the scheme part of the service configuration URL
-	Scheme = "pushbullet"
-)
-
-var _ types.Service = &Service{}
-
-// Send ...
-func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
-	for _, target := range config.Targets {
-		if err := doSend(config.Token, target, message); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
@@ -45,21 +29,47 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 	return nil
 }
 
-func doSend(token string, target string, message string) error {
-	_, err := getTargetType(target)
+// Send ...
+func (service *Service) Send(message string, params *types.Params) error {
+	config := service.config
+	for _, target := range config.Targets {
+		if err := doSend(config, target, message, params); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getTitle(params *types.Params) string {
+	title := "Shoutrrr notification"
+	if params != nil {
+		valParams := *params
+		title, ok := valParams["title"]
+		if !ok {
+			return title
+		}
+	}
+	return title
+}
+
+func doSend(config *Config, target string, message string, params *types.Params) error {
+	targetType, err := getTargetType(target)
 	if err != nil {
 		return err
 	}
 
-	/*
-			payload format:
-			{
-				"type": "note",
-		        "title": title,
-				"body": message,
-				"x": target // replace x with email, channel_tag or device_iden based on target type
-			}
-	*/
+	apiURL := serviceURL
+	json, _ := CreateJSONPayload(target, targetType, config, message, params)
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", apiURL, bytes.NewReader(json))
+	req.Header.Add("Access-Token", config.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
+	}
 
 	return nil
 }
@@ -69,11 +79,13 @@ func getTargetType(target string) (TargetType, error) {
 
 	if matchesEmail && err == nil {
 		return EmailTarget, nil
-	} else if string(target[0]) == "#" {
-		return ChannelTarget, nil
-	} else {
-		return DeviceTarget, nil
 	}
+
+	if len(target) > 0 && string(target[0]) == "#" {
+		return ChannelTarget, nil
+	}
+
+	return DeviceTarget, nil
 }
 
 // TargetType ...
