@@ -96,3 +96,4 @@ the service urls below.
 | Teams     | `teams://token-a/token-b/token-c`                                                            |
 | Telegram  | `telegram://api-token/channel`<br/>`telegram://api-token/channel-a/channel-b/channel-c/...`  |
 | Gotify    | `gotify://gotify-host/token`                                                                 |
+| Mattermost    | `mattermost://mattermost-host/token`<br/>`mattermost://mattermost-host/token/username/channel` |
