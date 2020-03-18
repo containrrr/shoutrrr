@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"log"
 	"net/url"
 	"strings"
@@ -136,6 +137,7 @@ var serviceMap = map[string]func() t.Service{
 	"logger":     func() t.Service { return &logger.Service{} },
 	"xmpp":       func() t.Service { return &xmpp.Service{} },
 	"pushbullet": func() t.Service { return &pushbullet.Service{} },
+	"mattermost": func() t.Service { return &mattermost.Service{}},
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
