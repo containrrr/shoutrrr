@@ -15,7 +15,7 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config Config) GetURL() *url.URL {
+func (config *Config) GetURL() *url.URL {
 	return &url.URL{
 		User:       url.User(config.Token),
 		Host:       config.Channel,
@@ -25,7 +25,7 @@ func (config Config) GetURL() *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config Config) SetURL(url *url.URL) error {
+func (config *Config) SetURL(url *url.URL) error {
 
 	config.Channel = url.Host
 	config.Token = url.User.Username()
