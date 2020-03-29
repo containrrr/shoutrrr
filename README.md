@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://github.com/containrrr/shoutrrr"><img src="https://raw.githubusercontent.com/containrrr/shoutrrr/gh-pages/res/shoutrrr.jpg" width="450" /></a>
+    <a href="https://github.com/containrrr/shoutrrr"><img src="https://raw.githubusercontent.com/containrrr/shoutrrr/gh-pages/shoutrrr.jpg" width="450" /></a>
 </p>
 <h1 align="center">
     Shoutrrr
