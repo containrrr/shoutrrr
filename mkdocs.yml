@@ -1,0 +1,17 @@
+site_name: Shoutrrr
+site_url: http://containrrr.github.io/shoutrrr/
+repo_url: https://github.com/containrrr/shoutrrr/
+theme:
+  name: 'material'
+markdown_extensions:
+  - toc:
+      permalink: True
+      separator: "_"
+nav:
+  - 'Home': 'index.md'
+  - 'Getting started': 'getting-started.md'
+  - Services:
+    - Overview: 'services/overview.md'
+    - Discord: 'services/discord.md'
+plugins:
+  - search
