@@ -1,0 +1,13 @@
+site_name: Shoutrrr
+site_url: http://containrrr.github.io/shoutrrr/
+repo_url: https://github.com/containrrr/shoutrrr/
+theme:
+  name: 'material'
+markdown_extensions:
+    - toc:
+        permalink: True
+        separator: "_"
+nav:
+   - 'Home': 'readme.md'
+plugins:
+    - search

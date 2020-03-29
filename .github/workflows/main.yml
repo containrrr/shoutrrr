@@ -22,3 +22,22 @@ jobs:
 
       - name: Test
         run: go test -v -coverprofile=coverage.out ./...
+
+      - name: Publish test coverage on Codacy
+        run: godacov -t $CODACY_TOKEN -r ./coverage.out -c $CIRCLE_SHA1
+        
+      - name: Install mkdocs
+        run: |
+          pip install \
+            mkdocs \
+            mkdocs-material \
+            md-toc
+
+      - name: Generate docs
+        run: mkdocs build
+
+      - name: Publish docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
