@@ -1,16 +1,16 @@
 # Services overview
 
-Currently shoutrrr supports the following services:
+Click on the service for a more thorough explanation.
 
 | Service                                      | URL format   |
 | -------------------------------------------- | ------------ |
-| [Discord](/services/discord)                 | `discord://<token>@<channel>`    |
-| [Telegram](/services/telegram)               | `telegram://<token>@telegram?channels=<channel-1>[,<channel-2>,...]`   |
-| [Pushover](/services/pushover)               | `pushover://<token>/<user>/<device>`   |
-| [Slack](/services/slack)                     | `slack://[<botname>@]<token-a>/<token-b>/<token-c>`      |
-| [Email](/services/email)                     | `smtp://<username>:<password>@<host>:<port>/?fromAddress=<fromAddress>&toAddresses=<recipient1>[,<recipient2>,...]`       |
-| [Microsoft Teams](/services/microsoft-teams) | `teams://<token-a>/<token-b>/<token-c>`      |
-| [Gotify](/services/gotify)                   | `gotify://<gotify-host>/<token>`     |
-| [Pushbullet](/services/pushbullet)           | `pushbullet://api-token[/<device>/#<channel>/<email>]` |
-| [IFTTT](/services/IFTTT)                     | `ifttt://<key>/?events=<event1>[,<event2>,...]&value1=<value1>&value2=<value2>&value3=<value3>`      |
-| [Mattermost](/services/mattermost)           | `mattermost://<mattermost-host>/<token>[/<username>/<channel>]` |
+| [Discord](/services/discord)                 | *discord://__`token`__@__`channel`__* |
+| [Telegram](/services/not-documented)         | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]* |
+| [Pushover](/services/not-documented)         | *pushover://__`token`__/__`user`__/__`device`__* |
+| [Slack](/services/not-documented)            | *slack://[__`botname`__@]__`token-a`__/__`token-b`__/__`token-c`__* |
+| [Email](/services/not-documented)            | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?fromAddress=__`fromAddress`__&toAddresses=__`recipient1`__[,__`recipient2`__,...]* |
+| [Microsoft Teams](/services/not-documented)  | *teams://__`token-a`__/__`token-b`__/__`token-c`__* |
+| [Gotify](/services/not-documented)           | *gotify://__`gotify-host`__/__`token`__* |
+| [Pushbullet](/services/not-documented)       | *pushbullet://__`api-token`__[/__`device`__/#__`channel`__/__`email`__]* |
+| [IFTTT](/services/not-documented)            | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__* |
+| [Mattermost](/services/not-documented)       | *mattermost://__`mattermost-host`__/__`token`__[/__`username`__/__`channel`__]* |
