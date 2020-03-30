@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"log"
 	"net/url"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
+	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/slack"
