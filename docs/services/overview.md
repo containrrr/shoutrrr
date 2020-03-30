@@ -13,3 +13,4 @@ Currently shoutrrr supports the following services:
 | [Gotify](/services/gotify)                   | `gotify://<gotify-host>/<token>`     |
 | [Pushbullet](/services/pushbullet)           | `pushbullet://api-token[/<device>/#<channel>/<email>]` |
 | [IFTTT](/services/IFTTT)                     | `ifttt://<key>/?events=<event1>[,<event2>,...]&value1=<value1>&value2=<value2>&value3=<value3>`      |
+| [Mattermost](/services/mattermost)           | `mattermost://<mattermost-host>/<token>[/<username>/<channel>]` |
