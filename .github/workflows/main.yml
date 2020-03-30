@@ -16,9 +16,26 @@ jobs:
 
       - name: Build
         run: go build -v .
-        
-      - name: Install godacov
-        run: go get github.com/schrej/godacov
 
       - name: Test
         run: go test -v -coverprofile=coverage.out ./...
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          
+      - name: Install mkdocs
+        run: |
+          pip install \
+            mkdocs \
+            mkdocs-material \
+            md-toc
+      - name: Generate docs
+        run: mkdocs build
+
+      - name: Publish docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
