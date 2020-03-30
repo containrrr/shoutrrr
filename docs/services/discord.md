@@ -8,7 +8,7 @@ Your Discord Webhook-URL will look like this:
 The shoutrrr service URL should look like this:  
 > discord://__`token`__@__`channel`__
 
-## Adding a webhook in Discord
+## Creating a webhook in Discord
 
 1. Open your server settings by first clicking on the name of the server.
 ![Screenshot 1](discord/sc-1.png)
