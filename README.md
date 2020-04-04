@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
     <a href="https://github.com/containrrr/shoutrrr">
         <img src="https://raw.githubusercontent.com/containrrr/shoutrrr/gh-pages/shoutrrr.jpg" width="450" /></a>
@@ -69,6 +69,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/amirschnell"><img src="https://avatars3.githubusercontent.com/u/9380508?v=4" width="100px;" alt=""/><br /><sub><b>Amir Schnell</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=amirschnell" title="Code">💻</a></td>
     <td align="center"><a href="https://piksel.se"><img src="https://avatars2.githubusercontent.com/u/807383?v=4" width="100px;" alt=""/><br /><sub><b>nils måsén</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=piksel" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=piksel" title="Documentation">📖</a> <a href="#maintenance-piksel" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/lukapeschke"><img src="https://avatars1.githubusercontent.com/u/17085536?v=4" width="100px;" alt=""/><br /><sub><b>Luka Peschke</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=lukapeschke" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=lukapeschke" title="Documentation">📖</a></td>
   </tr>
 </table>
 
