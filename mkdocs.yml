@@ -4,10 +4,14 @@ repo_url: https://github.com/containrrr/shoutrrr/
 theme:
   name: 'material'
 markdown_extensions:
-    - toc:
-        permalink: True
-        separator: "_"
+  - toc:
+      permalink: True
+      separator: "_"
 nav:
-   - 'Home': 'readme.md'
+  - 'Home': 'index.md'
+  - 'Getting started': 'getting-started.md'
+  - Services:
+    - Overview: 'services/overview.md'
+    - Discord: 'services/discord.md'
 plugins:
-    - search
+  - search
