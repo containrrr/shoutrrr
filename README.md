@@ -17,6 +17,7 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr)   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section --> [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-) <!-- ALL-CONTRIBUTORS-BADGE:END -->
     
 </div>
+<br/><br/>
 
 ## Quick Start
 
