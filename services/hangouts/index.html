@@ -11,7 +11,7 @@
       <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
-        <link rel="canonical" href="http://containrrr.github.io/shoutrrr/services/overview/">
+        <link rel="canonical" href="http://containrrr.github.io/shoutrrr/services/hangouts/">
       
       
       
@@ -38,7 +38,7 @@
     
     
       
-        <title>Overview - Shoutrrr</title>
+        <title>Hangouts Chat - Shoutrrr</title>
       
     
     
@@ -79,7 +79,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#services_overview" tabindex="0" class="md-skip">
+      <a href="#hangouts_chat" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -105,7 +105,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Overview
+                Hangouts Chat
               
             </span>
           
@@ -238,12 +238,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
       Services
@@ -259,20 +257,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-    <a href="./" title="Overview" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../overview/" title="Overview" class="md-nav__link">
       Overview
     </a>
-    
   </li>
 
         
@@ -310,6 +299,29 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    URL format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating_an_incoming_webhook_in_hangouts_chat" class="md-nav__link">
+    Creating an incoming webhook in Hangouts Chat
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -320,65 +332,43 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/containrrr/shoutrrr/edit/master/docs/services/overview.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/containrrr/shoutrrr/edit/master/docs/services/hangouts.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="services_overview">Services overview<a class="headerlink" href="#services_overview" title="Permanent link">&para;</a></h1>
-<p>Click on the service for a more thorough explanation.</p>
-<table>
-<thead>
-<tr>
-<th>Service</th>
-<th>URL format</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/shoutrrr/services/discord">Discord</a></td>
-<td><em>discord://<strong><code>token</code></strong>@<strong><code>channel</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Telegram</a></td>
-<td><em>telegram://<strong><code>token</code></strong>@telegram?channels=<strong><code>channel-1</code></strong>[,<strong><code>channel-2</code></strong>,...]</em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Pushover</a></td>
-<td><em>pushover://<strong><code>token</code></strong>/<strong><code>user</code></strong>/<strong><code>device</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Slack</a></td>
-<td><em>slack://[<strong><code>botname</code></strong>@]<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Email</a></td>
-<td><em>smtp://<strong><code>username</code></strong>:<strong><code>password</code></strong>@<strong><code>host</code></strong>:<strong><code>port</code></strong>/?fromAddress=<strong><code>fromAddress</code></strong>&amp;toAddresses=<strong><code>recipient1</code></strong>[,<strong><code>recipient2</code></strong>,...]</em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Microsoft Teams</a></td>
-<td><em>teams://<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Gotify</a></td>
-<td><em>gotify://<strong><code>gotify-host</code></strong>/<strong><code>token</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Pushbullet</a></td>
-<td><em>pushbullet://<strong><code>api-token</code></strong>[/<strong><code>device</code></strong>/#<strong><code>channel</code></strong>/<strong><code>email</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">IFTTT</a></td>
-<td><em>ifttt://<strong><code>key</code></strong>/?events=<strong><code>event1</code></strong>[,<strong><code>event2</code></strong>,...]&amp;value1=<strong><code>value1</code></strong>&amp;value2=<strong><code>value2</code></strong>&amp;value3=<strong><code>value3</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/not-documented">Mattermost</a></td>
-<td><em>mattermost://<strong><code>mattermost-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>username</code></strong>/<strong><code>channel</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="/shoutrrr/services/hangouts">Hangouts Chat</a></td>
-<td><em>hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</em></td>
-</tr>
-</tbody>
-</table>
+                <h1 id="hangouts_chat">Hangouts Chat<a class="headerlink" href="#hangouts_chat" title="Permanent link">&para;</a></h1>
+<h2 id="url_format">URL format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<p>Your Hangouts Chat Incoming Webhook URL will look like this:</p>
+<blockquote>
+<p>https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</p>
+</blockquote>
+<p>The shoutrrr service URL should look like this:</p>
+<blockquote>
+<p>hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</p>
+</blockquote>
+<p>In other words the incoming webhook URL with <code>https</code> replaced by <code>hangouts</code>.</p>
+<h2 id="creating_an_incoming_webhook_in_hangouts_chat">Creating an incoming webhook in Hangouts Chat<a class="headerlink" href="#creating_an_incoming_webhook_in_hangouts_chat" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>Open the room you would like to add Shoutrrr to and open the chat
+room menu.
+<img alt="Screenshot 1" src="hangouts-1.png" /></p>
+</li>
+<li>
+<p>Then click on <em>Configure webhooks</em>.
+<img alt="Screenshot 2" src="hangouts-2.png" /></p>
+</li>
+<li>
+<p>Name the webhook and save.
+<img alt="Screenshot 3" src="hangouts-3.png" /></p>
+</li>
+<li>
+<p>Copy the URL.
+<img alt="Screenshot 4" src="hangouts-4.png" /></p>
+</li>
+<li>
+<p>Format the service URL by replacing <code>https</code> with <code>hangouts</code>.</p>
+</li>
+</ol>
                 
                   
                 
@@ -396,41 +386,6 @@
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Getting started
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../discord/" title="Discord" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Discord
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
