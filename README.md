@@ -1,7 +1,4 @@
 <p align="center">
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
     <a href="https://github.com/containrrr/shoutrrr">
         <img src="https://raw.githubusercontent.com/containrrr/shoutrrr/gh-pages/shoutrrr.jpg" width="450" /></a>
 </p>
@@ -13,16 +10,14 @@
     Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
 </p>
 <p align="center">
-    <img src="https://github.com/containrrr/shoutrrr/workflows/Main%20Workflow/badge.svg" />
-    <a href="https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard"><img
-      alt="codacy coverage"
-      src="https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square"
-    /></a>
-    <a href="https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard"><img
- alt="codacy grade" src="https://img.shields.io/codacy/grade/30ce077eecde418ca328f4f7868f70c8/master.svg?style=flat-square" /></a>
-    <a href="https://github.com/containrrr/shoutrrr"><img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square" /></a>
-    <a href="https://github.com/containrrr/shoutrrr/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square" /></a>
-    <a href="https://godoc.org/github.com/containrrr/shoutrrr"><img           src="https://godoc.org/github.com/containrrr/shoutrrr?status.svg" alt="GoDoc" /></a>
+
+![github actions workflow status](https://github.com/containrrr/shoutrrr/workflows/Main%20Workflow/badge.svg)
+[![codacy coverage](https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square)](https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard)
+[![codacy grade](https://img.shields.io/codacy/grade/30ce077eecde418ca328f4f7868f70c8/master.svg?style=flat-square)](https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard) 
+[![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr) 
+[![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE) 
+[![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr)   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section --> [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-) <!-- ALL-CONTRIBUTORS-BADGE:END -->
+    
 </p>
 
 ## Quick Start
