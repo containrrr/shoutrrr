@@ -9,7 +9,7 @@
     Notification library for gophers and their furry friends.
     Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
 </p>
-<p align="center">
+<div align="center">
 
 ![github actions workflow status](https://github.com/containrrr/shoutrrr/workflows/Main%20Workflow/badge.svg)
 [![codacy coverage](https://img.shields.io/codacy/coverage/30ce077eecde418ca328f4f7868f70c8.svg?style=flat-square)](https://app.codacy.com/app/containrrr/shoutrrr?utm_source=github.com&utm_medium=referral&utm_content=containrrr/shoutrrr&utm_campaign=Badge_Grade_Dashboard)
@@ -18,7 +18,7 @@
 [![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE) 
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr)   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section --> [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-) <!-- ALL-CONTRIBUTORS-BADGE:END -->
     
-</p>
+</div>
 
 ## Quick Start
 
