@@ -15,7 +15,7 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 [![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr) 
 [![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE) 
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr)   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
     
 </div>
@@ -68,6 +68,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/lukapeschke"><img src="https://avatars1.githubusercontent.com/u/17085536?v=4" width="100px;" alt=""/><br /><sub><b>Luka Peschke</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=lukapeschke" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=lukapeschke" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/MrLuje"><img src="https://avatars0.githubusercontent.com/u/632075?v=4" width="100px;" alt=""/><br /><sub><b>MrLuje</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=MrLuje" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=MrLuje" title="Documentation">📖</a></td>
     <td align="center"><a href="http://simme.dev"><img src="https://avatars0.githubusercontent.com/u/1596025?v=4" width="100px;" alt=""/><br /><sub><b>Simon Aronsson</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=simskij" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=simskij" title="Documentation">📖</a> <a href="#maintenance-simskij" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://arnested.dk"><img src="https://avatars2.githubusercontent.com/u/190005?v=4" width="100px;" alt=""/><br /><sub><b>Arne Jørgensen</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=arnested" title="Documentation">📖</a></td>
   </tr>
 </table>
 
