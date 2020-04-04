@@ -44,6 +44,17 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "simskij",
+      "name": "Simon Aronsson",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1596025?v=4",
+      "profile": "http://simme.dev",
+      "contributions": [
+        "code",
+        "doc",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
