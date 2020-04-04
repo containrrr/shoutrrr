@@ -13,5 +13,6 @@ nav:
   - Services:
     - Overview: 'services/overview.md'
     - Discord: 'services/discord.md'
+    - Hangouts Chat: 'services/hangouts.md'
 plugins:
   - search
