@@ -38,7 +38,7 @@ Using shoutrrr is easy! There is currently two ways of using it as a package.
 #### Using a sender
 ```go
   url := "slack://token-a/token-b/token-c"
-  sender := shoutrrr.CreateSender(url)
+  sender, err := shoutrrr.CreateSender(url)
   sender.Send("Hello world (or slack channel) !", map[string]string { /* ... */ })
 ```
 
