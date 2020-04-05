@@ -468,7 +468,7 @@
 
 <h3 id="using_a_sender">Using a sender<a class="headerlink" href="#using_a_sender" title="Permanent link">&para;</a></h3>
 <pre><code class="go">  url := &quot;slack://token-a/token-b/token-c&quot;
-  sender := shoutrrr.CreateSender(url)
+  sender, err := shoutrrr.CreateSender(url)
   sender.Send(&quot;Hello world (or slack channel) !&quot;, map[string]string { /* ... */ })
 </code></pre>
 
