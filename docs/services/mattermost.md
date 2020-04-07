@@ -31,7 +31,7 @@ mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h
 
 ## Additional URL configuration
 
-Mattermost provides functionality to post as another user or to another channel as configured in the webhook configuration.
+Mattermost provides functionality to post as another user or to another channel, compared to the webhook configuration.
 <br/>
 To do this, you can add a *user* and/or *channel* to the service URL.
 
@@ -45,9 +45,9 @@ Be aware that if you want to pass user or channel only, you have to leave the ot
 
 ## Passing parameters via code
 
-If you want to, you also have teh possibility to pass parameters to the `send` function.
+If you want to, you also have the possibility to pass parameters to the `send` function.
 <br/>
-The following example contains all parameters, that are currently supported.
+The following example contains all parameters that are currently supported.
 
 ```gotemplate
 params := (*types.Params)(
