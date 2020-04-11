@@ -114,10 +114,10 @@ func (router *ServiceRouter) SetLogger(logger *log.Logger) {
 // ExtractServiceName from a notification URL
 func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL, error) {
 	serviceURL, err := url.Parse(rawURL)
-
 	if err != nil {
 		return "", &url.URL{}, err
 	}
+
 	return serviceURL.Scheme, serviceURL, nil
 }
 
@@ -151,6 +151,7 @@ var serviceMap = map[string]func() t.Service{
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
+
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
 		return nil, err
@@ -158,7 +159,7 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 
 	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
 	if !valid {
-		return nil, fmt.Errorf("unknown service scheme '%s'", scheme)
+		return nil, fmt.Errorf("unknown service scheme for URL '%s'", rawURL)
 	}
 
 	service := serviceFactory()
