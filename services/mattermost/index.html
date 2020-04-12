@@ -363,37 +363,40 @@
 <p>Format the service URL</p>
 </li>
 </ol>
-<pre><code>https://your-domain.com/hooks/bywsw8zt5jgpte3nm65qjiru6h
-                              └────────────────────────┘
-                                        token
-mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h
-                             └────────────────────────┘
-                                       token
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c">https://your-domain.com/hooks/bywsw8zt5jgpte3nm65qjiru6h</span>
+<span class="c">                              └────────────────────────┘</span>
+<span class="c">                                        token</span>
+<span class="c">mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h</span>
+<span class="c">                             └────────────────────────┘</span>
+<span class="c">                                       token</span>
+</code></pre></div>
+
 
 <h2 id="additional_url_configuration">Additional URL configuration<a class="headerlink" href="#additional_url_configuration" title="Permanent link">&para;</a></h2>
 <p>Mattermost provides functionality to post as another user or to another channel, compared to the webhook configuration.
 <br/>
 To do this, you can add a <em>user</em> and/or <em>channel</em> to the service URL.</p>
-<pre><code>mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrUser/shoutrrrChannel
-                             └────────────────────────┘ └──────────┘ └─────────────┘
-                                       token                user        channel
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c">mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrUser/shoutrrrChannel</span>
+<span class="c">                             └────────────────────────┘ └──────────┘ └─────────────┘</span>
+<span class="c">                                       token                user        channel</span>
+</code></pre></div>
+
 
 <p>Be aware that if you want to pass user or channel only, you have to leave the other one blank.</p>
 <h2 id="passing_parameters_via_code">Passing parameters via code<a class="headerlink" href="#passing_parameters_via_code" title="Permanent link">&para;</a></h2>
 <p>If you want to, you also have the possibility to pass parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<pre><code class="gotemplate">params := (*types.Params)(
-    &amp;map[string]string{
-        &quot;username&quot;: &quot;overwriteUserName&quot;,
-        &quot;channel&quot;: &quot;overwriteChannel&quot;,
-    },
-)
+<div class="codehilite"><pre><span></span><code><span class="n">params</span><span class="w"> </span><span class="err">:</span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="p">.</span><span class="n">Params</span><span class="p">)(</span><span class="w"></span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">map</span><span class="o">[</span><span class="n">string</span><span class="o">]</span><span class="n">string</span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="ss">&quot;username&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteUserName&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">&quot;channel&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteChannel&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span><span class="w"></span>
+<span class="p">)</span><span class="w"></span>
 
-service.Send(&quot;this is a message&quot;, params)
-</code></pre>
+<span class="n">service</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="ss">&quot;this is a message&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
 
 <p>This will overwrite any options, that you passed via URL.</p>
                 

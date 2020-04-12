@@ -260,67 +260,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    Commands
-  </a>
-  
-    <nav class="md-nav" aria-label="Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#send" class="md-nav__link">
-    Send
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#generate" class="md-nav__link">
-    Generate
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#debug" class="md-nav__link">
-    Debug
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#url" class="md-nav__link">
-    URL
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#action_details" class="md-nav__link">
     Action details
   </a>
@@ -466,67 +405,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    Commands
-  </a>
-  
-    <nav class="md-nav" aria-label="Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#send" class="md-nav__link">
-    Send
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#generate" class="md-nav__link">
-    Generate
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#debug" class="md-nav__link">
-    Debug
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#url" class="md-nav__link">
-    URL
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#action_details" class="md-nav__link">
     Action details
   </a>
@@ -562,92 +440,50 @@
 <h2 id="as_a_package">As a package<a class="headerlink" href="#as_a_package" title="Permanent link">&para;</a></h2>
 <p>Using shoutrrr is easy! There is currently two ways of using it as a package.</p>
 <h3 id="using_the_direct_send_command">Using the direct send command<a class="headerlink" href="#using_the_direct_send_command" title="Permanent link">&para;</a></h3>
-<pre><code class="go">  url := &quot;slack://token-a/token-b/token-c&quot;
-  err := shoutrrr.Send(url, &quot;Hello world (or slack channel) !&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code>  <span class="nx">url</span> <span class="o">:=</span> <span class="s">&quot;slack://token-a/token-b/token-c&quot;</span>
+  <span class="nx">err</span> <span class="o">:=</span> <span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="s">&quot;Hello world (or slack channel) !&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 
 <h3 id="using_a_sender">Using a sender<a class="headerlink" href="#using_a_sender" title="Permanent link">&para;</a></h3>
-<pre><code class="go">  url := &quot;slack://token-a/token-b/token-c&quot;
-  sender, err := shoutrrr.CreateSender(url)
-  sender.Send(&quot;Hello world (or slack channel) !&quot;, map[string]string { /* ... */ })
-</code></pre>
+<div class="codehilite"><pre><span></span><code>  <span class="nx">url</span> <span class="o">:=</span> <span class="s">&quot;slack://token-a/token-b/token-c&quot;</span>
+  <span class="nx">sender</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">CreateSender</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+  <span class="nx">sender</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="s">&quot;Hello world (or slack channel) !&quot;</span><span class="p">,</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+</code></pre></div>
+
 
 <h2 id="through_the_cli">Through the CLI<a class="headerlink" href="#through_the_cli" title="Permanent link">&para;</a></h2>
 <p>Start by running the <code>build.sh</code> script.
 You may then run the shoutrrr executable:</p>
-<pre><code class="shell">$ ./shoutrrr
+<div class="codehilite"><pre><span></span><code>$ ./shoutrrr
 
 Usage:
-./shoutrrr &lt;ActionVerb&gt; [...]
+./shoutrrr &lt;ActionVerb&gt; <span class="o">[</span>...<span class="o">]</span>
 Possible actions: send, verify, generate
-</code></pre>
+</code></pre></div>
 
-<h3 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h3>
-<h4 id="send">Send<a class="headerlink" href="#send" title="Permanent link">&para;</a></h4>
-<p>Send a notification using the supplied notification service url.</p>
-<pre><code class="bash">$ shoutrrr send \
-    --url &quot;&lt;SERVICE_URL&gt;&quot; \
-    --message &quot;&lt;MESSAGE BODY&gt;&quot;
-</code></pre>
 
-<h4 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h4>
-<p>Verify the validity of a notification service url.</p>
-<pre><code class="bash">$ shoutrrr verify \
-    --url &quot;&lt;SERVICE_URL&gt;&quot;
-</code></pre>
-
-<h4 id="generate">Generate<a class="headerlink" href="#generate" title="Permanent link">&para;</a></h4>
-<p>Generate and display the configuration for a notification service url.</p>
-<pre><code class="bash">$ shoutrrr generate \
-    --url &quot;&lt;SERVICE_URL&gt;&quot;
-</code></pre>
-
-<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<h4 id="debug">Debug<a class="headerlink" href="#debug" title="Permanent link">&para;</a></h4>
-<p>Enables debug output from the CLI.</p>
-<table>
-<thead>
-<tr>
-<th>Flags</th>
-<th>Env.</th>
-<th>Default</th>
-<th>Required</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code>, <code>-d</code></td>
-<td><code>SHOUTRRR_DEBUG</code></td>
-<td><code>false</code></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h4 id="url">URL<a class="headerlink" href="#url" title="Permanent link">&para;</a></h4>
-<p>The target url for the notifications generated, see <a href="./services/overview">overview</a>.</p>
-<table>
-<thead>
-<tr>
-<th>Flags</th>
-<th>Env.</th>
-<th>Default</th>
-<th>Required</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--url</code>, <code>-u</code></td>
-<td><code>SHOUTRRR_URL</code></td>
-<td>N/A</td>
-<td>✅</td>
-</tr>
-</tbody>
-</table>
 <h3 id="action_details">Action details<a class="headerlink" href="#action_details" title="Permanent link">&para;</a></h3>
-<pre><code class="shell">$ ./shoutrrr generate
+<div class="codehilite"><pre><span></span><code>$ ./shoutrrr send
 Usage:
-./shoutrrr generate [OPTIONS] &lt;service&gt;
-</code></pre>
+./shoutrrr send <span class="o">[</span>OPTIONS<span class="o">]</span> &lt;URL&gt; &lt;Message <span class="o">[</span>...<span class="o">]</span>&gt;
+
+OPTIONS:
+  -verbose
+        display additional output
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>$ ./shoutrrr verify
+Usage:
+./shoutrrr send <span class="o">[</span>OPTIONS<span class="o">]</span> &lt;URL&gt; &lt;Message <span class="o">[</span>...<span class="o">]</span>&gt;
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>$ ./shoutrrr generate
+Usage:
+./shoutrrr generate <span class="o">[</span>OPTIONS<span class="o">]</span> &lt;service&gt;
+</code></pre></div>
                 
               
               
