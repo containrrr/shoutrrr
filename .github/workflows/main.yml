@@ -18,7 +18,10 @@ jobs:
         run: go build -v .
 
       - name: Test
-        run: go test -v -coverprofile=coverage.out ./...
+        run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Publish coverage
+        run: CODECOV_TOKEN="$({ secrets.CODECOV_TOKEN })" bash <(curl -s https://codecov.io/bash)
 
       - name: Set up Python
         uses: actions/setup-python@v1
