@@ -72,7 +72,7 @@ func doSend(config *Config, target string, message string, params *types.Params)
 	}
 
 	if err != nil {
-		return fmt.Errorf("error occured while posting to pushbullet: %s", err.Error())
+		return fmt.Errorf("error occurred while posting to pushbullet: %s", err.Error())
 	}
 
 	return nil

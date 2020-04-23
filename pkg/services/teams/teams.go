@@ -56,7 +56,7 @@ func (service *Service) doSend(postURL string, message string) error {
 	}
 	if err != nil {
 		return fmt.Errorf(
-			"an error occured while sending notification to teams: %s",
+			"an error occurred while sending notification to teams: %s",
 			err.Error(),
 		)
 	}
