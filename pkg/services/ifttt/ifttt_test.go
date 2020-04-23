@@ -192,7 +192,7 @@ var _ = Describe("the ifttt package", func() {
 			})
 		})
 		When("given a param overrides for value1, value2 and value3", func() {
-			It("should return a jsonPayload string with value1, value2 and value3 overriden", func() {
+			It("should return a jsonPayload string with value1, value2 and value3 overridden", func() {
 				bytes, err := createJSONToSend(&Config{
 					Value1:            "a",
 					Value2:            "b",

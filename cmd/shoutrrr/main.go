@@ -25,7 +25,6 @@ func main() {
 		return
 	}
 
-	actionResult := 1025
 	actionWord := os.Args[1]
 	var action action
 
@@ -41,7 +40,7 @@ func main() {
 		return
 	}
 
-	actionResult = action.Run()
+	actionResult := action.Run()
 
 	if parseErr := action.FlagSet.Parse(os.Args[2:]); parseErr == nil {
 		actionResult = action.Run()

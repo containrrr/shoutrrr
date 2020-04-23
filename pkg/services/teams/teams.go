@@ -3,7 +3,6 @@ package teams
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -53,8 +52,13 @@ func (service *Service) doSend(postURL string, message string) error {
 
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonBody))
 	if res.StatusCode != http.StatusOK {
-		msg := fmt.Sprintf("failed to send notification to teams, response status code %s", res.Status)
-		return errors.New(msg)
+		return fmt.Errorf("failed to send notification to teams, response status code %s", res.Status)
+	}
+	if err != nil {
+		return fmt.Errorf(
+			"an error occured while sending notification to teams: %s",
+			err.Error(),
+		)
 	}
 	return nil
 }

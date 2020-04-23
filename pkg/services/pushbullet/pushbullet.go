@@ -71,6 +71,10 @@ func doSend(config *Config, target string, message string, params *types.Params)
 		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
 	}
 
+	if err != nil {
+		return fmt.Errorf("error occured while posting to pushbullet: %s", err.Error())
+	}
+
 	return nil
 }
 
