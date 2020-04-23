@@ -18,8 +18,8 @@ import (
 type Service struct {
 	standard.Standard
 	standard.Templater
-	config           *Config
-	multipartBoundry string
+	config            *Config
+	multipartBoundary string
 }
 
 const (
@@ -86,7 +86,7 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 	params["message"] = message
 
 	if config.UseHTML {
-		service.multipartBoundry = fmt.Sprintf("%x", rand.Int63())
+		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
 	}
 
 	if config.UseStartTLS {
@@ -191,7 +191,7 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 
 	var contentType string
 	if conf.UseHTML {
-		contentType = fmt.Sprintf(contentMultipart, service.multipartBoundry)
+		contentType = fmt.Sprintf(contentMultipart, service.multipartBoundary)
 	} else {
 		contentType = contentPlain
 	}
@@ -207,21 +207,21 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 
 func (service *Service) writeMultipartMessage(wc io.WriteCloser, params *map[string]string) failure {
 
-	if err := writeMultipartHeader(wc, service.multipartBoundry, contentPlain); err != nil {
+	if err := writeMultipartHeader(wc, service.multipartBoundary, contentPlain); err != nil {
 		return fail(FailPlainHeader, err)
 	}
 	if err := service.writeMessagePart(wc, params, "plain"); err != nil {
 		return err
 	}
 
-	if err := writeMultipartHeader(wc, service.multipartBoundry, contentHTML); err != nil {
+	if err := writeMultipartHeader(wc, service.multipartBoundary, contentHTML); err != nil {
 		return fail(FailHTMLHeader, err)
 	}
 	if err := service.writeMessagePart(wc, params, "HTML"); err != nil {
 		return err
 	}
 
-	if err := writeMultipartHeader(wc, service.multipartBoundry, ""); err != nil {
+	if err := writeMultipartHeader(wc, service.multipartBoundary, ""); err != nil {
 		return fail(FailMultiEndHeader, err)
 
 	}
@@ -242,13 +242,13 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, params *map[string]s
 	return nil
 }
 
-func writeMultipartHeader(wc io.WriteCloser, boundry string, contentType string) error {
+func writeMultipartHeader(wc io.WriteCloser, boundary string, contentType string) error {
 	suffix := "\n"
 	if len(contentType) < 1 {
 		suffix = "--"
 	}
 
-	if _, err := fmt.Fprintf(wc, "\n\n--%s%s", boundry, suffix); err != nil {
+	if _, err := fmt.Fprintf(wc, "\n\n--%s%s", boundary, suffix); err != nil {
 		return err
 	}
 
