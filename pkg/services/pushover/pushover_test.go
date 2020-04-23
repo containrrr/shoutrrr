@@ -82,7 +82,7 @@ var _ = Describe("the pushover config", func() {
 		It("should split it by commas if the key is devices", func() {
 			err := config.Set("devices", "a,b,c,d")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(config.Devices).To(Equal([]string { "a", "b", "c", "d"}))
+			Expect(config.Devices).To(Equal([]string{"a", "b", "c", "d"}))
 		})
 		It("should return an error if the key is not devices", func() {
 			err := config.Set("devicey", "a,b,c,d")
@@ -91,7 +91,7 @@ var _ = Describe("the pushover config", func() {
 	})
 	When("getting a config key", func() {
 		It("should join it with commas if the key is devices", func() {
-			config.Devices = []string { "a", "b", "c" }
+			config.Devices = []string{"a", "b", "c"}
 			value, err := config.Get("devices")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(value).To(Equal("a,b,c"))
@@ -105,13 +105,13 @@ var _ = Describe("the pushover config", func() {
 	When("listing the query fields", func() {
 		It("should return the key \"devices\"", func() {
 			fields := config.QueryFields()
-			Expect(fields).To(Equal([]string { "devices" }))
+			Expect(fields).To(Equal([]string{"devices"}))
 		})
 	})
 })
 
 func createURL(username string, token string) *url.URL {
-	return &url.URL {
+	return &url.URL{
 		User: url.UserPassword("Token", token),
 		Host: username,
 	}

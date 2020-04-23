@@ -118,13 +118,13 @@ var _ = Describe("the ifttt package", func() {
 			httpmock.Activate()
 			defer httpmock.DeactivateAndReset()
 			setupResponder("foo", "dummy", 404, "")
-			
+
 			URL, _ := url.Parse("ifttt://dummy/?events=foo")
-			
+
 			if err := service.Initialize(URL, logger); err != nil {
 				Fail("errored during initialization")
 			}
-			
+
 			err := service.Send("hello", nil)
 			Expect(err).To(HaveOccurred())
 		})
@@ -132,13 +132,13 @@ var _ = Describe("the ifttt package", func() {
 			httpmock.Activate()
 			defer httpmock.DeactivateAndReset()
 			setupResponder("foo", "dummy", 204, "")
-			
+
 			URL, _ := url.Parse("ifttt://dummy/?events=foo")
-			
+
 			if err := service.Initialize(URL, logger); err != nil {
 				Fail("errored during initialization")
 			}
-			
+
 			err := service.Send("hello", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})

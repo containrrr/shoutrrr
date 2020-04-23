@@ -10,19 +10,19 @@ import (
 
 //Config object holding all information
 type Config struct {
-standard.QuerylessConfig
-standard.EnumlessConfig
-UserName string
-Channel string
-Host	string
-Token string
+	standard.QuerylessConfig
+	standard.EnumlessConfig
+	UserName string
+	Channel  string
+	Host     string
+	Token    string
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
 		Host:       config.Host,
-		Path:       fmt.Sprintf("/hooks/%s",  config.Token),
+		Path:       fmt.Sprintf("/hooks/%s", config.Token),
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}
@@ -40,7 +40,6 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 	if len(path) < 1 || len(path) == 2 {
 		return errors.New(string(NotEnoughArguments))
 	}
-
 
 	config.Token = path[0]
 	if len(path) > 1 {

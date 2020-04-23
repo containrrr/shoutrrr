@@ -19,3 +19,6 @@ shoutrrr
 *.out
 .idea
 site
+
+report.json
+coverage.txt

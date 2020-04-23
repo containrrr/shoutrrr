@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	service     *Service
+	service          *Service
 	envMattermostURL *url.URL
 )
 
@@ -147,7 +147,7 @@ var _ = Describe("the mattermost service", func() {
 			config := &Config{}
 			config.SetURL(mattermostURL)
 			It("should generate the correct JSON body", func() {
-				params := (*types.Params)(&map[string]string{"username": "overwriteUserName","channel": "overwriteChannel",})
+				params := (*types.Params)(&map[string]string{"username": "overwriteUserName", "channel": "overwriteChannel"})
 				json, err := CreateJSONPayload(config, "this is a message", params)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(json)).To(Equal("{\"text\":\"this is a message\",\"username\":\"overwriteUserName\",\"channel\":\"overwriteChannel\"}"))

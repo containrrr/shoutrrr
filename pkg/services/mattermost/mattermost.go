@@ -35,7 +35,6 @@ func (service *Service) Send(message string, params *types.Params) error {
 	json, _ := CreateJSONPayload(config, message, params)
 	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 
-
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
 	}
@@ -44,5 +43,5 @@ func (service *Service) Send(message string, params *types.Params) error {
 
 // Builds the actual URL the request should go to
 func buildURL(config *Config) string {
-	return fmt.Sprintf("https://%s/hooks/%s",config.Host,config.Token)
+	return fmt.Sprintf("https://%s/hooks/%s", config.Host, config.Token)
 }
