@@ -6,7 +6,7 @@ theme:
   palette:
     primary: cyan
     accent: cyan
-  logo: gh-pages/shoutrrr.jpg
+  logo: shoutrrr.jpg
 markdown_extensions:
   - toc:
       permalink: True
