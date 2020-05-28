@@ -6,7 +6,8 @@ theme:
   palette:
     primary: cyan
     accent: cyan
-  logo: shoutrrr.jpg
+  logo: shoutrrr-x180.png
+  favicon: favicon.ico
 markdown_extensions:
   - toc:
       permalink: True
