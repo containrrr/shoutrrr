@@ -6,7 +6,7 @@ Click on the service for a more thorough explanation.
 | -------------------------------------------- | ------------ |
 | [Discord](/shoutrrr/services/discord)                 | *discord://__`token`__@__`channel`__* |
 | [Telegram](/shoutrrr/services/not-documented)         | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]* |
-| [Pushover](/shoutrrr/services/not-documented)         | *pushover://__`user`__:__`token`__/__`user`__/?devices=__`device`__* |
+| [Pushover](/shoutrrr/services/not-documented)         | *pushover://__`user`__:__`token`__@__`user`__/?devices=__`device`__* |
 | [Slack](/shoutrrr/services/not-documented)            | *slack://[__`botname`__@]__`token-a`__/__`token-b`__/__`token-c`__* |
 | [Email](/shoutrrr/services/not-documented)            | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?fromAddress=__`fromAddress`__&toAddresses=__`recipient1`__[,__`recipient2`__,...]* |
 | [Microsoft Teams](/shoutrrr/services/not-documented)  | *teams://__`token-a`__/__`token-b`__/__`token-c`__* |
