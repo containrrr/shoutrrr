@@ -3,6 +3,10 @@ site_url: http://containrrr.github.io/shoutrrr/
 repo_url: https://github.com/containrrr/shoutrrr/
 theme:
   name: 'material'
+  palette:
+    primary: cyan
+    accent: cyan
+  logo: gh-pages/shoutrrr.jpg
 markdown_extensions:
   - toc:
       permalink: True
