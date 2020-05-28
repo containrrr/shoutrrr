@@ -6,7 +6,7 @@ theme:
   palette:
     primary: cyan
     accent: cyan
-  logo: shoutrrr-x180.png
+  logo: shoutrrr-180px.png
   favicon: favicon.ico
 markdown_extensions:
   - toc:
