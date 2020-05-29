@@ -35,19 +35,17 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 	if serviceURL.Path == "" || serviceURL.Path == "/" {
 		return errors.New(string(NotEnoughArguments))
 	}
+	config.UserName = serviceURL.User.Username()
 	path := strings.Split(serviceURL.Path[1:], "/")
 
-	if len(path) < 1 || len(path) == 2 {
+	if len(path) < 1 {
 		return errors.New(string(NotEnoughArguments))
 	}
 
 	config.Token = path[0]
 	if len(path) > 1 {
 		if path[1] != "" {
-			config.UserName = path[1]
-		}
-		if path[2] != "" {
-			config.Channel = path[2]
+			config.Channel = path[1]
 		}
 	}
 
