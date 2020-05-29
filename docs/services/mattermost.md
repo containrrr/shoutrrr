@@ -36,12 +36,10 @@ Mattermost provides functionality to post as another user or to another channel,
 To do this, you can add a *user* and/or *channel* to the service URL.
 
 ```
-mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrUser/shoutrrrChannel
-                             └────────────────────────┘ └──────────┘ └─────────────┘
-                                       token                user        channel
+mattermost://shoutrrrUser@your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrChannel
+             └──────────┘                 └────────────────────────┘ └─────────────┘
+                 user                               token                channel
 ```
-
-Be aware that if you want to pass user or channel only, you have to leave the other one blank.
 
 ## Passing parameters via code
 

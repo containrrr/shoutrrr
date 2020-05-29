@@ -13,5 +13,5 @@ Click on the service for a more thorough explanation.
 | [Gotify](/shoutrrr/services/not-documented)           | *gotify://__`gotify-host`__/__`token`__* |
 | [Pushbullet](/shoutrrr/services/not-documented)       | *pushbullet://__`api-token`__[/__`device`__/#__`channel`__/__`email`__]* |
 | [IFTTT](/shoutrrr/services/not-documented)            | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__* |
-| [Mattermost](/shoutrrr/services/not-documented)       | *mattermost://__`mattermost-host`__/__`token`__[/__`username`__/__`channel`__]* |
+| [Mattermost](/shoutrrr/services/not-documented)       | *mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]* |
 | [Hangouts Chat](/shoutrrr/services/hangouts)          | *hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz* |
