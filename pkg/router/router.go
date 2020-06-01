@@ -19,6 +19,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
+	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/xmpp"
 )
@@ -140,6 +141,7 @@ var serviceMap = map[string]func() t.Service{
 	"pushbullet": func() t.Service { return &pushbullet.Service{} },
 	"mattermost": func() t.Service { return &mattermost.Service{} },
 	"hangouts":   func() t.Service { return &hangouts.Service{} },
+	"zulip":      func() t.Service { return &zulip.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
