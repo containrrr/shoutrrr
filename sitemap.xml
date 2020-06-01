@@ -19,5 +19,13 @@
      <loc>http://containrrr.github.io/shoutrrr/services/hangouts/</loc>
      <lastmod>2020-06-01</lastmod>
      <changefreq>daily</changefreq>
+    </url><url>
+     <loc>http://containrrr.github.io/shoutrrr/services/pushover/</loc>
+     <lastmod>2020-06-01</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>http://containrrr.github.io/shoutrrr/services/zulip/</loc>
+     <lastmod>2020-06-01</lastmod>
+     <changefreq>daily</changefreq>
     </url>
 </urlset>
