@@ -25,4 +25,4 @@ You can optionally specify the __`title`__ and __`priority`__ parameters in the 
 
 __Note:__ Only supply priority values between -1 and 1, since 2 requires additional parameters that are not supported yet.
 
-Please refer to the [Pushover API documentation]() for more information.  
+Please refer to the [Pushover API documentation](https://pushover.net/api#messages) for more information.  
