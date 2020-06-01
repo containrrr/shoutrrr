@@ -33,8 +33,9 @@ var _ = Describe("the pushover service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envPushoverURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send("this is an integration test", nil)
+			var err = service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+			err = service.Send("this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -84,7 +85,21 @@ var _ = Describe("the pushover config", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Devices).To(Equal([]string{"a", "b", "c", "d"}))
 		})
-		It("should return an error if the key is not devices", func() {
+		It("should update priority when a valid number is supplied", func() {
+			err := config.Set("priority", "1")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(config.Priority).To(Equal(int8(1)))
+		})
+		It("should update the title when it is supplied", func() {
+			err := config.Set("title", "new title")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(config.Title).To(Equal("new title"))
+		})
+		It("should return an error if priority is not a number", func() {
+			err := config.Set("priority", "super-duper")
+			Expect(err).To(HaveOccurred())
+		})
+		It("should return an error if the key is not recognized", func() {
 			err := config.Set("devicey", "a,b,c,d")
 			Expect(err).To(HaveOccurred())
 		})
@@ -96,16 +111,16 @@ var _ = Describe("the pushover config", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(value).To(Equal("a,b,c"))
 		})
-		It("should return an error if the key is not devices", func() {
+		It("should return an error if the key is not recognized", func() {
 			_, err := config.Get("devicey")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	When("listing the query fields", func() {
-		It("should return the key \"devices\"", func() {
+		It("should return the keys \"devices\",\"priority\",\"title\"", func() {
 			fields := config.QueryFields()
-			Expect(fields).To(Equal([]string{"devices"}))
+			Expect(fields).To(Equal([]string{"devices", "priority", "title"}))
 		})
 	})
 })

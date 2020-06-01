@@ -1,6 +1,7 @@
 package shoutrrr
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"log"
 
 	"github.com/containrrr/shoutrrr/pkg/router"
@@ -20,7 +21,7 @@ func Send(rawURL string, message string) error {
 		return err
 	}
 
-	return service.Send(message, nil)
+	return service.Send(message, &types.Params{})
 }
 
 // CreateSender returns a notification sender configured according to the supplied URL
