@@ -20,5 +20,8 @@ nav:
     - Overview: 'services/overview.md'
     - Discord: 'services/discord.md'
     - Hangouts Chat: 'services/hangouts.md'
+    - Pushover: 'services/pushover.md'
+    - Zulip Chat: 'services/zulip.md'
+
 plugins:
   - search
