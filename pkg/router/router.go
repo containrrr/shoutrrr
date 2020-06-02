@@ -50,6 +50,10 @@ func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
 
 // Send sends the specified message using the routers underlying services
 func (router *ServiceRouter) Send(message string, params *t.Params) []error {
+	if router == nil {
+		return []error{fmt.Errorf("error sending message: no senders")}
+	}
+
 	serviceCount := len(router.services)
 	errors := make([]error, serviceCount)
 	results := make(chan error, serviceCount)
