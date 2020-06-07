@@ -11,6 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/hangouts"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
+	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
@@ -146,6 +147,7 @@ var serviceMap = map[string]func() t.Service{
 	"mattermost": func() t.Service { return &mattermost.Service{} },
 	"hangouts":   func() t.Service { return &hangouts.Service{} },
 	"zulip":      func() t.Service { return &zulip.Service{} },
+	"join":       func() t.Service { return &join.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {

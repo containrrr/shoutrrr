@@ -16,3 +16,4 @@ Click on the service for a more thorough explanation.
 | [Mattermost](/shoutrrr/services/not-documented)       | *mattermost://__`mattermost-host`__/__`token`__[/__`username`__/__`channel`__]* |
 | [Hangouts Chat](/shoutrrr/services/hangouts)          | *hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz* |
 | [Zulip Chat](/shoutrrr/services/zulip)                | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__* |
+| [Join](/shoutrrr/services/not-documented)             | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]* |
