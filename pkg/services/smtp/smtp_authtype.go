@@ -12,6 +12,7 @@ type authTypeVals struct {
 	Plain   authType
 	CRAMMD5 authType
 	Unknown authType
+	OAuth2  authType
 	Enum    types.EnumFormatter
 }
 
@@ -20,12 +21,14 @@ var authTypes = &authTypeVals{
 	Plain:   1,
 	CRAMMD5: 2,
 	Unknown: 3,
+	OAuth2:  4,
 	Enum: format.CreateEnumFormatter(
 		[]string{
 			"None",
 			"Plain",
 			"CRAMMD5",
 			"Unknown",
+			"OAuth2",
 		}),
 }
 

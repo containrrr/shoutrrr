@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/containrrr/shoutrrr/pkg/services/smtp"
+	"log"
 )
 
 func generate() action {
@@ -21,17 +22,45 @@ func generate() action {
 
 			fmt.Printf("Service: %s\n", serviceSchema)
 
+			if serviceSchema == "smtp" {
+
+				guide := flags.Arg(1)
+				var url string
+				var err error
+
+				credFile := flags.Arg(2)
+
+				if guide == "oauth2" {
+					if len(credFile) > 0 {
+						url, err = smtp.OAuth2GeneratorFile(credFile)
+					} else {
+						url, err = smtp.OAuth2Generator()
+					}
+				} else if guide == "gmail" {
+					url, err = smtp.OAuth2GeneratorGmail(credFile)
+				} else {
+					err = fmt.Errorf("unknown guide %q", guide)
+				}
+
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Printf("\nService URL:\n%q", url)
+
+				return 0
+			}
+
 			serviceRouter := router.ServiceRouter{}
 
 			service, err := serviceRouter.Locate(serviceSchema)
 			if err != nil {
-				fmt.Printf("invalid service schema '%s'\n", serviceSchema)
+				fmt.Printf("invalid service schema '%s': %s\n", serviceSchema, err.Error())
 				return 2
 			}
 
 			configFormat, _ := format.GetConfigMap(service) // TODO: GetConfigFormat
-			for key, format := range configFormat {
-				fmt.Printf("%s: %s", key, format)
+			for key, cf := range configFormat {
+				fmt.Printf("%s: %s", key, cf)
 			}
 
 			return 1

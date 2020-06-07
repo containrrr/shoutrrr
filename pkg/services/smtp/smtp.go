@@ -135,6 +135,8 @@ func (service *Service) getAuth() (smtp.Auth, failure) {
 		return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
 	case authTypes.CRAMMD5:
 		return smtp.CRAMMD5Auth(config.Username, config.Password), nil
+	case authTypes.OAuth2:
+		return OAuth2Auth(config.Username, config.Password), nil
 	default:
 		return nil, fail(FailAuthType, nil, config.Auth.String())
 	}
