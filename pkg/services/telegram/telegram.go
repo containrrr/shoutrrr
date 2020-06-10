@@ -25,7 +25,7 @@ type Service struct {
 }
 
 // Send notification to Telegram
-func (service *Service) Send(message string, params *types.Params) error {
+func (service *Service) Send(message string, _ *types.Params) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
@@ -60,14 +60,17 @@ func (service *Service) GetConfig() *Config {
 
 func sendMessageToAPI(message string, channel string, apiToken string) error {
 	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, apiToken)
-	jsonData, _ := json.Marshal(
+	jsonData, err := json.Marshal(
 		JSON{
 			Text: message,
 			ID:   channel,
 		})
+	if err != nil {
+		return err
+	}
 
 	res, err := http.Post(postURL, "application/jsonData", bytes.NewBuffer(jsonData))
-	if res.StatusCode != http.StatusOK {
+	if err == nil && res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", channel, res.Status)
 	}
 	return err
