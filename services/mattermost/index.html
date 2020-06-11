@@ -407,13 +407,12 @@
 <p>Mattermost provides functionality to post as another user or to another channel, compared to the webhook configuration.
 <br/>
 To do this, you can add a <em>user</em> and/or <em>channel</em> to the service URL.</p>
-<div class="codehilite"><pre><span></span><code><span class="c">mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrUser/shoutrrrChannel</span>
-<span class="c">                             └────────────────────────┘ └──────────┘ └─────────────┘</span>
-<span class="c">                                       token                user        channel</span>
+<div class="codehilite"><pre><span></span><code><span class="c">mattermost://shoutrrrUser@your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrChannel</span>
+<span class="c">             └──────────┘                 └────────────────────────┘ └─────────────┘</span>
+<span class="c">                 user                               token                channel</span>
 </code></pre></div>
 
 
-<p>Be aware that if you want to pass user or channel only, you have to leave the other one blank.</p>
 <h2 id="passing_parameters_via_code">Passing parameters via code<a class="headerlink" href="#passing_parameters_via_code" title="Permanent link">&para;</a></h2>
 <p>If you want to, you also have the possibility to pass parameters to the <code>send</code> function.
 <br/>
