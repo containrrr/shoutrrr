@@ -53,8 +53,10 @@ jobs:
           ./goreleaser -v
 
       - name: Login to docker hub
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+        uses: azure/docker-login@v1
+        with:
+          username: '${{ secrets.DOCKER_USER }}'
+          password: '${{ secrets.DOCKER_PASSWORD }}'
 
       - name: Execute goreleaser
         run: CGO_ENABLED=0 ../goreleaser --debug
