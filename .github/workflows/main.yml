@@ -54,7 +54,7 @@ jobs:
 
       - name: Login to docker hub
         run: |
-          echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
+          echo "${{ secrets.DOCKER_PASS }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
 
       - name: Execute goreleaser
         run: CGO_ENABLED=0 ../goreleaser --debug
