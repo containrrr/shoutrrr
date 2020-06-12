@@ -13,24 +13,31 @@ import (
 
 func hasURLInEnvButNotFlag(cmd *cobra.Command) bool {
 	s, _ := cmd.Flags().GetString("url")
-	return s == "" && viper.GetViper().GetString("url") != ""
+	return s == "" && viper.GetViper().GetString("SHOUTRRR_URL") != ""
 }
 
 // Cmd sends a notification using a service url
 var Cmd = &cobra.Command{
 	Use:   "send",
 	Short: "Send a notification using a service url",
-	Args:  cobra.NoArgs,
+	Args:  cobra.MaximumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
+		fmt.Println(viper.GetViper().GetString("SHOUTRRR_URL"), "<--")
+		if len(args) == 1 {
+			cmd.Flags().Set("url", args[0])
+			return
+		}
 		// WORKAROUND: make cobra count env vars when checking required flags
 		if hasURLInEnvButNotFlag(cmd) {
-			cmd.Flags().Set("url", viper.GetViper().GetString("url"))
+			cmd.Flags().Set("url", viper.GetViper().GetString("SHOUTRRR_URL"))
+			return
 		}
 	},
 	Run: Run,
 }
 
 func init() {
+	Cmd.Flags().StringP("url", "u", "", "The notification url")
 	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url")
 	Cmd.MarkFlagRequired("message")
 }

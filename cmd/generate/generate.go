@@ -14,7 +14,7 @@ var serviceRouter router.ServiceRouter
 
 func hasURLInEnvButNotFlag(cmd *cobra.Command) bool {
 	s, _ := cmd.Flags().GetString("url")
-	return s == "" && viper.GetViper().GetString("url") != ""
+	return s == "" && viper.GetViper().GetString("SHOUTRRR_URL") != ""
 }
 
 // Cmd used to generate and display a config from a notification service URL
@@ -23,12 +23,19 @@ var Cmd = &cobra.Command{
 	Short: "Generates and displays a config from a notification service URL.",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// WORKAROUND: make cobra count env vars when checking required flags
+
+		if len(args) == 1 {
+			cmd.Flags().Set("url", args[0]))
+			return
+		}
+
 		if hasURLInEnvButNotFlag(cmd) {
-			cmd.Flags().Set("url", viper.GetViper().GetString("url"))
+			cmd.Flags().Set("url", viper.GetViper().GetString("SHOUTRRR_URL"))
+			return
 		}
 	},
 	Run:  Run,
-	Args: cobra.NoArgs,
+	Args: cobra.MaximumNArgs(1),
 }
 
 func init() {
