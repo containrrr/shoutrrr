@@ -59,7 +59,7 @@ jobs:
           password: '${{ secrets.DOCKER_PASSWORD }}'
 
       - name: Execute goreleaser
-        run: CGO_ENABLED=0 ../goreleaser --debug
+        run: CGO_ENABLED=0 ../goreleaser --debug --snapshot
 
       - name: Enable experimental docker features
         run: |
