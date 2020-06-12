@@ -1,0 +1,62 @@
+build:
+  dir: .
+  main: ./cmd/shoutrrr
+  binary: shoutrrr
+  goos:
+    - linux
+    - windows
+  goarch:
+    - amd64
+    - 386
+    - arm
+    - arm64
+archives:
+  - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}'
+    format: tar.gz
+    replacements:
+      arm: armhf
+      arm64: arm64v8
+      amd64: amd64
+      386: 386
+      darwin: macOS
+      linux: linux
+    format_overrides:
+      - goos: windows
+        format: zip
+dockers:
+  - goos: linux
+    goarch: amd64
+    goarm: ''
+    dockerfile: Dockerfile
+    image_templates:
+      - containrrr/shoutrrr:amd64-{{ .Version }}
+      - containrrr/shoutrrr:amd64-latest
+    binaries:
+      - shoutrrr
+  - goos: linux
+    goarch: 386
+    goarm: ''
+    dockerfile: Dockerfile
+    image_templates:
+      - containrrr/shoutrrr:i386-{{ .Version }}
+      - containrrr/shoutrrr:i386-latest
+    binaries:
+      - shoutrrr
+  - goos: linux
+    goarch: arm
+    goarm: 6
+    dockerfile: Dockerfile
+    image_templates:
+      - containrrr/shoutrrr:armhf-{{ .Version }}
+      - containrrr/shoutrrr:armhf-latest
+    binaries:
+      - shoutrrr
+  - goos: linux
+    goarch: arm64
+    goarm: ''
+    dockerfile: Dockerfile
+    image_templates:
+      - containrrr/shoutrrr:arm64v8-{{ .Version }}
+      - containrrr/shoutrrr:arm64v8-latest
+    binaries:
+      - shoutrrr

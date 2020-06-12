@@ -6,7 +6,7 @@
 *.dll
 *.so
 *.dylib
-shoutrrr
+/shoutrrr
 
 # Test binary, build with `go test -c`
 # ---
@@ -22,3 +22,4 @@ site
 
 report.json
 coverage.txt
+dist
