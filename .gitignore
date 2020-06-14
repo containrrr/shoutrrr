@@ -18,8 +18,8 @@
 
 *.out
 .idea
-site
 
 report.json
 coverage.txt
 dist
+site

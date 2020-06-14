@@ -25,7 +25,7 @@ var Cmd = &cobra.Command{
 		// WORKAROUND: make cobra count env vars when checking required flags
 
 		if len(args) == 1 {
-			cmd.Flags().Set("url", args[0]))
+			cmd.Flags().Set("url", args[0])
 			return
 		}
 
