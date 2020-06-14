@@ -54,7 +54,7 @@ $ shoutrrr send [OPTIONS] <URL> <Message [...]>
 ```
 
 ## Documentation
-For additional details, visit the [full documentation](https://containrrr.github.io/shoutrrr). 
+For additional details, visit the [full documentation](https://containrrr.dev/shoutrrr). 
 
 ## Contributors ✨
 
