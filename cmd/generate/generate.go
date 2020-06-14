@@ -4,38 +4,21 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var serviceRouter router.ServiceRouter
 
-func hasURLInEnvButNotFlag(cmd *cobra.Command) bool {
-	s, _ := cmd.Flags().GetString("url")
-	return s == "" && viper.GetViper().GetString("SHOUTRRR_URL") != ""
-}
-
 // Cmd used to generate and display a config from a notification service URL
 var Cmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generates and displays a config from a notification service URL.",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		// WORKAROUND: make cobra count env vars when checking required flags
-
-		if len(args) == 1 {
-			cmd.Flags().Set("url", args[0])
-			return
-		}
-
-		if hasURLInEnvButNotFlag(cmd) {
-			cmd.Flags().Set("url", viper.GetViper().GetString("SHOUTRRR_URL"))
-			return
-		}
-	},
-	Run:  Run,
-	Args: cobra.MaximumNArgs(1),
+	Use:    "generate",
+	Short:  "Generates and displays a config from a notification service URL.",
+	PreRun: util.MoveEnvVarToFlag,
+	Run:    Run,
+	Args:   cobra.MaximumNArgs(1),
 }
 
 func init() {
