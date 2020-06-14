@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/router"
 
@@ -13,17 +14,22 @@ import (
 
 // Cmd verifies the validity of a service url
 var Cmd = &cobra.Command{
-	Use:   "verify",
-	Short: "Verify the validity of a notification service URL",
-	Run:   Run,
-	Args:  cobra.ExactArgs(1),
+	Use:    "verify",
+	Short:  "Verify the validity of a notification service URL",
+	PreRun: util.MoveEnvVarToFlag,
+	Run:    Run,
+	Args:   cobra.MaximumNArgs(1),
 }
 
 var sr router.ServiceRouter
 
+func init() {
+	Cmd.Flags().StringP("url", "u", "", "The notification url")
+}
+
 // Run the verify command
 func Run(cmd *cobra.Command, args []string) {
-	URL := args[0]
+	URL, _ := cmd.Flags().GetString("url")
 	sr = router.ServiceRouter{}
 
 	service, err := sr.Locate(URL)

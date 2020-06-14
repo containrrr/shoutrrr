@@ -23,12 +23,13 @@ var Cmd = &cobra.Command{
 
 func init() {
 	serviceRouter = router.ServiceRouter{}
+	Cmd.Flags().StringP("url", "u", "", "The notification url")
 
 }
 
 // Run the generate command
 func Run(cmd *cobra.Command, args []string) {
-	URL := args[0]
+	URL, _ := cmd.Flags().GetString("url")
 
 	if _, err := serviceRouter.Locate(URL); err != nil {
 		fmt.Printf("invalid service schema '%s', %s", URL, err)
