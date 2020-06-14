@@ -12,7 +12,7 @@
         <link rel="canonical" href="http://containrrr.github.io/shoutrrr/services/mattermost/">
       
       
-      <link rel="shortcut icon" href="../../favicon.ico">
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.3">
     
     
@@ -23,12 +23,6 @@
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.6e35a1a6.min.css">
       
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a46bcfb3.min.css">
-      
-      
-        
-        
-        <meta name="theme-color" content="#00bcd4">
       
     
     
@@ -48,10 +42,7 @@
   </head>
   
   
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="cyan" data-md-color-accent="cyan">
+    <body dir="ltr">
   
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -72,7 +63,8 @@
   <nav class="md-header-nav md-grid" aria-label="Header">
     <a href="http://containrrr.github.io/shoutrrr/" title="Shoutrrr" class="md-header-nav__button md-logo" aria-label="Shoutrrr">
       
-  <img src="../../shoutrrr-180px.png" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
     <label class="md-header-nav__button md-icon" for="__drawer">
@@ -158,7 +150,8 @@
   <label class="md-nav__title" for="__drawer">
     <a href="http://containrrr.github.io/shoutrrr/" title="Shoutrrr" class="md-nav__button md-logo" aria-label="Shoutrrr">
       
-  <img src="../../shoutrrr-180px.png" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
     Shoutrrr
@@ -260,30 +253,6 @@
   <li class="md-nav__item">
     <a href="../hangouts/" title="Hangouts Chat" class="md-nav__link">
       Hangouts Chat
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../pushover/" title="Pushover" class="md-nav__link">
-      Pushover
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../zulip/" title="Zulip Chat" class="md-nav__link">
-      Zulip Chat
     </a>
   </li>
 
@@ -394,39 +363,37 @@
 <p>Format the service URL</p>
 </li>
 </ol>
-<div class="codehilite"><pre><span></span><code><span class="c">https://your-domain.com/hooks/bywsw8zt5jgpte3nm65qjiru6h</span>
-<span class="c">                              └────────────────────────┘</span>
-<span class="c">                                        token</span>
-<span class="c">mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h</span>
-<span class="c">                             └────────────────────────┘</span>
-<span class="c">                                       token</span>
-</code></pre></div>
-
+<pre><code>https://your-domain.com/hooks/bywsw8zt5jgpte3nm65qjiru6h
+                              └────────────────────────┘
+                                        token
+mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h
+                             └────────────────────────┘
+                                       token
+</code></pre>
 
 <h2 id="additional_url_configuration">Additional URL configuration<a class="headerlink" href="#additional_url_configuration" title="Permanent link">&para;</a></h2>
 <p>Mattermost provides functionality to post as another user or to another channel, compared to the webhook configuration.
 <br/>
 To do this, you can add a <em>user</em> and/or <em>channel</em> to the service URL.</p>
-<div class="codehilite"><pre><span></span><code><span class="c">mattermost://shoutrrrUser@your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrChannel</span>
-<span class="c">             └──────────┘                 └────────────────────────┘ └─────────────┘</span>
-<span class="c">                 user                               token                channel</span>
-</code></pre></div>
+<pre><code>mattermost://your-domain.com/bywsw8zt5jgpte3nm65qjiru6h/shoutrrrUser/shoutrrrChannel
+                             └────────────────────────┘ └──────────┘ └─────────────┘
+                                       token                user        channel
+</code></pre>
 
-
+<p>Be aware that if you want to pass user or channel only, you have to leave the other one blank.</p>
 <h2 id="passing_parameters_via_code">Passing parameters via code<a class="headerlink" href="#passing_parameters_via_code" title="Permanent link">&para;</a></h2>
 <p>If you want to, you also have the possibility to pass parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">params</span><span class="w"> </span><span class="err">:</span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="p">.</span><span class="n">Params</span><span class="p">)(</span><span class="w"></span>
-<span class="w">    </span><span class="o">&amp;</span><span class="k">map</span><span class="o">[</span><span class="n">string</span><span class="o">]</span><span class="n">string</span><span class="err">{</span><span class="w"></span>
-<span class="w">        </span><span class="ss">&quot;username&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteUserName&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="ss">&quot;channel&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteChannel&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="err">}</span><span class="p">,</span><span class="w"></span>
-<span class="p">)</span><span class="w"></span>
+<pre><code class="gotemplate">params := (*types.Params)(
+    &amp;map[string]string{
+        &quot;username&quot;: &quot;overwriteUserName&quot;,
+        &quot;channel&quot;: &quot;overwriteChannel&quot;,
+    },
+)
 
-<span class="n">service</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="ss">&quot;this is a message&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"></span>
-</code></pre></div>
-
+service.Send(&quot;this is a message&quot;, params)
+</code></pre>
 
 <p>This will overwrite any options, that you passed via URL.</p>
                 
