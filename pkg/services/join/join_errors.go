@@ -4,7 +4,7 @@ package join
 type ErrorMessage string
 
 const (
-	// TokenMissing should be used when a config URL is missing a token
+	// APIKeyMissing should be used when a config URL is missing a token
 	APIKeyMissing ErrorMessage = "API key missing from config URL"
 
 	// DevicesMissing should be used when a config URL is missing devices
