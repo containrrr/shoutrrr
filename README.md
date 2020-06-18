@@ -44,6 +44,17 @@ Using shoutrrr is easy! There is currently two ways of using it as a package.
   sender.Send("Hello world (or slack channel) !", map[string]string { /* ... */ })
 ```
 
+
+#### Using a sender with multiple URLs
+```go
+  urls := []string {
+    "slack://token-a/token-b/token-c"
+    "discord://token@channel"
+  }
+  sender, err := shoutrrr.CreateSender(url...)
+  sender.Send("Hello world (or slack channel) !", map[string]string { /* ... */ })
+```
+
 ### Through the CLI
 
 Start by running the `build.sh` script.
