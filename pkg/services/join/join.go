@@ -2,12 +2,13 @@ package join
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 const (
@@ -46,7 +47,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) sendToDevices(devices string, message string, title string, icon string) error {
 	config := service.config
 
-	apiUrl, err := url.Parse(hookURL)
+	apiURL, err := url.Parse(hookURL)
 	if err != nil {
 		return err
 	}
@@ -64,10 +65,10 @@ func (service *Service) sendToDevices(devices string, message string, title stri
 		data.Set("icon", icon)
 	}
 
-	apiUrl.RawQuery = data.Encode()
+	apiURL.RawQuery = data.Encode()
 
 	res, err := http.Post(
-		apiUrl.String(),
+		apiURL.String(),
 		contentType,
 		nil)
 
