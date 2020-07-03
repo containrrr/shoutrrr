@@ -11,12 +11,15 @@ type JSON struct {
 }
 
 // CreateJSONToSend creates a JSON payload to be sent to the discord webhook API
-func CreateJSONToSend(message string) ([]byte, error) {
+func CreateJSONToSend(message string, isJSON bool) ([]byte, error) {
 	if message == "" {
 		return nil, errors.New("message was empty")
 	}
 	if len(message) > maxlength {
 		return nil, errors.New("the supplied message exceeds the max length for discord")
+	}
+	if isJSON {
+		return []byte(message), nil
 	}
 	return json.Marshal(JSON{
 		Text: message,

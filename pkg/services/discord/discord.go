@@ -25,10 +25,11 @@ const (
 // Send a notification message to discord
 func (service *Service) Send(message string, params *types.Params) error {
 
-	payload, err := CreateJSONToSend(message)
+	payload, err := CreateJSONToSend(message, service.config.JSON)
 	if err != nil {
 		return err
 	}
+
 	fmt.Println(string(payload))
 
 	postURL := CreateAPIURLFromConfig(service.config)
