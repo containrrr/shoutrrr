@@ -4,12 +4,13 @@ import (
 	. "github.com/containrrr/shoutrrr/pkg/services/discord"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestDiscord(t *testing.T) {
@@ -54,6 +55,23 @@ var _ = Describe("the discord service", func() {
 				err := service.Initialize(serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
+			It("should not return an error when with raw path parameter", func() {
+				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/raw")
+				err := service.Initialize(serviceURL, nil)
+				Expect(err).NotTo(HaveOccurred())
+			})
+			It("should set the JSON flag when with raw path parameter", func() {
+				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/raw")
+				config := Config{}
+				config.SetURL(serviceURL)
+				Expect(config.JSON).To(BeTrue())
+			})
+			It("should not set the JSON flag when not provided raw path parameter", func() {
+				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel")
+				config := Config{}
+				config.SetURL(serviceURL)
+				Expect(config.JSON).NotTo(BeTrue())
+			})
 			It("should return an error if more than two arguments are given", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/illegal-argument")
 				err := service.Initialize(serviceURL, nil)
@@ -64,7 +82,7 @@ var _ = Describe("the discord service", func() {
 	Describe("creating a json payload", func() {
 		When("given a blank message", func() {
 			It("should return an error", func() {
-				_, err := CreateJSONToSend("")
+				_, err := CreateJSONToSend("", false)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -76,7 +94,7 @@ var _ = Describe("the discord service", func() {
 				for i := 0; i < 42; i++ {
 					builder.WriteString(hundredChars)
 				}
-				_, err := CreateJSONToSend(builder.String())
+				_, err := CreateJSONToSend(builder.String(), false)
 				Expect(err).To(HaveOccurred())
 			})
 		})

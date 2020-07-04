@@ -31,14 +31,15 @@ func (config *Config) SetURL(url *url.URL) error {
 
 	config.Channel = url.Host
 	config.Token = url.User.Username()
-	config.JSON = url.Path == "/json"
 
-	switch url.Path {
-	case "/raw":
-		config.JSON = true
-		break
-	default:
-		return errors.New("illegal argument in config URL")
+	if len(url.Path) > 0 {
+		switch url.Path {
+		case "/raw":
+			config.JSON = true
+			break
+		default:
+			return errors.New("illegal argument in config URL")
+		}
 	}
 
 	if config.Channel == "" {
