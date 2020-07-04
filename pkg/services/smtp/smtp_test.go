@@ -234,6 +234,29 @@ var _ = Describe("the SMTP service", func() {
 			})
 		})
 
+		When("given a configuration URL with StartTLS but it is not supported", func() {
+
+			It("should send notifications without any errors", func() {
+				testURL := "smtp://example.com:2225/?startTLS=yes&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+				err := testIntegration(testURL, []string{
+					"250-mx.google.com at your service",
+					"250-SIZE 35651584",
+					"250-AUTH LOGIN PLAIN",
+					"250 8BITMIME",
+					"250 Sender OK",
+					"250 Receiver OK",
+					"354 Go ahead",
+					"250 Data OK",
+					"221 OK",
+				}, "", "")
+				if msg, test := failures.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
 		When("server communication fails", func() {
 
 			It("should fail when not being able to enable StartTLS", func() {
