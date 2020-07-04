@@ -34,7 +34,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	config.JSON = url.Path == "/json"
 
 	switch url.Path {
-	case "/json":
+	case "/raw":
 		config.JSON = true
 		break
 	default:
