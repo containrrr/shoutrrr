@@ -241,6 +241,7 @@ var _ = Describe("the SMTP service", func() {
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
+					"250-STARTTLS",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
 					"502 That's too hard",
