@@ -55,7 +55,7 @@ var _ = Describe("the discord service", func() {
 				err := service.Initialize(serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
-			It("should not return an error when with raw path parameter", func() {
+			It("should not return an error when given the raw path parameter", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/raw")
 				err := service.Initialize(serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
