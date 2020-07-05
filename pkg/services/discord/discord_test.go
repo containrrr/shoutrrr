@@ -60,7 +60,7 @@ var _ = Describe("the discord service", func() {
 				err := service.Initialize(serviceURL, nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
-			It("should set the JSON flag when with raw path parameter", func() {
+			It("should set the JSON flag when given the raw path parameter", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/raw")
 				config := Config{}
 				config.SetURL(serviceURL)
