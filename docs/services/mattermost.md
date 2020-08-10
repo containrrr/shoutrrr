@@ -1,6 +1,6 @@
 # MatterMost
 
-## URL format
+## URL Format
 
 ## Creating a Webhook in MatterMost
 

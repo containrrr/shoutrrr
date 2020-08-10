@@ -1,6 +1,6 @@
 # Zulip Chat
 
-## URL format
+## URL Format
 
 The shoutrrr service URL should look like this:  
 > zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__

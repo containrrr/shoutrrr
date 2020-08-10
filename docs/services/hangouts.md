@@ -1,6 +1,6 @@
 # Hangouts Chat
 
-## URL format
+## URL Format
 
 Your Hangouts Chat Incoming Webhook URL will look like this:
 
