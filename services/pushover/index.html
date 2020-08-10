@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
       
-        <link rel="canonical" href="https://containrrr.dev/shoutrrr/services/discord/">
+        <link rel="canonical" href="https://containrrr.dev/shoutrrr/services/pushover/">
       
       
       <link rel="shortcut icon" href="../../favicon.ico">
@@ -17,7 +17,7 @@
     
     
       
-        <title>Discord - Shoutrrr</title>
+        <title>Pushover - Shoutrrr</title>
       
     
     
@@ -60,7 +60,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#discord" class="md-skip">
+        <a href="#pushover" class="md-skip">
           Skip to content
         </a>
       
@@ -87,7 +87,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Discord
+              Pushover
             
           </span>
         </div>
@@ -247,6 +247,30 @@
           
           
 
+
+  <li class="md-nav__item">
+    <a href="../discord/" title="Discord" class="md-nav__link">
+      Discord
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../hangouts/" title="Hangouts Chat" class="md-nav__link">
+      Hangouts Chat
+    </a>
+  </li>
+
+        
+          
+          
+          
+
   
 
 
@@ -258,14 +282,14 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Discord
+        Pushover
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
         </span>
       </label>
     
-    <a href="./" title="Discord" class="md-nav__link md-nav__link--active">
-      Discord
+    <a href="./" title="Pushover" class="md-nav__link md-nav__link--active">
+      Pushover
     </a>
     
       
@@ -291,8 +315,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating_a_webhook_in_discord" class="md-nav__link">
-    Creating a webhook in Discord
+  <a href="#getting_the_keys_from_pushover" class="md-nav__link">
+    Getting the keys from Pushover
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    Optional parameters
   </a>
   
 </li>
@@ -301,30 +332,6 @@
   
 </nav>
     
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../hangouts/" title="Hangouts Chat" class="md-nav__link">
-      Hangouts Chat
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../pushover/" title="Pushover" class="md-nav__link">
-      Pushover
-    </a>
   </li>
 
         
@@ -390,8 +397,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating_a_webhook_in_discord" class="md-nav__link">
-    Creating a webhook in Discord
+  <a href="#getting_the_keys_from_pushover" class="md-nav__link">
+    Getting the keys from Pushover
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    Optional parameters
   </a>
   
 </li>
@@ -408,7 +422,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/containrrr/shoutrrr/edit/master/docs/services/discord.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/containrrr/shoutrrr/edit/master/docs/services/pushover.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -416,50 +430,23 @@
                   
                 
                 
-                <h1 id="discord">Discord<a class="headerlink" href="#discord" title="Permanent link">&para;</a></h1>
+                <h1 id="pushover">Pushover<a class="headerlink" href="#pushover" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p>Your Discord Webhook-URL will look like this:</p>
-<blockquote>
-<p>https://discordapp.com/api/webhooks/<strong><code>channel</code></strong>/<strong><code>token</code></strong>  </p>
-</blockquote>
-<p>The shoutrrr service URL should look like this:  </p>
-<blockquote>
-<p>discord://<strong><code>token</code></strong>@<strong><code>channel</code></strong></p>
-</blockquote>
-<h2 id="creating_a_webhook_in_discord">Creating a webhook in Discord<a class="headerlink" href="#creating_a_webhook_in_discord" title="Permanent link">&para;</a></h2>
-<ol>
-<li>
-<p>Open your server settings by first clicking on the name of the server.
-<img alt="Screenshot 1" src="sc-1.png" /></p>
-</li>
-<li>
-<p>Then click on <em>Server Settings</em>.
-<img alt="Screenshot 2" src="sc-2.png" /></p>
-</li>
-<li>
-<p>In the menu on the left, click on <em>Webhooks</em>.
-<img alt="Screenshot 3" src="sc-3.png" /></p>
-</li>
-<li>
-<p>In the top right corner, click on <em>Create Webhook</em>.
-<img alt="Screenshot 4" src="sc-4.png" /></p>
-</li>
-<li>
-<p>Set name, channel and icon to your liking and copy the <em>Webhook URL</em> on the bottom. Then click save.
-<img alt="Screenshot 5" src="sc-5.png" /></p>
-</li>
-<li>
-<p>Format the service URL</p>
-</li>
-</ol>
-<div class="codehilite"><pre><span></span><code><span class="nl">https</span><span class="p">:</span><span class="c1">//discordapp.com/api/webhooks/693853386302554172/W3dE2OZz4C13_4z_uHfDOoC7BqTW288s-z1ykqI0iJnY_HjRqMGO8Sc7YDqvf_KVKjhJ</span>
-                                    <span class="err">└────────────────┘</span> <span class="err">└──────────────────────────────────────────────────────────────────┘</span>
-                                          <span class="n">channel</span>                                      <span class="n">token</span>
-
-<span class="nl">discord</span><span class="p">:</span><span class="c1">//W3dE2OZz4C13_4z_uHfDOoC7BqTW288s-z1ykqI0iJnY_HjRqMGO8Sc7YDqvf_KVKjhJ@693853386302554172</span>
-          <span class="err">└──────────────────────────────────────────────────────────────────┘</span> <span class="err">└────────────────┘</span>
-                                          <span class="n">token</span>                                      <span class="n">channel</span>
-</code></pre></div>
+<p><em>pushover://shoutrrr:<strong><code>apiToken</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...]</em></p>
+<h2 id="getting_the_keys_from_pushover">Getting the keys from Pushover<a class="headerlink" href="#getting_the_keys_from_pushover" title="Permanent link">&para;</a></h2>
+<p>At your <a href="https://pushover.net/">Pushover dashboard</a> you can view your <strong><code>userKey</code></strong> in the top right.<br />
+<img alt="Screenshot 1" src="po-1.png" /></p>
+<p>The <code>Name</code> column of the device list is what is used to refer to your devices (<strong><code>device1</code></strong> etc.)
+<img alt="Screenshot 4" src="po-4.png" /></p>
+<p>At the bottom of the same page there are links your <em>applications</em>, where you can find your <strong><code>apiToken</code></strong>
+<img alt="Screenshot 2" src="po-2.png" /></p>
+<p>The <strong><code>apiToken</code></strong> is displayed at the top of the application page.
+<img alt="Screenshot 3" src="po-3.png" /></p>
+<h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
+<p>You can optionally specify the <strong><code>title</code></strong> and <strong><code>priority</code></strong> parameters in the URL:<br />
+<em>pushover://shoutrrr:<strong><code>token</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device</code></strong>&amp;title=Custom+Title&amp;priority=1</em></p>
+<p><strong>Note:</strong> Only supply priority values between -1 and 1, since 2 requires additional parameters that are not supported yet.</p>
+<p>Please refer to the <a href="https://pushover.net/api#messages">Pushover API documentation</a> for more information.  </p>
                 
               
               
@@ -478,7 +465,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../overview/" title="Overview" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../hangouts/" title="Hangouts Chat" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -487,19 +474,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Overview
+                Hangouts Chat
               </div>
             </div>
           </a>
         
         
-          <a href="../hangouts/" title="Hangouts Chat" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../teams/" title="Teams" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Hangouts Chat
+                Teams
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
