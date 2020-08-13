@@ -1,7 +1,7 @@
 # Shoutrrr
 
 
-[![shoutrrr logo](https://github.com/containrrr/shoutrrr/raw/gh-pages/shoutrrr.jpg)](https://github.com/containrrr/shoutrrr)
+[![shoutrrr logo](https://github.com/containrrr/shoutrrr/raw/gh-pages/shoutrrr-logotype.png)](https://github.com/containrrr/shoutrrr)
 
 Notification library for gophers and their furry friends.
 Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
