@@ -64,6 +64,9 @@ jobs:
         with:
           username: '${{ secrets.DOCKER_USER }}'
           password: '${{ secrets.DOCKER_PASSWORD }}'
+ 
+      - name: Fetch CA cert bundle
+        run: curl -o ca-certificates.pem https://curl.haxx.se/ca/cacert.pem
 
       - name: Execute goreleaser
         run: |
