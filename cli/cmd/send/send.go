@@ -15,19 +15,21 @@ import (
 var Cmd = &cobra.Command{
 	Use:    "send",
 	Short:  "Send a notification using a service url",
-	Args:   cobra.MaximumNArgs(1),
-	PreRun: u.MoveEnvVarToFlag,
+	Args:   cobra.MaximumNArgs(2),
+	PreRun: u.LoadFlagsFromAltSources,
 	Run:    Run,
 }
 
 func init() {
 	Cmd.Flags().StringP("url", "u", "", "The notification url")
+	_ = Cmd.MarkFlagRequired("url")
+
 	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url")
-	Cmd.MarkFlagRequired("message")
+	_ = Cmd.MarkFlagRequired("message")
 }
 
 // Run the send command
-func Run(cmd *cobra.Command, args []string) {
+func Run(cmd *cobra.Command, _ []string) {
 	debug, _ := cmd.Flags().GetBool("debug")
 
 	url, _ := cmd.Flags().GetString("url")

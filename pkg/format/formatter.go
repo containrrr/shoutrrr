@@ -13,15 +13,31 @@ import (
 // GetConfigMap returns a string map of a given Config struct
 func GetConfigMap(service types.Service) (map[string]string, int) {
 
-	cr := reflect.ValueOf(service).Elem().FieldByName("config")
-	cr = reflect.NewAt(cr.Type(), unsafe.Pointer(cr.UnsafeAddr())).Elem()
+	configRef := reflect.ValueOf(service).Elem().FieldByName("config")
+	configType := configRef.Type().Elem()
+	cr := reflect.NewAt(configRef.Type(), unsafe.Pointer(configRef.UnsafeAddr())).Elem()
 	config := cr.Interface().(types.ServiceConfig)
 
 	formatter := formatter{
 		EnumFormatters: config.Enums(),
 		MaxDepth:       10,
 	}
-	return formatter.getStructMap(config, 0)
+	return formatter.getStructMap(configType, config, 0)
+}
+
+func GetConfigFormat(service types.Service) (map[string]string, int) {
+	configRef := reflect.ValueOf(service).Elem().FieldByName("config")
+	configType := configRef.Type().Elem()
+
+	config := reflect.New(configType)
+
+	serviceConfig := config.Interface().(types.ServiceConfig)
+
+	formatter := formatter{
+		EnumFormatters: serviceConfig.Enums(),
+		MaxDepth:       10,
+	}
+	return formatter.getStructMap(configType, nil, 0)
 }
 
 type formatter struct {
@@ -30,49 +46,53 @@ type formatter struct {
 	Errors         []error
 }
 
-func (fmtr *formatter) getStructMap(structItem interface{}, depth uint8) (map[string]string, int) {
-	defs := reflect.TypeOf(structItem)
+func (fmtr *formatter) getStructMap(defs reflect.Type, structItem interface{}, depth uint8) (map[string]string, int) {
 	values := reflect.ValueOf(structItem)
 
-	if defs.Kind() == reflect.Ptr {
+	if values.Kind() == reflect.Ptr {
 		values = values.Elem()
-		defs = defs.Elem()
 	}
 
-	numFields := values.NumField()
+	numFields := defs.NumField()
 	valueMap := make(map[string]string, numFields)
 	nextDepth := depth + 1
 	maxKeyLen := 0
 
 	for i := 0; i < numFields; i++ {
 		fieldDef := defs.Field(i)
+
 		if fieldDef.Anonymous {
 			// This is an embedded field, which should not be part of the Config output
 			continue
 		}
 
-		value := fmt.Sprintf("(%s)", fieldDef.Type.Name())
+		value := fmt.Sprintf("(%s)", fieldDef.Type.String())
 		valueLen := len(value)
+		preLen := 16
 
 		ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]
-		if isEnum {
-			fieldVal := values.Field(i)
-			kind := fieldVal.Kind()
-			if kind == reflect.Int {
-				valueStr := ef.Print(int(fieldVal.Int()))
-				value = ColorizeEnum(valueStr)
-				valueLen = len(valueStr)
-			} else {
-				err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, fieldDef.Name)
-				fmtr.Errors = append(fmtr.Errors, err)
+		if values.IsValid() {
+			// Add some space to print the value
+			preLen = 40
+			if isEnum {
+				fieldVal := values.Field(i)
+				kind := fieldVal.Kind()
+				if kind == reflect.Int {
+					valueStr := ef.Print(int(fieldVal.Int()))
+					value = ColorizeEnum(valueStr)
+					valueLen = len(valueStr)
+				} else {
+					err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, fieldDef.Name)
+					fmtr.Errors = append(fmtr.Errors, err)
+				}
+			} else if nextDepth < fmtr.MaxDepth {
+				value, valueLen = fmtr.getFieldValueString(values.Field(i), nextDepth)
 			}
-		} else if nextDepth < fmtr.MaxDepth {
-			value, valueLen = fmtr.getFieldValueString(values.Field(i), nextDepth)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
 
-			prePad := strings.Repeat(" ", util.Max(40-valueLen, 1))
+			prePad := strings.Repeat(" ", util.Max(preLen-valueLen, 1))
 			postPad := strings.Repeat(" ", util.Max(60-len(tag), 1))
 
 			value += " " + prePad + ColorizeDesc(tag) + postPad
@@ -127,11 +147,11 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 	}
 
 	if util.IsCollection(kind) {
-		len := field.Len()
-		items := make([]string, len)
+		fieldLen := field.Len()
+		items := make([]string, fieldLen)
 		totalLen := 4
 		var itemLen int
-		for i := 0; i < field.Len(); i++ {
+		for i := 0; i < fieldLen; i++ {
 			items[i], itemLen = fmtr.getFieldValueString(field.Index(i), nextDepth)
 			totalLen += itemLen
 		}
@@ -154,7 +174,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		return fmt.Sprintf("{ %s }", strings.Join(items, ", ")), totalLen
 	}
 	if kind == reflect.Struct {
-		structMap, _ := fmtr.getStructMap(field, depth+1)
+		structMap, _ := fmtr.getStructMap(field.Type(), field, depth+1)
 		structFieldCount := len(structMap)
 		items := make([]string, structFieldCount)
 		index := 0

@@ -172,6 +172,28 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 	return service, nil
 }
 
+// NewService returns a new uninitialized service instance
+func (router *ServiceRouter) NewService(service string) (t.Service, error) {
+	serviceFactory, valid := serviceMap[strings.ToLower(service)]
+	if !valid {
+		return nil, fmt.Errorf("unknown service %q", service)
+	}
+	return serviceFactory(), nil
+}
+
+// ListServices returns the available services
+func (router *ServiceRouter) ListServices() []string {
+	services := make([]string, len(serviceMap))
+
+	i := 0
+	for key := range serviceMap {
+		services[i] = key
+		i++
+	}
+
+	return services
+}
+
 // Locate returns the service implementation that corresponds to the given service URL
 func (router *ServiceRouter) Locate(rawURL string) (t.Service, error) {
 	service, err := router.initService(rawURL)

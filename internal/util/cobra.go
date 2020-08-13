@@ -5,17 +5,21 @@ import (
 	"github.com/spf13/viper"
 )
 
-// MoveEnvVarToFlag is a WORKAROUND to make cobra count env vars when checking required flags
-func MoveEnvVarToFlag(cmd *cobra.Command, args []string) {
+// LoadArgsFromAltSources is a WORKAROUND to make cobra count env vars and positional arguments when checking required flags
+func LoadFlagsFromAltSources(cmd *cobra.Command, args []string) {
 
-	if len(args) == 1 {
-		cmd.Flags().Set("url", args[0])
+	if len(args) > 0 {
+		_ = cmd.Flags().Set("url", args[0])
+
+		if len(args) > 1 {
+			_ = cmd.Flags().Set("message", args[1])
+		}
+
 		return
 	}
 
 	if hasURLInEnvButNotFlag(cmd) {
-		cmd.Flags().Set("url", viper.GetViper().GetString("SHOUTRRR_URL"))
-		return
+		_ = cmd.Flags().Set("url", viper.GetViper().GetString("SHOUTRRR_URL"))
 	}
 }
 

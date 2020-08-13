@@ -2,6 +2,7 @@ package verify
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"strings"
 
@@ -16,7 +17,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:    "verify",
 	Short:  "Verify the validity of a notification service URL",
-	PreRun: util.MoveEnvVarToFlag,
+	PreRun: util.LoadFlagsFromAltSources,
 	Run:    Run,
 	Args:   cobra.MaximumNArgs(1),
 }
@@ -25,10 +26,11 @@ var sr router.ServiceRouter
 
 func init() {
 	Cmd.Flags().StringP("url", "u", "", "The notification url")
+	_ = Cmd.MarkFlagRequired("url")
 }
 
 // Run the verify command
-func Run(cmd *cobra.Command, args []string) {
+func Run(cmd *cobra.Command, _ []string) {
 	URL, _ := cmd.Flags().GetString("url")
 	sr = router.ServiceRouter{}
 
@@ -42,6 +44,6 @@ func Run(cmd *cobra.Command, args []string) {
 	configMap, maxKeyLen := format.GetConfigMap(service)
 	for key, value := range configMap {
 		pad := strings.Repeat(" ", maxKeyLen-len(key))
-		fmt.Printf("%s%s: %s\n", pad, key, value)
+		_, _ = fmt.Fprintf(color.Output, "%s%s: %s\n", pad, key, value)
 	}
 }
