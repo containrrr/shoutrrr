@@ -14,7 +14,7 @@ const (
 )
 
 // ParseBool returns true for "1","true","yes" or false for "0","false","no" or defaultValue for any other value
-func ParseBool(value string, defaultValue bool) (bool, bool) {
+func ParseBool(value string, defaultValue bool) (parsedValue bool, ok bool) {
 	switch strings.ToLower(value) {
 	case "true":
 		fallthrough

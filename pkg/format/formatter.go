@@ -2,6 +2,7 @@ package format
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"reflect"
 	"strings"
 	"unsafe"
@@ -22,10 +23,10 @@ func GetConfigMap(service types.Service) (map[string]string, int) {
 		EnumFormatters: config.Enums(),
 		MaxDepth:       10,
 	}
-	return formatter.getStructMap(configType, config, 0)
+	return formatter.formatStructMap(configType, config, 0)
 }
 
-func GetConfigFormat(service types.Service) (map[string]string, int) {
+func GetConfigFormat(service types.Service) (reflect.Type, []fieldInfo) {
 	configRef := reflect.ValueOf(service).Elem().FieldByName("config")
 	configType := configRef.Type().Elem()
 
@@ -37,7 +38,7 @@ func GetConfigFormat(service types.Service) (map[string]string, int) {
 		EnumFormatters: serviceConfig.Enums(),
 		MaxDepth:       10,
 	}
-	return formatter.getStructMap(configType, nil, 0)
+	return configType, formatter.getStructFieldInfo(configType)
 }
 
 type formatter struct {
@@ -46,31 +47,29 @@ type formatter struct {
 	Errors         []error
 }
 
-func (fmtr *formatter) getStructMap(defs reflect.Type, structItem interface{}, depth uint8) (map[string]string, int) {
+func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem interface{}, depth uint8) (map[string]string, int) {
 	values := reflect.ValueOf(structItem)
 
 	if values.Kind() == reflect.Ptr {
 		values = values.Elem()
 	}
 
-	numFields := defs.NumField()
+	infoFields := fmtr.getStructFieldInfo(structType)
+
+	numFields := len(infoFields)
 	valueMap := make(map[string]string, numFields)
 	nextDepth := depth + 1
 	maxKeyLen := 0
 
 	for i := 0; i < numFields; i++ {
-		fieldDef := defs.Field(i)
+		field := infoFields[i]
 
-		if fieldDef.Anonymous {
-			// This is an embedded field, which should not be part of the Config output
-			continue
-		}
-
-		value := fmt.Sprintf("(%s)", fieldDef.Type.String())
-		valueLen := len(value)
+		var value string
+		valueLen := 0
 		preLen := 16
 
-		ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]
+		isEnum := field.EnumFormatter != nil
+
 		if values.IsValid() {
 			// Add some space to print the value
 			preLen = 40
@@ -78,46 +77,112 @@ func (fmtr *formatter) getStructMap(defs reflect.Type, structItem interface{}, d
 				fieldVal := values.Field(i)
 				kind := fieldVal.Kind()
 				if kind == reflect.Int {
-					valueStr := ef.Print(int(fieldVal.Int()))
+					valueStr := field.EnumFormatter.Print(int(fieldVal.Int()))
 					value = ColorizeEnum(valueStr)
 					valueLen = len(valueStr)
 				} else {
-					err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, fieldDef.Name)
+					err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, field.Name)
 					fmtr.Errors = append(fmtr.Errors, err)
 				}
 			} else if nextDepth < fmtr.MaxDepth {
 				value, valueLen = fmtr.getFieldValueString(values.Field(i), nextDepth)
 			}
+		} else {
+			// Since no values was supplied, let's substitute the value with the type
+			typeName := field.Type.String()
+			valueLen = len(typeName)
+			value = color.CyanString(typeName)
 		}
 
-		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
+		if len(field.Description) > 0 {
 
 			prePad := strings.Repeat(" ", util.Max(preLen-valueLen, 1))
-			postPad := strings.Repeat(" ", util.Max(60-len(tag), 1))
+			postPad := strings.Repeat(" ", util.Max(60-len(field.Description), 1))
 
-			value += " " + prePad + ColorizeDesc(tag) + postPad
+			value += " " + prePad + ColorizeDesc(field.Description) + postPad
 		}
 
-		if tag, ok := fieldDef.Tag.Lookup("tpl"); ok {
-			value += fmt.Sprintf(" <Template: %s>", ColorizeString(tag))
+		if len(field.Template) > 0 {
+			value += fmt.Sprintf(" <Template: %s>", ColorizeString(field.Template))
 		}
 
-		if tag, ok := fieldDef.Tag.Lookup("default"); ok {
-			value += fmt.Sprintf(" <Default: %s>", ColorizeValue(tag, isEnum))
+		if len(field.DefaultValue) > 0 {
+			value += fmt.Sprintf(" <Default: %s>", ColorizeValue(field.DefaultValue, isEnum))
 		}
 
 		if isEnum {
-			value += fmt.Sprintf(" [%s]", strings.Join(ef.Names(), ", "))
+			value += fmt.Sprintf(" [%s]", strings.Join(field.EnumFormatter.Names(), ", "))
 		}
 
-		valueMap[fieldDef.Name] = value
-		keyLen := len(fieldDef.Name)
+		valueMap[field.Name] = value
+		keyLen := len(field.Name)
 		if keyLen > maxKeyLen {
 			maxKeyLen = keyLen
 		}
 	}
 
 	return valueMap, maxKeyLen
+}
+
+type fieldInfo struct {
+	Name          string
+	Type          reflect.Type
+	EnumFormatter types.EnumFormatter
+	Description   string
+	DefaultValue  string
+	Template      string
+	Required      bool
+}
+
+func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []fieldInfo {
+
+	numFields := structType.NumField()
+	fields := make([]fieldInfo, numFields)
+	maxKeyLen := 0
+
+	for i := 0; i < numFields; i++ {
+		fieldDef := structType.Field(i)
+
+		if fieldDef.Anonymous {
+			// This is an embedded field, which should not be part of the Config output
+			continue
+		}
+
+		info := fieldInfo{
+			Name:     fieldDef.Name,
+			Type:     fieldDef.Type,
+			Required: true,
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
+			info.Description = tag
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("tpl"); ok {
+			info.Template = tag
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("default"); ok {
+			info.Required = false
+			info.DefaultValue = tag
+		}
+
+		if _, ok := fieldDef.Tag.Lookup("optional"); ok {
+			info.Required = false
+		}
+
+		if ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]; isEnum {
+			info.EnumFormatter = ef
+		}
+
+		fields[i] = info
+		keyLen := len(fieldDef.Name)
+		if keyLen > maxKeyLen {
+			maxKeyLen = keyLen
+		}
+	}
+
+	return fields
 }
 
 func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (string, int) {
@@ -174,7 +239,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		return fmt.Sprintf("{ %s }", strings.Join(items, ", ")), totalLen
 	}
 	if kind == reflect.Struct {
-		structMap, _ := fmtr.getStructMap(field.Type(), field, depth+1)
+		structMap, _ := fmtr.formatStructMap(field.Type(), field, depth+1)
 		structFieldCount := len(structMap)
 		items := make([]string, structFieldCount)
 		index := 0
