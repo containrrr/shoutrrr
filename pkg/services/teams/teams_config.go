@@ -1,7 +1,9 @@
 package teams
 
 import (
+	"fmt"
 	"net/url"
+	"path"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
@@ -25,10 +27,9 @@ func (config *Config) GetURL() *url.URL {
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
-
-	tokenA := url.User.Username()
-	tokenB, _ := url.User.Password()
-	tokenC := url.Hostname()
+	tokenA := fmt.Sprintf("%v@%v", url.User.Username(), url.Hostname())
+	_, tokenB := path.Split(path.Dir(url.Path))
+	tokenC := path.Base(url.Path)
 
 	config.Token = Token{
 		A: tokenA,
