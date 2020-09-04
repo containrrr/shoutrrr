@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -152,6 +153,7 @@ var serviceMap = map[string]func() t.Service{
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 
+	http.DefaultClient.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
 		return nil, err
