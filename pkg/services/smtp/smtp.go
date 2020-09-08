@@ -90,10 +90,14 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 	}
 
 	if config.UseStartTLS {
-		if err := client.StartTLS(&tls.Config{
-			ServerName: config.Host,
-		}); err != nil {
-			return fail(FailEnableStartTLS, err)
+		if supported, _ := client.Extension("StartTLS"); !supported {
+			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
+		} else {
+			if err := client.StartTLS(&tls.Config{
+				ServerName: config.Host,
+			}); err != nil {
+				return fail(FailEnableStartTLS, err)
+			}
 		}
 	}
 

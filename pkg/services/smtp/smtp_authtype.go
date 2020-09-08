@@ -39,3 +39,5 @@ func (at authType) String() string {
 func parseAuth(s string) authType {
 	return authType(authTypes.Enum.Parse(s))
 }
+
+var OAuth2 = authTypes.OAuth2

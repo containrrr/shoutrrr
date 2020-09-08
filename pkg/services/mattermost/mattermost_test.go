@@ -66,19 +66,11 @@ var _ = Describe("the mattermost service", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
-		When("generating a new config with url, that has a token but only one more argument", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testUser")
-			config := &Config{}
-			err := config.SetURL(mattermostURL)
-			It("should return an error", func() {
-				Expect(err).To(HaveOccurred())
-			})
-		})
 		When("generating a config object with username only", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testUserName/")
+			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken")
 			config := &Config{}
 			err := config.SetURL(mattermostURL)
-			It("should not hav caused an error", func() {
+			It("should not have caused an error", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 			It("should set username", func() {
@@ -89,7 +81,7 @@ var _ = Describe("the mattermost service", func() {
 			})
 		})
 		When("generating a config object with channel only", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken//testChannel")
+			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
 			err := config.SetURL(mattermostURL)
 			It("should not hav caused an error", func() {
@@ -103,7 +95,7 @@ var _ = Describe("the mattermost service", func() {
 			})
 		})
 		When("generating a config object with channel an userName", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testUserName/testChannel")
+			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
 			err := config.SetURL(mattermostURL)
 			It("should not hav caused an error", func() {
@@ -133,7 +125,7 @@ var _ = Describe("the mattermost service", func() {
 			})
 		})
 		When("sending a message with pre set username and channel", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testUserName/testChannel")
+			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
 			config.SetURL(mattermostURL)
 			It("should generate the correct JSON body", func() {
@@ -143,7 +135,7 @@ var _ = Describe("the mattermost service", func() {
 			})
 		})
 		When("sending a message with pre set username and channel but overwriting them with parameters", func() {
-			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken/testUserName/testChannel")
+			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
 			config.SetURL(mattermostURL)
 			It("should generate the correct JSON body", func() {

@@ -1,5 +1,15 @@
 name: Main Workflow
-on: [push]
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - 'v*'
+    paths-ignore:
+      - 'docs/*'
+
 jobs:
   build:
     name: Build Shoutrrr
@@ -15,32 +25,12 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Build
-        run: go build -v .
+        run: CGO_ENABLED=0 go build -v .
 
       - name: Test
-        run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
+        run: CGO_ENABLED=0 go test -v -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Publish coverage
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.x'
-          
-      - name: Install mkdocs
-        run: |
-          pip install \
-            mkdocs \
-            mkdocs-material \
-            md-toc
-      - name: Generate docs
-        run: mkdocs build
-
-      - name: Publish docs
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site

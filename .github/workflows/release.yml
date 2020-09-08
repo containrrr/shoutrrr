@@ -1,0 +1,148 @@
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: Build Shoutrrr
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        id: go
+        with:
+          go-version: 1.13
+
+      - name: Check out code
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: CGO_ENABLED=0 go build -v .
+
+      - name: Test
+        run: CGO_ENABLED=0 go test -v -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Publish coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+
+      - name: Install mkdocs
+        run: |
+          pip install \
+            mkdocs \
+            mkdocs-material \
+            md-toc
+      - name: Generate docs
+        run: mkdocs build
+
+      - name: Publish docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+
+      - name: Install goreleaser
+        run: |
+          cd .. && \
+          wget https://github.com/goreleaser/goreleaser/releases/download/v0.138.0/goreleaser_Linux_x86_64.tar.gz && \
+          tar -xvf goreleaser_Linux_x86_64.tar.gz && \
+          ./goreleaser -v
+
+      - name: Login to docker hub
+        uses: azure/docker-login@v1
+        with:
+          username: '${{ secrets.DOCKER_USER }}'
+          password: '${{ secrets.DOCKER_PASSWORD }}'
+
+      - name: Execute goreleaser
+        run: |
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} CGO_ENABLED=0 ../goreleaser --debug --rm-dist
+
+      - name: Enable experimental docker features
+        run: |
+          mkdir -p ~/.docker/ && \
+          echo '{"experimental": "enabled"}' > ~/.docker/config.json
+
+      - name: Create manifest for version
+        run: |
+          docker manifest create \
+            containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:amd64-${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:i386-${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:armhf-${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:arm64v8-${GITHUB_REF/refs\/tags\/v/}
+
+      - name: Annotate i386 version
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:i386-${GITHUB_REF/refs\/tags\/v/} \
+            --os linux \
+            --arch 386
+
+      - name: Annotate ARM version
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:armhf-${GITHUB_REF/refs\/tags\/v/} \
+            --os linux \
+            --arch arm
+
+      - name: Annotate ARM64 version
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} \
+            containrrr/shoutrrr:arm64v8-${GITHUB_REF/refs\/tags\/v/} \
+            --os linux \
+            --arch arm64 \
+            --variant v8
+
+      - name: Create manifest for latest
+        run: |
+          docker manifest create \
+            containrrr/shoutrrr:latest \
+            containrrr/shoutrrr:amd64-latest \
+            containrrr/shoutrrr:i386-latest \
+            containrrr/shoutrrr:armhf-latest \
+            containrrr/shoutrrr:arm64v8-latest
+
+      - name: Annotate i386 latest
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:latest \
+            containrrr/shoutrrr:i386-latest \
+            --os linux \
+            --arch 386
+
+      - name: Annotate ARM latest
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:latest \
+            containrrr/shoutrrr:armhf-latest \
+            --os linux \
+            --arch arm
+
+      - name: Annotate ARM64 latest
+        run: |
+          docker manifest annotate \
+            containrrr/shoutrrr:latest \
+            containrrr/shoutrrr:arm64v8-latest \
+            --os linux \
+            --arch arm64 \
+            --variant v8
+
+      - name: Push manifests to Dockerhub
+        run: |
+          docker manifest push containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} && \
+          docker manifest push containrrr/shoutrrr:latest

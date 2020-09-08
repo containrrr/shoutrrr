@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go build -o ./shoutrrr ./cmd/shoutrrr
+go build -o ./shoutrrr ./cli

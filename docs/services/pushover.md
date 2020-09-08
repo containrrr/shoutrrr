@@ -1,6 +1,6 @@
 # Pushover
 
-## URL Reference
+## URL Format
 
 *pushover://shoutrrr:__`apiToken`__@__`userKey`__/?devices=__`device1`__[,__`device2`__, ...]*
 

@@ -12,6 +12,7 @@ Using shoutrrr is easy! There is currently two ways of using it as a package.
 ```
 
 ### Using a sender
+
 ```go
   url := "slack://token-a/token-b/token-c"
   sender, err := shoutrrr.CreateSender(url)
@@ -31,23 +32,55 @@ Usage:
 Possible actions: send, verify, generate
 ```
 
+### Commands
+
+#### Send
+
+Send a notification using the supplied notification service url.
+
+```bash
+$ shoutrrr send \
+    --url "<SERVICE_URL>" \
+    --message "<MESSAGE BODY>"
+```
+
+#### Verify
+
+Verify the validity of a notification service url.
+
+```bash
+$ shoutrrr verify \
+    --url "<SERVICE_URL>"
+```
+
+#### Generate
+
+Generate and display the configuration for a notification service url.
+
+```bash
+$ shoutrrr generate \
+    --url "<SERVICE_URL>"
+```
+
+### Options
+
+#### Debug
+
+Enables debug output from the CLI.
+
+| Flags           | Env.             | Default | Required |
+| --------------- | ---------------- | ------- | -------- |
+| `--debug`, `-d` | `SHOUTRRR_DEBUG` | `false` |          |
+
+#### URL
+
+The target url for the notifications generated, see [overview](./services/overview).
+
+| Flags         | Env.           | Default | Required |
+| ------------- | -------------- | ------- | -------- |
+| `--url`, `-u` | `SHOUTRRR_URL` | N/A     | ✅       |
+
 ### Action details
-
-```shell
-$ ./shoutrrr send
-Usage:
-./shoutrrr send [OPTIONS] <URL> <Message [...]>
-
-OPTIONS:
-  -verbose
-        display additional output
-```
-
-```shell
-$ ./shoutrrr verify
-Usage:
-./shoutrrr send [OPTIONS] <URL> <Message [...]>
-```
 
 ```shell
 $ ./shoutrrr generate

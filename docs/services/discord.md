@@ -1,6 +1,6 @@
 # Discord
 
-## URL format
+## URL Format
 
 Your Discord Webhook-URL will look like this:
 > https://discordapp.com/api/webhooks/__`channel`__/__`token`__  

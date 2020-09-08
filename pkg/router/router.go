@@ -11,6 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/hangouts"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
+	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
@@ -113,10 +114,10 @@ func (router *ServiceRouter) SetLogger(logger *log.Logger) {
 // ExtractServiceName from a notification URL
 func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL, error) {
 	serviceURL, err := url.Parse(rawURL)
-
 	if err != nil {
 		return "", &url.URL{}, err
 	}
+
 	return serviceURL.Scheme, serviceURL, nil
 }
 
@@ -146,9 +147,11 @@ var serviceMap = map[string]func() t.Service{
 	"mattermost": func() t.Service { return &mattermost.Service{} },
 	"hangouts":   func() t.Service { return &hangouts.Service{} },
 	"zulip":      func() t.Service { return &zulip.Service{} },
+	"join":       func() t.Service { return &join.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
+
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
 		return nil, err
@@ -156,7 +159,7 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 
 	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
 	if !valid {
-		return nil, fmt.Errorf("unknown service scheme '%s'", scheme)
+		return nil, fmt.Errorf("unknown service scheme for URL '%s'", rawURL)
 	}
 
 	service := serviceFactory()
@@ -167,6 +170,28 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 	}
 
 	return service, nil
+}
+
+// NewService returns a new uninitialized service instance
+func (router *ServiceRouter) NewService(service string) (t.Service, error) {
+	serviceFactory, valid := serviceMap[strings.ToLower(service)]
+	if !valid {
+		return nil, fmt.Errorf("unknown service %q", service)
+	}
+	return serviceFactory(), nil
+}
+
+// ListServices returns the available services
+func (router *ServiceRouter) ListServices() []string {
+	services := make([]string, len(serviceMap))
+
+	i := 0
+	for key := range serviceMap {
+		services[i] = key
+		i++
+	}
+
+	return services
 }
 
 // Locate returns the service implementation that corresponds to the given service URL

@@ -6,7 +6,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// JSON payload used with the mattermost service
+// JSON payload for mattermost notifications
 type JSON struct {
 	Text     string `json:"text"`
 	UserName string `json:"username,omitempty"`
