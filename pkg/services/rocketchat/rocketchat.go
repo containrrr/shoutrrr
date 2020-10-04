@@ -17,11 +17,6 @@ type Service struct {
 	config *Config
 }
 
-const (
-	apiURL    = "https://rocket.chat/"
-	maxlength = 1000
-)
-
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
@@ -33,7 +28,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 	return nil
 }
 
-// Send a notification message to Slack
+// Send a notification message to Rocket.chat
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	apiURL := buildURL(config)

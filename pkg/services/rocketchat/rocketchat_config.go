@@ -29,8 +29,6 @@ func (config *Config) GetURL() *url.URL {
 	}
 }
 
-// https://chat.gravitel.ru/hooks/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX
-// rocketchat://rocketchat.my-domain.com/tokenA/tokenB
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(serviceURL *url.URL) error {
 

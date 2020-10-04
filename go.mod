@@ -1,8 +1,9 @@
-module github.com/containrrr/shoutrrr
+module github.com/dmitry-kovalev/shoutrrr
 
 go 1.12
 
 require (
+	github.com/containrrr/shoutrrr v0.0.0-20200912221004-9c522a1df83b
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/jarcoal/httpmock v1.0.4

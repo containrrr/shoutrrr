@@ -23,7 +23,7 @@ func TestRocketchat(t *testing.T) {
 var _ = Describe("the rocketchat service", func() {
 	BeforeSuite(func() {
 		service = &Service{}
-		envRocketchatURL, _ = url.Parse(os.Getenv("SHOUTRRR_MATTERMOST_URL"))
+		envRocketchatURL, _ = url.Parse(os.Getenv("SHOUTRRR_ROCKETCHAT_URL"))
 	})
 	When("running integration tests", func() {
 		It("should work without errors", func() {
