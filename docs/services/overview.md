@@ -17,3 +17,4 @@ Click on the service for a more thorough explanation.
 | [Hangouts Chat](./hangouts.md)    | *hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                       |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
 | [Join](./not-documented.md)       | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]*                          |
+| [Rocketchat](./rocketchat.md) | *rocketchat://[__`username`__@]__`rocketchat-host`__/__`token`__[/__`channel`&#124;`@recipient`__]*                                                               |
