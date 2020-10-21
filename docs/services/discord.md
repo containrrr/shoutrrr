@@ -29,9 +29,9 @@ The shoutrrr service URL should look like this:
 ```
 https://discordapp.com/api/webhooks/693853386302554172/W3dE2OZz4C13_4z_uHfDOoC7BqTW288s-z1ykqI0iJnY_HjRqMGO8Sc7YDqvf_KVKjhJ
                                     └────────────────┘ └──────────────────────────────────────────────────────────────────┘
-                                          channel                                      token
+                                        webhook id                                    token
 
 discord://W3dE2OZz4C13_4z_uHfDOoC7BqTW288s-z1ykqI0iJnY_HjRqMGO8Sc7YDqvf_KVKjhJ@693853386302554172
           └──────────────────────────────────────────────────────────────────┘ └────────────────┘
-                                          token                                      channel
+                                          token                                    webhook id
 ```
