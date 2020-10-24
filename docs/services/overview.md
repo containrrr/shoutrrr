@@ -4,7 +4,7 @@ Click on the service for a more thorough explanation.
 
 | Service                           | URL format                                                                                                                                      |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Discord](./discord.md)           | *discord://__`token`__@__`channel`__*                                                                                                           |
+| [Discord](./discord.md)           | *discord://__`token`__@__`id`__*                                                                                                           |
 | [Telegram](./not-documented.md)   | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]*                                                                |
 | [Pushover](./pushover.md)         | *pushover://shoutrrr:__`apiToken`__@__`userKey`__/?devices=__`device1`__[,__`device2`__, ...]*                                                  |
 | [Slack](./not-documented.md)      | *slack://[__`botname`__@]__`token-a`__/__`token-b`__/__`token-c`__*                                                                             |
