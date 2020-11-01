@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
 	"log"
 	"net/url"
 	"strings"
@@ -148,6 +149,7 @@ var serviceMap = map[string]func() t.Service{
 	"hangouts":   func() t.Service { return &hangouts.Service{} },
 	"zulip":      func() t.Service { return &zulip.Service{} },
 	"join":       func() t.Service { return &join.Service{} },
+	"rocketchat": func() t.Service { return &rocketchat.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
