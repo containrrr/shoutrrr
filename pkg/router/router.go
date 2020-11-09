@@ -22,6 +22,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
+	"github.com/containrrr/shoutrrr/pkg/services/opsgenie"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/xmpp"
 )
@@ -150,6 +151,7 @@ var serviceMap = map[string]func() t.Service{
 	"zulip":      func() t.Service { return &zulip.Service{} },
 	"join":       func() t.Service { return &join.Service{} },
 	"rocketchat": func() t.Service { return &rocketchat.Service{} },
+	"opsgenie":   func() t.Service { return &opsgenie.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
