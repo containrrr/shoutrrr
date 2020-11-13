@@ -3,9 +3,10 @@ package rocketchat
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for the rocket.chat service
@@ -46,7 +47,9 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 	config.TokenA = path[1]
 	config.TokenB = path[2]
 	if len(path) > 3 {
-		if path[3][0:1] != "@" {
+		if serviceURL.Fragment != "" {
+			config.Channel = "#" + strings.TrimLeft(serviceURL.Fragment, "#")
+		} else if path[3][0:1] != "@" {
 			config.Channel = "#" + path[3]
 		} else {
 			config.Channel = path[3]
