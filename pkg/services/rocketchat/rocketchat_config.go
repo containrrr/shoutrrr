@@ -3,9 +3,9 @@ package rocketchat
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 	"strings"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for the rocket.chat service
@@ -13,6 +13,7 @@ type Config struct {
 	standard.QuerylessConfig
 	standard.EnumlessConfig
 	UserName string
+	Port     string
 	Host     string
 	TokenA   string
 	Channel  string
@@ -43,6 +44,7 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 
 	config.UserName = UserName
 	config.Host = host
+	config.Port = serviceURL.Port()
 	config.TokenA = path[1]
 	config.TokenB = path[2]
 	if len(path) > 3 {

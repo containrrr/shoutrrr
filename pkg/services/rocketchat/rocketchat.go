@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -29,13 +28,14 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 // Send a notification message to Rocket.chat
+// Send a notification message to Rocket.chat
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	apiURL := buildURL(config)
 	json, _ := CreateJSONPayload(config, message, params)
 	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 	if err != nil {
-		return fmt.Errorf("Error while posting to URL: %v", err)
+		return fmt.Errorf("Error while posting to URL: %v\nHOST: %s\nPORT: %s\n", err, config.Host, config.Port)
 	}
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
@@ -44,5 +44,10 @@ func (service *Service) Send(message string, params *types.Params) error {
 }
 
 func buildURL(config *Config) string {
-	return fmt.Sprintf("https://%s/hooks/%s/%s", config.Host, config.TokenA, config.TokenB)
+	if config.Port != "443" {
+		return fmt.Sprintf("https://%s:%s/hooks/%s/%s", config.Host, config.Port, config.TokenA, config.TokenB)
+	} else {
+		return fmt.Sprintf("https://%s/hooks/%s/%s", config.Host, config.TokenA, config.TokenB)
+	}
+	return ""
 }
