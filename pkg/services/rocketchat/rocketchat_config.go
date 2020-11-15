@@ -14,6 +14,7 @@ type Config struct {
 	standard.EnumlessConfig
 	UserName string
 	Host     string
+	Port     string
 	TokenA   string
 	Channel  string
 	TokenB   string
@@ -41,6 +42,7 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 		return errors.New(NotEnoughArguments)
 	}
 
+	config.Port = serviceURL.Port()
 	config.UserName = UserName
 	config.Host = host
 	config.TokenA = path[1]
