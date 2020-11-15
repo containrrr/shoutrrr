@@ -48,8 +48,8 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 	config.TokenB = path[2]
 	if len(path) > 3 {
 		if serviceURL.Fragment != "" {
-			config.Channel = "#" + strings.TrimLeft(serviceURL.Fragment, "#")
-		} else if path[3][0:1] != "@" {
+			config.Channel = "#" + strings.TrimPrefix(serviceURL.Fragment, "#")
+		} else if !strings.HasPrefix(path[3], "@") {
 			config.Channel = "#" + path[3]
 		} else {
 			config.Channel = path[3]
