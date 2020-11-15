@@ -162,5 +162,14 @@ var _ = Describe("the rocketchat service", func() {
 				Expect(string(json)).To(Equal("{\"text\":\"this is a message\",\"username\":\"overwriteUserName\",\"channel\":\"overwriteChannel\"}"))
 			})
 		})
+		When("sending to an URL which contains HOST:PORT", func() {
+			rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/testChannel")
+			config := &Config{}
+			config.SetURL(rocketchatURL)
+			It("should generate a correct hook URL https://HOST:PORT", func() {
+				hookURL := buildURL(config)
+				Expect(hookURL).To(ContainSubstring("my-domain.com:5055"))
+			})
+		})
 	})
 })
