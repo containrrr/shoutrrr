@@ -17,7 +17,7 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 [![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr)
 [![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE)
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 </div>
@@ -84,6 +84,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://simme.dev"><img src="https://avatars0.githubusercontent.com/u/1596025?v=4" width="100px;" alt=""/><br /><sub><b>Simon Aronsson</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=simskij" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=simskij" title="Documentation">📖</a> <a href="#maintenance-simskij" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://arnested.dk"><img src="https://avatars2.githubusercontent.com/u/190005?v=4" width="100px;" alt=""/><br /><sub><b>Arne Jørgensen</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=arnested" title="Documentation">📖</a> <a href="https://github.com/containrrr/shoutrrr/commits?author=arnested" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/atighineanu"><img src="https://avatars1.githubusercontent.com/u/27206712?v=4" width="100px;" alt=""/><br /><sub><b>Alexei Tighineanu</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=atighineanu" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/ellisab"><img src="https://avatars2.githubusercontent.com/u/1402047?v=4" width="100px;" alt=""/><br /><sub><b>Alexandru Bonini</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=ellisab" title="Code">💻</a></td>
   </tr>
 </table>
 
