@@ -171,5 +171,19 @@ var _ = Describe("the rocketchat service", func() {
 				Expect(hookURL).To(ContainSubstring("my-domain.com:5055"))
 			})
 		})
+		When("sending to an URL with badly syntaxed #channel name", func() {
+			rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
+			config := &Config{}
+			config.SetURL(rocketchatURL)
+			It("should properly parse the Channel", func() {
+				Expect(config.Channel).To(ContainSubstring("#testChannel"))
+			})
+			rocketchatURL, _ = url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
+			config = &Config{}
+			config.SetURL(rocketchatURL)
+			It("should properly parse the Channel", func() {
+				Expect(config.Channel).To(ContainSubstring("#testChannel"))
+			})
+		})
 	})
 })
