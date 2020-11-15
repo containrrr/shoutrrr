@@ -65,6 +65,24 @@
         "doc",
         "code"
       ]
+    },
+    {
+      "login": "atighineanu",
+      "name": "Alexei Tighineanu",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/27206712?v=4",
+      "profile": "https://github.com/atighineanu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ellisab",
+      "name": "Alexandru Bonini",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1402047?v=4",
+      "profile": "https://github.com/ellisab",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
