@@ -176,7 +176,7 @@ var _ = Describe("the rocketchat service", func() {
                 rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
 			    config := &Config{}
   			    config.SetURL(rocketchatURL)
-				Expect(config.Channel).To(ContainSubstring("/###########################testChannel"))
+				Expect(config.Channel).To(ContainSubstring("###########################testChannel"))
 			})
 			It("should properly parse the Channel", func() {
 			    rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
