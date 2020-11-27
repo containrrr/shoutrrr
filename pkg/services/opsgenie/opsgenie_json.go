@@ -5,7 +5,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// JSON represents the  payload being sent to the OpsGenie API
+// AlertPayload represents the payload being sent to the OpsGenie API
 //
 // See: https://docs.opsgenie.com/docs/alert-api#create-alert
 //
@@ -21,7 +21,7 @@ import (
 //		"visibleTo":   `[{"id":"4513b7ea-3b91-438f-b7e4-e3e54af9147c","type":"team"},{"name":"rocket_team","type":"team"}]`,
 //		"details":     `{"key1": "value1", "key2": "value2"}`,
 //	})
-type JSON struct {
+type AlertPayload struct {
 	Message     string          `json:"message"`
 	Alias       string          `json:"alias,omitempty"`
 	Description string          `json:"description,omitempty"`
@@ -37,27 +37,27 @@ type JSON struct {
 	Note        string          `json:"note,omitempty"`
 }
 
-func (j JSON) setStringValue(variable *string, key string, params *types.Params) {
+func (j AlertPayload) setStringValue(variable *string, key string, params *types.Params) {
 	paramValue, ok := (*params)[key]
 	if ok {
 		*variable = paramValue
 	}
 }
 
-func (j JSON) setRawMessageValue(variable *json.RawMessage, key string, params *types.Params) {
+func (j AlertPayload) setRawMessageValue(variable *json.RawMessage, key string, params *types.Params) {
 	paramValue, ok := (*params)[key]
 	if ok {
 		*variable = json.RawMessage(paramValue)
 	}
 }
 
-// NewJSON instantiates JSON
-func NewJSON(message string, params *types.Params) JSON {
+// NewAlertPayload instantiates AlertPayload
+func NewAlertPayload(message string, params *types.Params) AlertPayload {
 	if params == nil {
 		params = &types.Params{}
 	}
 
-	result := JSON{Message: message}
+	result := AlertPayload{Message: message}
 	result.setStringValue(&result.Alias, "alias", params)
 	result.setStringValue(&result.Description, "description", params)
 	result.setRawMessageValue(&result.Responders, "responders", params)

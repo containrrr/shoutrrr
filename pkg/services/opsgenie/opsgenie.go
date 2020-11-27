@@ -23,7 +23,7 @@ type Service struct {
 	config *Config
 }
 
-func (service *Service) sendAlert(url string, apiKey string, payload JSON) error {
+func (service *Service) sendAlert(url string, apiKey string, payload AlertPayload) error {
 	jsonBody, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	url := fmt.Sprintf(alertEndpointTemplate, config.Host)
-	payload := NewJSON(message, params)
+	payload := NewAlertPayload(message, params)
 
 	return service.sendAlert(url, config.ApiKey, payload)
 }
