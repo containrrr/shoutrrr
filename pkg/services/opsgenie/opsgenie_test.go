@@ -26,7 +26,7 @@ func TestOpsGenie(t *testing.T) {
 	RunSpecs(t, "Shoutrrr OpsGenie Suite")
 }
 
-var _ = Describe("the OpsGenie plugin", func() {
+var _ = Describe("the OpsGenie service", func() {
 	var (
 		mockServer   *httptest.Server
 		service      *Service

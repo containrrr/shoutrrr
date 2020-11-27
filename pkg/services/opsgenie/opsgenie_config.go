@@ -6,7 +6,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
-// Config for use within the opsgenie plugin
+// Config for use within the opsgenie service
 type Config struct {
 	ApiKey string `desc:"The OpsGenie API key"`
 	Host   string `desc:"The OpsGenie API host. Use 'api.opsgenie.com' for US and 'api.eu.opsgenie.com' for EU instances"`
