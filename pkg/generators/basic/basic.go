@@ -2,15 +2,12 @@ package basic
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/fatih/color"
 	"os"
 	"reflect"
-	"strconv"
-	"strings"
 )
 
 type Generator struct{}
@@ -21,7 +18,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 
 	var err error
 
-	configType, fields := format.GetConfigFormat(service)
+	configType, fields := format.GetServiceConfigFormat(service)
 	configPtr := reflect.New(configType)
 	config := configPtr.Elem()
 
@@ -72,53 +69,8 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 				}
 			}
 
-			configField := config.FieldByName(field.Name)
-			fieldKind := field.Type.Kind()
-
-			if fieldKind == reflect.String {
-				configField.SetString(inputValue)
-				valueValid = true
-			} else if field.EnumFormatter != nil {
-				value := field.EnumFormatter.Parse(inputValue)
-				if value == format.EnumInvalid {
-					enumNames := strings.Join(field.EnumFormatter.Names(), ", ")
-					err = fmt.Errorf("not a one of %v", enumNames)
-				} else {
-					configField.SetInt(int64(value))
-					valueValid = true
-				}
-			} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
-				var value uint64
-				value, err = strconv.ParseUint(inputValue, 10, field.Type.Bits())
-				if err == nil {
-					configField.SetUint(value)
-					valueValid = true
-				}
-			} else if fieldKind >= reflect.Int && fieldKind <= reflect.Int64 {
-				var value int64
-				value, err = strconv.ParseInt(inputValue, 10, field.Type.Bits())
-				if err == nil {
-					configField.SetInt(value)
-					valueValid = true
-				}
-			} else if fieldKind == reflect.Bool {
-				if value, ok := format.ParseBool(inputValue, false); !ok {
-					err = errors.New("accepted values are 1, true, yes or 0, false, no")
-				} else {
-					configField.SetBool(value)
-					valueValid = true
-				}
-			} else if fieldKind >= reflect.Slice {
-				elemKind := field.Type.Elem().Kind()
-				if elemKind != reflect.String {
-					err = errors.New("field format is not supported")
-				} else {
-					values := strings.Split(inputValue, ",")
-					configField.Set(reflect.ValueOf(values))
-					valueValid = true
-				}
-			} else {
-				_, _ = fmt.Fprint(color.Output, "Invalid type ", color.HiYellowString(fieldKind.String()))
+			if valueValid, err = format.SetConfigField(config, field, inputValue); !valueValid {
+				_, _ = fmt.Fprint(color.Output, "Invalid type ", color.HiYellowString(field.Type.Kind().String()))
 				_, _ = fmt.Fprint(color.Output, "for field ", color.HiCyanString(field.Name), "\n\n")
 			}
 

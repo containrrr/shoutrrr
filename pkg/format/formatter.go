@@ -1,9 +1,11 @@
 package format
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fatih/color"
 	"reflect"
+	"strconv"
 	"strings"
 	"unsafe"
 
@@ -21,18 +23,26 @@ func GetConfigMap(service types.Service) (map[string]string, int) {
 
 	formatter := formatter{
 		EnumFormatters: config.Enums(),
-		MaxDepth:       10,
+		MaxDepth:       2,
 	}
 	return formatter.formatStructMap(configType, config, 0)
 }
 
-func GetConfigFormat(service types.Service) (reflect.Type, []fieldInfo) {
+func GetServiceConfigFormat(service types.Service) (reflect.Type, []FieldInfo) {
 	configRef := reflect.ValueOf(service).Elem().FieldByName("config")
 	configType := configRef.Type().Elem()
 
 	config := reflect.New(configType)
-
 	serviceConfig := config.Interface().(types.ServiceConfig)
+
+	return GetConfigFormat(serviceConfig)
+}
+
+func GetConfigFormat(serviceConfig types.ServiceConfig) (reflect.Type, []FieldInfo) {
+	configType := reflect.TypeOf(serviceConfig)
+	if configType.Kind() == reflect.Ptr {
+		configType = configType.Elem()
+	}
 
 	formatter := formatter{
 		EnumFormatters: serviceConfig.Enums(),
@@ -124,7 +134,7 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 	return valueMap, maxKeyLen
 }
 
-type fieldInfo struct {
+type FieldInfo struct {
 	Name          string
 	Type          reflect.Type
 	EnumFormatter types.EnumFormatter
@@ -132,12 +142,14 @@ type fieldInfo struct {
 	DefaultValue  string
 	Template      string
 	Required      bool
+	Title         bool
+	Key           string
 }
 
-func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []fieldInfo {
+func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
 
 	numFields := structType.NumField()
-	fields := make([]fieldInfo, numFields)
+	fields := make([]FieldInfo, 0, numFields)
 	maxKeyLen := 0
 
 	for i := 0; i < numFields; i++ {
@@ -148,10 +160,11 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []fieldInfo {
 			continue
 		}
 
-		info := fieldInfo{
+		info := FieldInfo{
 			Name:     fieldDef.Name,
 			Type:     fieldDef.Type,
 			Required: true,
+			Title:    false,
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
@@ -171,11 +184,19 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []fieldInfo {
 			info.Required = false
 		}
 
+		if _, ok := fieldDef.Tag.Lookup("title"); ok {
+			info.Title = true
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("key"); ok {
+			info.Key = tag
+		}
+
 		if ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]; isEnum {
 			info.EnumFormatter = ef
 		}
 
-		fields[i] = info
+		fields = append(fields, info)
 		keyLen := len(fieldDef.Name)
 		if keyLen > maxKeyLen {
 			maxKeyLen = keyLen
@@ -220,6 +241,10 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 			items[i], itemLen = fmtr.getFieldValueString(field.Index(i), nextDepth)
 			totalLen += itemLen
 		}
+		if fieldLen > 1 {
+			// Add space for separators
+			totalLen += (fieldLen - 1) * 2
+		}
 		return fmt.Sprintf("[ %s ]", strings.Join(items, ", ")), totalLen
 	}
 
@@ -253,4 +278,82 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 	}
 	strVal := kind.String()
 	return fmt.Sprintf("<?%s>", strVal), len(strVal) + 5
+}
+
+func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (valid bool, err error) {
+	configField := config.FieldByName(field.Name)
+	fieldKind := field.Type.Kind()
+
+	if fieldKind == reflect.String {
+		configField.SetString(inputValue)
+		return true, nil
+	} else if field.EnumFormatter != nil {
+		value := field.EnumFormatter.Parse(inputValue)
+		if value == EnumInvalid {
+			enumNames := strings.Join(field.EnumFormatter.Names(), ", ")
+			return false, fmt.Errorf("not a one of %v", enumNames)
+		} else {
+			configField.SetInt(int64(value))
+			return true, nil
+		}
+	} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
+		var value uint64
+		value, err = strconv.ParseUint(inputValue, 10, field.Type.Bits())
+		if err == nil {
+			configField.SetUint(value)
+			return true, nil
+		}
+	} else if fieldKind >= reflect.Int && fieldKind <= reflect.Int64 {
+		var value int64
+		value, err = strconv.ParseInt(inputValue, 10, field.Type.Bits())
+		if err == nil {
+			configField.SetInt(value)
+			return true, nil
+		}
+	} else if fieldKind == reflect.Bool {
+		if value, ok := ParseBool(inputValue, false); !ok {
+			return false, errors.New("accepted values are 1, true, yes or 0, false, no")
+		} else {
+			configField.SetBool(value)
+			return true, nil
+		}
+	} else if fieldKind >= reflect.Slice {
+		elemKind := field.Type.Elem().Kind()
+		if elemKind != reflect.String {
+			return false, errors.New("field format is not supported")
+		} else {
+			values := strings.Split(inputValue, ",")
+			configField.Set(reflect.ValueOf(values))
+			return true, nil
+		}
+	}
+	return false, nil
+
+}
+
+func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, err error) {
+	configField := config.FieldByName(field.Name)
+	fieldKind := field.Type.Kind()
+
+	if fieldKind == reflect.String {
+		return configField.String(), nil
+	} else if field.EnumFormatter != nil {
+		return field.EnumFormatter.Print(int(configField.Int())), nil
+	} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
+		return strconv.FormatUint(configField.Uint(), 10), nil
+	} else if fieldKind >= reflect.Int && fieldKind <= reflect.Int64 {
+		return strconv.FormatInt(configField.Int(), 10), nil
+	} else if fieldKind == reflect.Bool {
+		return PrintBool(configField.Bool()), nil
+	} else if fieldKind >= reflect.Slice {
+		sliceLen := configField.Len()
+		sliceValue := configField.Slice(0, sliceLen)
+		if field.Type.Elem().Kind() != reflect.String {
+			return "", errors.New("field format is not supported")
+		}
+		slice := sliceValue.Interface().([]string)
+		return strings.Join(slice, ","), nil
+	}
+	return "", fmt.Errorf("field kind %x is not supported", fieldKind)
+
 }
