@@ -10,7 +10,6 @@ import (
 
 //Config object holding all information
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	UserName string
 	Channel  string

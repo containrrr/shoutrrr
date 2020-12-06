@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/smtp"
 	"net/url"
@@ -48,11 +49,11 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err).NotTo(HaveOccurred(), "parsing")
 
 			config := &Config{}
-			config.BindKeys(config)
+			pkr := format.NewPropKeyResolver(config)
 			err = config.SetURL(url)
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
-			fmt.Printf("%v", config.QueryFields())
+			fmt.Printf("%v", pkr.QueryFields())
 			outputURL := config.GetURL()
 
 			fmt.Println(outputURL.String())
@@ -68,7 +69,6 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
 				config := &Config{}
-				config.BindKeys(config)
 				err = config.SetURL(url)
 				Expect(err).To(HaveOccurred(), "verifying")
 			})
@@ -81,7 +81,6 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
 				config := &Config{}
-				config.BindKeys(config)
 				err = config.SetURL(url)
 				Expect(err).To(HaveOccurred(), "verifying")
 			})
@@ -92,7 +91,6 @@ var _ = Describe("the SMTP service", func() {
 		var config *Config
 		BeforeEach(func() {
 			config = &Config{}
-			config.BindKeys(config)
 		})
 		It("should not allow getting invalid query values", func() {
 			testutils.TestConfigGetInvalidQueryValue(config)

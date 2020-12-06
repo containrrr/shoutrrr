@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strconv"
@@ -12,7 +11,6 @@ import (
 
 // Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
-	standard.KeyPropConfig
 	Host        string    `desc:"SMTP server hostname or IP address"`
 	Username    string    `desc:"authentication username"`
 	Password    string    `desc:"authentication password or hash"`
@@ -29,6 +27,17 @@ type Config struct {
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
+	resolver := format.NewPropKeyResolver(config)
+	return config.getURL(&resolver)
+}
+
+// SetURL updates a ServiceConfig from a URL representation of it's field values
+func (config *Config) SetURL(url *url.URL) error {
+	resolver := format.NewPropKeyResolver(config)
+	return config.setURL(&resolver, url)
+}
+
+func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
 		User:       url.UserPassword(config.Username, config.Password),
@@ -36,13 +45,12 @@ func (config *Config) GetURL() *url.URL {
 		Path:       "/",
 		Scheme:     Scheme,
 		ForceQuery: true,
-		RawQuery:   format.BuildQuery(config),
+		RawQuery:   format.BuildQuery(resolver),
 	}
 
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 
@@ -55,7 +63,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	}
 
 	for key, vals := range url.Query() {
-		if err := config.Set(key, vals[0]); err != nil {
+		if err := resolver.Set(key, vals[0]); err != nil {
 			return err
 		}
 	}
@@ -71,10 +79,12 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
-// GetSendConfig returns a copy of the config with overrides from params
-func GetSendConfig(config Config, params *types.Params) (Config, error) {
-	err := config.KeyPropConfig.UpdateConfigFromParams(&config, params)
-	return config, err
+// Clone returns a copy of the config
+func (config *Config) Clone() Config {
+	clone := *config
+	clone.ToAddresses = make([]string, len(config.ToAddresses))
+	copy(clone.ToAddresses, clone.ToAddresses)
+	return clone
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values

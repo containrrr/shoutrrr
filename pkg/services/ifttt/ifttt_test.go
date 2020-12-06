@@ -102,7 +102,7 @@ var _ = Describe("the ifttt package", func() {
 	When("serializing a config to URL", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
-				expectedURL := "ifttt://dummyID/?events=foo,bar,baz&value1=&value2=&value3=&messagevalue=0"
+				expectedURL := "ifttt://dummyID/?events=foo,bar,baz&messagevalue=0&value1=&value2=&value3="
 				config := Config{
 					Events:            []string{"foo", "bar", "baz"},
 					WebHookID:         "dummyID",

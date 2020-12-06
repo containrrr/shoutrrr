@@ -3,11 +3,10 @@ package xmpp
 import (
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"gosrc.io/xmpp"
 	"net/url"
 	"strconv"
-	"strings"
-
-	"gosrc.io/xmpp"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -25,26 +24,36 @@ type Config struct {
 	Username   string
 	Password   string
 	Host       string
-	ServerHost string
-	ToAddress  string
-	Subject    string
+	ServerHost string `key:"serverhost"`
+	ToAddress  string `key:"toaddress"`
+	Subject    string `key:"subject"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
+	resolver := format.NewPropKeyResolver(config)
+	return config.getURL(&resolver)
+}
+
+// SetURL updates a ServiceConfig from a URL representation of it's field values
+func (config *Config) SetURL(url *url.URL) error {
+	resolver := format.NewPropKeyResolver(config)
+	return config.setURL(&resolver, url)
+}
+
+func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
 		User:     url.UserPassword(config.Username, config.Password),
 		Host:     fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Path:     "/",
 		Scheme:   Scheme,
-		RawQuery: format.BuildQuery(config),
+		RawQuery: format.BuildQuery(resolver),
 	}
 
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 
@@ -57,7 +66,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	}
 
 	for key, vals := range url.Query() {
-		if err := config.Set(key, vals[0]); err != nil {
+		if err := resolver.Set(key, vals[0]); err != nil {
 			return err
 		}
 	}
@@ -66,43 +75,6 @@ func (config *Config) SetURL(url *url.URL) error {
 		return errors.New("toAddress missing from config URL")
 	}
 
-	return nil
-}
-
-// QueryFields returns the fields that are part of the Query of the service URL
-func (config *Config) QueryFields() []string {
-	return []string{
-		"toAddress",
-		"subject",
-		"serverHost",
-	}
-}
-
-// Get returns the value of a Query field
-func (config *Config) Get(key string) (string, error) {
-	switch strings.ToLower(key) {
-	case "toaddress":
-		return config.ToAddress, nil
-	case "subject":
-		return config.Subject, nil
-	case "serverhost":
-		return config.ServerHost, nil
-	}
-	return "", fmt.Errorf("invalid query key \"%s\"", key)
-}
-
-// Set updates the value of a Query field
-func (config *Config) Set(key string, value string) error {
-	switch strings.ToLower(key) {
-	case "toaddress":
-		config.ToAddress = value
-	case "subject":
-		config.Subject = value
-	case "serverhost":
-		config.ServerHost = value
-	default:
-		return fmt.Errorf("invalid query key \"%s\"", key)
-	}
 	return nil
 }
 

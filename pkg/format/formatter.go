@@ -23,7 +23,7 @@ func GetConfigMap(service types.Service) (map[string]string, int) {
 
 	formatter := formatter{
 		EnumFormatters: config.Enums(),
-		MaxDepth:       2,
+		MaxDepth:       10,
 	}
 	return formatter.formatStructMap(configType, config, 0)
 }
@@ -95,7 +95,7 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 					fmtr.Errors = append(fmtr.Errors, err)
 				}
 			} else if nextDepth < fmtr.MaxDepth {
-				value, valueLen = fmtr.getFieldValueString(values.Field(i), nextDepth)
+				value, valueLen = fmtr.getFieldValueString(values.FieldByName(field.Name), nextDepth)
 			}
 		} else {
 			// Since no values was supplied, let's substitute the value with the type

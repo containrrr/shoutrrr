@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
@@ -22,6 +23,7 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Send notification to Telegram
@@ -37,7 +39,8 @@ func (service *Service) Send(message string, _ *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 

@@ -38,8 +38,9 @@ var _ = Describe("the zulip service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envZulipURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send("This is an integration test message", nil)
+			err := service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -136,7 +137,7 @@ var _ = Describe("the zulip service", func() {
 					Stream:  "foo",
 					Topic:   "bar",
 				}
-				url := config.GetURL()
+				url := config.GetURL(nil)
 				Expect(url.String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar"))
 			})
 		})
@@ -148,7 +149,7 @@ var _ = Describe("the zulip service", func() {
 					Host:    "example.zulipchat.com",
 					Stream:  "foo",
 				}
-				url := config.GetURL()
+				url := config.GetURL(nil)
 				Expect(url.String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo"))
 			})
 		})

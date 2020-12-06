@@ -85,7 +85,20 @@ func Run(cmd *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	generator, err := generators.NewGenerator(generatorName)
+	var generator types.Generator
+
+	var generatorFlag = cmd.Flags().Lookup("generator")
+
+	if !generatorFlag.Changed {
+		// try to use the service default generator if one exists
+		generator, _ = generators.NewGenerator(serviceSchema)
+	}
+
+	if generator != nil {
+		generatorName = serviceSchema
+	} else {
+		generator, err = generators.NewGenerator(generatorName)
+	}
 
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)

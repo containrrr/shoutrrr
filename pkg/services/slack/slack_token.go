@@ -2,19 +2,14 @@ package slack
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 )
 
 // Token is a three part string split into A, B and C
-type Token struct {
-	A string
-	B string
-	C string
-}
+type Token []string
 
-func validateToken(token Token) error {
+func ValidateToken(token Token) error {
 	if err := tokenPartsAreNotEmpty(token); err != nil {
 		return err
 	} else if err := tokenPartsAreValidFormat(token); err != nil {
@@ -24,22 +19,22 @@ func validateToken(token Token) error {
 }
 
 func tokenPartsAreNotEmpty(token Token) error {
-	if token.A == "" {
+	if token[0] == "" {
 		return errors.New(string(TokenAMissing))
-	} else if token.B == "" {
+	} else if token[1] == "" {
 		return errors.New(string(TokenBMissing))
-	} else if token.C == "" {
+	} else if token[2] == "" {
 		return errors.New(string(TokenCMissing))
 	}
 	return nil
 }
 
 func tokenPartsAreValidFormat(token Token) error {
-	if !matchesPattern("[A-Z0-9]{9}", token.A) {
+	if !matchesPattern("[A-Z0-9]{9}", token[0]) {
 		return errors.New(string(TokenAMalformed))
-	} else if !matchesPattern("[A-Z0-9]{9}", token.B) {
+	} else if !matchesPattern("[A-Z0-9]{9}", token[1]) {
 		return errors.New(string(TokenBMalformed))
-	} else if !matchesPattern("[A-Za-z0-9]{24}", token.C) {
+	} else if !matchesPattern("[A-Za-z0-9]{24}", token[2]) {
 		return errors.New(string(TokenCMalformed))
 	}
 	return nil
@@ -54,15 +49,11 @@ func matchesPattern(pattern string, part string) bool {
 }
 
 func (t Token) String() string {
-	return fmt.Sprintf("%s-%s-%s", t.A, t.B, t.C)
+	return strings.Join(t, "-")
 }
 
 // ParseToken creates a Token from a sting representation
 func ParseToken(s string) Token {
-	parts := strings.Split(s, "-")
-	return Token{
-		A: parts[0],
-		B: parts[1],
-		C: parts[2],
-	}
+	token := strings.Split(s, "-")
+	return token
 }

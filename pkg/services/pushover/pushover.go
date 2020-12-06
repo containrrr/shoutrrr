@@ -2,6 +2,7 @@ package pushover
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
@@ -21,28 +22,20 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Send a notification message to Pushover
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
-	if params == nil {
-		params = &types.Params{}
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		return err
 	}
+
 	errors := make([]error, 0)
 
-	title, found := (*params)["subject"]
-	if !found {
-		title = config.Title
-	}
-
-	priority, found := (*params)["priority"]
-	if !found {
-		priority = strconv.FormatInt(int64(config.Priority), 10)
-	}
-
 	for _, device := range config.Devices {
-		if err := service.sendToDevice(device, message, title, priority); err != nil {
+		if err := service.sendToDevice(device, message, config); err != nil {
 			errors = append(errors, err)
 		}
 	}
@@ -54,8 +47,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return nil
 }
 
-func (service *Service) sendToDevice(device string, message string, title string, priority string) error {
-	config := service.config
+func (service *Service) sendToDevice(device string, message string, config *Config) error {
 
 	data := url.Values{}
 	data.Set("device", device)
@@ -63,12 +55,12 @@ func (service *Service) sendToDevice(device string, message string, title string
 	data.Set("token", config.Token)
 	data.Set("message", message)
 
-	if len(title) > 0 {
-		data.Set("title", title)
+	if len(config.Title) > 0 {
+		data.Set("title", config.Title)
 	}
 
-	if len(priority) > 0 {
-		data.Set("priority", priority)
+	if config.Priority > 0 {
+		data.Set("priority", strconv.FormatInt(int64(config.Priority), 10))
 	}
 
 	res, err := http.Post(
@@ -91,7 +83,8 @@ func (service *Service) sendToDevice(device string, message string, title string
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 

@@ -8,7 +8,6 @@ import (
 
 // Config for use within the Hangouts Chat plugin.
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	URL *url.URL
 }

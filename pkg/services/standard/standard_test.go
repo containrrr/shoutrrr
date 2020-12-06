@@ -131,24 +131,3 @@ var _ = Describe("the standard enumless config implementation", func() {
 		})
 	})
 })
-
-var _ = Describe("the standard queryless config implementation", func() {
-	When("it's queryfields method is called", func() {
-		It("should return an empty slice", func() {
-			Expect((&QuerylessConfig{}).QueryFields()).To(BeEmpty())
-		})
-	})
-	When("it's get method is called", func() {
-		It("should return an error and no value", func() {
-			val, err := (&QuerylessConfig{}).Get("foo")
-			Expect(val).To(BeEmpty())
-			Expect(err).To(HaveOccurred())
-		})
-	})
-	When("it's set method is called", func() {
-		It("should return an error", func() {
-			err := (&QuerylessConfig{}).Set("foo", "bar")
-			Expect(err).To(HaveOccurred())
-		})
-	})
-})

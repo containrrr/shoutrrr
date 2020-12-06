@@ -59,7 +59,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 
-	if err := service.config.SetURL(configURL); err != nil {
+	if err := service.config.SetURL(nil, configURL); err != nil {
 		return err
 	}
 
