@@ -23,6 +23,8 @@ nav:
       - Pushover: 'services/pushover.md'
       - Teams: 'services/teams.md'
       - Zulip Chat: 'services/zulip.md'
+  - Advanced usage:
+      - Proxy: 'proxy.md'
 
 plugins:
   - search
