@@ -38,6 +38,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		Auth:        authTypes.Unknown,
 		UseStartTLS: true,
 		UseHTML:     false,
+		Encryption:  encMethods.Auto,
 	}
 	if err := service.config.SetURL(configURL); err != nil {
 		return err
@@ -59,20 +60,33 @@ func (service *Service) Send(message string, params *types.Params) error {
 	if params == nil {
 		params = &types.Params{}
 	}
-	client, err := getClientConnection(service.config.Host, service.config.Port)
+	client, err := getClientConnection(service.config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
 	return service.doSend(client, message, *params)
 }
 
-func getClientConnection(host string, port uint16) (*smtp.Client, error) {
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+func getClientConnection(config *Config) (*smtp.Client, error) {
+
+	var conn net.Conn
+	var err error
+
+	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
+
+	if useImplicitTLS(config.Encryption, config.Port) {
+		conn, err = tls.Dial("tcp", addr, &tls.Config{
+			ServerName: config.Host,
+		})
+	} else {
+		conn, err = net.Dial("tcp", addr)
+	}
+
 	if err != nil {
 		return nil, fail(FailConnectToServer, err)
 	}
 
-	client, err := smtp.NewClient(conn, host)
+	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
 		return nil, fail(FailCreateSMTPClient, err)
 	}
@@ -89,7 +103,7 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
 	}
 
-	if config.UseStartTLS {
+	if config.UseStartTLS && !useImplicitTLS(config.Encryption, config.Port) {
 		if supported, _ := client.Extension("StartTLS"); !supported {
 			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
 		} else {

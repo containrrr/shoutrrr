@@ -13,17 +13,18 @@ import (
 
 // Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
-	Host        string   `desc:"SMTP server hostname or IP address"`
-	Username    string   `desc:"authentication username"`
-	Password    string   `desc:"authentication password or hash"`
-	Port        uint16   `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
-	FromAddress string   `desc:"e-mail address that the mail are sent from"`
-	FromName    string   `desc:"name of the sender" optional:"yes"`
-	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
-	Subject     string   `desc:"the subject of the sent mail" param:"subject" default:"Shoutrrr Notification"`
-	Auth        authType `desc:"SMTP authentication method"`
-	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"Yes"`
-	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"No"`
+	Host        string    `desc:"SMTP server hostname or IP address"`
+	Username    string    `desc:"authentication username"`
+	Password    string    `desc:"authentication password or hash"`
+	Port        uint16    `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
+	FromAddress string    `desc:"e-mail address that the mail are sent from"`
+	FromName    string    `desc:"name of the sender" optional:"yes"`
+	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)"`
+	Subject     string    `desc:"the subject of the sent mail" param:"subject" default:"Shoutrrr Notification"`
+	Auth        authType  `desc:"SMTP authentication method"`
+	Encryption  encMethod `desc:"Encryption method" default:"Auto"`
+	UseStartTLS bool      `desc:"attempt to use SMTP StartTLS encryption" default:"Yes"`
+	UseHTML     bool      `desc:"whether the message being sent is in HTML" default:"No"`
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -79,6 +80,7 @@ func (config *Config) QueryFields() []string {
 		"auth",
 		"subject",
 		"startTls",
+		"encryption",
 		"useHTML",
 	}
 }
@@ -98,6 +100,8 @@ func (config *Config) Get(key string) (string, error) {
 		return config.Subject, nil
 	case "starttls":
 		return format.PrintBool(config.UseStartTLS), nil
+	case "encryption":
+		return config.Encryption.String(), nil
 	case "usehtml":
 		return format.PrintBool(config.UseHTML), nil
 	}
@@ -119,6 +123,8 @@ func (config *Config) Set(key string, value string) error {
 		config.Subject = value
 	case "starttls":
 		config.UseStartTLS, _ = format.ParseBool(value, true)
+	case "encryption":
+		config.Encryption = parseEncryption(value)
 	case "usehtml":
 		config.UseHTML, _ = format.ParseBool(value, false)
 	default:
@@ -130,7 +136,8 @@ func (config *Config) Set(key string, value string) error {
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth": authTypes.Enum,
+		"Auth":       authTypes.Enum,
+		"Encryption": encMethods.Enum,
 	}
 }
 
