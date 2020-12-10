@@ -27,8 +27,8 @@ type AlertPayload struct {
 	Description string          `json:"description,omitempty"`
 	Responders  json.RawMessage `json:"responders,omitempty"`
 	VisibleTo   json.RawMessage `json:"visibleTo,omitempty"`
-	Actions     string          `json:"actions,omitempty"`
-	Tags        string          `json:"tags,omitempty"`
+	Actions     json.RawMessage `json:"actions,omitempty"`
+	Tags        json.RawMessage `json:"tags,omitempty"`
 	Details     json.RawMessage `json:"details,omitempty"`
 	Entity      string          `json:"entity,omitempty"`
 	Source      string          `json:"source,omitempty"`
@@ -52,18 +52,35 @@ func (j AlertPayload) setRawMessageValue(variable *json.RawMessage, key string, 
 }
 
 // NewAlertPayload instantiates AlertPayload
-func NewAlertPayload(message string, params *types.Params) AlertPayload {
+func NewAlertPayload(message string, config *Config, params *types.Params) AlertPayload {
 	if params == nil {
 		params = &types.Params{}
 	}
 
-	result := AlertPayload{Message: message}
+	result := AlertPayload{
+		Message: message,
+		// Populate with values from the query string as defaults
+		Alias:       config.Alias,
+		Description: config.Description,
+		Responders:  json.RawMessage(config.Responders),
+		VisibleTo:   json.RawMessage(config.VisibleTo),
+		Actions:     json.RawMessage(config.Actions),
+		Tags:        json.RawMessage(config.Tags),
+		Details:     json.RawMessage(config.Details),
+		Entity:      config.Entity,
+		Source:      config.Source,
+		Priority:    config.Priority,
+		User:        config.User,
+		Note:        config.Note,
+	}
+
+	// If specified, overwrite the values from the query string
 	result.setStringValue(&result.Alias, "alias", params)
 	result.setStringValue(&result.Description, "description", params)
 	result.setRawMessageValue(&result.Responders, "responders", params)
 	result.setRawMessageValue(&result.VisibleTo, "visibleTo", params)
-	result.setStringValue(&result.Actions, "actions", params)
-	result.setStringValue(&result.Tags, "tags", params)
+	result.setRawMessageValue(&result.Actions, "actions", params)
+	result.setRawMessageValue(&result.Tags, "tags", params)
 	result.setRawMessageValue(&result.Details, "details", params)
 	result.setStringValue(&result.Entity, "entity", params)
 	result.setStringValue(&result.Source, "source", params)

@@ -28,6 +28,7 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 	if err != nil {
 		return err
 	}
+
 	jsonBuffer := bytes.NewBuffer(jsonBody)
 
 	req, err := http.NewRequest("POST", url, jsonBuffer)
@@ -66,7 +67,6 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	url := fmt.Sprintf(alertEndpointTemplate, config.Host)
-	payload := NewAlertPayload(message, params)
-
+	payload := NewAlertPayload(message, config, params)
 	return service.sendAlert(url, config.ApiKey, payload)
 }

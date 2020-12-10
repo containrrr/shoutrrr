@@ -48,3 +48,13 @@ service.Send("An example alert message", &types.Params{
 })
 ```
 
+# Optional parameters
+
+You can optionally specify the parameters in the URL:
+pushover://shoutrrr:token@userKey/?devices=device&title=Custom+Title&priority=1
+
+Example using the command line:
+
+	shoutrrr send -u 'opsgenie://api.eu.opsgenie.com/token?tags=["tag1","tag2"]&description=testing&responders=[{"username":"superuser", "type": "user"}]&entity=Example Entity&source=Example Source&actions=["asdf", "bcde"]' -m "Hello World6"
+
+
