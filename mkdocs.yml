@@ -4,8 +4,7 @@ repo_url: https://github.com/containrrr/shoutrrr/
 theme:
   name: 'material'
   palette:
-    primary: cyan
-    accent: cyan
+    scheme: shoutrrr
   logo: shoutrrr-180px.png
   favicon: favicon.ico
 extra_css:
