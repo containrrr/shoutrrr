@@ -8,6 +8,8 @@ theme:
     accent: cyan
   logo: shoutrrr-180px.png
   favicon: favicon.ico
+extra_css:
+  - stylesheets/theme.css
 markdown_extensions:
   - toc:
       permalink: True
