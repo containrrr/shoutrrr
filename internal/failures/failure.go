@@ -5,11 +5,6 @@ import "fmt"
 // FailureID is a number to be used to identify a specific error
 type FailureID int
 
-const (
-	// FailTestSetup is FailureID used to represent an error that is part of the setup for tests
-	FailTestSetup FailureID = -1
-)
-
 type failure struct {
 	message string
 	id      FailureID
@@ -46,14 +41,6 @@ func Wrap(message string, id FailureID, wrappedError error, v ...interface{}) Fa
 		id:      id,
 		stack:   stack,
 	}
-}
-
-// IsTestSetupFailure checks whether the given failure is due to the test setup being broken
-func IsTestSetupFailure(f Failure) (string, bool) {
-	if f != nil && f.ID() == FailTestSetup {
-		return fmt.Sprintf("test setup failed: %s", f.Error()), true
-	}
-	return "", false
 }
 
 var _ error = &failure{}

@@ -1,8 +1,6 @@
 package smtp
 
 import (
-	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/smtp"
 	"net/url"
@@ -13,6 +11,8 @@ import (
 
 	"github.com/containrrr/shoutrrr/internal/failures"
 	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	. "github.com/onsi/ginkgo"
@@ -50,13 +50,10 @@ var _ = Describe("the SMTP service", func() {
 
 			config := &Config{}
 			pkr := format.NewPropKeyResolver(config)
-			err = config.SetURL(url)
+			err = config.setURL(&pkr, url)
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
-			fmt.Printf("%v", pkr.QueryFields())
 			outputURL := config.GetURL()
-
-			fmt.Println(outputURL.String())
 
 			Expect(outputURL.String()).To(Equal(testURL))
 
@@ -125,7 +122,6 @@ var _ = Describe("the SMTP service", func() {
 		It("should fail when writing multipart plain header", func() {
 			writer := testutils.CreateFailWriter(1)
 			err := service.writeMultipartMessage(writer, message)
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailPlainHeader))
 		})
@@ -133,7 +129,6 @@ var _ = Describe("the SMTP service", func() {
 		It("should fail when writing multipart plain message", func() {
 			writer := testutils.CreateFailWriter(2)
 			err := service.writeMultipartMessage(writer, message)
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailMessageRaw))
 		})
@@ -141,7 +136,6 @@ var _ = Describe("the SMTP service", func() {
 		It("should fail when writing multipart HTML header", func() {
 			writer := testutils.CreateFailWriter(4)
 			err := service.writeMultipartMessage(writer, message)
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailHTMLHeader))
 		})
@@ -149,7 +143,6 @@ var _ = Describe("the SMTP service", func() {
 		It("should fail when writing multipart HTML message", func() {
 			writer := testutils.CreateFailWriter(5)
 			err := service.writeMultipartMessage(writer, message)
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailMessageRaw))
 		})
@@ -157,7 +150,6 @@ var _ = Describe("the SMTP service", func() {
 		It("should fail when writing multipart end header", func() {
 			writer := testutils.CreateFailWriter(6)
 			err := service.writeMultipartMessage(writer, message)
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailMultiEndHeader))
 		})
@@ -168,7 +160,6 @@ var _ = Describe("the SMTP service", func() {
 			Expect(e).ToNot(HaveOccurred())
 
 			err := service.writeMessagePart(writer, message, "dummy")
-			fmt.Printf("%+v\n", err)
 			Expect(err).To(HaveOccurred())
 			Expect(err.ID()).To(Equal(FailMessageTemplate))
 		})
@@ -216,7 +207,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Data OK",
 					"221 OK",
 				}, "<pre>{{ .message }}</pre>", "{{ .message }}")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -239,7 +230,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Data OK",
 					"221 OK",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -262,7 +253,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Data OK",
 					"221 OK",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -282,7 +273,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 8BITMIME",
 					"502 That's too hard",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -293,12 +284,12 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when authentication type is invalid", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=bad&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
 				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailAuthType))
+				Expect(err.ID()).To(Equal(standard.FailServiceInit))
 			})
 
 			It("should fail when not being able to use authentication type", func() {
@@ -310,7 +301,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 8BITMIME",
 					"504 Liar",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -327,7 +318,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 8BITMIME",
 					"551 I don't know you",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -342,7 +333,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Sender OK",
 					"553 She doesn't want to be disturbed",
 				})
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -358,7 +349,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Receiver OK",
 					"554 Nah I'm fine thanks",
 				})
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -375,7 +366,7 @@ var _ = Describe("the SMTP service", func() {
 					"354 Go ahead",
 					"554 Such garbage!",
 				})
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -396,7 +387,7 @@ var _ = Describe("the SMTP service", func() {
 					"250 Data OK",
 					"502 You can't quit, you're fired!",
 				}, "", "")
-				if msg, test := failures.IsTestSetupFailure(err); test {
+				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
 				}
@@ -408,19 +399,19 @@ var _ = Describe("the SMTP service", func() {
 	})
 })
 
-func testSendRecipient(testURL string, responses []string) failure {
+func testSendRecipient(testURL string, responses []string) failures.Failure {
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
-		return failures.Wrap("error parsing URL", failures.FailTestSetup, err)
+		return standard.Failure(standard.FailParseURL, err)
 	}
 
 	err = service.Initialize(serviceURL, logger)
 	if err != nil {
-		return failures.Wrap("error parsing URL", failures.FailTestSetup, err)
+		return failures.Wrap("error parsing URL", standard.FailTestSetup, err)
 	}
 
 	if err := service.SetTemplateString("plain", "{{.message}}"); err != nil {
-		return failures.Wrap("error setting plain template", failures.FailTestSetup, err)
+		return failures.Wrap("error setting plain template", standard.FailTestSetup, err)
 	}
 
 	textCon, tcfaker := testutils.CreateTextConFaker(responses, "\r\n")
@@ -444,26 +435,26 @@ func testSendRecipient(testURL string, responses []string) failure {
 	return nil
 }
 
-func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string) failure {
+func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string) failures.Failure {
 
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
-		return failures.Wrap("error parsing URL", failures.FailTestSetup, err)
+		return standard.Failure(standard.FailParseURL, err)
 	}
 
-	err = service.Initialize(serviceURL, logger)
-	if err != nil {
-		return failures.Wrap("error parsing URL", failures.FailTestSetup, err)
+	if err = service.Initialize(serviceURL, logger); err != nil {
+		return standard.Failure(standard.FailServiceInit, err)
 	}
 
 	if htmlTemplate != "" {
 		if err := service.SetTemplateString("HTML", htmlTemplate); err != nil {
-			return failures.Wrap("error setting HTML template", failures.FailTestSetup, err)
+			return failures.Wrap("error setting HTML template", standard.FailTestSetup, err)
 		}
 	}
+
 	if plainTemplate != "" {
 		if err := service.SetTemplateString("plain", plainTemplate); err != nil {
-			return failures.Wrap("error setting plain template", failures.FailTestSetup, err)
+			return failures.Wrap("error setting plain template", standard.FailTestSetup, err)
 		}
 	}
 
