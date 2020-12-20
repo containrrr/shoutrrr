@@ -6,14 +6,15 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
+	"strings"
 )
 
 // Config for use within the telegram plugin
 type Config struct {
 	Token        string
-	Preview      bool      `key:"preview" default:"yes" desc:"If disabled, no web page preview will be displayed for URLs"`
-	Notification bool      `key:"notification" default:"yes" desc:"If disabled, sends message silently"`
-	ParseMode    parseMode `key:"parsemode" default:"None"`
+	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
+	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
+	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
 	Channels     []string  `key:"channels"`
 }
 
@@ -38,8 +39,10 @@ func (config *Config) SetURL(url *url.URL) error {
 
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
+	tokenParts := strings.Split(config.Token, ":")
+
 	return &url.URL{
-		User:       url.UserPassword("Token", config.Token),
+		User:       url.UserPassword(tokenParts[0], tokenParts[1]),
 		Host:       Scheme,
 		Scheme:     Scheme,
 		ForceQuery: true,

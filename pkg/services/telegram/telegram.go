@@ -43,7 +43,10 @@ func (service *Service) Send(message string, params *types.Params) error {
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
+	service.config = &Config{
+		Preview:      true,
+		Notification: true,
+	}
 	service.pkr = format.NewPropKeyResolver(service.config)
 	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
