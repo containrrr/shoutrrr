@@ -10,13 +10,18 @@ import (
 
 // Config for use within the telegram plugin
 type Config struct {
-	Token    string
-	Channels []string `key:"channels"`
+	Token        string
+	Preview      bool      `key:"preview" default:"yes" desc:"If disabled, no web page preview will be displayed for URLs"`
+	Notification bool      `key:"notification" default:"yes" desc:"If disabled, sends message silently"`
+	ParseMode    parseMode `key:"parsemode" default:"None"`
+	Channels     []string  `key:"channels"`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config *Config) Enums() map[string]types.EnumFormatter {
-	return map[string]types.EnumFormatter{}
+	return map[string]types.EnumFormatter{
+		"ParseMode": parseModes.Enum,
+	}
 }
 
 // GetURL returns a URL representation of it's current field values

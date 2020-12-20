@@ -2,6 +2,7 @@ package telegram_test
 
 import (
 	"fmt"
+	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
@@ -40,8 +41,9 @@ var _ = Describe("the telegram plugin", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envTelegramURL)
-			telegram.Initialize(serviceURL, logger)
-			err := telegram.Send("This is an integration test message", nil)
+			err := telegram.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+			err = telegram.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 		When("given a message that exceeds the max length", func() {
@@ -56,8 +58,9 @@ var _ = Describe("the telegram plugin", func() {
 					builder.WriteString(hundredChars)
 				}
 
-				telegram.Initialize(serviceURL, logger)
-				err := telegram.Send(builder.String(), nil)
+				err := telegram.Initialize(serviceURL, logger)
+				Expect(err).NotTo(HaveOccurred())
+				err = telegram.Send(builder.String(), nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -69,8 +72,9 @@ var _ = Describe("the telegram plugin", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
 				message := "this is a perfectly valid message"
 
-				telegram.Initialize(serviceURL, logger)
-				err := telegram.Send(message, nil)
+				err := telegram.Initialize(serviceURL, logger)
+				Expect(err).NotTo(HaveOccurred())
+				err = telegram.Send(message, nil)
 				Expect(err).To(HaveOccurred())
 				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
@@ -89,6 +93,7 @@ var _ = Describe("the telegram plugin", func() {
 			It("should return an error if only the api token where supplied", func() {
 				expectErrorAndEmptyObject(telegram, "telegram://12345:mock-token@telegram", logger)
 			})
+
 			When("the url is valid", func() {
 				var config *Config
 				var err error
@@ -120,12 +125,33 @@ var _ = Describe("the telegram plugin", func() {
 		})
 	})
 
+	Describe("sending the payload", func() {
+		var err error
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("", func() {
+			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
+			err = telegram.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			setupResponder("sendMessage", telegram.GetConfig().Token, 200, "")
+
+			err = telegram.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+	})
+
 	It("should implement basic service API methods correctly", func() {
 		testutils.TestConfigGetInvalidQueryValue(&Config{})
 		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?channels=channel-1&foo=bar")
 
-		testutils.TestConfigGetEnumsCount(&Config{}, 0)
-		testutils.TestConfigGetFieldsCount(&Config{}, 1)
+		testutils.TestConfigGetEnumsCount(&Config{}, 1)
+		testutils.TestConfigGetFieldsCount(&Config{}, 4)
 	})
 })
 
@@ -137,4 +163,9 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	fmt.Printf("Token: \"%+v\" \"%s\" \n", config.Token, config.Token)
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Channels)).To(BeZero())
+}
+
+func setupResponder(endpoint string, token string, code int, body string) {
+	targetUrl := fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, endpoint)
+	httpmock.RegisterResponder("POST", targetUrl, httpmock.NewStringResponder(code, body))
 }
