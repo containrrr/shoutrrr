@@ -9,18 +9,17 @@ import (
 
 // Config for the slack service
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
-	BotName string
-	Token   Token
+	BotName string   `default:"Shoutrrr"`
+	Token   []string `description:"List of comma separated token parts"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		User:       url.UserPassword(config.BotName, config.Token.String()),
-		Host:       config.Token.A,
-		Path:       fmt.Sprintf("/%s/%s", config.Token.B, config.Token.C),
+		User:       url.User(config.BotName),
+		Host:       config.Token[0],
+		Path:       fmt.Sprintf("/%s/%s", config.Token[1], config.Token[2]),
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}
@@ -36,20 +35,17 @@ func (config *Config) SetURL(serviceURL *url.URL) error {
 
 	host := serviceURL.Hostname()
 
-	path := strings.Split(serviceURL.Path, "/")
+	token := strings.Split(serviceURL.Path, "/")
+	token[0] = host
 
-	if len(path) < 2 {
-		path = []string{"", "", ""}
+	if len(token) < 2 {
+		token = []string{"", "", ""}
 	}
 
 	config.BotName = botName
-	config.Token = Token{
-		A: host,
-		B: path[1],
-		C: path[2],
-	}
+	config.Token = token
 
-	if err := validateToken(config.Token); err != nil {
+	if err := ValidateToken(config.Token); err != nil {
 		return err
 	}
 

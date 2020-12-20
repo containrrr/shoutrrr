@@ -42,7 +42,8 @@ func Run(cmd *cobra.Command, _ []string) {
 	}
 
 	configMap, maxKeyLen := format.GetConfigMap(service)
-	for key, value := range configMap {
+	for key, _ := range configMap {
+		value := configMap[key]
 		pad := strings.Repeat(" ", maxKeyLen-len(key))
 		_, _ = fmt.Fprintf(color.Output, "%s%s: %s\n", pad, key, value)
 	}

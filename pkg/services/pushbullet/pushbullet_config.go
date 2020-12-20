@@ -11,7 +11,6 @@ import (
 
 // Config ...
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	Targets []string
 	Token   string

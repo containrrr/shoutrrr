@@ -3,6 +3,7 @@ package rocketchat
 import (
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
 
@@ -11,7 +12,6 @@ import (
 
 // Config for the rocket.chat service
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	UserName string
 	Host     string
@@ -68,7 +68,7 @@ const (
 )
 
 // CreateConfigFromURL to use within the rocket.chat service
-func CreateConfigFromURL(serviceURL *url.URL) (*Config, error) {
+func CreateConfigFromURL(_ types.ConfigQueryResolver, serviceURL *url.URL) (*Config, error) {
 	config := Config{}
 	err := config.SetURL(serviceURL)
 	return &config, err

@@ -8,7 +8,6 @@ import (
 
 // Config for use within the teams plugin
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	Token Token
 }

@@ -1,6 +1,7 @@
 package xmpp
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/url"
 
@@ -14,6 +15,7 @@ import (
 // Service sends notifications via XMPP
 type Service struct {
 	standard.Standard
+	pkr    format.PropKeyResolver
 	client *xmpp.Client
 	router *xmpp.Router
 	config *Config
@@ -27,7 +29,8 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		Subject: "Shoutrrr Notification",
 	}
 
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
@@ -49,18 +52,13 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	if params == nil {
-		params = &types.Params{}
-	}
-
-	// TODO: Move param override to shared service API
-	subject, found := (*params)["subject"]
-	if !found {
-		subject = service.config.Subject
+	config := service.config
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		return err
 	}
 
 	msg := stanza.Message{
-		Subject: subject,
+		Subject: config.Subject,
 		Body:    message,
 		Attrs: stanza.Attrs{
 			To: service.config.ToAddress,

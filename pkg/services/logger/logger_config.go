@@ -8,7 +8,6 @@ import (
 
 // Config is the configuration object for the Logger Service
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 }
 
@@ -20,7 +19,7 @@ func (config *Config) GetURL() *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *Config) SetURL(_ *url.URL) error {
 	return nil
 }
 
