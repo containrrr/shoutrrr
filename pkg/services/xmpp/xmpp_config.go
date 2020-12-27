@@ -3,10 +3,12 @@ package xmpp
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"gosrc.io/xmpp"
 	"net/url"
 	"strconv"
+
+	"gosrc.io/xmpp"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"

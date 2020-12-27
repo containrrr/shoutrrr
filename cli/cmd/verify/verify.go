@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/internal/util"
@@ -37,12 +38,18 @@ func Run(cmd *cobra.Command, _ []string) {
 	service, err := sr.Locate(URL)
 
 	if err != nil {
-		fmt.Printf("error verifying URL: %s", err)
+		fmt.Printf("error verifying URL: %s\n", err)
 		os.Exit(1)
 	}
 
 	configMap, maxKeyLen := format.GetConfigMap(service)
-	for key, _ := range configMap {
+	configKeys := make([]string, 0, len(configMap))
+	for key := range configMap {
+		configKeys = append(configKeys, key)
+	}
+	sort.Strings(configKeys)
+
+	for _, key := range configKeys {
 		value := configMap[key]
 		pad := strings.Repeat(" ", maxKeyLen-len(key))
 		_, _ = fmt.Fprintf(color.Output, "%s%s: %s\n", pad, key, value)

@@ -80,7 +80,7 @@ func (c *PropKeyResolver) set(target reflect.Value, key string, value string) er
 func (pkr *PropKeyResolver) UpdateConfigFromParams(config types.ServiceConfig, params *types.Params) error {
 	if params != nil {
 		for key, val := range *params {
-			if err := pkr.set(reflect.ValueOf(config), key, val); err != nil {
+			if err := pkr.set(reflect.Indirect(reflect.ValueOf(config)), key, val); err != nil {
 				return err
 			}
 		}
