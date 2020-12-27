@@ -5,8 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/containrrr/shoutrrr"
+	cli "github.com/containrrr/shoutrrr/cli/cmd"
 	u "github.com/containrrr/shoutrrr/internal/util"
+	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,9 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.Flags().StringP("url", "u", "", "The notification url")
+	Cmd.Flags().BoolP("verbose", "v", false, "")
+
+	Cmd.Flags().StringSliceP("url", "u", []string{}, "The notification url")
 	_ = Cmd.MarkFlagRequired("url")
 
 	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url")
@@ -30,26 +33,42 @@ func init() {
 
 // Run the send command
 func Run(cmd *cobra.Command, _ []string) {
-	debug, _ := cmd.Flags().GetBool("debug")
+	verbose, _ := cmd.Flags().GetBool("verbose")
 
-	url, _ := cmd.Flags().GetString("url")
+	urls, _ := cmd.Flags().GetStringSlice("url")
 	message, _ := cmd.Flags().GetString("message")
 
 	var logger *log.Logger
 
-	if debug {
-		fmt.Printf("URL: %s\n", url)
+	if verbose {
+		fmt.Println("URLs:")
+		for _, url := range urls {
+			fmt.Printf("  %s\n", url)
+		}
 		fmt.Printf("Message: %s\n", message)
 		logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
 	} else {
 		logger = util.DiscardLogger
 	}
 
-	shoutrrr.SetLogger(logger)
-	err := shoutrrr.Send(url, message)
+	exitCode := cli.ExSuccess
 
+	sr, err := router.New(logger, urls...)
 	if err != nil {
-		fmt.Printf("error invoking send: %s", err)
-		os.Exit(1)
+		fmt.Printf("error invoking send: %s\n", err)
+		exitCode = cli.ExConfig
+	} else {
+		errs := sr.SendAsync(message, nil)
+		for err := range errs {
+			if err == nil {
+				fmt.Println("Notification sent")
+			} else {
+				fmt.Printf("Error: %v\n", err)
+				exitCode = cli.ExUnavailable
+			}
+		}
 	}
+
+	os.Exit(exitCode)
+
 }

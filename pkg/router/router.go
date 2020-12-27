@@ -4,26 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
-	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
-
-	"github.com/containrrr/shoutrrr/pkg/services/discord"
-	"github.com/containrrr/shoutrrr/pkg/services/gotify"
-	"github.com/containrrr/shoutrrr/pkg/services/hangouts"
-	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
-	"github.com/containrrr/shoutrrr/pkg/services/join"
-	"github.com/containrrr/shoutrrr/pkg/services/logger"
-	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
-	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
-	"github.com/containrrr/shoutrrr/pkg/services/pushover"
-	"github.com/containrrr/shoutrrr/pkg/services/slack"
-	"github.com/containrrr/shoutrrr/pkg/services/smtp"
-	"github.com/containrrr/shoutrrr/pkg/services/teams"
-	"github.com/containrrr/shoutrrr/pkg/services/telegram"
-	"github.com/containrrr/shoutrrr/pkg/services/xmpp"
-	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 )
 
@@ -59,28 +43,44 @@ func (router *ServiceRouter) Send(message string, params *t.Params) []error {
 
 	serviceCount := len(router.services)
 	errors := make([]error, serviceCount)
-	results := make(chan error, serviceCount)
+	results := router.SendAsync(message, params)
+
+	for i := range router.services {
+		errors[i] = <-results
+	}
+
+	return errors
+}
+
+// SendAsync sends the specified message using the routers underlying services
+func (router *ServiceRouter) SendAsync(message string, params *t.Params) chan error {
+	serviceCount := len(router.services)
+	proxy := make(chan error, serviceCount)
+	errors := make(chan error, serviceCount)
 
 	if params == nil {
 		params = &t.Params{}
 	}
 	for _, service := range router.services {
-		go sendToService(service, results, router.Timeout, message, *params)
+		go sendToService(service, proxy, router.Timeout, message, *params)
 	}
-	for i := range router.services {
-		select {
-		case res := <-results:
-			errors[i] = res
-		case <-time.After(10 * time.Second):
-			fmt.Println("timeout 1")
+
+	go func() {
+		for i := 0; i < serviceCount; i++ {
+			errors <- <-proxy
 		}
-	}
+		close(errors)
+	}()
+
 	return errors
 }
 
 func sendToService(service t.Service, results chan error, timeout time.Duration, message string, params t.Params) {
-	// TODO: There really ought to be a way to tell what service generated the error
-	result := make(chan error, 1)
+	result := make(chan error)
+
+	// TODO: There really ought to be a better way to name the services
+	pkg := reflect.TypeOf(service).Elem().PkgPath()
+	serviceName := pkg[strings.LastIndex(pkg, "/")+1:]
 
 	go func() { result <- service.Send(message, &params) }()
 
@@ -88,9 +88,8 @@ func sendToService(service t.Service, results chan error, timeout time.Duration,
 	case res := <-result:
 		results <- res
 	case <-time.After(timeout):
-		results <- fmt.Errorf("timed out")
+		results <- fmt.Errorf("failed to send using %v: timed out", serviceName)
 	}
-	close(result)
 }
 
 // Enqueue adds the message to an internal queue and sends it when Flush is invoked
@@ -132,25 +131,6 @@ func (router *ServiceRouter) Route(rawURL string, message string) error {
 	}
 
 	return service.Send(message, nil)
-}
-
-var serviceMap = map[string]func() t.Service{
-	"discord":    func() t.Service { return &discord.Service{} },
-	"pushover":   func() t.Service { return &pushover.Service{} },
-	"slack":      func() t.Service { return &slack.Service{} },
-	"teams":      func() t.Service { return &teams.Service{} },
-	"telegram":   func() t.Service { return &telegram.Service{} },
-	"smtp":       func() t.Service { return &smtp.Service{} },
-	"ifttt":      func() t.Service { return &ifttt.Service{} },
-	"gotify":     func() t.Service { return &gotify.Service{} },
-	"logger":     func() t.Service { return &logger.Service{} },
-	"xmpp":       func() t.Service { return &xmpp.Service{} },
-	"pushbullet": func() t.Service { return &pushbullet.Service{} },
-	"mattermost": func() t.Service { return &mattermost.Service{} },
-	"hangouts":   func() t.Service { return &hangouts.Service{} },
-	"zulip":      func() t.Service { return &zulip.Service{} },
-	"join":       func() t.Service { return &join.Service{} },
-	"rocketchat": func() t.Service { return &rocketchat.Service{} },
 }
 
 func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
