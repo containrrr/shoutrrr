@@ -27,18 +27,26 @@ type Service struct {
 }
 
 // Send notification to Telegram
-func (service *Service) Send(message string, _ *types.Params) error {
+func (service *Service) Send(message string, params *types.Params) error {
 	if len(message) > maxlength {
 		return errors.New("message exceeds the max length")
 	}
 
-	return service.sendMessageForChatIDs(message)
+	config := *service.config
+	if err := service.pkr.UpdateConfigFromParams(&config, params); err != nil {
+		return err
+	}
+
+	return service.sendMessageForChatIDs(message, &config)
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
+	service.config = &Config{
+		Preview:      true,
+		Notification: true,
+	}
 	service.pkr = format.NewPropKeyResolver(service.config)
 	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
@@ -47,9 +55,9 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 	return nil
 }
 
-func (service *Service) sendMessageForChatIDs(message string) error {
+func (service *Service) sendMessageForChatIDs(message string, config *Config) error {
 	for _, channel := range service.config.Channels {
-		if err := sendMessageToAPI(message, channel, service.config.Token); err != nil {
+		if err := sendMessageToAPI(message, channel, config); err != nil {
 			return err
 		}
 	}
@@ -61,13 +69,12 @@ func (service *Service) GetConfig() *Config {
 	return service.config
 }
 
-func sendMessageToAPI(message string, channel string, apiToken string) error {
-	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, apiToken)
-	jsonData, err := json.Marshal(
-		JSON{
-			Text: message,
-			ID:   channel,
-		})
+func sendMessageToAPI(message string, channel string, config *Config) error {
+	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, config.Token)
+
+	payload := createSendMessagePayload(message, channel, config)
+
+	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}

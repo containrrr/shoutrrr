@@ -23,6 +23,7 @@ nav:
       - Hangouts Chat: 'services/hangouts.md'
       - Pushover: 'services/pushover.md'
       - Teams: 'services/teams.md'
+      - Telegram: 'services/telegram.md'
       - Zulip Chat: 'services/zulip.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
