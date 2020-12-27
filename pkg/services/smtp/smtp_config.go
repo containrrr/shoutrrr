@@ -83,7 +83,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 func (config *Config) Clone() Config {
 	clone := *config
 	clone.ToAddresses = make([]string, len(config.ToAddresses))
-	copy(clone.ToAddresses, clone.ToAddresses)
+	copy(clone.ToAddresses, config.ToAddresses)
 	return clone
 }
 

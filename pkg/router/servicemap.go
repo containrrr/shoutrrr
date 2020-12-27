@@ -15,9 +15,9 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
+	"github.com/containrrr/shoutrrr/pkg/services/xmpp"
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/xmpp"
 )
 
 var serviceMap = map[string]func() t.Service{
