@@ -1,9 +1,10 @@
 package xmpp
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
 
 	"gosrc.io/xmpp"
 	"gosrc.io/xmpp/stanza"

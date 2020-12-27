@@ -2,11 +2,12 @@ package router
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
 	"log"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
 
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
@@ -21,9 +22,9 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
+	"github.com/containrrr/shoutrrr/pkg/services/xmpp"
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/xmpp"
 )
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
