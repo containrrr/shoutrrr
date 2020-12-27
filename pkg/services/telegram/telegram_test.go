@@ -133,7 +133,7 @@ var _ = Describe("the telegram plugin", func() {
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
-		It("", func() {
+		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
 			err = telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
