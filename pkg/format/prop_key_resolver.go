@@ -3,13 +3,14 @@ package format
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// KeyPropConfig implements the ServiceConfig interface for services that uses key tags for query props
+// PropKeyResolver implements the ConfigQueryResolver interface for services that uses key tags for query props
 type PropKeyResolver struct {
 	confValue reflect.Value
 	keyFields map[string]FieldInfo
@@ -23,10 +24,12 @@ func NewPropKeyResolver(config types.ServiceConfig) PropKeyResolver {
 	keyFields := make(map[string]FieldInfo, len(fields))
 	keys := make([]string, 0, len(fields))
 	for _, field := range fields {
-		key := strings.ToLower(field.Key)
-		if key != "" {
-			keys = append(keys, key)
-			keyFields[key] = field
+		for _, key := range field.Keys {
+			key = strings.ToLower(key)
+			if key != "" {
+				keys = append(keys, key)
+				keyFields[key] = field
+			}
 		}
 	}
 
@@ -102,4 +105,8 @@ func GetConfigQueryResolver(config types.ServiceConfig) types.ConfigQueryResolve
 		resolver = &pkr
 	}
 	return resolver
+}
+
+func (pkr *PropKeyResolver) KeyIsPrimary(key string) bool {
+	return pkr.keyFields[key].Keys[0] == key
 }
