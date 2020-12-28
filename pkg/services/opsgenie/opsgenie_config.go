@@ -92,6 +92,16 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
+func (config *Config) GetURL() *url.URL {
+	return &url.URL{
+		Host:       fmt.Sprintf("%s:%d", config.Host, config.Port),
+		Path:       fmt.Sprintf("/%s", config.ApiKey),
+		Scheme:     Scheme,
+		ForceQuery: true,
+		RawQuery:   format.BuildQuery(config),
+	}
+}
+
 const (
 	// Scheme is the identifying part of this service's configuration URL
 	Scheme = "opsgenie"
