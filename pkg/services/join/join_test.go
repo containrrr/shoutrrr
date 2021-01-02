@@ -1,6 +1,7 @@
 package join_test
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
@@ -20,6 +21,7 @@ func TestJoin(t *testing.T) {
 var (
 	service    *join.Service
 	config     *join.Config
+	pkr        format.PropKeyResolver
 	envJoinURL *url.URL
 )
 var _ = Describe("the join service", func() {
@@ -44,6 +46,7 @@ var _ = Describe("the join service", func() {
 var _ = Describe("the join config", func() {
 	BeforeEach(func() {
 		config = &join.Config{}
+		pkr = format.NewPropKeyResolver(config)
 	})
 	When("updating it using an url", func() {
 		It("should update the API key using the password part of the url", func() {
@@ -69,42 +72,42 @@ var _ = Describe("the join config", func() {
 	})
 	When("setting a config key", func() {
 		It("should split it by commas if the key is devices", func() {
-			err := config.Set("devices", "a,b,c,d")
+			err := pkr.Set("devices", "a,b,c,d")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Devices).To(Equal([]string{"a", "b", "c", "d"}))
 		})
 		It("should update icon when an icon is supplied", func() {
-			err := config.Set("icon", "https://example.com/icon.png")
+			err := pkr.Set("icon", "https://example.com/icon.png")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Icon).To(Equal("https://example.com/icon.png"))
 		})
 		It("should update the title when it is supplied", func() {
-			err := config.Set("title", "new title")
+			err := pkr.Set("title", "new title")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Title).To(Equal("new title"))
 		})
 		It("should return an error if the key is not recognized", func() {
-			err := config.Set("devicey", "a,b,c,d")
+			err := pkr.Set("devicey", "a,b,c,d")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 	When("getting a config key", func() {
 		It("should join it with commas if the key is devices", func() {
 			config.Devices = []string{"a", "b", "c"}
-			value, err := config.Get("devices")
+			value, err := pkr.Get("devices")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(value).To(Equal("a,b,c"))
 		})
 		It("should return an error if the key is not recognized", func() {
-			_, err := config.Get("devicey")
+			_, err := pkr.Get("devicey")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	When("listing the query fields", func() {
-		It("should return the keys \"devices\", \"title\", \"icon\"", func() {
-			fields := config.QueryFields()
-			Expect(fields).To(Equal([]string{"devices", "title", "icon"}))
+		It("should return the keys \"devices\", \"icon\", \"title\" in alphabetical order", func() {
+			fields := pkr.QueryFields()
+			Expect(fields).To(Equal([]string{"devices", "icon", "title"}))
 		})
 	})
 })

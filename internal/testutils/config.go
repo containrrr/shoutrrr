@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
 
 	Ω "github.com/onsi/gomega"
@@ -10,7 +11,7 @@ import (
 
 // TestConfigGetInvalidQueryValue tests whether the config returns an error when an invalid query value is requested
 func TestConfigGetInvalidQueryValue(config types.ServiceConfig) {
-	value, err := config.Get("invalid query var")
+	value, err := format.GetConfigQueryResolver(config).Get("invalid query var")
 	Ω.ExpectWithOffset(1, value).To(Ω.BeEmpty())
 	Ω.ExpectWithOffset(1, err).To(Ω.HaveOccurred())
 }
@@ -32,6 +33,6 @@ func TestConfigGetEnumsCount(config types.ServiceConfig, expectedCount int) {
 
 // TestConfigGetFieldsCount tests whether the config.QueryFields return the expected amount of fields
 func TestConfigGetFieldsCount(config types.ServiceConfig, expectedCount int) {
-	fields := config.QueryFields()
+	fields := format.GetConfigQueryResolver(config).QueryFields()
 	Ω.ExpectWithOffset(1, fields).To(Ω.HaveLen(expectedCount))
 }

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -27,7 +28,7 @@ const (
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
-	if err := validateToken(config.Token); err != nil {
+	if err := ValidateToken(config.Token); err != nil {
 		return err
 	}
 	if len(message) > maxlength {
@@ -60,10 +61,5 @@ func (service *Service) doSend(config *Config, message string) error {
 }
 
 func (service *Service) getURL(config *Config) string {
-	return fmt.Sprintf(
-		"%s/%s/%s/%s",
-		apiURL,
-		config.Token.A,
-		config.Token.B,
-		config.Token.C)
+	return fmt.Sprintf("%s/%s", apiURL, strings.Join(config.Token, "/"))
 }

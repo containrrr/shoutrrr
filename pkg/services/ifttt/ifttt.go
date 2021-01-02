@@ -3,6 +3,7 @@ package ifttt
 import (
 	"bytes"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,13 +20,17 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.config = &Config{
+		UseMessageAsValue: 2,
+	}
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
@@ -34,12 +39,17 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 
 // Send a notification message to a IFTTT webhook
 func (service *Service) Send(message string, params *types.Params) error {
-	payload, err := createJSONToSend(service.config, message, params)
+	config := service.config
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		return err
+	}
+
+	payload, err := createJSONToSend(config, message, params)
 	fmt.Printf("%+v", payload)
 	if err != nil {
 		return err
 	}
-	for _, event := range service.config.Events {
+	for _, event := range config.Events {
 		apiURL := service.createAPIURLForEvent(event)
 		err := doSend(payload, apiURL)
 		if err != nil {

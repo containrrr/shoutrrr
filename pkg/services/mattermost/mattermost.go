@@ -34,7 +34,9 @@ func (service *Service) Send(message string, params *types.Params) error {
 	apiURL := buildURL(config)
 	json, _ := CreateJSONPayload(config, message, params)
 	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
-
+	if err != nil {
+		return err
+	}
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
 	}

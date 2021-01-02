@@ -2,6 +2,7 @@ package zulip
 
 import (
 	"errors"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 )
 
@@ -11,12 +12,12 @@ type Config struct {
 	BotKey  string
 	Host    string
 	Path    string
-	Stream  string
-	Topic   string
+	Stream  string `key:"stream"`
+	Topic   string `key:"topic"`
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *Config) GetURL(_ types.ConfigQueryResolver) *url.URL {
 	query := &url.Values{}
 
 	if config.Stream != "" {
@@ -37,7 +38,7 @@ func (config *Config) GetURL() *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(serviceURL *url.URL) error {
+func (config *Config) SetURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
 	var ok bool
 
 	config.BotMail = serviceURL.User.Username()
@@ -85,7 +86,7 @@ const (
 // CreateConfigFromURL to use within the zulip service
 func CreateConfigFromURL(serviceURL *url.URL) (*Config, error) {
 	config := Config{}
-	err := config.SetURL(serviceURL)
+	err := config.SetURL(nil, serviceURL)
 
 	return &config, err
 }

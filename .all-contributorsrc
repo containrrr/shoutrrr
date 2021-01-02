@@ -83,6 +83,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "sentriz",
+      "name": "Senan Kelly",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/6832539?v=4",
+      "profile": "https://senan.xyz",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

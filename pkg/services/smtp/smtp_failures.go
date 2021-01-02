@@ -39,8 +39,10 @@ const (
 	FailCloseDataStream
 	// FailConnectToServer is returned when the TCP connection to the server failed
 	FailConnectToServer
-	// FailCreateSMTPClient us returned when the smtp.Client initialization failed
+	// FailCreateSMTPClient is returned when the smtp.Client initialization failed
 	FailCreateSMTPClient
+	// FailApplySendParams is returned when updating the send config failed
+	FailApplySendParams
 )
 
 func fail(failureID failures.FailureID, err error, v ...interface{}) failure {
@@ -63,6 +65,7 @@ func fail(failureID failures.FailureID, err error, v ...interface{}) failure {
 		int(FailOpenDataStream):   "error creating message stream",
 		int(FailWriteHeaders):     "error writing message headers",
 		int(FailCloseDataStream):  "error closing message stream",
+		int(FailApplySendParams):  "error applying params to send config",
 		int(FailUnknown):          "an unknown error occurred",
 	}
 

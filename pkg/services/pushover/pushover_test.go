@@ -1,9 +1,9 @@
 package pushover_test
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/util"
-
 	"net/url"
 	"os"
 	"testing"
@@ -20,6 +20,7 @@ func TestPushover(t *testing.T) {
 var (
 	service        *pushover.Service
 	config         *pushover.Config
+	keyResolver    format.PropKeyResolver
 	envPushoverURL *url.URL
 )
 var _ = Describe("the pushover service", func() {
@@ -44,6 +45,7 @@ var _ = Describe("the pushover service", func() {
 var _ = Describe("the pushover config", func() {
 	BeforeEach(func() {
 		config = &pushover.Config{}
+		keyResolver = format.NewPropKeyResolver(config)
 	})
 	When("updating it using an url", func() {
 		It("should update the username using the host part of the url", func() {
@@ -81,45 +83,45 @@ var _ = Describe("the pushover config", func() {
 	})
 	When("setting a config key", func() {
 		It("should split it by commas if the key is devices", func() {
-			err := config.Set("devices", "a,b,c,d")
+			err := keyResolver.Set("devices", "a,b,c,d")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Devices).To(Equal([]string{"a", "b", "c", "d"}))
 		})
 		It("should update priority when a valid number is supplied", func() {
-			err := config.Set("priority", "1")
+			err := keyResolver.Set("priority", "1")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Priority).To(Equal(int8(1)))
 		})
 		It("should update the title when it is supplied", func() {
-			err := config.Set("title", "new title")
+			err := keyResolver.Set("title", "new title")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Title).To(Equal("new title"))
 		})
 		It("should return an error if priority is not a number", func() {
-			err := config.Set("priority", "super-duper")
+			err := keyResolver.Set("priority", "super-duper")
 			Expect(err).To(HaveOccurred())
 		})
 		It("should return an error if the key is not recognized", func() {
-			err := config.Set("devicey", "a,b,c,d")
+			err := keyResolver.Set("devicey", "a,b,c,d")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 	When("getting a config key", func() {
 		It("should join it with commas if the key is devices", func() {
 			config.Devices = []string{"a", "b", "c"}
-			value, err := config.Get("devices")
+			value, err := keyResolver.Get("devices")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(value).To(Equal("a,b,c"))
 		})
 		It("should return an error if the key is not recognized", func() {
-			_, err := config.Get("devicey")
+			_, err := keyResolver.Get("devicey")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	When("listing the query fields", func() {
 		It("should return the keys \"devices\",\"priority\",\"title\"", func() {
-			fields := config.QueryFields()
+			fields := keyResolver.QueryFields()
 			Expect(fields).To(Equal([]string{"devices", "priority", "title"}))
 		})
 	})

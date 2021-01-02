@@ -6,12 +6,12 @@ import (
 )
 
 // BuildQuery converts the fields of a config object to a delimited query string
-func BuildQuery(c types.ServiceConfig) string {
+func BuildQuery(cqr types.ConfigQueryResolver) string {
 	query := ""
-	fields := c.QueryFields()
 	format := "%s=%s"
+	fields := cqr.QueryFields()
 	for index, key := range fields {
-		value, _ := c.Get(key)
+		value, _ := cqr.Get(key)
 		if index == 1 {
 			format = "&%s=%s"
 		}

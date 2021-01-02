@@ -3,6 +3,7 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
 	"log"
 	"math/rand"
@@ -20,6 +21,7 @@ type Service struct {
 	standard.Templater
 	config            *Config
 	multipartBoundary string
+	propKeyResolver   format.PropKeyResolver
 }
 
 const (
@@ -38,8 +40,12 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		Auth:        authTypes.Unknown,
 		UseStartTLS: true,
 		UseHTML:     false,
+		Encryption:  encMethods.Auto,
 	}
-	if err := service.config.SetURL(configURL); err != nil {
+
+	pkr := format.NewPropKeyResolver(service.config)
+
+	if err := service.config.setURL(&pkr, configURL); err != nil {
 		return err
 	}
 
@@ -51,28 +57,46 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		}
 	}
 
+	service.propKeyResolver = pkr
+
 	return nil
 }
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	if params == nil {
-		params = &types.Params{}
-	}
-	client, err := getClientConnection(service.config.Host, service.config.Port)
+	client, err := getClientConnection(service.config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
-	return service.doSend(client, message, *params)
+
+	config := service.config.Clone()
+	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
+		return fail(FailApplySendParams, err)
+	} else {
+		return service.doSend(client, message, &config)
+	}
 }
 
-func getClientConnection(host string, port uint16) (*smtp.Client, error) {
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+func getClientConnection(config *Config) (*smtp.Client, error) {
+
+	var conn net.Conn
+	var err error
+
+	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
+
+	if useImplicitTLS(config.Encryption, config.Port) {
+		conn, err = tls.Dial("tcp", addr, &tls.Config{
+			ServerName: config.Host,
+		})
+	} else {
+		conn, err = net.Dial("tcp", addr)
+	}
+
 	if err != nil {
 		return nil, fail(FailConnectToServer, err)
 	}
 
-	client, err := smtp.NewClient(conn, host)
+	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
 		return nil, fail(FailCreateSMTPClient, err)
 	}
@@ -80,16 +104,13 @@ func getClientConnection(host string, port uint16) (*smtp.Client, error) {
 	return client, nil
 }
 
-func (service *Service) doSend(client *smtp.Client, message string, params map[string]string) failure {
-	config := service.config
-
-	params["message"] = message
+func (service *Service) doSend(client *smtp.Client, message string, config *Config) failure {
 
 	if config.UseHTML {
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
 	}
 
-	if config.UseStartTLS {
+	if config.UseStartTLS && !useImplicitTLS(config.Encryption, config.Port) {
 		if supported, _ := client.Extension("StartTLS"); !supported {
 			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
 		} else {
@@ -101,7 +122,7 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 		}
 	}
 
-	if auth, err := service.getAuth(); err != nil {
+	if auth, err := service.getAuth(config); err != nil {
 		return err
 	} else if auth != nil {
 		if err := client.Auth(auth); err != nil {
@@ -111,7 +132,7 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 
 	for _, toAddress := range config.ToAddresses {
 
-		err := service.sendToRecipient(client, toAddress, &params)
+		err := service.sendToRecipient(client, toAddress, config, message)
 		if err != nil {
 			return fail(FailSendRecipient, err)
 		}
@@ -128,9 +149,7 @@ func (service *Service) doSend(client *smtp.Client, message string, params map[s
 	return nil
 }
 
-func (service *Service) getAuth() (smtp.Auth, failure) {
-
-	config := service.config
+func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
 	switch config.Auth {
 	case authTypes.None:
@@ -147,11 +166,10 @@ func (service *Service) getAuth() (smtp.Auth, failure) {
 
 }
 
-func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, params *map[string]string) failure {
-	conf := service.config
+func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, config *Config, message string) failure {
 
 	// Set the sender and recipient first
-	if err := client.Mail(conf.FromAddress); err != nil {
+	if err := client.Mail(config.FromAddress); err != nil {
 		return fail(FailSetSender, err)
 	}
 	if err := client.Rcpt(toAddress); err != nil {
@@ -164,21 +182,15 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, p
 		return fail(FailOpenDataStream, err)
 	}
 
-	// TODO: Move param override to shared service API
-	subject, found := (*params)["subject"]
-	if !found {
-		subject = conf.Subject
-	}
-
-	if err := writeHeaders(wc, service.getHeaders(toAddress, subject)); err != nil {
+	if err := writeHeaders(wc, service.getHeaders(toAddress, config.Subject)); err != nil {
 		return fail(FailWriteHeaders, err)
 	}
 
 	var ferr failure
-	if conf.UseHTML {
-		ferr = service.writeMultipartMessage(wc, params)
+	if config.UseHTML {
+		ferr = service.writeMultipartMessage(wc, message)
 	} else {
-		ferr = service.writeMessagePart(wc, params, "plain")
+		ferr = service.writeMessagePart(wc, message, "plain")
 	}
 
 	if ferr != nil {
@@ -211,19 +223,19 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 	}
 }
 
-func (service *Service) writeMultipartMessage(wc io.WriteCloser, params *map[string]string) failure {
+func (service *Service) writeMultipartMessage(wc io.WriteCloser, message string) failure {
 
 	if err := writeMultipartHeader(wc, service.multipartBoundary, contentPlain); err != nil {
 		return fail(FailPlainHeader, err)
 	}
-	if err := service.writeMessagePart(wc, params, "plain"); err != nil {
+	if err := service.writeMessagePart(wc, message, "plain"); err != nil {
 		return err
 	}
 
 	if err := writeMultipartHeader(wc, service.multipartBoundary, contentHTML); err != nil {
 		return fail(FailHTMLHeader, err)
 	}
-	if err := service.writeMessagePart(wc, params, "HTML"); err != nil {
+	if err := service.writeMessagePart(wc, message, "HTML"); err != nil {
 		return err
 	}
 
@@ -235,13 +247,15 @@ func (service *Service) writeMultipartMessage(wc io.WriteCloser, params *map[str
 	return nil
 }
 
-func (service *Service) writeMessagePart(wc io.WriteCloser, params *map[string]string, template string) failure {
+func (service *Service) writeMessagePart(wc io.WriteCloser, message string, template string) failure {
 	if tpl, found := service.GetTemplate(template); found {
-		if err := tpl.Execute(wc, params); err != nil {
+		data := make(map[string]string)
+		data["message"] = message
+		if err := tpl.Execute(wc, data); err != nil {
 			return fail(FailMessageTemplate, err)
 		}
 	} else {
-		if _, err := fmt.Fprintf(wc, (*params)["message"]); err != nil {
+		if _, err := fmt.Fprintf(wc, message); err != nil {
 			return fail(FailMessageRaw, err)
 		}
 	}

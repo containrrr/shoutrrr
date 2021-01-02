@@ -8,7 +8,6 @@ import (
 
 // Config for use within the gotify plugin
 type Config struct {
-	standard.QuerylessConfig
 	standard.EnumlessConfig
 	Token   string
 	Host    string

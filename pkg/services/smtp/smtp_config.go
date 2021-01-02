@@ -3,31 +3,41 @@ package smtp
 import (
 	"errors"
 	"fmt"
-	"net/url"
-	"strconv"
-	"strings"
-
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"net/url"
+	"strconv"
 )
 
 // Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
-	Host        string   `desc:"SMTP server hostname or IP address"`
-	Username    string   `desc:"authentication username"`
-	Password    string   `desc:"authentication password or hash"`
-	Port        uint16   `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
-	FromAddress string   `desc:"e-mail address that the mail are sent from"`
-	FromName    string   `desc:"name of the sender" optional:"yes"`
-	ToAddresses []string `desc:"list of recipient e-mails separated by \",\" (comma)"`
-	Subject     string   `desc:"the subject of the sent mail" param:"subject" default:"Shoutrrr Notification"`
-	Auth        authType `desc:"SMTP authentication method"`
-	UseStartTLS bool     `desc:"attempt to use SMTP StartTLS encryption" default:"Yes"`
-	UseHTML     bool     `desc:"whether the message being sent is in HTML" default:"No"`
+	Host        string    `desc:"SMTP server hostname or IP address"`
+	Username    string    `desc:"authentication username"`
+	Password    string    `desc:"authentication password or hash"`
+	Port        uint16    `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
+	FromAddress string    `desc:"e-mail address that the mail are sent from" key:"fromaddress"`
+	FromName    string    `desc:"name of the sender" optional:"yes" key:"fromname"`
+	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)" key:"toaddresses"`
+	Subject     string    `desc:"the subject of the sent mail" key:"subject" default:"Shoutrrr Notification" field:"title"`
+	Auth        authType  `desc:"SMTP authentication method" key:"auth"`
+	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
+	UseStartTLS bool      `desc:"attempt to use SMTP StartTLS encryption" default:"Yes" key:"starttls"`
+	UseHTML     bool      `desc:"whether the message being sent is in HTML" default:"No" key:"usehtml"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
+	resolver := format.NewPropKeyResolver(config)
+	return config.getURL(&resolver)
+}
+
+// SetURL updates a ServiceConfig from a URL representation of it's field values
+func (config *Config) SetURL(url *url.URL) error {
+	resolver := format.NewPropKeyResolver(config)
+	return config.setURL(&resolver, url)
+}
+
+func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
 		User:       url.UserPassword(config.Username, config.Password),
@@ -35,13 +45,12 @@ func (config *Config) GetURL() *url.URL {
 		Path:       "/",
 		Scheme:     Scheme,
 		ForceQuery: true,
-		RawQuery:   format.BuildQuery(config),
+		RawQuery:   format.BuildQuery(resolver),
 	}
 
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 
@@ -54,7 +63,7 @@ func (config *Config) SetURL(url *url.URL) error {
 	}
 
 	for key, vals := range url.Query() {
-		if err := config.Set(key, vals[0]); err != nil {
+		if err := resolver.Set(key, vals[0]); err != nil {
 			return err
 		}
 	}
@@ -70,67 +79,19 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
-// QueryFields returns the fields that are part of the Query of the service URL
-func (config *Config) QueryFields() []string {
-	return []string{
-		"fromAddress",
-		"fromName",
-		"toAddresses",
-		"auth",
-		"subject",
-		"startTls",
-		"useHTML",
-	}
-}
-
-// Get returns the value of a Query field
-func (config *Config) Get(key string) (string, error) {
-	switch strings.ToLower(key) {
-	case "fromaddress":
-		return config.FromAddress, nil
-	case "fromname":
-		return config.FromName, nil
-	case "toaddresses":
-		return strings.Join(config.ToAddresses, ","), nil
-	case "auth":
-		return config.Auth.String(), nil
-	case "subject":
-		return config.Subject, nil
-	case "starttls":
-		return format.PrintBool(config.UseStartTLS), nil
-	case "usehtml":
-		return format.PrintBool(config.UseHTML), nil
-	}
-	return "", fmt.Errorf("invalid query key \"%s\"", key)
-}
-
-// Set updates the value of a Query field
-func (config *Config) Set(key string, value string) error {
-	switch strings.ToLower(key) {
-	case "fromaddress":
-		config.FromAddress = value
-	case "fromname":
-		config.FromName = value
-	case "toaddresses":
-		config.ToAddresses = strings.Split(value, ",")
-	case "auth":
-		config.Auth = parseAuth(value)
-	case "subject":
-		config.Subject = value
-	case "starttls":
-		config.UseStartTLS, _ = format.ParseBool(value, true)
-	case "usehtml":
-		config.UseHTML, _ = format.ParseBool(value, false)
-	default:
-		return fmt.Errorf("invalid query key \"%s\"", key)
-	}
-	return nil
+// Clone returns a copy of the config
+func (config *Config) Clone() Config {
+	clone := *config
+	clone.ToAddresses = make([]string, len(config.ToAddresses))
+	copy(clone.ToAddresses, config.ToAddresses)
+	return clone
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth": authTypes.Enum,
+		"Auth":       authTypes.Enum,
+		"Encryption": encMethods.Enum,
 	}
 }
 
