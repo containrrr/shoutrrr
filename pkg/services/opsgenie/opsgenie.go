@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	alertEndpointTemplate = "https://%s/v2/alerts"
+	alertEndpointTemplate = "https://%s:%d/v2/alerts"
 )
 
 // Service providing OpsGenie as a notification service
@@ -66,7 +66,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 // See: https://docs.opsgenie.com/docs/alert-api#create-alert
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
-	url := fmt.Sprintf(alertEndpointTemplate, config.Host)
+	url := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
 	payload := NewAlertPayload(message, config, params)
 	return service.sendAlert(url, config.ApiKey, payload)
 }

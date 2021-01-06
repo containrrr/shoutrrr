@@ -19,6 +19,7 @@ import (
 
 const (
 	mockAPIKey = "eb243592-faa2-4ba2-a551q-1afdf565c889"
+	mockHost   = "api.opsgenie.com"
 )
 
 func TestOpsGenie(t *testing.T) {
@@ -220,5 +221,73 @@ var _ = Describe("the OpsGenie service", func() {
 			})
 		})
 	})
+})
 
+var _ = Describe("the OpsGenie Config struct", func() {
+	When("provided with a simple URL", func() {
+		It("should populate the config with host and apikey", func() {
+			url, err := url.Parse(fmt.Sprintf("opsgenie://%s/%s", mockHost, mockAPIKey))
+			Expect(err).To(BeNil())
+
+			config := Config{}
+			err = config.SetURL(url)
+			Expect(err).To(BeNil())
+
+			Expect(config.ApiKey).To(Equal(mockAPIKey))
+			Expect(config.Host).To(Equal(mockHost))
+			Expect(config.Port).To(Equal(uint16(0)))
+		})
+	})
+
+	When("provided with an URL with port", func() {
+		It("should populate the port field", func() {
+			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s", mockHost, mockAPIKey))
+			Expect(err).To(BeNil())
+
+			config := Config{}
+			err = config.SetURL(url)
+			Expect(err).To(BeNil())
+
+			Expect(config.Port).To(Equal(uint16(12345)))
+		})
+	})
+
+	When("provided with an URL and query parameters", func() {
+		It("should populate the relevant fields with the query parameter values", func() {
+			queryParams := `alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&actions=["An+action"]&tags=["tag1","tag2"]&details=these+are+details&entity=An+example+entity&source=The+source&priority=P1&user=Dracula&note=Here+is+a+note`
+			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s?%s", mockHost, mockAPIKey, queryParams))
+			Expect(err).To(BeNil())
+
+			config := Config{}
+			err = config.SetURL(url)
+			Expect(err).To(BeNil())
+
+			Expect(config.Alias).To(Equal("Life is too short for no alias"))
+			Expect(config.Description).To(Equal("Every alert needs a description"))
+			//TODO
+			//Responders  json.RawMessage `json:"responders,omitempty"`
+			//VisibleTo   json.RawMessage `json:"visibleTo,omitempty"`
+			Expect(config.Actions).To(Equal(`["An action"]`))
+			Expect(config.Tags).To(Equal(`["tag1","tag2"]`))
+			Expect(config.Details).To(Equal("these are details"))
+			Expect(config.Entity).To(Equal("An example entity"))
+			Expect(config.Source).To(Equal("The source"))
+			Expect(config.Priority).To(Equal("P1"))
+			Expect(config.User).To(Equal("Dracula"))
+			Expect(config.Note).To(Equal("Here is a note"))
+
+		})
+	})
+
+	When("provided with an URL and an invalid query parameter", func() {
+		It("should return an error", func() {
+			queryParams := `invalid=value`
+			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s?%s", mockHost, mockAPIKey, queryParams))
+
+			config := Config{}
+			err = config.SetURL(url)
+
+			Expect(err).NotTo(BeNil())
+		})
+	})
 })
