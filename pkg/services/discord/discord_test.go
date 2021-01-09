@@ -2,6 +2,7 @@ package discord_test
 
 import (
 	. "github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/types/rich"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	"net/url"
@@ -35,8 +36,10 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send(
+			err := service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Send(
 				"this is an integration test",
 				nil,
 			)
@@ -63,13 +66,15 @@ var _ = Describe("the discord service", func() {
 			It("should set the JSON flag when given the raw path parameter", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel/raw")
 				config := Config{}
-				config.SetURL(serviceURL)
+				err := config.SetURL(serviceURL)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(config.JSON).To(BeTrue())
 			})
 			It("should not set the JSON flag when not provided raw path parameter", func() {
 				serviceURL, _ := url.Parse("discord://dummyToken@dummyChannel")
 				config := Config{}
-				config.SetURL(serviceURL)
+				err := config.SetURL(serviceURL)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(config.JSON).NotTo(BeTrue())
 			})
 			It("should return an error if more than two arguments are given", func() {
@@ -80,23 +85,49 @@ var _ = Describe("the discord service", func() {
 		})
 	})
 	Describe("creating a json payload", func() {
-		When("given a blank message", func() {
-			It("should return an error", func() {
-				_, err := CreateJSONToSend("", false)
-				Expect(err).To(HaveOccurred())
-			})
-		})
+		//When("given a blank message", func() {
+		//	It("should return an error", func() {
+		//		_, err := CreatePayloadFromItems("", false)
+		//		Expect(err).To(HaveOccurred())
+		//	})
+		//})
 		When("given a message that exceeds the max length", func() {
-			It("should return an error", func() {
-				hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
-				builder := strings.Builder{}
+			It("should return a payload with chunked messages", func() {
 
-				for i := 0; i < 42; i++ {
-					builder.WriteString(hundredChars)
-				}
-				_, err := CreateJSONToSend(builder.String(), false)
-				Expect(err).To(HaveOccurred())
+				items, omitted := buildItemsFromHundreds(42)
+
+				Expect(items).To(HaveLen(3))
+
+				Expect(items[0].Text).To(HaveLen(1994))
+				Expect(items[1].Text).To(HaveLen(1999))
+				Expect(items[2].Text).To(HaveLen(205))
+
+				Expect(omitted).To(Equal(0))
+			})
+			It("omit characters above total max", func() {
+
+				items, omitted := buildItemsFromHundreds(62)
+
+				Expect(items).To(HaveLen(4))
+
+				Expect(items[0].Text).To(HaveLen(1994))
+				Expect(items[1].Text).To(HaveLen(1999))
+				Expect(len(items[2].Text)).To(Equal(1999))
+				Expect(len(items[3].Text)).To(Equal(5))
+
+				Expect(omitted).To(Equal(200))
 			})
 		})
 	})
 })
+
+func buildItemsFromHundreds(hundreds int) (items []rich.MessageItem, omitted int) {
+	hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
+	builder := strings.Builder{}
+
+	for i := 0; i < hundreds; i++ {
+		builder.WriteString(hundredChars)
+	}
+
+	return CreateItemsFromPlain(&Config{}, builder.String())
+}
