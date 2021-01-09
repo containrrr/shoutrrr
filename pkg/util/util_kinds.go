@@ -36,3 +36,8 @@ func IsCollection(kind reflect.Kind) bool {
 	}
 	return ContainsKind(collections, kind)
 }
+
+// IsNumeric returns whether the Kind is one of the numeric ones
+func IsNumeric(kind reflect.Kind) bool {
+	return kind >= reflect.Int && kind <= reflect.Complex128
+}

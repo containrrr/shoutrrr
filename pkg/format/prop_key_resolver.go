@@ -91,6 +91,16 @@ func (pkr *PropKeyResolver) UpdateConfigFromParams(config types.ServiceConfig, p
 	return nil
 }
 
+// UpdateConfigFromParams mutates the provided config, updating the values from it's corresponding params
+func (pkr *PropKeyResolver) SetDefaultProps(config types.ServiceConfig) error {
+	for key, info := range pkr.keyFields {
+		if err := pkr.set(reflect.Indirect(reflect.ValueOf(config)), key, info.DefaultValue); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (pkr *PropKeyResolver) Bind(config types.ServiceConfig) PropKeyResolver {
 	bound := *pkr
 	bound.confValue = reflect.ValueOf(config)
