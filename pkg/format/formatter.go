@@ -96,7 +96,7 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 					fmtr.Errors = append(fmtr.Errors, err)
 				}
 			} else if nextDepth < fmtr.MaxDepth {
-				value, valueLen = fmtr.getFieldValueString(values.FieldByName(field.Name), nextDepth)
+				value, valueLen = fmtr.getFieldValueString(values.FieldByName(field.Name), field.Base, nextDepth)
 			}
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
@@ -144,6 +144,7 @@ type FieldInfo struct {
 	Template      string
 	Required      bool
 	Title         bool
+	Base          int
 	Keys          []string
 }
 
@@ -168,6 +169,10 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
 			Title:    false,
 		}
 
+		if util.IsNumeric(fieldDef.Type.Kind()) {
+			info.Base = getFieldBase(fieldDef)
+		}
+
 		if tag, ok := fieldDef.Tag.Lookup("desc"); ok {
 			info.Description = tag
 		}
@@ -190,6 +195,7 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {
+			tag := strings.ToLower(tag)
 			info.Keys = strings.Split(tag, ",")
 		}
 
@@ -207,17 +213,28 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
 	return fields
 }
 
-func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (string, int) {
+func getFieldBase(field reflect.StructField) int {
+	if tag, ok := field.Tag.Lookup("base"); ok {
+		if base, err := strconv.ParseUint(tag, 10, 8); err == nil {
+			return int(base)
+		}
+	}
+
+	// Default to base 10 if not tagged
+	return 10
+}
+
+func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth uint8) (string, int) {
 
 	nextDepth := depth + 1
 	kind := field.Kind()
 
 	if util.IsUnsignedDecimal(kind) {
-		strVal := fmt.Sprintf("%d", field.Uint())
+		strVal := strconv.FormatUint(field.Uint(), base)
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
 	}
 	if util.IsSignedDecimal(kind) {
-		strVal := fmt.Sprintf("%d", field.Int())
+		strVal := strconv.FormatInt(field.Int(), base)
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
 	}
 	if kind == reflect.String {
@@ -239,7 +256,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		totalLen := 4
 		var itemLen int
 		for i := 0; i < fieldLen; i++ {
-			items[i], itemLen = fmtr.getFieldValueString(field.Index(i), nextDepth)
+			items[i], itemLen = fmtr.getFieldValueString(field.Index(i), base, nextDepth)
 			totalLen += itemLen
 		}
 		if fieldLen > 1 {
@@ -256,8 +273,8 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 		// initial value for totalLen is surrounding curlies and spaces, and separating commas
 		totalLen := 4 + (field.Len() - 1)
 		for iter.Next() {
-			key, keyLen := fmtr.getFieldValueString(iter.Key(), nextDepth)
-			value, valueLen := fmtr.getFieldValueString(iter.Value(), nextDepth)
+			key, keyLen := fmtr.getFieldValueString(iter.Key(), base, nextDepth)
+			value, valueLen := fmtr.getFieldValueString(iter.Value(), base, nextDepth)
 			items[index] = fmt.Sprintf("%s: %s", key, value)
 			totalLen += keyLen + valueLen + 2
 		}
