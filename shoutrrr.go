@@ -1,10 +1,10 @@
 package shoutrrr
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"log"
-
 	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/containrrr/shoutrrr/pkg/types"
+
+	"log"
 )
 
 var defaultRouter = router.ServiceRouter{}

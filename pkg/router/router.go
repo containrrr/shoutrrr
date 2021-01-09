@@ -52,6 +52,29 @@ func (router *ServiceRouter) Send(message string, params *t.Params) []error {
 	return errors
 }
 
+// SendItems sends the specified message items using the routers underlying services
+func (router *ServiceRouter) SendItems(items []t.MessageItem, params t.Params) []error {
+	if router == nil {
+		return []error{fmt.Errorf("error sending message: no senders")}
+	}
+
+	// Fallback using old API for now
+	message := strings.Builder{}
+	for _, item := range items {
+		message.WriteString(item.Text)
+	}
+
+	serviceCount := len(router.services)
+	errors := make([]error, serviceCount)
+	results := router.SendAsync(message.String(), (*t.Params)(&params))
+
+	for i := range router.services {
+		errors[i] = <-results
+	}
+
+	return errors
+}
+
 // SendAsync sends the specified message using the routers underlying services
 func (router *ServiceRouter) SendAsync(message string, params *t.Params) chan error {
 	serviceCount := len(router.services)
