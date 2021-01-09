@@ -98,7 +98,7 @@ var _ = Describe("the SMTP service", func() {
 
 		It("should have the exped number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
-			testutils.TestConfigGetFieldsCount(config, 8)
+			testutils.TestConfigGetFieldsCount(config, 9)
 		})
 	})
 

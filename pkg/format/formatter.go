@@ -3,11 +3,12 @@ package format
 import (
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
 	"reflect"
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/fatih/color"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
@@ -143,7 +144,7 @@ type FieldInfo struct {
 	Template      string
 	Required      bool
 	Title         bool
-	Key           string
+	Keys          []string
 }
 
 func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
@@ -189,7 +190,7 @@ func (fmtr *formatter) getStructFieldInfo(structType reflect.Type) []FieldInfo {
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {
-			info.Key = tag
+			info.Keys = strings.Split(tag, ",")
 		}
 
 		if ef, isEnum := fmtr.EnumFormatters[fieldDef.Name]; isEnum {
