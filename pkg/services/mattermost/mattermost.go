@@ -43,6 +43,11 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return err
 }
 
+// SendItems concatenates the items and sends them using Send
+func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
+	return service.Send(types.ItemsToPlain(items), params)
+}
+
 // Builds the actual URL the request should go to
 func buildURL(config *Config) string {
 	return fmt.Sprintf("https://%s/hooks/%s", config.Host, config.Token)

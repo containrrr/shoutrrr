@@ -59,6 +59,11 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return nil
 }
 
+// SendItems concatenates the items and sends them using Send
+func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
+	return service.Send(types.ItemsToPlain(items), params)
+}
+
 // CreateAPIURLForEvent creates a IFTTT webhook URL for the given event
 func (service *Service) createAPIURLForEvent(event string) string {
 	return fmt.Sprintf(

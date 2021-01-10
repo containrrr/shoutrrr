@@ -55,3 +55,8 @@ func (service *Service) Send(message string, _ *types.Params) error {
 
 	return nil
 }
+
+// SendItems concatenates the items and sends them using Send
+func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
+	return service.Send(types.ItemsToPlain(items), params)
+}

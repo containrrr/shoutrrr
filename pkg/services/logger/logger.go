@@ -25,6 +25,11 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(params)
 }
 
+// SendItems concatenates the items and sends them using Send
+func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
+	return service.Send(types.ItemsToPlain(items), params)
+}
+
 func (service *Service) doSend(params *types.Params) error {
 	msg := (*params)["message"]
 	if tpl, found := service.GetTemplate("message"); found {
