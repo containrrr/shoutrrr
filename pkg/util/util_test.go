@@ -41,21 +41,21 @@ var _ = Describe("the util package", func() {
 			Expect(TestLogger().Prefix()).To(Equal("Test"))
 		})
 	})
-	When("checking if a supplied kind is of the signed decimal kind", func() {
+	When("checking if a supplied kind is of the signed integer kind", func() {
 		It("should be true if the kind is Int", func() {
-			Expect(IsSignedDecimal(reflect.Int)).To(BeTrue())
+			Expect(IsSignedInt(reflect.Int)).To(BeTrue())
 		})
 		It("should be false if the kind is String", func() {
-			Expect(IsSignedDecimal(reflect.String)).To(BeFalse())
+			Expect(IsSignedInt(reflect.String)).To(BeFalse())
 		})
 	})
 
-	When("checking if a supplied kind is of the unsigned decimal kind", func() {
+	When("checking if a supplied kind is of the unsigned integer kind", func() {
 		It("should be true if the kind is Uint", func() {
-			Expect(IsUnsignedDecimal(reflect.Uint)).To(BeTrue())
+			Expect(IsUnsignedInt(reflect.Uint)).To(BeTrue())
 		})
 		It("should be false if the kind is Int", func() {
-			Expect(IsUnsignedDecimal(reflect.Int)).To(BeFalse())
+			Expect(IsUnsignedInt(reflect.Int)).To(BeFalse())
 		})
 	})
 

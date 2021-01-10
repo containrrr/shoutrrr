@@ -229,11 +229,11 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth 
 	nextDepth := depth + 1
 	kind := field.Kind()
 
-	if util.IsUnsignedDecimal(kind) {
+	if util.IsUnsignedInt(kind) {
 		strVal := strconv.FormatUint(field.Uint(), base)
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
 	}
-	if util.IsSignedDecimal(kind) {
+	if util.IsSignedInt(kind) {
 		strVal := strconv.FormatInt(field.Int(), base)
 		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
 	}
