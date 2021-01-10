@@ -1,53 +1,52 @@
 package discord
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types/rich"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 	"time"
 )
 
-// JSON is the actual notification payload
+// WebhookPayload is the webhook endpoint payload
 type WebhookPayload struct {
-	Embeds []EmbedItem `json:"content"`
+	Embeds []embedItem `json:"content"`
 }
 
 // JSON is the actual notification payload
-type EmbedItem struct {
+type embedItem struct {
 	Title     string       `json:"title,omitempty"`
 	Content   string       `json:"description,omitempty"`
 	URL       string       `json:"url,omitempty"`
 	Timestamp string       `json:"timestamp,omitempty"`
 	Color     int          `json:"color,omitempty"`
-	Footer    *EmbedFooter `json:"footer,omitempty"`
+	Footer    *embedFooter `json:"footer,omitempty"`
 }
 
-type EmbedFooter struct {
+type embedFooter struct {
 	Text    string `json:"text"`
 	IconURL string `json:"icon_url,omitempty"`
 }
 
-// CreateJSONToSend creates a JSON payload to be sent to the discord webhook API
-func CreatePayloadFromItems(items []rich.MessageItem, title string, colors [rich.MessageLevelCount]int, omitted int) ([]byte, error) {
+// CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
+func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]int, omitted int) (WebhookPayload, error) {
 
 	itemCount := util.Min(9, len(items))
-	embeds := make([]EmbedItem, 1, itemCount+1)
+	embeds := make([]embedItem, 1, itemCount+1)
 
 	for _, item := range items {
 
 		color := 0
-		if item.Level >= rich.Unknown && int(item.Level) < len(colors) {
+		if item.Level >= types.Unknown && int(item.Level) < len(colors) {
 			color = colors[item.Level]
 		}
 
-		ei := EmbedItem{
+		ei := embedItem{
 			Content: item.Text,
 			Color:   color,
 		}
 
-		if item.Level != rich.Unknown {
-			ei.Footer = &EmbedFooter{
+		if item.Level != types.Unknown {
+			ei.Footer = &embedFooter{
 				Text: item.Level.String(),
 			}
 		}
@@ -61,12 +60,12 @@ func CreatePayloadFromItems(items []rich.MessageItem, title string, colors [rich
 
 	embeds[0].Title = title
 	if omitted > 0 {
-		embeds[0].Footer = &EmbedFooter{
+		embeds[0].Footer = &embedFooter{
 			Text: fmt.Sprintf("... (%v character(s) where omitted)", omitted),
 		}
 	}
 
-	return json.Marshal(WebhookPayload{
+	return WebhookPayload{
 		Embeds: embeds,
-	})
+	}, nil
 }

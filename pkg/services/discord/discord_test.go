@@ -2,7 +2,7 @@ package discord_test
 
 import (
 	. "github.com/containrrr/shoutrrr/pkg/services/discord"
-	"github.com/containrrr/shoutrrr/pkg/types/rich"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 
 	"net/url"
@@ -44,6 +44,12 @@ var _ = Describe("the discord service", func() {
 				nil,
 			)
 			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+	Describe("the service", func() {
+		It("should implement Service interface", func() {
+			var impl types.Service = service
+			Expect(impl).ToNot(BeNil())
 		})
 	})
 	Describe("creating a config", func() {
@@ -94,7 +100,7 @@ var _ = Describe("the discord service", func() {
 		When("given a message that exceeds the max length", func() {
 			It("should return a payload with chunked messages", func() {
 
-				items, omitted := buildItemsFromHundreds(42)
+				items, omitted := buildItemsFromHundreds(42, false)
 
 				Expect(items).To(HaveLen(3))
 
@@ -106,7 +112,7 @@ var _ = Describe("the discord service", func() {
 			})
 			It("omit characters above total max", func() {
 
-				items, omitted := buildItemsFromHundreds(62)
+				items, omitted := buildItemsFromHundreds(62, false)
 
 				Expect(items).To(HaveLen(4))
 
@@ -121,7 +127,7 @@ var _ = Describe("the discord service", func() {
 	})
 })
 
-func buildItemsFromHundreds(hundreds int) (items []rich.MessageItem, omitted int) {
+func buildItemsFromHundreds(hundreds int, split bool) (items []types.MessageItem, omitted int) {
 	hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
 	builder := strings.Builder{}
 
@@ -129,5 +135,5 @@ func buildItemsFromHundreds(hundreds int) (items []rich.MessageItem, omitted int
 		builder.WriteString(hundredChars)
 	}
 
-	return CreateItemsFromPlain(&Config{}, builder.String())
+	return CreateItemsFromPlain(builder.String(), split)
 }
