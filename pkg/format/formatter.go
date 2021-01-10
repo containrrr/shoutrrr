@@ -316,14 +316,16 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 		}
 	} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
 		var value uint64
-		value, err = strconv.ParseUint(inputValue, 10, field.Type.Bits())
+		number, base := util.StripNumberPrefix(inputValue)
+		value, err = strconv.ParseUint(number, base, field.Type.Bits())
 		if err == nil {
 			configField.SetUint(value)
 			return true, nil
 		}
 	} else if fieldKind >= reflect.Int && fieldKind <= reflect.Int64 {
 		var value int64
-		value, err = strconv.ParseInt(inputValue, 10, field.Type.Bits())
+		number, base := util.StripNumberPrefix(inputValue)
+		value, err = strconv.ParseInt(number, base, field.Type.Bits())
 		if err == nil {
 			configField.SetInt(value)
 			return true, nil
@@ -344,8 +346,11 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 			configField.Set(reflect.ValueOf(values))
 			return true, nil
 		}
+	} else {
+		err = fmt.Errorf("invalid field kind %v", fieldKind)
 	}
-	return false, nil
+
+	return false, err
 
 }
 

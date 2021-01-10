@@ -67,4 +67,16 @@ var _ = Describe("the util package", func() {
 			Expect(IsCollection(reflect.Map)).To(BeFalse())
 		})
 	})
+
+	When("calling function StripNumberPrefix", func() {
+		It("should return the default base if none is found", func() {
+			_, base := StripNumberPrefix("46")
+			Expect(base).To(Equal(0))
+		})
+		It("should remove # prefix and return base 16 if found", func() {
+			number, base := StripNumberPrefix("#ab")
+			Expect(number).To(Equal("ab"))
+			Expect(base).To(Equal(16))
+		})
+	})
 })
