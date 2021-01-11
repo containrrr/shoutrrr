@@ -53,5 +53,12 @@ func (c *Config) setURL(resolver t.ConfigQueryResolver, configURL *url.URL) erro
 		}
 	}
 
+	for r, room := range c.Rooms {
+		// If room does not begin with a '#' let's prepend it
+		if room[0] != '#' && room[0] != '!' {
+			c.Rooms[r] = "#" + room
+		}
+	}
+
 	return nil
 }

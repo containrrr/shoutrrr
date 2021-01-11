@@ -1,6 +1,7 @@
 package matrix_test
 
 import (
+	"fmt"
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/matrix"
 	"github.com/jarcoal/httpmock"
@@ -98,18 +99,12 @@ func setupMockResponders() {
 
 	httpmock.RegisterResponder(
 		"GET",
-		mockServer+APISync,
-		httpmock.NewStringResponder(200, `{}`))
+		mockServer+APIJoinedRooms,
+		httpmock.NewStringResponder(200, `{ "joined_rooms": [ "!room:mockserver" ] }`))
 
 	httpmock.RegisterResponder(
 		"POST",
-		mockServer+APISendMessage,
+		mockServer+fmt.Sprintf(APISendMessage, "%21room:mockserver"),
 		httpmock.NewStringResponder(200, `{ "event_id": "7" }`))
 
-}
-
-func expectErrorOnInit(service *Service, rawURL string, logger *log.Logger) {
-	serviceURL, _ := url.Parse(rawURL)
-	err := service.Initialize(serviceURL, logger)
-	Expect(err).To(HaveOccurred())
 }
