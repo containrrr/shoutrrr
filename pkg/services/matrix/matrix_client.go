@@ -74,8 +74,12 @@ func (c *Client) LoginPassword(user string, password string) error {
 	}
 
 	c.accessToken = response.AccessToken
+	tokenHint := ""
+	if len(response.AccessToken) > 3 {
+		tokenHint = response.AccessToken[:3]
+	}
 
-	c.logf("AccessToken: %v...\n", response.AccessToken[:3])
+	c.logf("AccessToken: %v...\n", tokenHint)
 	c.logf("HomeServer: %v\n", response.HomeServer)
 	c.logf("User: %v\n", response.UserID)
 
