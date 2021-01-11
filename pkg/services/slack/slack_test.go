@@ -1,8 +1,11 @@
 package slack_test
 
 import (
+	"errors"
 	. "github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
+	"log"
 
 	"net/url"
 	"os"
@@ -20,14 +23,15 @@ func TestSlack(t *testing.T) {
 var (
 	service     *Service
 	envSlackURL *url.URL
+	logger      *log.Logger
 )
 
 var _ = Describe("the slack service", func() {
 
 	BeforeSuite(func() {
 		service = &Service{}
+		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envSlackURL, _ = url.Parse(os.Getenv("SHOUTRRR_SLACK_URL"))
-
 	})
 
 	When("running integration tests", func() {
@@ -118,6 +122,38 @@ var _ = Describe("the slack service", func() {
 				_, configError := CreateConfigFromURL(slackURL)
 				Expect(configError).To(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("sending the payload", func() {
+		var err error
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("should not report an error if the server accepts the payload", func() {
+			serviceURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetUrl := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
+			httpmock.RegisterResponder("POST", targetUrl, httpmock.NewStringResponder(200, ""))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should not panic if an error occurs when sending the payload", func() {
+			serviceURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetURL := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
+			httpmock.RegisterResponder("POST", targetURL, httpmock.NewErrorResponder(errors.New("dummy error")))
+
+			err = service.Send("Message", nil)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })
