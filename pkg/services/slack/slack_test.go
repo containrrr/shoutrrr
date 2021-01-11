@@ -138,8 +138,8 @@ var _ = Describe("the slack service", func() {
 			err = service.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-			targetUrl := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
-			httpmock.RegisterResponder("POST", targetUrl, httpmock.NewStringResponder(200, ""))
+			targetURL := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
+			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
