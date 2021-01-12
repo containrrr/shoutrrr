@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -18,6 +18,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -26,6 +27,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 	service.config = &Config{
 		Title: "Shoutrrr notification",
 	}
+	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 	return err
 }
@@ -60,40 +62,24 @@ func buildURL(config *Config) (string, error) {
 	return fmt.Sprintf("https://%s/message?token=%s", config.Host, token), nil
 }
 
-func getPriority(params map[string]string) int {
-	priorityStr, ok := params["priority"]
-	if !ok {
-		priorityStr = "0"
-	}
-	priority, err := strconv.Atoi(priorityStr)
-	if err != nil {
-		priority = 0
-	}
-	return priority
-}
-
-func getTitle(params map[string]string, config *Config) string {
-	title, ok := params["title"]
-	if !ok {
-		title = config.Title
-	}
-	return title
-}
-
 // Send a notification message to Gotify
 func (service *Service) Send(message string, params *types.Params) error {
 	if params == nil {
 		params = &types.Params{}
 	}
 	config := service.config
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		service.Logf("Failed to update params: %v", err)
+	}
+
 	postURL, err := buildURL(config)
 	if err != nil {
 		return err
 	}
 	jsonBody, err := json.Marshal(JSON{
 		Message:  message,
-		Title:    getTitle(*params, config),
-		Priority: getPriority(*params),
+		Title:    config.Title,
+		Priority: config.Priority,
 	})
 	if err != nil {
 		return err
