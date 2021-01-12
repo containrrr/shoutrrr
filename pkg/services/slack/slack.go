@@ -50,14 +50,23 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 func (service *Service) doSend(config *Config, message string) error {
-	apiURL := service.getURL(config)
-	json, _ := CreateJSONPayload(config, message)
-	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
+	postURL := service.getURL(config)
+	payload, _ := CreateJSONPayload(config, message)
+	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
+	if res == nil && err == nil {
+		err = fmt.Errorf("unknown error")
 	}
-	return err
+
+	if err == nil && res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("response status code %s", res.Status)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to send slack notification: %v", err)
+	}
+
+	return nil
 }
 
 func (service *Service) getURL(config *Config) string {
