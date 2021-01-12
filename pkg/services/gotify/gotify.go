@@ -23,7 +23,9 @@ type Service struct {
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
+	service.config = &Config{
+		Title: "Shoutrrr notification",
+	}
 	err := service.config.SetURL(configURL)
 	return err
 }
@@ -70,10 +72,10 @@ func getPriority(params map[string]string) int {
 	return priority
 }
 
-func getTitle(params map[string]string) string {
+func getTitle(params map[string]string, config *Config) string {
 	title, ok := params["title"]
 	if !ok {
-		title = "Shoutrrr notification"
+		title = config.Title
 	}
 	return title
 }
@@ -90,7 +92,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 	jsonBody, err := json.Marshal(JSON{
 		Message:  message,
-		Title:    getTitle(*params),
+		Title:    getTitle(*params, config),
 		Priority: getPriority(*params),
 	})
 	if err != nil {

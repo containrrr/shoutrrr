@@ -12,6 +12,7 @@ type Config struct {
 	Token   string
 	Host    string
 	Prority int
+	Title   string `default:"Shoutrrr notification"`
 }
 
 // GetURL returns a URL representation of it's current field values
