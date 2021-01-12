@@ -29,6 +29,21 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		expectedURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
 		Expect(url).To(Equal(expectedURL))
 	})
+
+	When("TLS is disabled", func() {
+		It("should use http schema", func() {
+			config := Config{
+				Token:      "Aaa.bbb.ccc.ddd",
+				Host:       "my.gotify.tld",
+				DisableTLS: true,
+			}
+			url, err := buildURL(&config)
+			Expect(err).To(BeNil())
+			expectedURL := "http://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
+			Expect(url).To(Equal(expectedURL))
+		})
+	})
+
 	When("provided a valid token", func() {
 		It("should return true", func() {
 			token := "Ahwbsdyhwwgarxd"
@@ -50,7 +65,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?priority=1&title=Test title"
+				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -98,5 +113,6 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 			err = service.Send("Message", nil)
 			Expect(err).To(HaveOccurred())
 		})
+
 	})
 })

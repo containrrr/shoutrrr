@@ -11,10 +11,11 @@ import (
 // Config for use within the gotify plugin
 type Config struct {
 	standard.EnumlessConfig
-	Token    string
-	Host     string
-	Priority int    `key:"priority" default:"0"`
-	Title    string `key:"title" default:"Shoutrrr notification"`
+	Token      string
+	Host       string
+	Priority   int    `key:"priority" default:"0"`
+	Title      string `key:"title" default:"Shoutrrr notification"`
+	DisableTLS bool   `key:"disabletls" default:"No"`
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -29,7 +30,6 @@ func (config *Config) SetURL(url *url.URL) error {
 	return config.setURL(&resolver, url)
 }
 
-// GetURL returns a URL representation of it's current field values
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		Host:       config.Host,
@@ -40,7 +40,6 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	}
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	config.Host = url.Host
 	config.Token = url.Path

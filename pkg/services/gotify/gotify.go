@@ -59,7 +59,11 @@ func buildURL(config *Config) (string, error) {
 	if !isTokenValid(token) {
 		return "", fmt.Errorf("invalid gotify token \"%s\"", token)
 	}
-	return fmt.Sprintf("https://%s/message?token=%s", config.Host, token), nil
+	scheme := "https"
+	if config.DisableTLS {
+		scheme = scheme[:4]
+	}
+	return fmt.Sprintf("%s://%s/message?token=%s", scheme, config.Host, token), nil
 }
 
 // Send a notification message to Gotify
