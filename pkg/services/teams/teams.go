@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -16,42 +18,69 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Send a notification message to Microsoft Teams
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
-	postURL := buildURL(config)
-	return service.doSend(postURL, message)
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		service.Logf("Failed to update params: %v", err)
+	}
+
+	return service.doSend(config, message)
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+
+	service.pkr = format.NewPropKeyResolver(service.config)
+
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (service *Service) doSend(postURL string, message string) error {
-	body := JSON{
-		CardType: "MessageCard",
-		Context:  "http://schema.org/extensions",
-		Markdown: true,
-		Text:     message,
+func (service *Service) doSend(config *Config, message string) error {
+	var sections []Section
+
+	for _, line := range strings.Split(message, "\n") {
+		sections = append(sections, Section{
+			Text: line,
+		})
 	}
 
-	jsonBody, err := json.Marshal(body)
+	// Teams need a summary for the webhook, use title or first (truncated) row
+	summary := config.Title
+	if summary == "" && len(sections) > 0 {
+		summary = sections[0].Text
+		if len(summary) > 20 {
+			summary = summary[:21]
+		}
+	}
+
+	payload, err := json.Marshal(Payload{
+		CardType:   "MessageCard",
+		Context:    "http://schema.org/extensions",
+		Markdown:   true,
+		Title:      config.Title,
+		ThemeColor: config.Color,
+		Summary:    summary,
+		Sections:   sections,
+	})
 	if err != nil {
 		return err
 	}
 
-	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonBody))
-	if res.StatusCode != http.StatusOK {
+	postURL := buildWebhookURL(config.WebhookParts)
+
+	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
+	if err == nil && res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to send notification to teams, response status code %s", res.Status)
 	}
 	if err != nil {
@@ -61,14 +90,4 @@ func (service *Service) doSend(postURL string, message string) error {
 		)
 	}
 	return nil
-}
-
-func buildURL(config *Config) string {
-	var baseURL = "https://outlook.office.com/webhook"
-	return fmt.Sprintf(
-		"%s/%s/IncomingWebhook/%s/%s",
-		baseURL,
-		config.Token.A,
-		config.Token.B,
-		config.Token.C)
 }
