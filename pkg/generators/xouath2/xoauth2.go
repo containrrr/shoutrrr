@@ -17,9 +17,9 @@ type Generator struct{}
 func (g *Generator) Generate(_ types.Service, props map[string]string, args []string) (types.ServiceConfig, error) {
 
 	if provider, found := props["provider"]; found {
-		 if provider == "gmail" {
-			 return oauth2GeneratorGmail(args[0])
-		 }
+		if provider == "gmail" {
+			return oauth2GeneratorGmail(args[0])
+		}
 	}
 
 	if len(args) > 0 {
@@ -179,11 +179,10 @@ func generateOauth2Config(conf *oauth2.Config, host string) (*smtp.Config, error
 		FromAddress: sender,
 		FromName:    "Shoutrrr",
 		ToAddresses: []string{sender},
-		Auth:        smtp.OAuth2,
+		Auth:        smtp.AuthTypes.OAuth2,
 		UseStartTLS: true,
 		UseHTML:     true,
 	}
 
 	return svcConf, nil
 }
-
