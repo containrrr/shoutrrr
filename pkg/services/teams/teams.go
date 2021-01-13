@@ -47,10 +47,10 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 func (service *Service) doSend(config *Config, message string) error {
-	var sections []Section
+	var sections []section
 
 	for _, line := range strings.Split(message, "\n") {
-		sections = append(sections, Section{
+		sections = append(sections, section{
 			Text: line,
 		})
 	}
@@ -64,7 +64,7 @@ func (service *Service) doSend(config *Config, message string) error {
 		}
 	}
 
-	payload, err := json.Marshal(Payload{
+	payload, err := json.Marshal(payload{
 		CardType:   "MessageCard",
 		Context:    "http://schema.org/extensions",
 		Markdown:   true,

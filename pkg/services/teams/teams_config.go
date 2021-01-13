@@ -19,8 +19,8 @@ type Config struct {
 	Color        string `key:"color" optional:""`
 }
 
-// CreateConfigFromWebhookURL creates a new config from a teams webhook URL
-func CreateConfigFromWebhookURL(webhookURL string) (*Config, error) {
+// SetFromWebhookURL updates the config WebhookParts from a teams webhook URL
+func (config *Config) SetFromWebhookURL(webhookURL string) (*Config, error) {
 	parts, err := parseWebhookURL(webhookURL)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		User:       url.User(parts[0]),
 		Host:       parts[1],
-		Path:       "/" + parts[2] + parts[3] + "/",
+		Path:       "/" + parts[2] + "/" + parts[3],
 		Scheme:     Scheme,
 		ForceQuery: false,
 		RawQuery:   format.BuildQuery(resolver),
@@ -71,7 +71,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		webhookParts = [4]string{url.User.Username(), url.Hostname(), parts[0], parts[1]}
 	}
 
-	if err := VerifyWebhookParts(webhookParts); err != nil {
+	if err := verifyWebhookParts(webhookParts); err != nil {
 		return fmt.Errorf("invalid URL format: %v", err)
 	}
 
