@@ -39,11 +39,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 
 	service.pkr = format.NewPropKeyResolver(service.config)
 
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return service.config.setURL(&service.pkr, configURL)
 }
 
 func (service *Service) doSend(config *Config, message string) error {
