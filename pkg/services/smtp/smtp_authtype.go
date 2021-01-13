@@ -16,6 +16,7 @@ type authTypeVals struct {
 	Enum    types.EnumFormatter
 }
 
+// AuthTypes is the enum helper for populating the Auth field
 var AuthTypes = &authTypeVals{
 	None:    0,
 	Plain:   1,

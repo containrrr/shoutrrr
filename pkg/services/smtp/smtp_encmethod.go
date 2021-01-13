@@ -16,6 +16,7 @@ type encMethodVals struct {
 	Enum types.EnumFormatter
 }
 
+// EncMethods is the enum helper for populating the Encryption field
 var EncMethods = &encMethodVals{
 	None:        0,
 	ExplicitTLS: 1,
