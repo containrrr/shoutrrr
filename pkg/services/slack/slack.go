@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
@@ -17,6 +18,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 const (
@@ -27,6 +29,10 @@ const (
 // Send a notification message to Slack
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
+
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		return err
+	}
 
 	if err := ValidateToken(config.Token); err != nil {
 		return err
@@ -42,7 +48,8 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
@@ -51,8 +58,12 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 
 func (service *Service) doSend(config *Config, message string) error {
 	postURL := service.getURL(config)
-	payload, _ := CreateJSONPayload(config, message)
-	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
+	payload, err := CreateJSONPayload(config, message)
+
+	var res *http.Response
+	if err == nil {
+		res, err = http.Post(postURL, "application/json", bytes.NewBuffer(payload))
+	}
 
 	if res == nil && err == nil {
 		err = fmt.Errorf("unknown error")

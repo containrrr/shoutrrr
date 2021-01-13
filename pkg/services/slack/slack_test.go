@@ -41,8 +41,10 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send("This is an integration test message", nil)
+			err := service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -106,8 +108,8 @@ var _ = Describe("the slack service", func() {
 				slackURL, _ := url.Parse("slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
 				config, configError := CreateConfigFromURL(slackURL)
 
-				Expect(config.BotName).To(Equal(DefaultUser))
 				Expect(configError).NotTo(HaveOccurred())
+				Expect(config.BotName).To(BeEmpty())
 			})
 			It("should set the botname if the argument list is three", func() {
 				slackURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
