@@ -1,9 +1,12 @@
 package pushover_test
 
 import (
+	"errors"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
+	"log"
 	"net/url"
 	"os"
 	"testing"
@@ -11,6 +14,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+const hookURL = "https://api.pushover.net/1/messages.json"
 
 func TestPushover(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -22,10 +27,12 @@ var (
 	config         *pushover.Config
 	keyResolver    format.PropKeyResolver
 	envPushoverURL *url.URL
+	logger         *log.Logger
 )
 var _ = Describe("the pushover service", func() {
 	BeforeSuite(func() {
 		service = &pushover.Service{}
+		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envPushoverURL, _ = url.Parse(os.Getenv("SHOUTRRR_PUSHOVER_URL"))
 	})
 	When("running integration tests", func() {
@@ -123,6 +130,39 @@ var _ = Describe("the pushover config", func() {
 		It("should return the keys \"devices\",\"priority\",\"title\"", func() {
 			fields := keyResolver.QueryFields()
 			Expect(fields).To(Equal([]string{"devices", "priority", "title"}))
+		})
+	})
+
+	Describe("sending the payload", func() {
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("should not report an error if the server accepts the payload", func() {
+			serviceURL, err := url.Parse("pushover://:apptoken@usertoken")
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", hookURL, httpmock.NewStringResponder(200, ""))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should not panic if an error occurs when sending the payload", func() {
+			serviceURL, err := url.Parse("pushover://:apptoken@usertoken")
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", hookURL, httpmock.NewErrorResponder(errors.New("dummy error")))
+
+			err = service.Send("Message", nil)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })
