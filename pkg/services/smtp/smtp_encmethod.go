@@ -16,7 +16,8 @@ type encMethodVals struct {
 	Enum types.EnumFormatter
 }
 
-var encMethods = &encMethodVals{
+// EncMethods is the enum helper for populating the Encryption field
+var EncMethods = &encMethodVals{
 	None:        0,
 	ExplicitTLS: 1,
 	ImplicitTLS: 2,
@@ -32,18 +33,14 @@ var encMethods = &encMethodVals{
 }
 
 func (at encMethod) String() string {
-	return encMethods.Enum.Print(int(at))
-}
-
-func parseEncryption(s string) encMethod {
-	return encMethod(encMethods.Enum.Parse(s))
+	return EncMethods.Enum.Print(int(at))
 }
 
 func useImplicitTLS(encryption encMethod, port uint16) bool {
 	switch encryption {
-	case encMethods.ImplicitTLS:
+	case EncMethods.ImplicitTLS:
 		return true
-	case encMethods.Auto:
+	case EncMethods.Auto:
 		return port == ImplicitTLSPort
 	default:
 		return false
