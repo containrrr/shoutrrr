@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	apiBase   = "https://api.telegram.org/bot"
+	apiFormat = "https://api.telegram.org/bot%s/%s"
 	maxlength = 4096
 )
 
@@ -69,7 +69,7 @@ func (service *Service) GetConfig() *Config {
 }
 
 func sendMessageToAPI(message string, channel string, config *Config) error {
-	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, config.Token)
+	postURL := fmt.Sprintf(apiFormat, config.Token, "sendMessage")
 
 	payload := createSendMessagePayload(message, channel, config)
 
