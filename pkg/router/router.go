@@ -66,7 +66,7 @@ func (router *ServiceRouter) SendItems(items []t.MessageItem, params t.Params) [
 
 	serviceCount := len(router.services)
 	errors := make([]error, serviceCount)
-	results := router.SendAsync(message.String(), (*t.Params)(&params))
+	results := router.SendAsync(message.String(), &params)
 
 	for i := range router.services {
 		errors[i] = <-results
