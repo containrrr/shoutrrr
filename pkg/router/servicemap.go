@@ -11,6 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
+	"github.com/containrrr/shoutrrr/pkg/services/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
@@ -37,4 +38,5 @@ var serviceMap = map[string]func() t.Service{
 	"zulip":      func() t.Service { return &zulip.Service{} },
 	"join":       func() t.Service { return &join.Service{} },
 	"rocketchat": func() t.Service { return &rocketchat.Service{} },
+	"shoutrrr":   func() t.Service { return &shoutrrr.Service{} },
 }
