@@ -75,6 +75,19 @@ var _ = Describe("the router suite", func() {
 		})
 	})
 
+	When("initializing a service with a custom URL", func() {
+		It("should return an error if the service does not support it", func() {
+			service, err := sr.initService("log+https://hybr.is")
+			Expect(err).To(HaveOccurred())
+			Expect(service).To(BeNil())
+		})
+		It("should successfully init a service that does support it", func() {
+			service, err := sr.initService("teams+https://hybr.is")
+			Expect(err).To(HaveOccurred())
+			Expect(service).To(BeNil())
+		})
+	})
+
 	When("a message is enqueued", func() {
 		It("should be added to the internal queue", func() {
 
