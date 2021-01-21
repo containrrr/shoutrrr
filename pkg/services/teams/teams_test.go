@@ -13,6 +13,7 @@ import (
 
 const (
 	testWebhookURL = "https://outlook.office.com/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
+	customURL      = "teams+https://publicservice.info/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
 	testURLBase    = "teams://11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
 )
 
@@ -34,7 +35,7 @@ var _ = Describe("the teams plugin", func() {
 					"44444444-4444-4444-8444-cccccccccccc",
 				},
 			}
-			apiURL := buildWebhookURL(config.WebhookParts)
+			apiURL := buildWebhookURL(DefaultHost, config.WebhookParts)
 			Expect(apiURL).To(Equal(testWebhookURL))
 
 			parts, err := parseAndVerifyWebhookURL(apiURL)
@@ -46,18 +47,59 @@ var _ = Describe("the teams plugin", func() {
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := testURLBase + "?color=aabbcc&title=Test title"
+				testURL := testURLBase + "?color=aabbcc&host=outlook.office.com&title=Test title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
-				config := &Config{}
+				config := &Config{Host: DefaultHost}
 				err = config.SetURL(url)
 				Expect(err).NotTo(HaveOccurred(), "verifying")
 
 				outputURL := config.GetURL()
 				Expect(outputURL.String()).To(Equal(testURL))
 
+			})
+		})
+	})
+
+	Describe("converting custom URL to service URL", func() {
+		When("an invalid custom URL is provided", func() {
+			It("should return an error", func() {
+				service := Service{}
+				testURL := "teams+https://google.com/search?q=what+is+love"
+
+				customURL, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				_, err = service.GetConfigURLFromCustom(customURL)
+				Expect(err).To(HaveOccurred(), "converting")
+			})
+		})
+		When("a valid custom URL is provided", func() {
+			It("should set the host field from the custom URL", func() {
+				service := Service{}
+				testURL := customURL
+
+				customURL, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				serviceURL, err := service.GetConfigURLFromCustom(customURL)
+				Expect(err).NotTo(HaveOccurred(), "converting")
+
+				Expect(serviceURL.String()).To(Equal(testURLBase + "?color=&host=publicservice.info&title="))
+			})
+			It("should preserve the query params in the generated service URL", func() {
+				service := Service{}
+				testURL := "teams+" + testWebhookURL + "?color=f008c1&title=TheTitle"
+
+				customURL, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				serviceURL, err := service.GetConfigURLFromCustom(customURL)
+				Expect(err).NotTo(HaveOccurred(), "converting")
+
+				Expect(serviceURL.String()).To(Equal(testURLBase + "?color=f008c1&host=outlook.office.com&title=TheTitle"))
 			})
 		})
 	})

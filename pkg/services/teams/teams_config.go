@@ -17,6 +17,7 @@ type Config struct {
 	WebhookParts [4]string
 	Title        string `key:"title" optional:""`
 	Color        string `key:"color" optional:""`
+	Host         string `key:"host" optional:"" default:"outlook.office.com"`
 }
 
 // SetFromWebhookURL updates the config WebhookParts from a teams webhook URL
@@ -86,9 +87,10 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 	return nil
 }
 
-func buildWebhookURL(parts [4]string) string {
+func buildWebhookURL(host string, parts [4]string) string {
 	return fmt.Sprintf(
-		"https://outlook.office.com/webhook/%s@%s/IncomingWebhook/%s/%s",
+		"https://%s/webhook/%s@%s/IncomingWebhook/%s/%s",
+		host,
 		parts[0],
 		parts[1],
 		parts[2],
@@ -131,5 +133,6 @@ func (service *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
 
 const (
 	// Scheme is the identifying part of this service's configuration URL
-	Scheme = "teams"
+	Scheme      = "teams"
+	DefaultHost = "outlook.office.com"
 )
