@@ -119,7 +119,14 @@ func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL
 		return "", &url.URL{}, err
 	}
 
-	return serviceURL.Scheme, serviceURL, nil
+	scheme := serviceURL.Scheme
+	schemeParts := strings.Split(scheme, "+")
+
+	if len(schemeParts) > 1 {
+		scheme = schemeParts[0]
+	}
+
+	return scheme, serviceURL, nil
 }
 
 // Route a message to a specific notification service using the notification URL
@@ -146,6 +153,19 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 	}
 
 	service := serviceFactory()
+
+	if configURL.Scheme != scheme {
+		router.logger.Println("Got custom URL:", configURL.String())
+		customURLService, ok := service.(t.CustomURLService)
+		if !ok {
+			return nil, fmt.Errorf("custom URLs are not supported by '%s' service", scheme)
+		}
+		configURL, err = customURLService.GetConfigURLFromCustom(configURL)
+		if err != nil {
+			return nil, err
+		}
+		router.logger.Println("Converted service URL:", configURL.String())
+	}
 
 	err = service.Initialize(configURL, router.logger)
 	if err != nil {
