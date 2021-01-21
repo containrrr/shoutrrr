@@ -133,6 +133,7 @@ func (service *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
 
 const (
 	// Scheme is the identifying part of this service's configuration URL
-	Scheme      = "teams"
+	Scheme = "teams"
+	// DefaultHost is the default host for the webhook request
 	DefaultHost = "outlook.office.com"
 )

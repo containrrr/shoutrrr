@@ -45,7 +45,7 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 }
 
 // GetConfigURLFromCustom creates a regular service URL from one with a custom host
-func (_ *Service) GetConfigURLFromCustom(customURL *url.URL) (serviceURL *url.URL, err error) {
+func (*Service) GetConfigURLFromCustom(customURL *url.URL) (serviceURL *url.URL, err error) {
 	parts, err := parseAndVerifyWebhookURL(customURL.String())
 	if err != nil {
 		return nil, err
