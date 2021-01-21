@@ -2,7 +2,6 @@ package slack
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
@@ -22,8 +21,7 @@ type Service struct {
 }
 
 const (
-	apiURL    = "https://hooks.slack.com/services"
-	maxlength = 1000
+	apiURL = "https://hooks.slack.com/services"
 )
 
 // Send a notification message to Slack
@@ -36,9 +34,6 @@ func (service *Service) Send(message string, params *types.Params) error {
 
 	if err := ValidateToken(config.Token); err != nil {
 		return err
-	}
-	if len(message) > maxlength {
-		return errors.New("message exceeds max length")
 	}
 
 	return service.doSend(config, message)
