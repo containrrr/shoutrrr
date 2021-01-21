@@ -29,6 +29,7 @@ func GetConfigMap(service types.Service) (map[string]string, int) {
 	return formatter.formatStructMap(configType, config, 0)
 }
 
+// GetServiceConfigFormat returns type and field information about a ServiceConfig, resolved from it's Service
 func GetServiceConfigFormat(service types.Service) (reflect.Type, []FieldInfo) {
 	configRef := reflect.ValueOf(service).Elem().FieldByName("config")
 	configType := configRef.Type().Elem()
@@ -39,6 +40,7 @@ func GetServiceConfigFormat(service types.Service) (reflect.Type, []FieldInfo) {
 	return GetConfigFormat(serviceConfig)
 }
 
+// GetConfigFormat returns type and field information about a ServiceConfig
 func GetConfigFormat(serviceConfig types.ServiceConfig) (reflect.Type, []FieldInfo) {
 	configType := reflect.TypeOf(serviceConfig)
 	if configType.Kind() == reflect.Ptr {
@@ -135,6 +137,7 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 	return valueMap, maxKeyLen
 }
 
+// FieldInfo is the meta data about a config field
 type FieldInfo struct {
 	Name          string
 	Type          reflect.Type
@@ -281,6 +284,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, depth uint8) (st
 	return fmt.Sprintf("<?%s>", strVal), len(strVal) + 5
 }
 
+// SetConfigField deserializes the inputValue and sets the field of a config to that value
 func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (valid bool, err error) {
 	configField := config.FieldByName(field.Name)
 	fieldKind := field.Type.Kind()
@@ -293,10 +297,11 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 		if value == EnumInvalid {
 			enumNames := strings.Join(field.EnumFormatter.Names(), ", ")
 			return false, fmt.Errorf("not a one of %v", enumNames)
-		} else {
-			configField.SetInt(int64(value))
-			return true, nil
 		}
+
+		configField.SetInt(int64(value))
+		return true, nil
+
 	} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
 		var value uint64
 		value, err = strconv.ParseUint(inputValue, 10, field.Type.Bits())
@@ -312,26 +317,29 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 			return true, nil
 		}
 	} else if fieldKind == reflect.Bool {
-		if value, ok := ParseBool(inputValue, false); !ok {
+		value, ok := ParseBool(inputValue, false)
+		if !ok {
 			return false, errors.New("accepted values are 1, true, yes or 0, false, no")
-		} else {
-			configField.SetBool(value)
-			return true, nil
 		}
+
+		configField.SetBool(value)
+		return true, nil
 	} else if fieldKind >= reflect.Slice {
 		elemKind := field.Type.Elem().Kind()
 		if elemKind != reflect.String {
 			return false, errors.New("field format is not supported")
-		} else {
-			values := strings.Split(inputValue, ",")
-			configField.Set(reflect.ValueOf(values))
-			return true, nil
 		}
+
+		values := strings.Split(inputValue, ",")
+		configField.Set(reflect.ValueOf(values))
+		return true, nil
+
 	}
 	return false, nil
 
 }
 
+// GetConfigFieldString serializes the config field value to a string representation
 func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, err error) {
 	configField := config.FieldByName(field.Name)
 	fieldKind := field.Type.Kind()

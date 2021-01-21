@@ -9,6 +9,7 @@ type ServiceConfig interface {
 	Enums() map[string]EnumFormatter
 }
 
+// ConfigQueryResolver is the interface used to get/set and list service config query fields
 type ConfigQueryResolver interface {
 	Get(string) (string, error)
 	Set(string, string) error
