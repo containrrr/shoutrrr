@@ -147,12 +147,10 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 		return nil, err
 	}
 
-	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
-	if !valid {
-		return nil, fmt.Errorf("unknown service scheme for URL '%s'", rawURL)
+	service, err := newService(scheme)
+	if err != nil {
+		return nil, err
 	}
-
-	service := serviceFactory()
 
 	if configURL.Scheme != scheme {
 		router.logger.Println("Got custom URL:", configURL.String())
@@ -176,10 +174,15 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 }
 
 // NewService returns a new uninitialized service instance
-func (router *ServiceRouter) NewService(service string) (t.Service, error) {
-	serviceFactory, valid := serviceMap[strings.ToLower(service)]
+func (*ServiceRouter) NewService(serviceScheme string) (t.Service, error) {
+	return newService(serviceScheme)
+}
+
+// newService returns a new uninitialized service instance
+func newService(serviceScheme string) (t.Service, error) {
+	serviceFactory, valid := serviceMap[strings.ToLower(serviceScheme)]
 	if !valid {
-		return nil, fmt.Errorf("unknown service %q", service)
+		return nil, fmt.Errorf("unknown service %q", serviceScheme)
 	}
 	return serviceFactory(), nil
 }

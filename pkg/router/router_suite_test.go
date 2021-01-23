@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -53,6 +54,24 @@ var _ = Describe("the router suite", func() {
 			service, err := sr.initService("log+https://hybr.is")
 			Expect(err).To(HaveOccurred())
 			Expect(service).To(BeNil())
+		})
+	})
+
+	Describe("the service map", func() {
+		When("resolving implemented services", func() {
+			services := (&ServiceRouter{}).ListServices()
+
+			for _, scheme := range services {
+				// copy ref to local closure
+				serviceScheme := scheme
+
+				It(fmt.Sprintf("should return a Service for '%s'", serviceScheme), func() {
+					service, err := newService(serviceScheme)
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(service).ToNot(BeNil())
+				})
+			}
 		})
 	})
 
