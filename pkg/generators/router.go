@@ -9,10 +9,11 @@ import (
 )
 
 var generatorMap = map[string]func() t.Generator{
-	"basic": func() t.Generator { return &basic.Generator{} },
+	"basic":  func() t.Generator { return &basic.Generator{} },
 	"oauth2": func() t.Generator { return &xouath2.Generator{} },
 }
 
+// NewGenerator creates an instance of the generator that corresponds to the provided identifier
 func NewGenerator(identifier string) (t.Generator, error) {
 	generatorFactory, valid := generatorMap[strings.ToLower(identifier)]
 	if !valid {
@@ -21,6 +22,7 @@ func NewGenerator(identifier string) (t.Generator, error) {
 	return generatorFactory(), nil
 }
 
+// ListGenerators lists all available generators
 func ListGenerators() []string {
 	generators := make([]string, len(generatorMap))
 

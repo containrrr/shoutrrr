@@ -12,8 +12,10 @@ import (
 	"strings"
 )
 
+// Generator is the XOAuth2 Generator implementation
 type Generator struct{}
 
+// Generate generates a service URL from a set of user questions/answers
 func (g *Generator) Generate(_ types.Service, props map[string]string, args []string) (types.ServiceConfig, error) {
 
 	if provider, found := props["provider"]; found {
@@ -24,10 +26,9 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, args []st
 
 	if len(args) > 0 {
 		return oauth2GeneratorFile(args[0])
-	} else {
-		return oauth2Generator()
 	}
 
+	return oauth2Generator()
 }
 
 func oauth2GeneratorFile(file string) (*smtp.Config, error) {
@@ -67,9 +68,9 @@ func oauth2GeneratorFile(file string) (*smtp.Config, error) {
 
 func oauth2Generator() (*smtp.Config, error) {
 
-	var clientId string
+	var clientID string
 	fmt.Print("ClientID: ")
-	_, err := fmt.Scanln(&clientId)
+	_, err := fmt.Scanln(&clientID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,23 +82,23 @@ func oauth2Generator() (*smtp.Config, error) {
 		return nil, err
 	}
 
-	var authUrl string
+	var authURL string
 	fmt.Print("AuthURL: ")
-	_, err = fmt.Scanln(&authUrl)
+	_, err = fmt.Scanln(&authURL)
 	if err != nil {
 		return nil, err
 	}
 
-	var tokenUrl string
+	var tokenURL string
 	fmt.Print("TokenURL: ")
-	_, err = fmt.Scanln(&tokenUrl)
+	_, err = fmt.Scanln(&tokenURL)
 	if err != nil {
 		return nil, err
 	}
 
-	var redirectUrl string
+	var redirectURL string
 	fmt.Print("RedirectURL: ")
-	_, err = fmt.Scanln(&redirectUrl)
+	_, err = fmt.Scanln(&redirectURL)
 	if err != nil {
 		return nil, err
 	}
@@ -117,14 +118,14 @@ func oauth2Generator() (*smtp.Config, error) {
 	}
 
 	conf := oauth2.Config{
-		ClientID:     clientId,
+		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint: oauth2.Endpoint{
-			AuthURL:   authUrl,
-			TokenURL:  tokenUrl,
+			AuthURL:   authURL,
+			TokenURL:  tokenURL,
 			AuthStyle: oauth2.AuthStyleAutoDetect,
 		},
-		RedirectURL: redirectUrl,
+		RedirectURL: redirectURL,
 		Scopes:      strings.Split(scopes, ","),
 	}
 

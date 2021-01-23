@@ -73,9 +73,9 @@ func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config.Clone()
 	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
 		return fail(FailApplySendParams, err)
-	} else {
-		return service.doSend(client, message, &config)
 	}
+
+	return service.doSend(client, message, &config)
 }
 
 func getClientConnection(config *Config) (*smtp.Client, error) {
