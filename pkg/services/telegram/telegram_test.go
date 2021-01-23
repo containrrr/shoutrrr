@@ -21,7 +21,7 @@ func TestTelegram(t *testing.T) {
 	RunSpecs(t, "Shoutrrr Telegram Suite")
 }
 
-var _ = Describe("the telegram plugin", func() {
+var _ = Describe("the telegram service", func() {
 	var telegram *Service
 	var envTelegramURL string
 	var logger *log.Logger

@@ -7,13 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"log"
 	"net/url"
-	"testing"
 )
-
-func TestTelegramInternal(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Telegram Suite")
-}
 
 var _ = Describe("the telegram service", func() {
 	var logger *log.Logger

@@ -82,9 +82,9 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 
 func (config *Config) getClientConfig() *xmpp.Config {
 	conf := xmpp.Config{
-		Jid:      config.fromAddress(),
-		Password: config.Password,
-		Insecure: true,
+		Jid:        config.fromAddress(),
+		Credential: xmpp.Password(config.Password),
+		Insecure:   true,
 	}
 
 	if config.ServerHost != "" {
