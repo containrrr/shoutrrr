@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -23,22 +24,54 @@ var _ = Describe("the router suite", func() {
 
 	When("extract service name is given a url", func() {
 		It("should extract the protocol/service part", func() {
-			url := "slack://invalid-part"
+			url := "slack://rest/of/url"
 			serviceName, _, err := sr.ExtractServiceName(url)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(serviceName).To(Equal("slack"))
 		})
+		It("should extract the service part when provided in custom form", func() {
+			url := "teams+https://rest/of/url"
+			serviceName, _, err := sr.ExtractServiceName(url)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(serviceName).To(Equal("teams"))
+		})
 		It("should return an error if the protocol/service part is missing", func() {
-			url := "://invalid-part"
+			url := "://rest/of/url"
 			serviceName, _, err := sr.ExtractServiceName(url)
 			Expect(err).To(HaveOccurred())
 			Expect(serviceName).To(Equal(""))
 		})
 		It("should return an error if the protocol/service part is containing invalid letters", func() {
-			url := "a d://invalid-part"
+			url := "a d://rest/of/url"
 			serviceName, _, err := sr.ExtractServiceName(url)
 			Expect(err).To(HaveOccurred())
 			Expect(serviceName).To(Equal(""))
+		})
+	})
+
+	When("initializing a service with a custom URL", func() {
+		It("should return an error if the service does not support it", func() {
+			service, err := sr.initService("log+https://hybr.is")
+			Expect(err).To(HaveOccurred())
+			Expect(service).To(BeNil())
+		})
+	})
+
+	Describe("the service map", func() {
+		When("resolving implemented services", func() {
+			services := (&ServiceRouter{}).ListServices()
+
+			for _, scheme := range services {
+				// copy ref to local closure
+				serviceScheme := scheme
+
+				It(fmt.Sprintf("should return a Service for '%s'", serviceScheme), func() {
+					service, err := newService(serviceScheme)
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(service).ToNot(BeNil())
+				})
+			}
 		})
 	})
 
