@@ -15,7 +15,9 @@ func BuildQuery(cqr types.ConfigQueryResolver) string {
 		if index == 1 {
 			format = "&%s=%s"
 		}
-		query += fmt.Sprintf(format, key, value)
+		if value != "" {
+			query += fmt.Sprintf(format, key, value)
+		}
 	}
 
 	return query

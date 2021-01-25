@@ -67,6 +67,9 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	url := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
-	payload := NewAlertPayload(message, config, params)
+	payload, err := NewAlertPayload(message, config, params)
+	if err != nil {
+		return err
+	}
 	return service.sendAlert(url, config.ApiKey, payload)
 }

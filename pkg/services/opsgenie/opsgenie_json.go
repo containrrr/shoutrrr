@@ -2,6 +2,9 @@ package opsgenie
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
@@ -25,16 +28,52 @@ type AlertPayload struct {
 	Message     string          `json:"message"`
 	Alias       string          `json:"alias,omitempty"`
 	Description string          `json:"description,omitempty"`
-	Responders  json.RawMessage `json:"responders,omitempty"`
-	VisibleTo   json.RawMessage `json:"visibleTo,omitempty"`
-	Actions     json.RawMessage `json:"actions,omitempty"`
-	Tags        json.RawMessage `json:"tags,omitempty"`
+	Responders  []Entity        `json:"responders,omitempty"`
+	VisibleTo   []Entity        `json:"visibleTo,omitempty"`
+	Actions     []string        `json:"actions,omitempty"`
+	Tags        []string        `json:"tags,omitempty"`
 	Details     json.RawMessage `json:"details,omitempty"`
 	Entity      string          `json:"entity,omitempty"`
 	Source      string          `json:"source,omitempty"`
 	Priority    string          `json:"priority,omitempty"`
 	User        string          `json:"user,omitempty"`
 	Note        string          `json:"note,omitempty"`
+}
+
+// TODO: Refactor all set*Value methods into one
+func (j AlertPayload) setEntityValue(variable *[]Entity, key string, params *types.Params) {
+	paramValue, ok := (*params)[key]
+	if ok {
+		entityStrings := strings.Split(paramValue, ",")
+		for _, entityStr := range entityStrings {
+			elements := strings.Split(entityStr, ":")
+
+			// TODO: Error handling
+			entityType := elements[0]
+			identifier := elements[1]
+
+			entity := Entity{
+				Type: entityType,
+			}
+
+			isID, err := isOpsGenieID(identifier)
+			if err != nil {
+				// TODO: Error handling
+			}
+
+			if isID {
+				entity.ID = identifier
+			} else if entityType == "team" {
+				entity.Name = identifier
+			} else if entityType == "user" {
+				entity.Username = identifier
+			} else {
+				// TODO: Error handling
+			}
+
+			*variable = append(*variable, entity)
+		}
+	}
 }
 
 func (j AlertPayload) setStringValue(variable *string, key string, params *types.Params) {
@@ -44,6 +83,24 @@ func (j AlertPayload) setStringValue(variable *string, key string, params *types
 	}
 }
 
+func (j AlertPayload) setConfigValue(variable *string, key string, params *types.Params) {
+	paramValue, ok := (*params)[key]
+	if ok {
+		*variable = paramValue
+	}
+}
+
+// Splits a parameter string at the comma and assigns it to a slice variable
+//
+// TODO: This is somewhat of a duplication of the code in formatter.go#SetConfigField - is there a better way?
+func (j AlertPayload) setSliceValues(variable *[]string, key string, params *types.Params) {
+	paramValue, ok := (*params)[key]
+	if ok {
+		*variable = strings.Split(paramValue, ",")
+	}
+}
+
+// TODO
 func (j AlertPayload) setRawMessageValue(variable *json.RawMessage, key string, params *types.Params) {
 	paramValue, ok := (*params)[key]
 	if ok {
@@ -51,8 +108,12 @@ func (j AlertPayload) setRawMessageValue(variable *json.RawMessage, key string, 
 	}
 }
 
+func deserializeSlice(str string) []string {
+	return strings.Split(str, ",")
+}
+
 // NewAlertPayload instantiates AlertPayload
-func NewAlertPayload(message string, config *Config, params *types.Params) AlertPayload {
+func NewAlertPayload(message string, config *Config, params *types.Params) (AlertPayload, error) {
 	if params == nil {
 		params = &types.Params{}
 	}
@@ -62,10 +123,10 @@ func NewAlertPayload(message string, config *Config, params *types.Params) Alert
 		// Populate with values from the query string as defaults
 		Alias:       config.Alias,
 		Description: config.Description,
-		Responders:  json.RawMessage(config.Responders),
-		VisibleTo:   json.RawMessage(config.VisibleTo),
-		Actions:     json.RawMessage(config.Actions),
-		Tags:        json.RawMessage(config.Tags),
+		Responders:  config.Responders,
+		VisibleTo:   config.VisibleTo,
+		Actions:     config.Actions,
+		Tags:        config.Tags,
 		Details:     json.RawMessage(config.Details),
 		Entity:      config.Entity,
 		Source:      config.Source,
@@ -74,19 +135,44 @@ func NewAlertPayload(message string, config *Config, params *types.Params) Alert
 		Note:        config.Note,
 	}
 
-	// If specified, overwrite the values from the query string
-	result.setStringValue(&result.Alias, "alias", params)
-	result.setStringValue(&result.Description, "description", params)
-	result.setRawMessageValue(&result.Responders, "responders", params)
-	result.setRawMessageValue(&result.VisibleTo, "visibleTo", params)
-	result.setRawMessageValue(&result.Actions, "actions", params)
-	result.setRawMessageValue(&result.Tags, "tags", params)
-	result.setRawMessageValue(&result.Details, "details", params)
-	result.setStringValue(&result.Entity, "entity", params)
-	result.setStringValue(&result.Source, "source", params)
-	result.setStringValue(&result.Priority, "priority", params)
-	result.setStringValue(&result.User, "user", params)
-	result.setStringValue(&result.Note, "note", params)
+	for key, value := range *params {
+		var err error
 
-	return result
+		switch key {
+		case "alias":
+			result.Alias = value
+		case "description":
+			result.Description = value
+		case "responders":
+			result.Responders, err = deserializeEntities(value)
+		case "visibleTo":
+			result.VisibleTo, err = deserializeEntities(value)
+		case "actions":
+			result.Actions = deserializeSlice(value)
+		case "tags":
+			result.Tags = deserializeSlice(value)
+		case "details":
+			// TODO
+			result.Details = json.RawMessage(value)
+		case "entity":
+			result.Entity = value
+		case "source":
+			result.Source = value
+		case "priority":
+			result.Priority = value
+		case "user":
+			result.User = value
+		case "note":
+			result.Note = value
+		default:
+			return result, fmt.Errorf("unknown config key: %q", key)
+		}
+
+		if err != nil {
+			return result, err
+		}
+
+	}
+
+	return result, nil
 }
