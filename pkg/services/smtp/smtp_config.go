@@ -3,10 +3,11 @@ package smtp
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strconv"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config is the configuration needed to send e-mail notifications over SMTP
@@ -18,7 +19,7 @@ type Config struct {
 	FromAddress string    `desc:"e-mail address that the mail are sent from" key:"fromaddress"`
 	FromName    string    `desc:"name of the sender" optional:"yes" key:"fromname"`
 	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)" key:"toaddresses"`
-	Subject     string    `desc:"the subject of the sent mail" key:"subject" default:"Shoutrrr Notification" field:"title"`
+	Subject     string    `desc:"the subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
 	Auth        authType  `desc:"SMTP authentication method" key:"auth"`
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
 	UseStartTLS bool      `desc:"attempt to use SMTP StartTLS encryption" default:"Yes" key:"starttls"`
@@ -90,8 +91,8 @@ func (config *Config) Clone() Config {
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth":       authTypes.Enum,
-		"Encryption": encMethods.Enum,
+		"Auth":       AuthTypes.Enum,
+		"Encryption": EncMethods.Enum,
 	}
 }
 

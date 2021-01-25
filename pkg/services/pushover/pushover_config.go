@@ -11,9 +11,9 @@ import (
 type Config struct {
 	Token    string
 	User     string
-	Devices  []string `key:"devices"`
-	Priority int8     `key:"priority"`
-	Title    string   `key:"title" role:"title"`
+	Devices  []string `key:"devices" optional:""`
+	Priority int8     `key:"priority" default:"0"`
+	Title    string   `key:"title" optional:""`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values

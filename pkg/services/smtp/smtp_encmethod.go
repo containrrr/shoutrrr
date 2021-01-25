@@ -8,15 +8,21 @@ import (
 type encMethod int
 
 type encMethodVals struct {
-	None        encMethod
+	// None means no encryption
+	None encMethod
+	// ExplicitTLS means that TLS needs to be initiated by using StartTLS
 	ExplicitTLS encMethod
+	// ImplicitTLS means that TLS is used for the whole session
 	ImplicitTLS encMethod
-	Auto        encMethod
+	// Auto means that TLS will be implicitly used for port 465, otherwise explicit TLS will be used if its supported
+	Auto encMethod
 
+	// Enum is the EnumFormatter instance for EncMethods
 	Enum types.EnumFormatter
 }
 
-var encMethods = &encMethodVals{
+// EncMethods is the enum helper for populating the Encryption field
+var EncMethods = &encMethodVals{
 	None:        0,
 	ExplicitTLS: 1,
 	ImplicitTLS: 2,
@@ -32,18 +38,14 @@ var encMethods = &encMethodVals{
 }
 
 func (at encMethod) String() string {
-	return encMethods.Enum.Print(int(at))
-}
-
-func parseEncryption(s string) encMethod {
-	return encMethod(encMethods.Enum.Parse(s))
+	return EncMethods.Enum.Print(int(at))
 }
 
 func useImplicitTLS(encryption encMethod, port uint16) bool {
 	switch encryption {
-	case encMethods.ImplicitTLS:
+	case EncMethods.ImplicitTLS:
 		return true
-	case encMethods.Auto:
+	case EncMethods.Auto:
 		return port == ImplicitTLSPort
 	default:
 		return false

@@ -5,19 +5,50 @@
 Using shoutrrr is easy! There is currently two ways of using it as a package.
 
 ### Using the direct send command
+Easiest to use, but very limited.
 
 ```go
-  url := "slack://token-a/token-b/token-c"
-  err := shoutrrr.Send(url, "Hello world (or slack channel) !")
+url := "slack://token-a/token-b/token-c"
+err := shoutrrr.Send(url, "Hello world (or slack channel) !")
 ```
 
 ### Using a sender
+Using a sender gives you the ability to preconfigure multiple notification services and send to all of them with the same `Send(message, params)` method.
 
 ```go
-  url := "slack://token-a/token-b/token-c"
-  sender, err := shoutrrr.CreateSender(url)
-  sender.Send("Hello world (or slack channel) !", map[string]string { /* ... */ })
+urlA := "slack://token-a/token-b/token-c"
+urlB := "telegram://110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw@telegram?channels=@mychannel"
+sender, err := shoutrrr.CreateSender(urlA, urlB)
+
+// Send notifications instantly to all services
+sender.Send("Hello world (or slack/telegram channel)!", map[string]string { "title": "He-hey~!"  })
+
+// ...or bundle notifications... 
+func doWork() error {
+    // ...and send them when leaving the scope
+    defer sender.Flush(map[string]string { "title": "Work Result" })
+    
+    sender.Enqueue("Started doing %v", stuff)
+    
+    // Maybe get creative...?
+    defer func(start time.Time) { 
+    	sender.Enqueue("Elapsed: %v", time.Now().Sub(start)) 
+    }(time.Now())
+    
+    if err := doMoreWork(); err != nil {
+        sender.Enqueue("Oh no! %v", err)
+    	
+        // This will send the currently queued up messages...
+        return
+    }   
+    
+    sender.Enqueue("Everything went very well!")
+    
+    // ...or this:
+}
+
 ```
+
 
 ## Through the CLI
 
@@ -58,9 +89,18 @@ $ shoutrrr verify \
 Generate and display the configuration for a notification service url.
 
 ```bash
-$ shoutrrr generate \
-    --url "<SERVICE_URL>"
+$ shoutrrr generate [OPTIONS] <SERVICE>
 ```
+
+| Flags                        | Description                                     |
+| ---------------------------- | ------------------------------------------------|
+| `-g, --generator string`     |  The generator to use (default "basic")         |
+| `-p, --property stringArray` |  Configuration property in key=value format     |
+| `-s, --service string`       |  The notification service to generate a URL for |
+
+**Note**: Service can either be supplied as the first argument or using the `-s` flag.
+
+For more information on generators, see [Generators](./generators/overview.md).
 
 ### Options
 
@@ -79,11 +119,3 @@ The target url for the notifications generated, see [overview](./services/overvi
 | Flags         | Env.           | Default | Required |
 | ------------- | -------------- | ------- | -------- |
 | `--url`, `-u` | `SHOUTRRR_URL` | N/A     | ✅       |
-
-### Action details
-
-```shell
-$ ./shoutrrr generate
-Usage:
-./shoutrrr generate [OPTIONS] <service>
-```

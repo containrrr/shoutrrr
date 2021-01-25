@@ -30,10 +30,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	fmt.Println(string(payload))
-
 	postURL := CreateAPIURLFromConfig(service.config)
-	fmt.Println(postURL)
 
 	return doSend(payload, postURL)
 }
@@ -60,8 +57,18 @@ func CreateAPIURLFromConfig(config *Config) string {
 
 func doSend(payload []byte, postURL string) error {
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
-	if res.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("failed to send notification to discord, response status code %s", res.Status)
+
+	if res == nil && err == nil {
+		err = fmt.Errorf("unknown error")
 	}
-	return err
+
+	if err == nil && res.StatusCode != http.StatusNoContent {
+		err = fmt.Errorf("response status code %s", res.Status)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to send discord notification: %v", err)
+	}
+
+	return nil
 }

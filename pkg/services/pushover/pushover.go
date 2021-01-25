@@ -32,16 +32,9 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	errors := make([]error, 0)
-
-	for _, device := range config.Devices {
-		if err := service.sendToDevice(device, message, config); err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	if len(errors) > 0 {
-		return fmt.Errorf("failed to send notifications to pushover devices: %v", errors)
+	device := strings.Join(config.Devices, ",")
+	if err := service.sendToDevice(device, message, config); err != nil {
+		return fmt.Errorf("failed to send notifications to pushover devices: %v", err)
 	}
 
 	return nil

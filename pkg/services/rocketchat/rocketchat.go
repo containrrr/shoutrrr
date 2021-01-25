@@ -51,7 +51,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func buildURL(config *Config) string {
 	if config.Port != "" {
 		return fmt.Sprintf("https://%s:%s/hooks/%s/%s", config.Host, config.Port, config.TokenA, config.TokenB)
-	} else {
-		return fmt.Sprintf("https://%s/hooks/%s/%s", config.Host, config.TokenA, config.TokenB)
 	}
+
+	return fmt.Sprintf("https://%s/hooks/%s/%s", config.Host, config.TokenA, config.TokenB)
 }

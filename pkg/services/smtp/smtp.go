@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/smtp"
 	"net/url"
+	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -37,10 +38,10 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		Port:        25,
 		ToAddresses: nil,
 		Subject:     "",
-		Auth:        authTypes.Unknown,
+		Auth:        AuthTypes.Unknown,
 		UseStartTLS: true,
 		UseHTML:     false,
-		Encryption:  encMethods.Auto,
+		Encryption:  EncMethods.Auto,
 	}
 
 	pkr := format.NewPropKeyResolver(service.config)
@@ -49,11 +50,11 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		return err
 	}
 
-	if service.config.Auth == authTypes.Unknown {
+	if service.config.Auth == AuthTypes.Unknown {
 		if service.config.Username != "" {
-			service.config.Auth = authTypes.Plain
+			service.config.Auth = AuthTypes.Plain
 		} else {
-			service.config.Auth = authTypes.None
+			service.config.Auth = AuthTypes.None
 		}
 	}
 
@@ -72,9 +73,9 @@ func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config.Clone()
 	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
 		return fail(FailApplySendParams, err)
-	} else {
-		return service.doSend(client, message, &config)
 	}
+
+	return service.doSend(client, message, &config)
 }
 
 func getClientConnection(config *Config) (*smtp.Client, error) {
@@ -152,13 +153,13 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
 	switch config.Auth {
-	case authTypes.None:
+	case AuthTypes.None:
 		return nil, nil
-	case authTypes.Plain:
+	case AuthTypes.Plain:
 		return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
-	case authTypes.CRAMMD5:
+	case AuthTypes.CRAMMD5:
 		return smtp.CRAMMD5Auth(config.Username, config.Password), nil
-	case authTypes.OAuth2:
+	case AuthTypes.OAuth2:
 		return OAuth2Auth(config.Username, config.Password), nil
 	default:
 		return nil, fail(FailAuthType, nil, config.Auth.String())
@@ -216,6 +217,7 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 
 	return map[string]string{
 		"Subject":      subject,
+		"Date":         time.Now().Format(time.RFC1123Z),
 		"To":           toAddress,
 		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
 		"MIME-version": "1.0;",
