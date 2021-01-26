@@ -11,21 +11,21 @@ import (
 
 // Config for use within the opsgenie service
 type Config struct {
-	ApiKey      string   `desc:"The OpsGenie API key"`
-	Host        string   `desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
-	Port        uint16   `desc:"The OpsGenie API port." default:"443"`
-	Alias       string   `key:"alias" desc:"Client-defined identifier of the alert" optional:"true"`
-	Description string   `key:"description" desc:"Description field of the alert" optional:"true"`
-	Responders  []Entity `key:"responders" desc:"Teams, users, escalations and schedules that the alert will be routed to send notifications" optional:"true"`
-	VisibleTo   []Entity `key:"visibleTo" desc:"Teams and users that the alert will become visible to without sending any notification" optional:"true"`
-	Actions     []string `key:"actions" desc:"Custom actions that will be available for the alert" optional:"true"`
-	Tags        []string `key:"tags" desc:"Tags of the alert" optional:"true"`
-	Details     string   `key:"details" desc:"Map of key-value pairs to use as custom properties of the alert" optional:"true"`
-	Entity      string   `key:"entity" desc:"Entity field of the alert that is generally used to specify which domain the Source field of the alert" optional:"true"`
-	Source      string   `key:"source" desc:"Source field of the alert" optional:"true"`
-	Priority    string   `key:"priority" desc:"Priority level of the alert. Possible values are P1, P2, P3, P4 and P5" optional:"true"`
-	Note        string   `key:"note" desc:"Additional note that will be added while creating the alert" optional:"true"`
-	User        string   `key:"user" desc:"Display name of the request owner" optional:"true"`
+	ApiKey      string            `desc:"The OpsGenie API key"`
+	Host        string            `desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
+	Port        uint16            `desc:"The OpsGenie API port." default:"443"`
+	Alias       string            `key:"alias" desc:"Client-defined identifier of the alert" optional:"true"`
+	Description string            `key:"description" desc:"Description field of the alert" optional:"true"`
+	Responders  []Entity          `key:"responders" desc:"Teams, users, escalations and schedules that the alert will be routed to send notifications" optional:"true"`
+	VisibleTo   []Entity          `key:"visibleTo" desc:"Teams and users that the alert will become visible to without sending any notification" optional:"true"`
+	Actions     []string          `key:"actions" desc:"Custom actions that will be available for the alert" optional:"true"`
+	Tags        []string          `key:"tags" desc:"Tags of the alert" optional:"true"`
+	Details     map[string]string `key:"details" desc:"Map of key-value pairs to use as custom properties of the alert" optional:"true"`
+	Entity      string            `key:"entity" desc:"Entity field of the alert that is generally used to specify which domain the Source field of the alert" optional:"true"`
+	Source      string            `key:"source" desc:"Source field of the alert" optional:"true"`
+	Priority    string            `key:"priority" desc:"Priority level of the alert. Possible values are P1, P2, P3, P4 and P5" optional:"true"`
+	Note        string            `key:"note" desc:"Additional note that will be added while creating the alert" optional:"true"`
+	User        string            `key:"user" desc:"Display name of the request owner" optional:"true"`
 }
 
 func (config Config) Enums() map[string]types.EnumFormatter {
@@ -47,26 +47,31 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 		host = config.Host
 	}
 
+	// Serialize Shoutrrr standard data types
+	rawQuery := format.BuildQuery(resolver)
+
+	// Serialize OpsGenie specific data types
+	separator := "&"
+	if rawQuery == "" {
+		separator = ""
+	}
+
+	if len(config.Responders) > 0 {
+		responders, _ := serializeEntities(config.Responders)
+		rawQuery = rawQuery + separator + "responders=" + responders
+		separator = "&"
+	}
+	if len(config.VisibleTo) > 0 {
+		visibleTo, _ := serializeEntities(config.VisibleTo)
+		rawQuery = rawQuery + separator + "visibleTo=" + visibleTo
+	}
+
 	result := &url.URL{
 		Host:     host,
 		Path:     fmt.Sprintf("/%s", config.ApiKey),
 		Scheme:   Scheme,
-		RawQuery: format.BuildQuery(resolver),
+		RawQuery: rawQuery,
 	}
-
-	// Add OpsGenie specific data types
-	q := result.Query()
-	if len(config.Responders) > 0 {
-		// TODO: Error handling
-		responders, _ := serializeEntities(config.Responders)
-		q.Set("responders", responders)
-	}
-	if len(config.VisibleTo) > 0 {
-		// TODO: Error handling
-		visibleTo, _ := serializeEntities(config.VisibleTo)
-		q.Set("visibleTo", visibleTo)
-	}
-	result.RawQuery = q.Encode()
 
 	return result
 }

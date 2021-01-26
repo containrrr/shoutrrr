@@ -324,7 +324,7 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 		configField.SetBool(value)
 		return true, nil
-	} else if fieldKind >= reflect.Slice {
+	} else if fieldKind == reflect.Slice {
 		elemKind := field.Type.Elem().Kind()
 		if elemKind != reflect.String {
 			return false, errors.New("field format is not supported")
@@ -332,6 +332,30 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 		values := strings.Split(inputValue, ",")
 		configField.Set(reflect.ValueOf(values))
+		return true, nil
+
+	} else if fieldKind == reflect.Map {
+		keyKind := field.Type.Key().Kind()
+		elemKind := field.Type.Elem().Kind()
+		if elemKind != reflect.String || keyKind != reflect.String {
+			return false, errors.New("field format is not supported")
+		}
+
+		newMap := make(map[string]string)
+
+		pairs := strings.Split(inputValue, ",")
+		for _, pair := range pairs {
+			elems := strings.Split(pair, ":")
+			if len(elems) != 2 {
+				return false, errors.New("field format is not supported")
+			}
+			key := elems[0]
+			value := elems[1]
+
+			newMap[key] = value
+		}
+
+		configField.Set(reflect.ValueOf(newMap))
 		return true, nil
 
 	}
@@ -354,7 +378,7 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 		return strconv.FormatInt(configField.Int(), 10), nil
 	} else if fieldKind == reflect.Bool {
 		return PrintBool(configField.Bool()), nil
-	} else if fieldKind >= reflect.Slice {
+	} else if fieldKind == reflect.Slice {
 		sliceLen := configField.Len()
 		sliceValue := configField.Slice(0, sliceLen)
 		if field.Type.Elem().Kind() != reflect.String {
@@ -362,6 +386,20 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 		}
 		slice := sliceValue.Interface().([]string)
 		return strings.Join(slice, ","), nil
+	} else if fieldKind == reflect.Map {
+		keyKind := field.Type.Key().Kind()
+		elemKind := field.Type.Elem().Kind()
+		if elemKind != reflect.String || keyKind != reflect.String {
+			return "", errors.New("field format is not supported")
+		}
+
+		kvPairs := []string{}
+		for _, key := range configField.MapKeys() {
+			value := configField.MapIndex(key).Interface()
+
+			kvPairs = append(kvPairs, fmt.Sprintf("%s:%s", key, value))
+		}
+		return strings.Join(kvPairs, ","), nil
 	}
 	return "", fmt.Errorf("field kind %x is not supported", fieldKind)
 

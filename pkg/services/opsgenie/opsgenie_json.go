@@ -1,7 +1,6 @@
 package opsgenie
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -25,91 +24,43 @@ import (
 //		"details":     `{"key1": "value1", "key2": "value2"}`,
 //	})
 type AlertPayload struct {
-	Message     string          `json:"message"`
-	Alias       string          `json:"alias,omitempty"`
-	Description string          `json:"description,omitempty"`
-	Responders  []Entity        `json:"responders,omitempty"`
-	VisibleTo   []Entity        `json:"visibleTo,omitempty"`
-	Actions     []string        `json:"actions,omitempty"`
-	Tags        []string        `json:"tags,omitempty"`
-	Details     json.RawMessage `json:"details,omitempty"`
-	Entity      string          `json:"entity,omitempty"`
-	Source      string          `json:"source,omitempty"`
-	Priority    string          `json:"priority,omitempty"`
-	User        string          `json:"user,omitempty"`
-	Note        string          `json:"note,omitempty"`
+	Message     string            `json:"message"`
+	Alias       string            `json:"alias,omitempty"`
+	Description string            `json:"description,omitempty"`
+	Responders  []Entity          `json:"responders,omitempty"`
+	VisibleTo   []Entity          `json:"visibleTo,omitempty"`
+	Actions     []string          `json:"actions,omitempty"`
+	Tags        []string          `json:"tags,omitempty"`
+	Details     map[string]string `json:"details,omitempty"`
+	Entity      string            `json:"entity,omitempty"`
+	Source      string            `json:"source,omitempty"`
+	Priority    string            `json:"priority,omitempty"`
+	User        string            `json:"user,omitempty"`
+	Note        string            `json:"note,omitempty"`
 }
 
-// TODO: Refactor all set*Value methods into one
-func (j AlertPayload) setEntityValue(variable *[]Entity, key string, params *types.Params) {
-	paramValue, ok := (*params)[key]
-	if ok {
-		entityStrings := strings.Split(paramValue, ",")
-		for _, entityStr := range entityStrings {
-			elements := strings.Split(entityStr, ":")
-
-			// TODO: Error handling
-			entityType := elements[0]
-			identifier := elements[1]
-
-			entity := Entity{
-				Type: entityType,
-			}
-
-			isID, err := isOpsGenieID(identifier)
-			if err != nil {
-				// TODO: Error handling
-			}
-
-			if isID {
-				entity.ID = identifier
-			} else if entityType == "team" {
-				entity.Name = identifier
-			} else if entityType == "user" {
-				entity.Username = identifier
-			} else {
-				// TODO: Error handling
-			}
-
-			*variable = append(*variable, entity)
-		}
-	}
-}
-
-func (j AlertPayload) setStringValue(variable *string, key string, params *types.Params) {
-	paramValue, ok := (*params)[key]
-	if ok {
-		*variable = paramValue
-	}
-}
-
-func (j AlertPayload) setConfigValue(variable *string, key string, params *types.Params) {
-	paramValue, ok := (*params)[key]
-	if ok {
-		*variable = paramValue
-	}
-}
-
-// Splits a parameter string at the comma and assigns it to a slice variable
-//
-// TODO: This is somewhat of a duplication of the code in formatter.go#SetConfigField - is there a better way?
-func (j AlertPayload) setSliceValues(variable *[]string, key string, params *types.Params) {
-	paramValue, ok := (*params)[key]
-	if ok {
-		*variable = strings.Split(paramValue, ",")
-	}
-}
-
-// TODO
-func (j AlertPayload) setRawMessageValue(variable *json.RawMessage, key string, params *types.Params) {
-	paramValue, ok := (*params)[key]
-	if ok {
-		*variable = json.RawMessage(paramValue)
-	}
-}
-
+// TODO: Duplicated code, see: formatter.go
 func deserializeSlice(str string) []string {
 	return strings.Split(str, ",")
+}
+
+// TODO: Duplicated code, see: formatter.go
+func deserializeMap(str string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	pairs := strings.Split(str, ",")
+	for _, pair := range pairs {
+		elems := strings.Split(pair, ":")
+		if len(elems) != 2 {
+			return result, fmt.Errorf("field format is not supported")
+		}
+		key := elems[0]
+		value := elems[1]
+
+		result[key] = value
+	}
+
+	return result, nil
 }
 
 // NewAlertPayload instantiates AlertPayload
@@ -127,7 +78,7 @@ func NewAlertPayload(message string, config *Config, params *types.Params) (Aler
 		VisibleTo:   config.VisibleTo,
 		Actions:     config.Actions,
 		Tags:        config.Tags,
-		Details:     json.RawMessage(config.Details),
+		Details:     config.Details,
 		Entity:      config.Entity,
 		Source:      config.Source,
 		Priority:    config.Priority,
@@ -135,6 +86,7 @@ func NewAlertPayload(message string, config *Config, params *types.Params) (Aler
 		Note:        config.Note,
 	}
 
+	// Populate with values from runtime parameters
 	for key, value := range *params {
 		var err error
 
@@ -152,8 +104,7 @@ func NewAlertPayload(message string, config *Config, params *types.Params) (Aler
 		case "tags":
 			result.Tags = deserializeSlice(value)
 		case "details":
-			// TODO
-			result.Details = json.RawMessage(value)
+			result.Details, err = deserializeMap(value)
 		case "entity":
 			result.Entity = value
 		case "source":

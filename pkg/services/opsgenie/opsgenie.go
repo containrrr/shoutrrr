@@ -58,8 +58,7 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	err := service.config.SetURL(configURL)
-	return err
+	return service.config.SetURL(configURL)
 }
 
 // Send a notification message to OpsGenie

@@ -122,7 +122,7 @@ var _ = Describe("the OpsGenie service", func() {
 					"visibleTo":   "team:rocket",
 					"actions":     "action1,action2",
 					"tags":        "tag1,tag2",
-					"details":     `{"key1": "value1", "key2": "value2"}`,
+					"details":     "key1:value1,key2:value2",
 					"entity":      "An example entity",
 					"source":      "The source",
 					"priority":    "P1",
@@ -137,7 +137,7 @@ var _ = Describe("the OpsGenie service", func() {
 	Context("with query parameters", func() {
 		BeforeEach(func() {
 			// Initialize service
-			serviceURL, err := url.Parse(fmt.Sprintf(`opsgenie://%s/%s?alias=query-alias&description=query-description&responders=team:query_team&visibleTo=user:query_user&actions=queryAction1,queryAction2&tags=queryTag1,queryTag2&details={"queryKey1": "queryValue1", "queryKey2": "queryValue2"}&entity=query-entity&source=query-source&priority=P2&user=query-user&note=query-note`, mockHost, mockAPIKey))
+			serviceURL, err := url.Parse(fmt.Sprintf(`opsgenie://%s/%s?alias=query-alias&description=query-description&responders=team:query_team&visibleTo=user:query_user&actions=queryAction1,queryAction2&tags=queryTag1,queryTag2&details=queryKey1:queryValue1,queryKey2:queryValue2&entity=query-entity&source=query-source&priority=P2&user=query-user&note=query-note`, mockHost, mockAPIKey))
 			Expect(err).To(BeNil())
 
 			service = &Service{}
@@ -201,7 +201,7 @@ var _ = Describe("the OpsGenie service", func() {
 					"visibleTo":   "team:rocket",
 					"actions":     "action1,action2",
 					"tags":        "tag1,tag2",
-					"details":     `{"key1": "value1", "key2": "value2"}`,
+					"details":     "key1:value1,key2:value2",
 					"entity":      "An example entity",
 					"source":      "The source",
 					"priority":    "P1",
@@ -244,8 +244,8 @@ var _ = Describe("the OpsGenie Config struct", func() {
 	})
 
 	When("generating a config from a url with query parameters", func() {
-		It("should populate the relevant fields with the query parameter values", func() {
-			queryParams := `alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&actions=An+action&tags=tag1,tag2&details=these+are+details&entity=An+example+entity&source=The+source&priority=P1&user=Dracula&note=Here+is+a+note&responders=user:Test,team:NOC&visibleTo=user:A+User`
+		It("should populate the config fields with the query parameter values", func() {
+			queryParams := `alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&actions=An+action&tags=tag1,tag2&details=key:value,key2:value2&entity=An+example+entity&source=The+source&priority=P1&user=Dracula&note=Here+is+a+note&responders=user:Test,team:NOC&visibleTo=user:A+User`
 			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s?%s", mockHost, mockAPIKey, queryParams))
 			Expect(err).To(BeNil())
 
@@ -264,7 +264,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			}))
 			Expect(config.Actions).To(Equal([]string{"An action"}))
 			Expect(config.Tags).To(Equal([]string{"tag1", "tag2"}))
-			Expect(config.Details).To(Equal("these are details"))
+			Expect(config.Details).To(Equal(map[string]string{"key": "value", "key2": "value2"}))
 			Expect(config.Entity).To(Equal("An example entity"))
 			Expect(config.Source).To(Equal("The source"))
 			Expect(config.Priority).To(Equal("P1"))
@@ -311,13 +311,14 @@ var _ = Describe("the OpsGenie Config struct", func() {
 				Responders: []Entity{
 					{Type: "user", Username: "Test"},
 					{Type: "team", Name: "NOC"},
+					{Type: "team", ID: "4513b7ea-3b91-438f-b7e4-e3e54af9147c"},
 				},
 				VisibleTo: []Entity{
 					{Type: "user", Username: "A User"},
 				},
 				Actions:  []string{"action1", "action2"},
 				Tags:     []string{"tag1", "tag2"},
-				Details:  "these are details",
+				Details:  map[string]string{"key": "value"},
 				Entity:   "An example entity",
 				Source:   "The source",
 				Priority: "P1",
@@ -326,9 +327,8 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			}
 
 			url := config.GetURL()
-			fmt.Println(url.String())
-			//&responders=user:Test,team:NOC&visibleTo=user:A+User
-			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1,action2&alias=Life is too short for no alias&description=Every alert needs a description&details=these are details&entity=An example entity&note=Here is a note&priority=P1&source=The source&tags=tag1,tag2&user=Dracula`))
+			// TODO: An URL can not use space https://stackoverflow.com/questions/5442658/spaces-in-urls
+			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1,action2&alias=Life is too short for no alias&description=Every alert needs a description&details=key:value&entity=An example entity&note=Here is a note&priority=P1&source=The source&tags=tag1,tag2&user=Dracula&responders=user:Test,team:NOC,team:4513b7ea-3b91-438f-b7e4-e3e54af9147c&visibleTo=user:A User`))
 		})
 	})
 })

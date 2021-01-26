@@ -9,8 +9,8 @@ import (
 
 	cli "github.com/containrrr/shoutrrr/cli/cmd"
 	u "github.com/containrrr/shoutrrr/internal/util"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
