@@ -1,29 +1,28 @@
 package format
 
 import (
-	"fmt"
+	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // BuildQuery converts the fields of a config object to a delimited query string
 func BuildQuery(cqr types.ConfigQueryResolver) string {
-	query := ""
-	format := "%s=%s"
+	query := url.Values{}
 	fields := cqr.QueryFields()
 
 	pkr, isPkr := cqr.(*PropKeyResolver)
 
-	for index, key := range fields {
+	for _, key := range fields {
 		if isPkr && !pkr.KeyIsPrimary(key) {
 			continue
 		}
-		value, _ := cqr.Get(key)
-		if index == 1 {
-			format = "&%s=%s"
+		value, err := cqr.Get(key)
+
+		if err == nil {
+			query.Set(key, value)
 		}
-		query += fmt.Sprintf(format, key, value)
 	}
 
-	return query
+	return query.Encode()
 }

@@ -71,9 +71,9 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 				}
 			}
 
-			if valueValid, err = format.SetConfigField(config, field, inputValue); !valueValid {
+			if valueValid, err = format.SetConfigField(config, field, inputValue); !valueValid && err == nil {
 				_, _ = fmt.Fprint(color.Output, "Invalid type ", color.HiYellowString(field.Type.Kind().String()))
-				_, _ = fmt.Fprint(color.Output, "for field ", color.HiCyanString(field.Name), "\n\n")
+				_, _ = fmt.Fprint(color.Output, " for field ", color.HiCyanString(field.Name), "\n\n")
 			}
 
 			if err != nil {
