@@ -54,11 +54,6 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(config, message)
 }
 
-// SendItems concatenates the items and sends them using Send
-func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
-	return service.Send(types.ItemsToPlain(items), params)
-}
-
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)

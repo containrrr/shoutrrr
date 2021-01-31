@@ -78,11 +78,6 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(client, message, &config)
 }
 
-// SendItems concatenates the items and sends them using Send
-func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
-	return service.Send(types.ItemsToPlain(items), params)
-}
-
 func getClientConnection(config *Config) (*smtp.Client, error) {
 
 	var conn net.Conn

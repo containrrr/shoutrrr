@@ -4,5 +4,6 @@ package types
 type Sender interface {
 	Send(message string, params *Params) error
 
-	SendItems(items []MessageItem, params *Params) error
+	// Rich sender API:
+	// SendItems(items []MessageItem, params *Params) error
 }
