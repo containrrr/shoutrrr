@@ -9,7 +9,8 @@ import (
 
 // WebhookPayload is the webhook endpoint payload
 type WebhookPayload struct {
-	Embeds []embedItem `json:"content"`
+	Embeds   []embedItem `json:"embeds"`
+	Username string      `json:"username,omitempty"`
 }
 
 // JSON is the actual notification payload
