@@ -41,21 +41,21 @@ var _ = Describe("the util package", func() {
 			Expect(TestLogger().Prefix()).To(Equal("Test"))
 		})
 	})
-	When("checking if a supplied kind is of the signed decimal kind", func() {
+	When("checking if a supplied kind is of the signed integer kind", func() {
 		It("should be true if the kind is Int", func() {
-			Expect(IsSignedDecimal(reflect.Int)).To(BeTrue())
+			Expect(IsSignedInt(reflect.Int)).To(BeTrue())
 		})
 		It("should be false if the kind is String", func() {
-			Expect(IsSignedDecimal(reflect.String)).To(BeFalse())
+			Expect(IsSignedInt(reflect.String)).To(BeFalse())
 		})
 	})
 
-	When("checking if a supplied kind is of the unsigned decimal kind", func() {
+	When("checking if a supplied kind is of the unsigned integer kind", func() {
 		It("should be true if the kind is Uint", func() {
-			Expect(IsUnsignedDecimal(reflect.Uint)).To(BeTrue())
+			Expect(IsUnsignedInt(reflect.Uint)).To(BeTrue())
 		})
 		It("should be false if the kind is Int", func() {
-			Expect(IsUnsignedDecimal(reflect.Int)).To(BeFalse())
+			Expect(IsUnsignedInt(reflect.Int)).To(BeFalse())
 		})
 	})
 
@@ -65,6 +65,18 @@ var _ = Describe("the util package", func() {
 		})
 		It("should be false if the kind is map", func() {
 			Expect(IsCollection(reflect.Map)).To(BeFalse())
+		})
+	})
+
+	When("checking if a supplied kind is numeric", func() {
+		It("should be true if supplied a constant integer", func() {
+			Expect(IsNumeric(reflect.TypeOf(5).Kind())).To(BeTrue())
+		})
+		It("should be true if supplied a constant float", func() {
+			Expect(IsNumeric(reflect.TypeOf(2.5).Kind())).To(BeTrue())
+		})
+		It("should be false if supplied a constant string", func() {
+			Expect(IsNumeric(reflect.TypeOf("3").Kind())).To(BeFalse())
 		})
 	})
 })
