@@ -19,7 +19,9 @@ var sr ServiceRouter
 
 var _ = Describe("the router suite", func() {
 	BeforeEach(func() {
-		sr = ServiceRouter{}
+		sr = ServiceRouter{
+			logger: log.New(GinkgoWriter, "Test", log.LstdFlags),
+		}
 	})
 
 	When("extract service name is given a url", func() {
@@ -72,6 +74,19 @@ var _ = Describe("the router suite", func() {
 					Expect(service).ToNot(BeNil())
 				})
 			}
+		})
+	})
+
+	When("initializing a service with a custom URL", func() {
+		It("should return an error if the service does not support it", func() {
+			service, err := sr.initService("log+https://hybr.is")
+			Expect(err).To(HaveOccurred())
+			Expect(service).To(BeNil())
+		})
+		It("should successfully init a service that does support it", func() {
+			service, err := sr.initService("teams+https://publicservice.info/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(service).NotTo(BeNil())
 		})
 	})
 
