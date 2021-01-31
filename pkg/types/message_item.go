@@ -1,6 +1,7 @@
 package types
 
 import (
+	"strings"
 	"time"
 )
 
@@ -53,4 +54,15 @@ func (mi *MessageItem) WithField(key, value string) *MessageItem {
 		Value: value,
 	})
 	return mi
+}
+
+// ItemsToPlain joins together the MessageItems' Text using newlines
+// Used implement the rich sender API by redirecting to the plain sender implementation
+func ItemsToPlain(items []MessageItem) string {
+	builder := strings.Builder{}
+	for _, item := range items {
+		builder.WriteString(item.Text)
+		builder.WriteRune('\n')
+	}
+	return builder.String()
 }

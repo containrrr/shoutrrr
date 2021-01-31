@@ -68,6 +68,18 @@ var _ = Describe("the util package", func() {
 		})
 	})
 
+	When("calling function StripNumberPrefix", func() {
+		It("should return the default base if none is found", func() {
+			_, base := StripNumberPrefix("46")
+			Expect(base).To(Equal(0))
+		})
+		It("should remove # prefix and return base 16 if found", func() {
+			number, base := StripNumberPrefix("#ab")
+			Expect(number).To(Equal("ab"))
+			Expect(base).To(Equal(16))
+		})
+	})
+
 	When("checking if a supplied kind is numeric", func() {
 		It("should be true if supplied a constant integer", func() {
 			Expect(IsNumeric(reflect.TypeOf(5).Kind())).To(BeTrue())
