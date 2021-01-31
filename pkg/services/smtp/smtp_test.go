@@ -43,7 +43,7 @@ var _ = Describe("the SMTP service", func() {
 	})
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=Auto&fromaddress=sender@example.com&fromname=Sender&starttls=No&subject=Subject&toaddresses=rec1@example.com,rec2@example.com&usehtml=No"
+			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=Auto&fromaddress=sender%40example.com&fromname=Sender&starttls=No&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=No"
 
 			url, err := url.Parse(testURL)
 			Expect(err).NotTo(HaveOccurred(), "parsing")

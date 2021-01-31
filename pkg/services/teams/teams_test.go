@@ -47,7 +47,7 @@ var _ = Describe("the teams plugin", func() {
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := testURLBase + "?color=aabbcc&host=outlook.office.com&title=Test title"
+				testURL := testURLBase + "?color=aabbcc&host=outlook.office.com&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")

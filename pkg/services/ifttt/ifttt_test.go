@@ -102,7 +102,7 @@ var _ = Describe("the ifttt package", func() {
 	When("serializing a config to URL", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
-				expectedURL := "ifttt://dummyID/?events=foo,bar,baz&messagevalue=0&value1=&value2=&value3="
+				expectedURL := "ifttt://dummyID/?events=foo%2Cbar%2Cbaz&messagevalue=0&value1=&value2=&value3="
 				config := Config{
 					Events:            []string{"foo", "bar", "baz"},
 					WebHookID:         "dummyID",
@@ -218,6 +218,6 @@ var _ = Describe("the ifttt package", func() {
 })
 
 func setupResponder(event string, key string, code int, body string) {
-	url := fmt.Sprintf("https://maker.ifttt.com/trigger/%s/with/key/%s", event, key)
-	httpmock.RegisterResponder("POST", url, httpmock.NewStringResponder(code, body))
+	targetURL := fmt.Sprintf("https://maker.ifttt.com/trigger/%s/with/key/%s", event, key)
+	httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(code, body))
 }

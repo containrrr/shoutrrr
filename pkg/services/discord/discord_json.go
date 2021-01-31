@@ -18,7 +18,7 @@ type embedItem struct {
 	Content   string       `json:"description,omitempty"`
 	URL       string       `json:"url,omitempty"`
 	Timestamp string       `json:"timestamp,omitempty"`
-	Color     int          `json:"color,omitempty"`
+	Color     uint         `json:"color,omitempty"`
 	Footer    *embedFooter `json:"footer,omitempty"`
 }
 
@@ -28,14 +28,14 @@ type embedFooter struct {
 }
 
 // CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
-func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]int, omitted int) (WebhookPayload, error) {
+func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint, omitted int) (WebhookPayload, error) {
 
 	itemCount := util.Min(9, len(items))
 	embeds := make([]embedItem, 1, itemCount+1)
 
 	for _, item := range items {
 
-		color := 0
+		color := uint(0)
 		if item.Level >= types.Unknown && int(item.Level) < len(colors) {
 			color = colors[item.Level]
 		}

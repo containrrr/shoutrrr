@@ -79,7 +79,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization (with path)", func() {
-				testURL := "gotify://my.gotify.tld/gotify/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test title"
+				testURL := "gotify://my.gotify.tld/gotify/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -93,7 +93,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 
 			})
 			It("should be identical after de-/serialization (without path)", func() {
-				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test title"
+				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
