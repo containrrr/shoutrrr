@@ -54,7 +54,7 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 }
 
 // MessageItemsFromLines creates a set of MessageItems that is compatible with the supplied limits
-func MessageItemsFromLines(plain string, limits t.MessageLimit, splitLines bool) (items []t.MessageItem, omitted int) {
+func MessageItemsFromLines(plain string, limits t.MessageLimit) (items []t.MessageItem, omitted int) {
 	omitted = 0
 	maxCount := limits.ChunkCount - 1
 
@@ -73,6 +73,10 @@ func MessageItemsFromLines(plain string, limits t.MessageLimit, splitLines bool)
 				// Trim and add ellipsis
 				runes = runes[:maxLen-len(ellipsis)]
 				line = string(runes) + ellipsis
+			}
+
+			if len(runes) < 1 {
+				continue
 			}
 
 			items = append(items, t.MessageItem{
