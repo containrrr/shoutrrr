@@ -23,7 +23,7 @@ func TestDiscord(t *testing.T) {
 }
 
 var (
-	dummyColors   = [types.MessageLevelCount]int{}
+	dummyColors   = [types.MessageLevelCount]uint{}
 	service       *Service
 	envDiscordURL *url.URL
 	logger        *log.Logger
@@ -97,7 +97,7 @@ var _ = Describe("the discord service", func() {
 		})
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "discord://token@channel?avatar=TestBot.jpg&color=112233&colordebug=223344&colorerror=334455&colorinfo=445566&colorwarn=556677&splitlines=No&title=Test Title&username=TestBot"
+				testURL := "discord://token@channel?avatar=TestBot.jpg&color=0x112233&colordebug=0x223344&colorerror=0x334455&colorinfo=0x445566&colorwarn=0x556677&splitlines=No&title=Test+Title&username=TestBot"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -205,7 +205,7 @@ var _ = Describe("the discord service", func() {
 	})
 })
 
-func buildPayloadFromHundreds(hundreds int, split bool, title string, colors [types.MessageLevelCount]int) (WebhookPayload, error) {
+func buildPayloadFromHundreds(hundreds int, split bool, title string, colors [types.MessageLevelCount]uint) (WebhookPayload, error) {
 	hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
 	builder := strings.Builder{}
 

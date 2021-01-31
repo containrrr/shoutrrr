@@ -234,11 +234,14 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth 
 
 	if util.IsUnsignedInt(kind) {
 		strVal := strconv.FormatUint(field.Uint(), base)
-		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
+		if base == 16 {
+			strVal = "0x" + strVal
+		}
+		return ColorizeNumber(strVal), len(strVal)
 	}
 	if util.IsSignedInt(kind) {
 		strVal := strconv.FormatInt(field.Int(), base)
-		return ColorizeNumber(fmt.Sprintf("%s", strVal)), len(strVal)
+		return ColorizeNumber(strVal), len(strVal)
 	}
 	if kind == reflect.String {
 		strVal := field.String()
@@ -343,14 +346,26 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 		configField.SetBool(value)
 		return true, nil
-	} else if fieldKind >= reflect.Slice {
-		elemKind := field.Type.Elem().Kind()
+	} else if fieldKind >= reflect.Slice || fieldKind == reflect.Array {
+		elemType := field.Type.Elem()
+		elemKind := elemType.Kind()
 		if elemKind != reflect.String {
 			return false, errors.New("field format is not supported")
 		}
 
 		values := strings.Split(inputValue, ",")
-		configField.Set(reflect.ValueOf(values))
+		value := reflect.ValueOf(values)
+		if fieldKind == reflect.Array {
+			arrayLen := field.Type.Len()
+			if len(values) != arrayLen {
+				return false, fmt.Errorf("field value count needs to be %d", arrayLen)
+			}
+			arr := reflect.Indirect(reflect.New(field.Type))
+			reflect.Copy(arr, value)
+			value = arr
+		}
+
+		configField.Set(value)
 		return true, nil
 
 	} else {
@@ -371,9 +386,13 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 	} else if field.EnumFormatter != nil {
 		return field.EnumFormatter.Print(int(configField.Int())), nil
 	} else if fieldKind >= reflect.Uint && fieldKind <= reflect.Uint64 {
-		return strconv.FormatUint(configField.Uint(), 10), nil
+		number := strconv.FormatUint(configField.Uint(), field.Base)
+		if field.Base == 16 {
+			number = "0x" + number
+		}
+		return number, nil
 	} else if fieldKind >= reflect.Int && fieldKind <= reflect.Int64 {
-		return strconv.FormatInt(configField.Int(), 10), nil
+		return strconv.FormatInt(configField.Int(), field.Base), nil
 	} else if fieldKind == reflect.Bool {
 		return PrintBool(configField.Bool()), nil
 	} else if fieldKind >= reflect.Slice {

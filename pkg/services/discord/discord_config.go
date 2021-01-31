@@ -16,17 +16,17 @@ type Config struct {
 	Title      string `key:"title"      default:""`
 	Username   string `key:"username"   default:""        desc:"Override the webhook default username"`
 	AvatarURL  string `key:"avatar"     default:""        desc:"Override the webhook default avatar"`
-	Color      int    `key:"color"      default:"0x50D9ff" desc:"The color of the left border for plain messages"   base:"16"`
-	ColorError int    `key:"colorError" default:"0xd60510" desc:"The color of the left border for error messages"   base:"16"`
-	ColorWarn  int    `key:"colorWarn"  default:"0xffc441" desc:"The color of the left border for warning messages" base:"16"`
-	ColorInfo  int    `key:"colorInfo"  default:"0x2488ff" desc:"The color of the left border for info messages"    base:"16"`
-	ColorDebug int    `key:"colorDebug" default:"0x7b00ab" desc:"The color of the left border for debug messages"   base:"16"`
+	Color      uint   `key:"color"      default:"0x50D9ff" desc:"The color of the left border for plain messages"   base:"16"`
+	ColorError uint   `key:"colorError" default:"0xd60510" desc:"The color of the left border for error messages"   base:"16"`
+	ColorWarn  uint   `key:"colorWarn"  default:"0xffc441" desc:"The color of the left border for warning messages" base:"16"`
+	ColorInfo  uint   `key:"colorInfo"  default:"0x2488ff" desc:"The color of the left border for info messages"    base:"16"`
+	ColorDebug uint   `key:"colorDebug" default:"0x7b00ab" desc:"The color of the left border for debug messages"   base:"16"`
 	SplitLines bool   `key:"splitLines" default:"yes"     desc:"Whether to send each line as a separate embedded item"`
 	JSON       bool   `desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
 }
 
 // LevelColors returns an array of colors with a MessageLevel index
-func (config *Config) LevelColors() (colors [types.MessageLevelCount]int) {
+func (config *Config) LevelColors() (colors [types.MessageLevelCount]uint) {
 	colors[types.Unknown] = config.Color
 	colors[types.Error] = config.ColorError
 	colors[types.Warning] = config.ColorWarn
