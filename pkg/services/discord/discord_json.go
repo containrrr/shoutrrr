@@ -51,7 +51,7 @@ func CreatePayloadFromItems(items []types.MessageItem, title string, colors [typ
 			}
 		}
 
-		if item.Timestamp != nil {
+		if !item.Timestamp.IsZero() {
 			ei.Timestamp = item.Timestamp.UTC().Format(time.RFC3339)
 		}
 

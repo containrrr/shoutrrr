@@ -4,11 +4,10 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
-
 	"gosrc.io/xmpp"
 	"gosrc.io/xmpp/stanza"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -35,9 +34,22 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		return err
 	}
 
+	service.router = xmpp.NewRouter()
+	service.router.HandleFunc("message", func(s xmpp.Sender, p stanza.Packet) {
+		msg, ok := p.(stanza.Message)
+		if !ok {
+			service.Logf("XMPP: ignoring unknown packet: %T", p)
+			return
+		}
+
+		service.Logf("XMPP: message from %s: %s", msg.From, msg.Body)
+	})
+
 	config := service.config.getClientConfig()
 
-	client, err := xmpp.NewClient(*config, service.router)
+	client, err := xmpp.NewClient(config, service.router, func(err error) {
+		service.Log("XMPP:", err)
+	})
 	if err != nil {
 		return err
 	}

@@ -9,8 +9,8 @@ import (
 
 	cli "github.com/containrrr/shoutrrr/cli/cmd"
 	u "github.com/containrrr/shoutrrr/internal/util"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
@@ -26,7 +26,7 @@ var Cmd = &cobra.Command{
 func init() {
 	Cmd.Flags().BoolP("verbose", "v", false, "")
 
-	Cmd.Flags().StringSliceP("url", "u", []string{}, "The notification url")
+	Cmd.Flags().StringArrayP("url", "u", []string{}, "The notification url")
 	_ = Cmd.MarkFlagRequired("url")
 
 	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url")
@@ -39,7 +39,7 @@ func init() {
 func Run(cmd *cobra.Command, _ []string) {
 	verbose, _ := cmd.Flags().GetBool("verbose")
 
-	urls, _ := cmd.Flags().GetStringSlice("url")
+	urls, _ := cmd.Flags().GetStringArray("url")
 	message, _ := cmd.Flags().GetString("message")
 	title, _ := cmd.Flags().GetString("title")
 

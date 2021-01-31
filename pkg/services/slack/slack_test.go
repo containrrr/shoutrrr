@@ -1,8 +1,11 @@
 package slack_test
 
 import (
+	"errors"
 	. "github.com/containrrr/shoutrrr/pkg/services/slack"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
+	"log"
 
 	"net/url"
 	"os"
@@ -20,14 +23,15 @@ func TestSlack(t *testing.T) {
 var (
 	service     *Service
 	envSlackURL *url.URL
+	logger      *log.Logger
 )
 
 var _ = Describe("the slack service", func() {
 
 	BeforeSuite(func() {
 		service = &Service{}
+		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envSlackURL, _ = url.Parse(os.Getenv("SHOUTRRR_SLACK_URL"))
-
 	})
 
 	When("running integration tests", func() {
@@ -37,8 +41,10 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send("This is an integration test message", nil)
+			err := service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -97,13 +103,29 @@ var _ = Describe("the slack service", func() {
 		})
 	})
 	Describe("the slack config", func() {
+		When("parsing the configuration URL", func() {
+			It("should be identical after de-/serialization", func() {
+				testURL := "slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456?color=3f00fe&title=Test title"
+
+				url, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				config := &Config{}
+				err = config.SetURL(url)
+				Expect(err).NotTo(HaveOccurred(), "verifying")
+
+				outputURL := config.GetURL()
+				Expect(outputURL.String()).To(Equal(testURL))
+
+			})
+		})
 		When("generating a config object", func() {
 			It("should use the default botname if the argument list contains three strings", func() {
 				slackURL, _ := url.Parse("slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
 				config, configError := CreateConfigFromURL(slackURL)
 
-				Expect(config.BotName).To(Equal(DefaultUser))
 				Expect(configError).NotTo(HaveOccurred())
+				Expect(config.BotName).To(BeEmpty())
 			})
 			It("should set the botname if the argument list is three", func() {
 				slackURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
@@ -118,6 +140,38 @@ var _ = Describe("the slack service", func() {
 				_, configError := CreateConfigFromURL(slackURL)
 				Expect(configError).To(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("sending the payload", func() {
+		var err error
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("should not report an error if the server accepts the payload", func() {
+			serviceURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetURL := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
+			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should not panic if an error occurs when sending the payload", func() {
+			serviceURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetURL := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
+			httpmock.RegisterResponder("POST", targetURL, httpmock.NewErrorResponder(errors.New("dummy error")))
+
+			err = service.Send("Message", nil)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })

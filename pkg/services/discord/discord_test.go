@@ -160,7 +160,7 @@ var _ = Describe("the discord service", func() {
 				items := []types.MessageItem{
 					{
 						Text:      "Message",
-						Timestamp: &testTime,
+						Timestamp: testTime,
 						Level:     types.Warning,
 					},
 				}

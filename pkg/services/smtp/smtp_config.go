@@ -91,8 +91,8 @@ func (config *Config) Clone() Config {
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth":       authTypes.Enum,
-		"Encryption": encMethods.Enum,
+		"Auth":       AuthTypes.Enum,
+		"Encryption": EncMethods.Enum,
 	}
 }
 

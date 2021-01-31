@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// LoadArgsFromAltSources is a WORKAROUND to make cobra count env vars and positional arguments when checking required flags
+// LoadFlagsFromAltSources is a WORKAROUND to make cobra count env vars and positional arguments when checking required flags
 func LoadFlagsFromAltSources(cmd *cobra.Command, args []string) {
 
 	if len(args) > 0 {

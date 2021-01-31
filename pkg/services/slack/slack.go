@@ -2,8 +2,8 @@ package slack
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
@@ -17,22 +17,23 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 const (
-	apiURL    = "https://hooks.slack.com/services"
-	maxlength = 1000
+	apiURL = "https://hooks.slack.com/services"
 )
 
 // Send a notification message to Slack
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 
-	if err := ValidateToken(config.Token); err != nil {
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
 		return err
 	}
-	if len(message) > maxlength {
-		return errors.New("message exceeds max length")
+
+	if err := ValidateToken(config.Token); err != nil {
+		return err
 	}
 
 	return service.doSend(config, message)
@@ -47,22 +48,32 @@ func (service *Service) SendItems(items []types.MessageItem, params *types.Param
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
-		return err
-	}
-
-	return nil
+	service.pkr = format.NewPropKeyResolver(service.config)
+	return service.config.setURL(&service.pkr, configURL)
 }
 
 func (service *Service) doSend(config *Config, message string) error {
-	apiURL := service.getURL(config)
-	json, _ := CreateJSONPayload(config, message)
-	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
+	postURL := service.getURL(config)
+	payload, err := CreateJSONPayload(config, message)
 
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
+	var res *http.Response
+	if err == nil {
+		res, err = http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 	}
-	return err
+
+	if res == nil && err == nil {
+		err = fmt.Errorf("unknown error")
+	}
+
+	if err == nil && res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("response status code %s", res.Status)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to send slack notification: %v", err)
+	}
+
+	return nil
 }
 
 func (service *Service) getURL(config *Config) string {

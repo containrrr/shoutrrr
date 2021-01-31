@@ -10,8 +10,10 @@ import (
 	"reflect"
 )
 
+// Generator is the Basic Generator implementation
 type Generator struct{}
 
+// Generate generates a service URL from a set of user questions/answers
 func (g *Generator) Generate(service types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	fmt.Println("Enter the configuration values as prompted")
 	fmt.Println()

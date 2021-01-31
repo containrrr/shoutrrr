@@ -5,46 +5,55 @@ import (
 	"time"
 )
 
-// MessageLevel is used to denote the importance of a MessageItem
-type MessageLevel int
+// MessageLevel is used to denote the urgency of a message item
+type MessageLevel uint8
 
 const (
-	// Unknown MessageLevel (default)
+	// Unknown is the default message level
 	Unknown MessageLevel = iota
-	// Debug MessageLevel
+	// Debug is the lowest kind of known message level
 	Debug
-	// Info MessageLevel
+	// Info is generally used as the "normal" message level
 	Info
-	// Warning MessageLevel
+	// Warning is generally used to denote messages that might be OK, but can cause problems
 	Warning
-	// Error MessageLevel
+	// Error is generally used for messages about things that did not go as planned
 	Error
 	messageLevelCount
-	// MessageLevelCount is the number of MessageLevel values
+	// MessageLevelCount is used to create arrays that maps levels to other values
 	MessageLevelCount = int(messageLevelCount)
 )
 
-func (level MessageLevel) String() string {
-	switch level {
-	case Debug:
-		return "Debug"
-	case Info:
-		return "Info"
-	case Warning:
-		return "Warning"
-	case Error:
-		return "Error"
-	case Unknown:
-	default:
-	}
-	return "Unknown"
+var messageLevelStrings = [MessageLevelCount]string{
+	"Unknown",
+	"Debug",
+	"Info",
+	"Warning",
+	"Error",
 }
 
-// MessageItem is a notification message with some additional meta data
+func (level MessageLevel) String() string {
+	if level >= messageLevelCount {
+		return messageLevelStrings[0]
+	}
+	return messageLevelStrings[level]
+}
+
+// MessageItem is an entry in a notification being sent by a service
 type MessageItem struct {
 	Text      string
-	Timestamp *time.Time
+	Timestamp time.Time
 	Level     MessageLevel
+	Fields    []Field
+}
+
+// WithField appends the key/value pair to the message items fields
+func (mi *MessageItem) WithField(key, value string) *MessageItem {
+	mi.Fields = append(mi.Fields, Field{
+		Key:   key,
+		Value: value,
+	})
+	return mi
 }
 
 // ItemsToPlain joins together the MessageItems' Text using newlines

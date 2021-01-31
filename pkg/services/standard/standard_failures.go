@@ -16,6 +16,7 @@ const (
 	FailUnknown f.FailureID = iota
 )
 
+// Failure creates a Failure instance corresponding to the provided failureID, wrapping the provided error
 func Failure(failureID f.FailureID, err error, v ...interface{}) f.Failure {
 	messages := map[int]string{
 		int(FailParseURL): "error parsing Service URL",

@@ -52,6 +52,29 @@ func (router *ServiceRouter) Send(message string, params *t.Params) []error {
 	return errors
 }
 
+// SendItems sends the specified message items using the routers underlying services
+func (router *ServiceRouter) SendItems(items []t.MessageItem, params t.Params) []error {
+	if router == nil {
+		return []error{fmt.Errorf("error sending message: no senders")}
+	}
+
+	// Fallback using old API for now
+	message := strings.Builder{}
+	for _, item := range items {
+		message.WriteString(item.Text)
+	}
+
+	serviceCount := len(router.services)
+	errors := make([]error, serviceCount)
+	results := router.SendAsync(message.String(), &params)
+
+	for i := range router.services {
+		errors[i] = <-results
+	}
+
+	return errors
+}
+
 // SendAsync sends the specified message using the routers underlying services
 func (router *ServiceRouter) SendAsync(message string, params *t.Params) chan error {
 	serviceCount := len(router.services)
@@ -119,7 +142,14 @@ func (router *ServiceRouter) ExtractServiceName(rawURL string) (string, *url.URL
 		return "", &url.URL{}, err
 	}
 
-	return serviceURL.Scheme, serviceURL, nil
+	scheme := serviceURL.Scheme
+	schemeParts := strings.Split(scheme, "+")
+
+	if len(schemeParts) > 1 {
+		scheme = schemeParts[0]
+	}
+
+	return scheme, serviceURL, nil
 }
 
 // Route a message to a specific notification service using the notification URL
@@ -140,12 +170,23 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 		return nil, err
 	}
 
-	serviceFactory, valid := serviceMap[strings.ToLower(scheme)]
-	if !valid {
-		return nil, fmt.Errorf("unknown service scheme for URL '%s'", rawURL)
+	service, err := newService(scheme)
+	if err != nil {
+		return nil, err
 	}
 
-	service := serviceFactory()
+	if configURL.Scheme != scheme {
+		router.logger.Println("Got custom URL:", configURL.String())
+		customURLService, ok := service.(t.CustomURLService)
+		if !ok {
+			return nil, fmt.Errorf("custom URLs are not supported by '%s' service", scheme)
+		}
+		configURL, err = customURLService.GetConfigURLFromCustom(configURL)
+		if err != nil {
+			return nil, err
+		}
+		router.logger.Println("Converted service URL:", configURL.String())
+	}
 
 	err = service.Initialize(configURL, router.logger)
 	if err != nil {
@@ -156,10 +197,15 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 }
 
 // NewService returns a new uninitialized service instance
-func (router *ServiceRouter) NewService(service string) (t.Service, error) {
-	serviceFactory, valid := serviceMap[strings.ToLower(service)]
+func (*ServiceRouter) NewService(serviceScheme string) (t.Service, error) {
+	return newService(serviceScheme)
+}
+
+// newService returns a new uninitialized service instance
+func newService(serviceScheme string) (t.Service, error) {
+	serviceFactory, valid := serviceMap[strings.ToLower(serviceScheme)]
 	if !valid {
-		return nil, fmt.Errorf("unknown service %q", service)
+		return nil, fmt.Errorf("unknown service %q", serviceScheme)
 	}
 	return serviceFactory(), nil
 }

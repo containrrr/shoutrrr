@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -18,12 +18,16 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
+	service.config = &Config{
+		Title: "Shoutrrr notification",
+	}
+	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 	return err
 }
@@ -55,27 +59,11 @@ func buildURL(config *Config) (string, error) {
 	if !isTokenValid(token) {
 		return "", fmt.Errorf("invalid gotify token \"%s\"", token)
 	}
-	return fmt.Sprintf("https://%s/message?token=%s", config.Host, token), nil
-}
-
-func getPriority(params map[string]string) int {
-	priorityStr, ok := params["priority"]
-	if !ok {
-		priorityStr = "0"
+	scheme := "https"
+	if config.DisableTLS {
+		scheme = scheme[:4]
 	}
-	priority, err := strconv.Atoi(priorityStr)
-	if err != nil {
-		priority = 0
-	}
-	return priority
-}
-
-func getTitle(params map[string]string) string {
-	title, ok := params["title"]
-	if !ok {
-		title = "Shoutrrr notification"
-	}
-	return title
+	return fmt.Sprintf("%s://%s%s/message?token=%s", scheme, config.Host, config.Path, token), nil
 }
 
 // Send a notification message to Gotify
@@ -84,14 +72,18 @@ func (service *Service) Send(message string, params *types.Params) error {
 		params = &types.Params{}
 	}
 	config := service.config
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		service.Logf("Failed to update params: %v", err)
+	}
+
 	postURL, err := buildURL(config)
 	if err != nil {
 		return err
 	}
 	jsonBody, err := json.Marshal(JSON{
 		Message:  message,
-		Title:    getTitle(*params),
-		Priority: getPriority(*params),
+		Title:    config.Title,
+		Priority: config.Priority,
 	})
 	if err != nil {
 		return err

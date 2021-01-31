@@ -16,7 +16,8 @@ type authTypeVals struct {
 	Enum    types.EnumFormatter
 }
 
-var authTypes = &authTypeVals{
+// AuthTypes is the enum helper for populating the Auth field
+var AuthTypes = &authTypeVals{
 	None:    0,
 	Plain:   1,
 	CRAMMD5: 2,
@@ -33,11 +34,5 @@ var authTypes = &authTypeVals{
 }
 
 func (at authType) String() string {
-	return authTypes.Enum.Print(int(at))
+	return AuthTypes.Enum.Print(int(at))
 }
-
-func parseAuth(s string) authType {
-	return authType(authTypes.Enum.Parse(s))
-}
-
-var OAuth2 = authTypes.OAuth2

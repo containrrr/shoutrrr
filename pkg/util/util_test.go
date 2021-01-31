@@ -79,4 +79,16 @@ var _ = Describe("the util package", func() {
 			Expect(base).To(Equal(16))
 		})
 	})
+
+	When("checking if a supplied kind is numeric", func() {
+		It("should be true if supplied a constant integer", func() {
+			Expect(IsNumeric(reflect.TypeOf(5).Kind())).To(BeTrue())
+		})
+		It("should be true if supplied a constant float", func() {
+			Expect(IsNumeric(reflect.TypeOf(2.5).Kind())).To(BeTrue())
+		})
+		It("should be false if supplied a constant string", func() {
+			Expect(IsNumeric(reflect.TypeOf("3").Kind())).To(BeFalse())
+		})
+	})
 })
