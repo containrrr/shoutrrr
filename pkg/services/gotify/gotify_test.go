@@ -44,6 +44,20 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		})
 	})
 
+	When("a custom path is provided", func() {
+		It("should add it to the URL", func() {
+			config := Config{
+				Token: "Aaa.bbb.ccc.ddd",
+				Host:  "my.gotify.tld",
+				Path:  "/gotify",
+			}
+			url, err := buildURL(&config)
+			Expect(err).To(BeNil())
+			expectedURL := "https://my.gotify.tld/gotify/message?token=Aaa.bbb.ccc.ddd"
+			Expect(url).To(Equal(expectedURL))
+		})
+	})
+
 	When("provided a valid token", func() {
 		It("should return true", func() {
 			token := "Ahwbsdyhwwgarxd"
@@ -64,7 +78,21 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	})
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
-			It("should be identical after de-/serialization", func() {
+			It("should be identical after de-/serialization (with path)", func() {
+				testURL := "gotify://my.gotify.tld/gotify/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test title"
+
+				url, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				config := &Config{}
+				err = config.SetURL(url)
+				Expect(err).NotTo(HaveOccurred(), "verifying")
+
+				outputURL := config.GetURL()
+				Expect(outputURL.String()).To(Equal(testURL))
+
+			})
+			It("should be identical after de-/serialization (without path)", func() {
 				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?disabletls=No&priority=1&title=Test title"
 
 				url, err := url.Parse(testURL)
