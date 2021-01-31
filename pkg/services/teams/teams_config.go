@@ -21,13 +21,27 @@ type Config struct {
 }
 
 // SetFromWebhookURL updates the config WebhookParts from a teams webhook URL
-func (config *Config) SetFromWebhookURL(webhookURL string) (*Config, error) {
-	parts, err := parseWebhookURL(webhookURL)
+func (config *Config) SetFromWebhookURL(webhookURL string) error {
+	parts, err := parseAndVerifyWebhookURL(webhookURL)
 	if err != nil {
+		return err
+	}
+
+	config.WebhookParts = parts
+	return nil
+}
+
+// ConfigFromWebhookURL creates a new Config from a parsed Teams Webhook URL
+func ConfigFromWebhookURL(webhookURL url.URL) (*Config, error) {
+	config := &Config{
+		Host: webhookURL.Host,
+	}
+
+	if err := config.SetFromWebhookURL(webhookURL.String()); err != nil {
 		return nil, err
 	}
 
-	return &Config{WebhookParts: parts}, nil
+	return config, nil
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -97,18 +111,6 @@ func buildWebhookURL(host string, parts [4]string) string {
 		parts[3])
 }
 
-func parseWebhookURL(webhookURL string) (parts [4]string, err error) {
-	if len(webhookURL) < 195 {
-		return parts, fmt.Errorf("invalid webhook URL format")
-	}
-	return [4]string{
-		webhookURL[35:71],
-		webhookURL[72:108],
-		webhookURL[125:157],
-		webhookURL[158:194],
-	}, nil
-}
-
 func parseAndVerifyWebhookURL(webhookURL string) (parts [4]string, err error) {
 	pattern, err := regexp.Compile(`([0-9a-f-]{36})@([0-9a-f-]{36})/[^/]+/([0-9a-f]{32})/([0-9a-f-]{36})`)
 	if err != nil {
@@ -122,13 +124,6 @@ func parseAndVerifyWebhookURL(webhookURL string) (parts [4]string, err error) {
 
 	copy(parts[:], groups[1:])
 	return parts, nil
-}
-
-// CreateConfigFromURL for use within the teams plugin
-func (service *Service) CreateConfigFromURL(url *url.URL) (*Config, error) {
-	config := Config{}
-	err := config.SetURL(url)
-	return &config, err
 }
 
 const (

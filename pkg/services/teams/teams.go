@@ -46,21 +46,17 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 
 // GetConfigURLFromCustom creates a regular service URL from one with a custom host
 func (*Service) GetConfigURLFromCustom(customURL *url.URL) (serviceURL *url.URL, err error) {
-	parts, err := parseAndVerifyWebhookURL(customURL.String())
+	config, err := ConfigFromWebhookURL(*customURL)
 	if err != nil {
 		return nil, err
 	}
 
-	config := Config{}
-	resolver := format.NewPropKeyResolver(&config)
+	resolver := format.NewPropKeyResolver(config)
 	for key, vals := range customURL.Query() {
 		if err := resolver.Set(key, vals[0]); err != nil {
 			return nil, err
 		}
 	}
-
-	config.Host = customURL.Host
-	config.WebhookParts = parts
 
 	return config.getURL(&resolver), nil
 }
