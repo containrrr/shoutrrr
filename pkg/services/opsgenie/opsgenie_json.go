@@ -1,9 +1,7 @@
 package opsgenie
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
@@ -39,91 +37,49 @@ type AlertPayload struct {
 	Note        string            `json:"note,omitempty"`
 }
 
-// TODO: Duplicated code, see: formatter.go
-func deserializeSlice(str string) []string {
-	return strings.Split(str, ",")
-}
-
-// TODO: Duplicated code, see: formatter.go
-func deserializeMap(str string) (map[string]string, error) {
-	result := make(map[string]string)
-
-	pairs := strings.Split(str, ",")
-	for _, pair := range pairs {
-		elems := strings.Split(pair, ":")
-		if len(elems) != 2 {
-			return result, fmt.Errorf("field format is not supported")
-		}
-		key := elems[0]
-		value := elems[1]
-
-		result[key] = value
-	}
-
-	return result, nil
-}
-
-// NewAlertPayload instantiates AlertPayload
 func NewAlertPayload(message string, config *Config, params *types.Params) (AlertPayload, error) {
 	if params == nil {
 		params = &types.Params{}
 	}
 
-	result := AlertPayload{
-		Message: message,
-		// Populate with values from the query string as defaults
-		Alias:       config.Alias,
-		Description: config.Description,
-		Responders:  config.Responders,
-		VisibleTo:   config.VisibleTo,
-		Actions:     config.Actions,
-		Tags:        config.Tags,
-		Details:     config.Details,
-		Entity:      config.Entity,
-		Source:      config.Source,
-		Priority:    config.Priority,
-		User:        config.User,
-		Note:        config.Note,
-	}
+	// Defensive copy
+	payloadFields := *config
 
-	// Populate with values from runtime parameters
-	for key, value := range *params {
-		var err error
-
-		switch key {
-		case "alias":
-			result.Alias = value
-		case "description":
-			result.Description = value
-		case "responders":
-			result.Responders, err = deserializeEntities(value)
-		case "visibleTo":
-			result.VisibleTo, err = deserializeEntities(value)
-		case "actions":
-			result.Actions = deserializeSlice(value)
-		case "tags":
-			result.Tags = deserializeSlice(value)
-		case "details":
-			result.Details, err = deserializeMap(value)
-		case "entity":
-			result.Entity = value
-		case "source":
-			result.Source = value
-		case "priority":
-			result.Priority = value
-		case "user":
-			result.User = value
-		case "note":
-			result.Note = value
-		default:
-			return result, fmt.Errorf("unknown config key: %q", key)
-		}
-
+	pkr := format.NewPropKeyResolver(&payloadFields)
+	if value, found := (*params)["responders"]; found {
+		responders, err := deserializeEntities(value)
 		if err != nil {
-			return result, err
+			return AlertPayload{}, err
 		}
-
+		payloadFields.Responders = responders
+		delete(*params, "responders")
+	}
+	if value, found := (*params)["visibleTo"]; found {
+		visibleTo, err := deserializeEntities(value)
+		if err != nil {
+			return AlertPayload{}, err
+		}
+		payloadFields.VisibleTo = visibleTo
+		delete(*params, "visibleTo")
+	}
+	if err := pkr.UpdateConfigFromParams(&payloadFields, params); err != nil {
+		return AlertPayload{}, err
 	}
 
+	result := AlertPayload{
+		Message:     message,
+		Alias:       payloadFields.Alias,
+		Description: payloadFields.Description,
+		Responders:  payloadFields.Responders,
+		VisibleTo:   payloadFields.VisibleTo,
+		Actions:     payloadFields.Actions,
+		Tags:        payloadFields.Tags,
+		Details:     payloadFields.Details,
+		Entity:      payloadFields.Entity,
+		Source:      payloadFields.Source,
+		Priority:    payloadFields.Priority,
+		User:        payloadFields.User,
+		Note:        payloadFields.Note,
+	}
 	return result, nil
 }

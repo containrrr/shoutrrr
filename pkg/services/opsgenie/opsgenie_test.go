@@ -211,6 +211,74 @@ var _ = Describe("the OpsGenie service", func() {
 				Expect(err).To(BeNil())
 			})
 		})
+
+		When("sending two alerts", func() {
+			It("should not mix-up the runtime parameters and the query parameters", func() {
+				// Internally the opsgenie service copies runtime parameters into the config struct
+				// before generating the alert payload. This test ensures that none of the parameters
+				// from alert 1 remain in the config struct when sending alert 2
+				// In short: This tests if we clone the config struct
+
+				checkRequest = func(body string, header http.Header) {
+					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
+					Expect(header["Content-Type"][0]).To(Equal("application/json"))
+					Expect(body).To(Equal(`{"` +
+						`message":"1",` +
+						`"alias":"1",` +
+						`"description":"1",` +
+						`"responders":[{"type":"team","name":"1"}],` +
+						`"visibleTo":[{"type":"team","name":"1"}],` +
+						`"actions":["action1","action2"],` +
+						`"tags":["tag1","tag2"],` +
+						`"details":{"key1":"value1","key2":"value2"},` +
+						`"entity":"1",` +
+						`"source":"1",` +
+						`"priority":"P1",` +
+						`"user":"1",` +
+						`"note":"1"` +
+						`}`))
+				}
+
+				err := service.Send("1", &types.Params{
+					"alias":       "1",
+					"description": "1",
+					"responders":  "team:1",
+					"visibleTo":   "team:1",
+					"actions":     "action1,action2",
+					"tags":        "tag1,tag2",
+					"details":     "key1:value1,key2:value2",
+					"entity":      "1",
+					"source":      "1",
+					"priority":    "P1",
+					"user":        "1",
+					"note":        "1",
+				})
+				Expect(err).To(BeNil())
+
+				checkRequest = func(body string, header http.Header) {
+					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
+					Expect(header["Content-Type"][0]).To(Equal("application/json"))
+					Expect(body).To(Equal(`{` +
+						`"message":"2",` +
+						`"alias":"query-alias",` +
+						`"description":"query-description",` +
+						`"responders":[{"type":"team","name":"query_team"}],` +
+						`"visibleTo":[{"type":"user","username":"query_user"}],` +
+						`"actions":["queryAction1","queryAction2"],` +
+						`"tags":["queryTag1","queryTag2"],` +
+						`"details":{"queryKey1":"queryValue1","queryKey2":"queryValue2"},` +
+						`"entity":"query-entity",` +
+						`"source":"query-source",` +
+						`"priority":"P2",` +
+						`"user":"query-user",` +
+						`"note":"query-note"` +
+						`}`))
+				}
+
+				err = service.Send("2", nil)
+				Expect(err).To(BeNil())
+			})
+		})
 	})
 })
 
