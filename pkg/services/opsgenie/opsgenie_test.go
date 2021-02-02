@@ -342,6 +342,22 @@ var _ = Describe("the OpsGenie Config struct", func() {
 		})
 	})
 
+	When("generating a config from a url with differently escaped spaces", func() {
+		It("should parse the escaped spaces correctly", func() {
+			// Use: '%20', '+' and a normal space
+			queryParams := `alias=Life is+too%20short+for+no+alias`
+			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s?%s", mockHost, mockAPIKey, queryParams))
+			Expect(err).To(BeNil())
+
+			config := Config{}
+			err = config.SetURL(url)
+			Expect(err).To(BeNil())
+
+			Expect(config.Alias).To(Equal("Life is too short for no alias"))
+
+		})
+	})
+
 	When("generating a url from a simple config", func() {
 		It("should generate a url", func() {
 			config := Config{
@@ -395,7 +411,6 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			}
 
 			url := config.GetURL()
-			// TODO: An URL can not use space https://stackoverflow.com/questions/5442658/spaces-in-urls
 			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1,action2&alias=Life is too short for no alias&description=Every alert needs a description&details=key:value&entity=An example entity&note=Here is a note&priority=P1&source=The source&tags=tag1,tag2&user=Dracula&responders=user:Test,team:NOC,team:4513b7ea-3b91-438f-b7e4-e3e54af9147c&visibleTo=user:A User`))
 		})
 	})
