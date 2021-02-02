@@ -41,8 +41,10 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
-			err := service.Send("This is an integration test message", nil)
+			err := service.Initialize(serviceURL, util.TestLogger())
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -101,13 +103,29 @@ var _ = Describe("the slack service", func() {
 		})
 	})
 	Describe("the slack config", func() {
+		When("parsing the configuration URL", func() {
+			It("should be identical after de-/serialization", func() {
+				testURL := "slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456?color=3f00fe&title=Test+title"
+
+				url, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				config := &Config{}
+				err = config.SetURL(url)
+				Expect(err).NotTo(HaveOccurred(), "verifying")
+
+				outputURL := config.GetURL()
+				Expect(outputURL.String()).To(Equal(testURL))
+
+			})
+		})
 		When("generating a config object", func() {
 			It("should use the default botname if the argument list contains three strings", func() {
 				slackURL, _ := url.Parse("slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456")
 				config, configError := CreateConfigFromURL(slackURL)
 
-				Expect(config.BotName).To(Equal(DefaultUser))
 				Expect(configError).NotTo(HaveOccurred())
+				Expect(config.BotName).To(BeEmpty())
 			})
 			It("should set the botname if the argument list is three", func() {
 				slackURL, _ := url.Parse("slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456")

@@ -1,27 +1,72 @@
 package discord
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
+	"time"
 )
 
-// JSON is the actual notification payload
-type JSON struct {
-	Text string `json:"content"`
+// WebhookPayload is the webhook endpoint payload
+type WebhookPayload struct {
+	Embeds   []embedItem `json:"embeds"`
+	Username string      `json:"username,omitempty"`
 }
 
-// CreateJSONToSend creates a JSON payload to be sent to the discord webhook API
-func CreateJSONToSend(message string, isJSON bool) ([]byte, error) {
-	if message == "" {
-		return nil, errors.New("message was empty")
+// JSON is the actual notification payload
+type embedItem struct {
+	Title     string       `json:"title,omitempty"`
+	Content   string       `json:"description,omitempty"`
+	URL       string       `json:"url,omitempty"`
+	Timestamp string       `json:"timestamp,omitempty"`
+	Color     uint         `json:"color,omitempty"`
+	Footer    *embedFooter `json:"footer,omitempty"`
+}
+
+type embedFooter struct {
+	Text    string `json:"text"`
+	IconURL string `json:"icon_url,omitempty"`
+}
+
+// CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
+func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint, omitted int) (WebhookPayload, error) {
+
+	itemCount := util.Min(9, len(items))
+	embeds := make([]embedItem, 1, itemCount+1)
+
+	for _, item := range items {
+
+		color := uint(0)
+		if item.Level >= types.Unknown && int(item.Level) < len(colors) {
+			color = colors[item.Level]
+		}
+
+		ei := embedItem{
+			Content: item.Text,
+			Color:   color,
+		}
+
+		if item.Level != types.Unknown {
+			ei.Footer = &embedFooter{
+				Text: item.Level.String(),
+			}
+		}
+
+		if !item.Timestamp.IsZero() {
+			ei.Timestamp = item.Timestamp.UTC().Format(time.RFC3339)
+		}
+
+		embeds = append(embeds, ei)
 	}
-	if len(message) > maxlength {
-		return nil, errors.New("the supplied message exceeds the max length for discord")
+
+	embeds[0].Title = title
+	if omitted > 0 {
+		embeds[0].Footer = &embedFooter{
+			Text: fmt.Sprintf("... (%v character(s) where omitted)", omitted),
+		}
 	}
-	if isJSON {
-		return []byte(message), nil
-	}
-	return json.Marshal(JSON{
-		Text: message,
-	})
+
+	return WebhookPayload{
+		Embeds: embeds,
+	}, nil
 }

@@ -4,35 +4,22 @@ import (
 	"reflect"
 )
 
-// IsUnsignedDecimal is a check against the unsigned decimal types
-func IsUnsignedDecimal(kind reflect.Kind) bool {
-	unsignedDecimals := []reflect.Kind{
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Uint,
-	}
-	return ContainsKind(unsignedDecimals, kind)
+// IsUnsignedInt is a check against the unsigned integer types
+func IsUnsignedInt(kind reflect.Kind) bool {
+	return kind >= reflect.Uint && kind <= reflect.Uint64
 }
 
-// IsSignedDecimal is a check against the signed decimal types
-func IsSignedDecimal(kind reflect.Kind) bool {
-	signedDecimals := []reflect.Kind{
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-		reflect.Int,
-	}
-	return ContainsKind(signedDecimals, kind)
+// IsSignedInt is a check against the signed decimal types
+func IsSignedInt(kind reflect.Kind) bool {
+	return kind >= reflect.Int && kind <= reflect.Int64
 }
 
 // IsCollection is a check against slice and array
 func IsCollection(kind reflect.Kind) bool {
-	collections := []reflect.Kind{
-		reflect.Slice,
-		reflect.Array,
-	}
-	return ContainsKind(collections, kind)
+	return kind == reflect.Slice || kind == reflect.Array
+}
+
+// IsNumeric returns whether the Kind is one of the numeric ones
+func IsNumeric(kind reflect.Kind) bool {
+	return kind >= reflect.Int && kind <= reflect.Complex128
 }

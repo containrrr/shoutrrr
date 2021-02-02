@@ -63,7 +63,7 @@ func buildURL(config *Config) (string, error) {
 	if config.DisableTLS {
 		scheme = scheme[:4]
 	}
-	return fmt.Sprintf("%s://%s/message?token=%s", scheme, config.Host, token), nil
+	return fmt.Sprintf("%s://%s%s/message?token=%s", scheme, config.Host, config.Path, token), nil
 }
 
 // Send a notification message to Gotify

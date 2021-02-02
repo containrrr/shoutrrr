@@ -9,6 +9,7 @@ import (
 // Token is a three part string split into A, B and C
 type Token []string
 
+// ValidateToken checks that the token is in the expected format
 func ValidateToken(token Token) error {
 	if err := tokenPartsAreNotEmpty(token); err != nil {
 		return err
