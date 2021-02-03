@@ -40,8 +40,10 @@ func (service *Service) Send(message string, _ *types.Params) error {
 		return err
 	}
 
+	postURL := getAPIURL(config)
+
 	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := http.Post(config.URL.String(), "application/json", jsonBuffer)
+	resp, err := http.Post(postURL.String(), "application/json", jsonBuffer)
 
 	if err != nil {
 		return fmt.Errorf("failed to send notification to Hangouts Chat: %s", err)
@@ -54,4 +56,17 @@ func (service *Service) Send(message string, _ *types.Params) error {
 	}
 
 	return nil
+}
+
+func getAPIURL(config *Config) *url.URL {
+	query := url.Values{}
+	query.Set("key", config.Key)
+	query.Set("token", config.Token)
+
+	return &url.URL{
+		Path:     config.Path,
+		Host:     config.Host,
+		Scheme:   "https",
+		RawQuery: query.Encode(),
+	}
 }
