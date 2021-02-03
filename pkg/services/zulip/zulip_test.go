@@ -86,7 +86,6 @@ var _ = Describe("the zulip service", func() {
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
-					Path:    "api/v1/messages",
 					Stream:  "foo",
 					Topic:   "bar",
 				}
@@ -100,7 +99,6 @@ var _ = Describe("the zulip service", func() {
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
-					Path:    "api/v1/messages",
 					Stream:  "foo",
 					Topic:   "bar",
 				}
@@ -121,7 +119,6 @@ var _ = Describe("the zulip service", func() {
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
-					Path:    "api/v1/messages",
 					Stream:  "foo",
 					Topic:   "bar",
 				}
@@ -137,7 +134,7 @@ var _ = Describe("the zulip service", func() {
 					Stream:  "foo",
 					Topic:   "bar",
 				}
-				url := config.GetURL(nil)
+				url := config.GetURL()
 				Expect(url.String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar"))
 			})
 		})
@@ -149,7 +146,7 @@ var _ = Describe("the zulip service", func() {
 					Host:    "example.zulipchat.com",
 					Stream:  "foo",
 				}
-				url := config.GetURL(nil)
+				url := config.GetURL()
 				Expect(url.String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo"))
 			})
 		})
