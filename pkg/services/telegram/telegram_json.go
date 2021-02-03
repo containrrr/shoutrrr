@@ -1,6 +1,6 @@
 package telegram
 
-// JSON to be used as a notification payload for the telegram notification service
+// SendMessagePayload is the notification payload for the telegram notification service
 type SendMessagePayload struct {
 	Text                string `json:"text"`
 	ID                  string `json:"chat_id"`
