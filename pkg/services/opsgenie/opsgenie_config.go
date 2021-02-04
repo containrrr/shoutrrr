@@ -48,29 +48,21 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	}
 
 	// Serialize Shoutrrr standard data types
-	rawQuery := format.BuildQuery(resolver)
-
+	query, _ := url.ParseQuery(format.BuildQuery(resolver))
 	// Serialize OpsGenie specific data types
-	separator := "&"
-	if rawQuery == "" {
-		separator = ""
-	}
-
 	if len(config.Responders) > 0 {
 		responders, _ := serializeEntities(config.Responders)
-		rawQuery = rawQuery + separator + "responders=" + responders
-		separator = "&"
+		query.Set("responders", responders)
 	}
 	if len(config.VisibleTo) > 0 {
 		visibleTo, _ := serializeEntities(config.VisibleTo)
-		rawQuery = rawQuery + separator + "visibleTo=" + visibleTo
+		query.Set("visibleTo", visibleTo)
 	}
-
 	result := &url.URL{
 		Host:     host,
 		Path:     fmt.Sprintf("/%s", config.ApiKey),
 		Scheme:   Scheme,
-		RawQuery: rawQuery,
+		RawQuery: query.Encode(),
 	}
 
 	return result
