@@ -411,7 +411,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			}
 
 			url := config.GetURL()
-			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1%2Caction2&alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&details=key%3Avalue&entity=An+example+entity&note=Here+is+a+note&priority=P1&source=The+source&tags=tag1%2Ctag2&user=Dracula&responders=user:Test,team:NOC,team:4513b7ea-3b91-438f-b7e4-e3e54af9147c&visibleTo=user:A User`))
+			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1%2Caction2&alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&details=key%3Avalue&entity=An+example+entity&note=Here+is+a+note&priority=P1&responders=user%3ATest%2Cteam%3ANOC%2Cteam%3A4513b7ea-3b91-438f-b7e4-e3e54af9147c&source=The+source&tags=tag1%2Ctag2&user=Dracula&visibleTo=user%3AA+User`))
 		})
 	})
 })
