@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -21,6 +22,7 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 func (service *Service) sendAlert(url string, apiKey string, payload AlertPayload) error {
@@ -58,7 +60,8 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	return service.config.SetURL(configURL)
+	service.pkr = format.NewPropKeyResolver(service.config)
+	return service.config.setURL(&service.pkr, configURL)
 }
 
 // Send a notification message to OpsGenie
@@ -66,9 +69,55 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	url := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
-	payload, err := NewAlertPayload(message, config, params)
+	payload, err := service.newAlertPayload(message, params)
 	if err != nil {
 		return err
 	}
 	return service.sendAlert(url, config.ApiKey, payload)
+}
+
+func (service *Service) newAlertPayload(message string, params *types.Params) (AlertPayload, error) {
+	if params == nil {
+		params = &types.Params{}
+	}
+
+	// Defensive copy
+	payloadFields := *service.config
+
+	if value, found := (*params)["responders"]; found {
+		responders, err := deserializeEntities(value)
+		if err != nil {
+			return AlertPayload{}, err
+		}
+		payloadFields.Responders = responders
+		delete(*params, "responders")
+	}
+	if value, found := (*params)["visibleTo"]; found {
+		visibleTo, err := deserializeEntities(value)
+		if err != nil {
+			return AlertPayload{}, err
+		}
+		payloadFields.VisibleTo = visibleTo
+		delete(*params, "visibleTo")
+	}
+	if err := service.pkr.UpdateConfigFromParams(&payloadFields, params); err != nil {
+		return AlertPayload{}, err
+	}
+
+	result := AlertPayload{
+		Message:     message,
+		Alias:       payloadFields.Alias,
+		Description: payloadFields.Description,
+		Responders:  payloadFields.Responders,
+		VisibleTo:   payloadFields.VisibleTo,
+		Actions:     payloadFields.Actions,
+		Tags:        payloadFields.Tags,
+		Details:     payloadFields.Details,
+		Entity:      payloadFields.Entity,
+		Source:      payloadFields.Source,
+		Priority:    payloadFields.Priority,
+		User:        payloadFields.User,
+		Note:        payloadFields.Note,
+	}
+	return result, nil
 }

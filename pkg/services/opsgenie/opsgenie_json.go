@@ -1,10 +1,5 @@
 package opsgenie
 
-import (
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-)
-
 // AlertPayload represents the payload being sent to the OpsGenie API
 //
 // See: https://docs.opsgenie.com/docs/alert-api#create-alert
@@ -35,51 +30,4 @@ type AlertPayload struct {
 	Priority    string            `json:"priority,omitempty"`
 	User        string            `json:"user,omitempty"`
 	Note        string            `json:"note,omitempty"`
-}
-
-func NewAlertPayload(message string, config *Config, params *types.Params) (AlertPayload, error) {
-	if params == nil {
-		params = &types.Params{}
-	}
-
-	// Defensive copy
-	payloadFields := *config
-
-	pkr := format.NewPropKeyResolver(&payloadFields)
-	if value, found := (*params)["responders"]; found {
-		responders, err := deserializeEntities(value)
-		if err != nil {
-			return AlertPayload{}, err
-		}
-		payloadFields.Responders = responders
-		delete(*params, "responders")
-	}
-	if value, found := (*params)["visibleTo"]; found {
-		visibleTo, err := deserializeEntities(value)
-		if err != nil {
-			return AlertPayload{}, err
-		}
-		payloadFields.VisibleTo = visibleTo
-		delete(*params, "visibleTo")
-	}
-	if err := pkr.UpdateConfigFromParams(&payloadFields, params); err != nil {
-		return AlertPayload{}, err
-	}
-
-	result := AlertPayload{
-		Message:     message,
-		Alias:       payloadFields.Alias,
-		Description: payloadFields.Description,
-		Responders:  payloadFields.Responders,
-		VisibleTo:   payloadFields.VisibleTo,
-		Actions:     payloadFields.Actions,
-		Tags:        payloadFields.Tags,
-		Details:     payloadFields.Details,
-		Entity:      payloadFields.Entity,
-		Source:      payloadFields.Source,
-		Priority:    payloadFields.Priority,
-		User:        payloadFields.User,
-		Note:        payloadFields.Note,
-	}
-	return result, nil
 }
