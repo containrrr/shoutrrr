@@ -102,11 +102,25 @@ var _ = Describe("the ifttt package", func() {
 	When("serializing a config to URL", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
-				expectedURL := "ifttt://dummyID/?events=foo%2Cbar%2Cbaz&messagevalue=0&value1=&value2=&value3="
+				expectedURL := "ifttt://dummyID/?events=foo%2Cbar%2Cbaz&messagevalue=0"
 				config := Config{
 					Events:            []string{"foo", "bar", "baz"},
 					WebHookID:         "dummyID",
 					UseMessageAsValue: 0,
+				}
+				resultURL := config.GetURL().String()
+				Expect(resultURL).To(Equal(expectedURL))
+			})
+		})
+
+		When("given values", func() {
+			It("should return an URL with all the values", func() {
+				expectedURL := "ifttt://dummyID/?messagevalue=0&value1=v1&value2=v2&value3=v3"
+				config := Config{
+					WebHookID: "dummyID",
+					Value1:    "v1",
+					Value2:    "v2",
+					Value3:    "v3",
 				}
 				resultURL := config.GetURL().String()
 				Expect(resultURL).To(Equal(expectedURL))
