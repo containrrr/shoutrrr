@@ -21,23 +21,58 @@ type Entity struct {
 	Username string `json:"username,omitempty"`
 }
 
+// SetFromProp deserializes an entity
+func (e *Entity) SetFromProp(propValue string) error {
+	elements := strings.Split(propValue, ":")
+
+	if len(elements) != 2 {
+		return fmt.Errorf("invalid entity, should have two elments separated by colon: %q", propValue)
+	}
+	e.Type = elements[0]
+	identifier := elements[1]
+	isID, err := isOpsGenieID(identifier)
+	if err != nil {
+		return fmt.Errorf("invalid entity, cannot parse id/name: %q", identifier)
+	}
+
+	if isID {
+		e.ID = identifier
+	} else if e.Type == "team" {
+		e.Name = identifier
+	} else if e.Type == "user" {
+		e.Username = identifier
+	} else {
+		return fmt.Errorf("invalid entity, unexpected entity type: %q", e.Type)
+	}
+
+	return nil
+}
+
+// GetPropValue serializes an entity
+func (e *Entity) GetPropValue() (string, error) {
+	identifier := ""
+
+	if e.ID != "" {
+		identifier = e.ID
+	} else if e.Name != "" {
+		identifier = e.Name
+	} else if e.Username != "" {
+		identifier = e.Username
+	} else {
+		return "", fmt.Errorf("invalid entity, should have either ID, name or username")
+	}
+
+	return fmt.Sprintf("%s:%s", e.Type, identifier), nil
+}
+
 func serializeEntities(entities []Entity) (string, error) {
 	entityStrings := []string{}
 
 	for _, entity := range entities {
-		identifier := ""
-
-		if entity.ID != "" {
-			identifier = entity.ID
-		} else if entity.Name != "" {
-			identifier = entity.Name
-		} else if entity.Username != "" {
-			identifier = entity.Username
-		} else {
-			return "", fmt.Errorf("invalid entity, should have either ID, name or username")
+		entityStr, err := entity.GetPropValue()
+		if err != nil {
+			return "", err
 		}
-
-		entityStr := fmt.Sprintf("%s:%s", entity.Type, identifier)
 		entityStrings = append(entityStrings, entityStr)
 	}
 
@@ -49,33 +84,10 @@ func deserializeEntities(str string) ([]Entity, error) {
 
 	entityStrings := strings.Split(str, ",")
 	for _, entityStr := range entityStrings {
-		elements := strings.Split(entityStr, ":")
-
-		if len(elements) != 2 {
-			return result, fmt.Errorf("invalid entity, should have two elments separated by colon: %q", entityStr)
+		entity := Entity{}
+		if err := entity.SetFromProp(entityStr); err != nil {
+			return result, err
 		}
-		entityType := elements[0]
-		identifier := elements[1]
-
-		entity := Entity{
-			Type: entityType,
-		}
-
-		isID, err := isOpsGenieID(identifier)
-		if err != nil {
-			return result, fmt.Errorf("invalid entity, cannot parse id/name: %q", identifier)
-		}
-
-		if isID {
-			entity.ID = identifier
-		} else if entityType == "team" {
-			entity.Name = identifier
-		} else if entityType == "user" {
-			entity.Username = identifier
-		} else {
-			return result, fmt.Errorf("invalid entity, unexpected entity type: %q", entityType)
-		}
-
 		result = append(result, entity)
 	}
 
