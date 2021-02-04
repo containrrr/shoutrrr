@@ -52,4 +52,5 @@ func useImplicitTLS(encryption encMethod, port uint16) bool {
 	}
 }
 
+// ImplicitTLSPort is de facto standard SMTPS port
 const ImplicitTLSPort = 465

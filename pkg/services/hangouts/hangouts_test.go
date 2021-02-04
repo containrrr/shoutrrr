@@ -21,6 +21,6 @@ var _ = Describe("the Hangouts Chat plugin URL building", func() {
 		config.SetURL(configURL)
 
 		expectedURL := "https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz"
-		Expect(config.URL.String()).To(Equal(expectedURL))
+		Expect(getAPIURL(&config).String()).To(Equal(expectedURL))
 	})
 })
