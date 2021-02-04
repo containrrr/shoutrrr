@@ -11,7 +11,7 @@ import (
 
 // Config for use within the opsgenie service
 type Config struct {
-	ApiKey      string            `desc:"The OpsGenie API key"`
+	APIKey      string            `desc:"The OpsGenie API key"`
 	Host        string            `desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
 	Port        uint16            `desc:"The OpsGenie API port." default:"443"`
 	Alias       string            `key:"alias" desc:"Client-defined identifier of the alert" optional:"true"`
@@ -28,11 +28,12 @@ type Config struct {
 	User        string            `key:"user" desc:"Display name of the request owner" optional:"true"`
 }
 
+// Enums returns an empty map because the OpsGenie service doesn't use Enums
 func (config Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{}
 }
 
-// Public version of GetURL that creates a new PropKeyResolver when accessed from outside the package
+// GetURL is the public version of getURL that creates a new PropKeyResolver when accessed from outside the package
 func (config *Config) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
@@ -60,7 +61,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	}
 	result := &url.URL{
 		Host:     host,
-		Path:     fmt.Sprintf("/%s", config.ApiKey),
+		Path:     fmt.Sprintf("/%s", config.APIKey),
 		Scheme:   Scheme,
 		RawQuery: query.Encode(),
 	}
@@ -77,7 +78,7 @@ func (config *Config) SetURL(url *url.URL) error {
 // Private version of SetURL that can use an instance of PropKeyResolver instead of rebuilding it's model from reflection
 func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	config.Host = url.Hostname()
-	config.ApiKey = url.Path[1:]
+	config.APIKey = url.Path[1:]
 
 	if url.Port() != "" {
 		port, err := strconv.ParseUint(url.Port(), 10, 16)

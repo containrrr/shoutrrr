@@ -292,7 +292,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			err = config.SetURL(url)
 			Expect(err).To(BeNil())
 
-			Expect(config.ApiKey).To(Equal(mockAPIKey))
+			Expect(config.APIKey).To(Equal(mockAPIKey))
 			Expect(config.Host).To(Equal(mockHost))
 			Expect(config.Port).To(Equal(uint16(0)))
 		})
@@ -362,7 +362,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 		It("should generate a url", func() {
 			config := Config{
 				Host:   "api.opsgenie.com",
-				ApiKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
+				APIKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
 			}
 
 			url := config.GetURL()
@@ -375,7 +375,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 		It("should generate a url with port", func() {
 			config := Config{
 				Host:   "api.opsgenie.com",
-				ApiKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
+				APIKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
 				Port:   12345,
 			}
 
@@ -389,7 +389,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 		It("should generate a url with query parameters", func() {
 			config := Config{
 				Host:        "api.opsgenie.com",
-				ApiKey:      "eb243592-faa2-4ba2-a551q-1afdf565c889",
+				APIKey:      "eb243592-faa2-4ba2-a551q-1afdf565c889",
 				Alias:       "Life is too short for no alias",
 				Description: "Every alert needs a description",
 				Responders: []Entity{

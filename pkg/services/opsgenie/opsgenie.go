@@ -73,7 +73,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	if err != nil {
 		return err
 	}
-	return service.sendAlert(url, config.ApiKey, payload)
+	return service.sendAlert(url, config.APIKey, payload)
 }
 
 func (service *Service) newAlertPayload(message string, params *types.Params) (AlertPayload, error) {
