@@ -81,25 +81,9 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 		valueLen := 0
 		preLen := 16
 
-		isEnum := field.EnumFormatter != nil
-
 		if values.IsValid() {
-			// Add some space to print the value
 			preLen = 40
-			if isEnum {
-				fieldVal := values.Field(i)
-				kind := fieldVal.Kind()
-				if kind == reflect.Int {
-					valueStr := field.EnumFormatter.Print(int(fieldVal.Int()))
-					value = ColorizeEnum(valueStr)
-					valueLen = len(valueStr)
-				} else {
-					err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, field.Name)
-					fmtr.Errors = append(fmtr.Errors, err)
-				}
-			} else if nextDepth < fmtr.MaxDepth {
-				value, valueLen = fmtr.getFieldValueString(values.FieldByName(field.Name), field.Base, nextDepth)
-			}
+			value, valueLen = fmtr.getStructFieldValueString(values.Field(i), field, nextDepth)
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
 			typeName := field.Type.String()
@@ -120,10 +104,10 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 		}
 
 		if len(field.DefaultValue) > 0 {
-			value += fmt.Sprintf(" <Default: %s>", ColorizeValue(field.DefaultValue, isEnum))
+			value += fmt.Sprintf(" <Default: %s>", ColorizeValue(field.DefaultValue, field.EnumFormatter != nil))
 		}
 
-		if isEnum {
+		if field.EnumFormatter != nil {
 			value += fmt.Sprintf(" [%s]", strings.Join(field.EnumFormatter.Names(), ", "))
 		}
 
@@ -135,6 +119,23 @@ func (fmtr *formatter) formatStructMap(structType reflect.Type, structItem inter
 	}
 
 	return valueMap, maxKeyLen
+}
+
+func (fmtr *formatter) getStructFieldValueString(fieldVal reflect.Value, field FieldInfo, nextDepth uint8) (value string, valueLen int) {
+	if field.EnumFormatter != nil {
+		kind := fieldVal.Kind()
+		if kind == reflect.Int {
+			valueStr := field.EnumFormatter.Print(int(fieldVal.Int()))
+			return ColorizeEnum(valueStr), len(valueStr)
+		} else {
+			err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, field.Name)
+			fmtr.Errors = append(fmtr.Errors, err)
+			return "", 0
+		}
+	} else if nextDepth >= fmtr.MaxDepth {
+		return
+	}
+	return fmtr.getFieldValueString(fieldVal, field.Base, nextDepth)
 }
 
 // FieldInfo is the meta data about a config field
@@ -261,7 +262,7 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth 
 		items := make([]string, fieldLen)
 		totalLen := 4
 		var itemLen int
-		for i := 0; i < fieldLen; i++ {
+		for i := range items {
 			items[i], itemLen = fmtr.getFieldValueString(field.Index(i), base, nextDepth)
 			totalLen += itemLen
 		}
@@ -273,32 +274,29 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth 
 	}
 
 	if kind == reflect.Map {
-		items := make([]string, field.Len())
+		sb := strings.Builder{}
+		sb.WriteString("{ ")
 		iter := field.MapRange()
-		index := 0
 		// initial value for totalLen is surrounding curlies and spaces, and separating commas
 		totalLen := 4 + (field.Len() - 1)
-		for iter.Next() {
+		for i := 0; iter.Next(); i++ {
 			key, keyLen := fmtr.getFieldValueString(iter.Key(), base, nextDepth)
 			value, valueLen := fmtr.getFieldValueString(iter.Value(), base, nextDepth)
-			items[index] = fmt.Sprintf("%s: %s", key, value)
+			if sb.Len() > 2 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(fmt.Sprintf("%s: %s", key, value))
 			totalLen += keyLen + valueLen + 2
 		}
+		sb.WriteString(" }")
 
-		return fmt.Sprintf("{ %s }", strings.Join(items, ", ")), totalLen
+		return sb.String(), totalLen
 	}
-	if kind == reflect.Struct {
-		structMap, _ := fmtr.formatStructMap(field.Type(), field, depth+1)
-		structFieldCount := len(structMap)
-		items := make([]string, structFieldCount)
-		index := 0
-		totalLen := 4 + (structFieldCount - 1)
-		for key, value := range structMap {
-			items[index] = fmt.Sprintf("%s: %s", key, value)
-			index++
-			totalLen += len(key) + 2 + len(value)
+	if kind == reflect.Struct || kind == reflect.Ptr {
+		formatted, err := GetConfigPropString(field)
+		if err == nil {
+			return formatted, len(formatted)
 		}
-		return fmt.Sprintf("< %s >", strings.Join(items, ", ")), totalLen
 	}
 	strVal := kind.String()
 	return fmt.Sprintf("<?%s>", strVal), len(strVal) + 5
@@ -346,27 +344,6 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 		configField.SetBool(value)
 		return true, nil
-	} else if fieldKind == reflect.Slice || fieldKind == reflect.Array {
-		elemType := field.Type.Elem()
-		elemKind := elemType.Kind()
-		if elemKind != reflect.String {
-			return false, errors.New("field format is not supported")
-		}
-
-		values := strings.Split(inputValue, ",")
-		value := reflect.ValueOf(values)
-		if fieldKind == reflect.Array {
-			arrayLen := field.Type.Len()
-			if len(values) != arrayLen {
-				return false, fmt.Errorf("field value count needs to be %d", arrayLen)
-			}
-			arr := reflect.Indirect(reflect.New(field.Type))
-			reflect.Copy(arr, value)
-			value = arr
-		}
-
-		configField.Set(value)
-		return true, nil
 	} else if fieldKind == reflect.Map {
 		keyKind := field.Type.Key().Kind()
 		elemKind := field.Type.Elem().Kind()
@@ -390,6 +367,65 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 		configField.Set(reflect.ValueOf(newMap))
 		return true, nil
+	} else if fieldKind == reflect.Struct {
+		valuePtr, err := GetConfigPropFromString(field.Type, inputValue)
+		if err != nil {
+			return false, err
+		}
+		configField.Set(valuePtr.Elem())
+		return true, nil
+	} else if fieldKind >= reflect.Slice || fieldKind == reflect.Array {
+		elemType := field.Type.Elem()
+		elemValType := elemType
+		elemKind := elemType.Kind()
+
+		if elemKind == reflect.Ptr {
+			// When updating a pointer slice, use the value type kind
+			elemValType = elemType.Elem()
+			elemKind = elemValType.Kind()
+		}
+
+		if elemKind != reflect.Struct && elemKind != reflect.String {
+			return false, errors.New("field format is not supported")
+		}
+
+		values := strings.Split(inputValue, ",")
+
+		var value reflect.Value
+		if elemKind == reflect.Struct {
+			propValues := reflect.MakeSlice(reflect.SliceOf(elemType), 0, len(values))
+			for _, v := range values {
+				propPtr, err := GetConfigPropFromString(elemValType, v)
+				if err != nil {
+					return false, err
+				}
+				propVal := propPtr
+
+				// If not a pointer slice, dereference the value
+				if elemType.Kind() != reflect.Ptr {
+					propVal = propPtr.Elem()
+				}
+				propValues = reflect.Append(propValues, propVal)
+			}
+			value = propValues
+		} else {
+			// Use the split string parts as the target value
+			value = reflect.ValueOf(values)
+		}
+
+		if fieldKind == reflect.Array {
+			arrayLen := field.Type.Len()
+			if len(values) != arrayLen {
+				return false, fmt.Errorf("field value count needs to be %d", arrayLen)
+			}
+			arr := reflect.Indirect(reflect.New(field.Type))
+			reflect.Copy(arr, value)
+			value = arr
+		}
+
+		configField.Set(value)
+		return true, nil
+
 	} else {
 		err = fmt.Errorf("invalid field kind %v", fieldKind)
 	}
@@ -398,10 +434,44 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 }
 
+func GetConfigPropFromString(structType reflect.Type, value string) (reflect.Value, error) {
+	valuePtr := reflect.New(structType)
+	configProp, ok := valuePtr.Interface().(types.ConfigProp)
+	if !ok {
+		return reflect.Value{}, errors.New("struct field cannot be used as a prop")
+	}
+
+	if err := configProp.SetFromProp(value); err != nil {
+		return reflect.Value{}, err
+	}
+
+	return valuePtr, nil
+}
+
+func GetConfigPropString(propPtr reflect.Value) (string, error) {
+
+	if propPtr.Kind() != reflect.Ptr {
+		propVal := propPtr
+		propPtr = reflect.New(propVal.Type())
+		propPtr.Elem().Set(propVal)
+	}
+
+	configProp, ok := propPtr.Interface().(types.ConfigProp)
+	if !ok {
+		return "", errors.New("struct field cannot be used as a prop")
+	}
+
+	return configProp.GetPropValue()
+}
+
 // GetConfigFieldString serializes the config field value to a string representation
 func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, err error) {
 	configField := config.FieldByName(field.Name)
 	fieldKind := field.Type.Kind()
+	if fieldKind == reflect.Ptr {
+		configField = configField.Elem()
+		fieldKind = field.Type.Elem().Kind()
+	}
 
 	if fieldKind == reflect.String {
 		return configField.String(), nil
@@ -417,14 +487,6 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 		return strconv.FormatInt(configField.Int(), field.Base), nil
 	} else if fieldKind == reflect.Bool {
 		return PrintBool(configField.Bool()), nil
-	} else if fieldKind == reflect.Slice {
-		sliceLen := configField.Len()
-		sliceValue := configField.Slice(0, sliceLen)
-		if field.Type.Elem().Kind() != reflect.String {
-			return "", errors.New("field format is not supported")
-		}
-		slice := sliceValue.Interface().([]string)
-		return strings.Join(slice, ","), nil
 	} else if fieldKind == reflect.Map {
 		keyKind := field.Type.Key().Kind()
 		elemKind := field.Type.Elem().Kind()
@@ -439,6 +501,28 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 			kvPairs = append(kvPairs, fmt.Sprintf("%s:%s", key, value))
 		}
 		return strings.Join(kvPairs, ","), nil
+	} else if fieldKind == reflect.Slice || fieldKind == reflect.Array {
+		sliceLen := configField.Len()
+		sliceValue := configField.Slice(0, sliceLen)
+		elemKind := field.Type.Elem().Kind()
+		var slice []string
+		if elemKind == reflect.Struct || elemKind == reflect.Ptr {
+			slice = make([]string, sliceLen)
+			for i := range slice {
+				strVal, err := GetConfigPropString(configField.Index(i))
+				if err != nil {
+					return "", err
+				}
+				slice[i] = strVal
+			}
+		} else if elemKind == reflect.String {
+			slice = sliceValue.Interface().([]string)
+		} else {
+			return "", errors.New("field format is not supported")
+		}
+		return strings.Join(slice, ","), nil
+	} else if fieldKind == reflect.Struct {
+		return GetConfigPropString(configField)
 	}
 	return "", fmt.Errorf("field kind %x is not supported", fieldKind)
 
