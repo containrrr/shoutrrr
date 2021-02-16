@@ -294,7 +294,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 
 			Expect(config.APIKey).To(Equal(mockAPIKey))
 			Expect(config.Host).To(Equal(mockHost))
-			Expect(config.Port).To(Equal(uint16(0)))
+			Expect(config.Port).To(Equal(uint16(443)))
 		})
 	})
 
