@@ -65,35 +65,6 @@ func (e *Entity) GetPropValue() (string, error) {
 	return fmt.Sprintf("%s:%s", e.Type, identifier), nil
 }
 
-func serializeEntities(entities []Entity) (string, error) {
-	entityStrings := []string{}
-
-	for _, entity := range entities {
-		entityStr, err := entity.GetPropValue()
-		if err != nil {
-			return "", err
-		}
-		entityStrings = append(entityStrings, entityStr)
-	}
-
-	return strings.Join(entityStrings, ","), nil
-}
-
-func deserializeEntities(str string) ([]Entity, error) {
-	result := []Entity{}
-
-	entityStrings := strings.Split(str, ",")
-	for _, entityStr := range entityStrings {
-		entity := Entity{}
-		if err := entity.SetFromProp(entityStr); err != nil {
-			return result, err
-		}
-		result = append(result, entity)
-	}
-
-	return result, nil
-}
-
 // Detects OpsGenie IDs in the form 4513b7ea-3b91-438f-b7e4-e3e54af9147c
 func isOpsGenieID(str string) (bool, error) {
 	return regexp.MatchString(`^[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}$`, str)

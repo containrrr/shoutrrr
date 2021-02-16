@@ -84,22 +84,6 @@ func (service *Service) newAlertPayload(message string, params *types.Params) (A
 	// Defensive copy
 	payloadFields := *service.config
 
-	if value, found := (*params)["responders"]; found {
-		responders, err := deserializeEntities(value)
-		if err != nil {
-			return AlertPayload{}, err
-		}
-		payloadFields.Responders = responders
-		delete(*params, "responders")
-	}
-	if value, found := (*params)["visibleTo"]; found {
-		visibleTo, err := deserializeEntities(value)
-		if err != nil {
-			return AlertPayload{}, err
-		}
-		payloadFields.VisibleTo = visibleTo
-		delete(*params, "visibleTo")
-	}
 	if err := service.pkr.UpdateConfigFromParams(&payloadFields, params); err != nil {
 		return AlertPayload{}, err
 	}

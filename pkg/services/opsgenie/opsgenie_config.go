@@ -50,22 +50,11 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 		host = config.Host
 	}
 
-	// Serialize Shoutrrr standard data types
-	query, _ := url.ParseQuery(format.BuildQuery(resolver))
-	// Serialize OpsGenie specific data types
-	if len(config.Responders) > 0 {
-		responders, _ := serializeEntities(config.Responders)
-		query.Set("responders", responders)
-	}
-	if len(config.VisibleTo) > 0 {
-		visibleTo, _ := serializeEntities(config.VisibleTo)
-		query.Set("visibleTo", visibleTo)
-	}
 	result := &url.URL{
 		Host:     host,
 		Path:     fmt.Sprintf("/%s", config.APIKey),
 		Scheme:   Scheme,
-		RawQuery: query.Encode(),
+		RawQuery: format.BuildQuery(resolver),
 	}
 
 	return result
@@ -93,18 +82,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 	}
 
 	for key, vals := range url.Query() {
-		var err error
-
-		switch key {
-		case "responders":
-			config.Responders, err = deserializeEntities(vals[0])
-		case "visibleTo":
-			config.VisibleTo, err = deserializeEntities(vals[0])
-		default:
-			err = resolver.Set(key, vals[0])
-		}
-
-		if err != nil {
+		if err := resolver.Set(key, vals[0]); err != nil {
 			return err
 		}
 	}
