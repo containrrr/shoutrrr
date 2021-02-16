@@ -9,6 +9,8 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
+const defaultPort = 443
+
 // Config for use within the opsgenie service
 type Config struct {
 	APIKey      string            `desc:"The OpsGenie API key"`
@@ -86,6 +88,8 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 			return err
 		}
 		config.Port = uint16(port)
+	} else {
+		config.Port = 443
 	}
 
 	for key, vals := range url.Query() {
