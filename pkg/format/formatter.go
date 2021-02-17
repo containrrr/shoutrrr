@@ -128,11 +128,11 @@ func (fmtr *formatter) getStructFieldValueString(fieldVal reflect.Value, field F
 		if kind == reflect.Int {
 			valueStr := field.EnumFormatter.Print(int(fieldVal.Int()))
 			return ColorizeEnum(valueStr), len(valueStr)
-		} else {
-			err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, field.Name)
-			fmtr.Errors = append(fmtr.Errors, err)
-			return "", 0
 		}
+		err := fmt.Errorf("incorrect enum type '%s' for field '%s'", kind, field.Name)
+		fmtr.Errors = append(fmtr.Errors, err)
+		return "", 0
+
 	} else if nextDepth >= fmtr.MaxDepth {
 		return
 	}
@@ -450,6 +450,7 @@ func SetConfigField(config reflect.Value, field FieldInfo, inputValue string) (v
 
 }
 
+// GetConfigPropFromString deserializes a config property from a string representation using the ConfigProp interface
 func GetConfigPropFromString(structType reflect.Type, value string) (reflect.Value, error) {
 	valuePtr := reflect.New(structType)
 	configProp, ok := valuePtr.Interface().(types.ConfigProp)
@@ -464,6 +465,7 @@ func GetConfigPropFromString(structType reflect.Type, value string) (reflect.Val
 	return valuePtr, nil
 }
 
+// GetConfigPropString serializes a config property to a string representation using the ConfigProp interface
 func GetConfigPropString(propPtr reflect.Value) (string, error) {
 
 	if propPtr.Kind() != reflect.Ptr {
