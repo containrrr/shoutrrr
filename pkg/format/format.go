@@ -5,28 +5,12 @@ import (
 	"strings"
 )
 
-// NotifyFormat describes the format used in the notification body
-type NotifyFormat int
-
-const (
-	// Markdown is the default notification format
-	Markdown NotifyFormat = 0
-)
-
 // ParseBool returns true for "1","true","yes" or false for "0","false","no" or defaultValue for any other value
 func ParseBool(value string, defaultValue bool) (parsedValue bool, ok bool) {
 	switch strings.ToLower(value) {
-	case "true":
-		fallthrough
-	case "1":
-		fallthrough
-	case "yes":
+	case "true", "1", "yes":
 		return true, true
-	case "false":
-		fallthrough
-	case "0":
-		fallthrough
-	case "no":
+	case "false", "0", "no":
 		return false, true
 	default:
 		return defaultValue, false
