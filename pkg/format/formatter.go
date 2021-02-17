@@ -515,9 +515,10 @@ func GetConfigFieldString(config reflect.Value, field FieldInfo) (value string, 
 		kvPairs := []string{}
 		for _, key := range configField.MapKeys() {
 			value := configField.MapIndex(key).Interface()
-
 			kvPairs = append(kvPairs, fmt.Sprintf("%s:%s", key, value))
 		}
+		// Map key/value-pairs are sorted after concat as it should be identical to sorting the keys before
+		sort.Strings(kvPairs)
 		return strings.Join(kvPairs, ","), nil
 	} else if fieldKind == reflect.Slice || fieldKind == reflect.Array {
 		sliceLen := configField.Len()
