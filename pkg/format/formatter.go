@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"unsafe"
@@ -274,19 +275,34 @@ func (fmtr *formatter) getFieldValueString(field reflect.Value, base int, depth 
 	}
 
 	if kind == reflect.Map {
-		sb := strings.Builder{}
-		sb.WriteString("{ ")
+
 		iter := field.MapRange()
 		// initial value for totalLen is surrounding curlies and spaces, and separating commas
 		totalLen := 4 + (field.Len() - 1)
+
+		keys := make([]string, field.Len())
+		keyFmtMap := make(map[string]string, field.Len())
+
 		for i := 0; iter.Next(); i++ {
-			key, keyLen := fmtr.getFieldValueString(iter.Key(), base, nextDepth)
+			key := iter.Key().String()
+			keyFmt, keyLen := fmtr.getFieldValueString(iter.Key(), base, nextDepth)
 			value, valueLen := fmtr.getFieldValueString(iter.Value(), base, nextDepth)
+
+			keys[i] = key
+			keyFmtMap[key] = fmt.Sprintf("%s: %s", keyFmt, value)
+			totalLen += keyLen + valueLen + 2
+		}
+
+		sort.Strings(keys)
+
+		sb := strings.Builder{}
+		sb.WriteString("{ ")
+		for _, key := range keys {
+
 			if sb.Len() > 2 {
 				sb.WriteString(", ")
 			}
-			sb.WriteString(fmt.Sprintf("%s: %s", key, value))
-			totalLen += keyLen + valueLen + 2
+			sb.WriteString(keyFmtMap[key])
 		}
 		sb.WriteString(" }")
 

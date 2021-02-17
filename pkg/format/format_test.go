@@ -215,7 +215,7 @@ var _ = Describe("the format package", func() {
 					testSetAndFormat(tv, fieldMap["SubPropPtrSlice"], "@diet,@glue", "[ @diet, @glue ]")
 				})
 				It("should format prop struct slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["StrMap"], "one:1,two:2", "{ one: 1, two: 2 }")
+					testSetAndFormat(tv, fieldMap["StrMap"], "a:1,c:3,b:2", "{ a: 1, b: 2, c: 3 }")
 				})
 			})
 		})
