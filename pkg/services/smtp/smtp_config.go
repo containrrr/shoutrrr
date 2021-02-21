@@ -41,7 +41,7 @@ func (config *Config) SetURL(url *url.URL) error {
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
-		User:       url.UserPassword(config.Username, config.Password),
+		User:       util.UrlUserPassword(config.Username, config.Password),
 		Host:       fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Path:       "/",
 		Scheme:     Scheme,

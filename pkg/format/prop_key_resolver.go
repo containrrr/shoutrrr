@@ -127,3 +127,8 @@ func GetConfigQueryResolver(config types.ServiceConfig) types.ConfigQueryResolve
 func (pkr *PropKeyResolver) KeyIsPrimary(key string) bool {
 	return pkr.keyFields[key].Keys[0] == key
 }
+
+// IsDefault returns whether the specified key value is the default value
+func (pkr *PropKeyResolver) IsDefault(key string, value string) bool {
+	return pkr.keyFields[key].DefaultValue == value
+}
