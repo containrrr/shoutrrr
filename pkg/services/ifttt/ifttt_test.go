@@ -112,6 +112,20 @@ var _ = Describe("the ifttt package", func() {
 				Expect(resultURL).To(Equal(expectedURL))
 			})
 		})
+
+		When("given values", func() {
+			It("should return an URL with all the values", func() {
+				expectedURL := "ifttt://dummyID/?messagevalue=0&value1=v1&value2=v2&value3=v3"
+				config := Config{
+					WebHookID: "dummyID",
+					Value1:    "v1",
+					Value2:    "v2",
+					Value3:    "v3",
+				}
+				resultURL := config.GetURL().String()
+				Expect(resultURL).To(Equal(expectedURL))
+			})
+		})
 	})
 	When("sending a message", func() {
 		It("should error if the response code is not 204 no content", func() {

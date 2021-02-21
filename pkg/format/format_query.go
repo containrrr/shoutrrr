@@ -19,6 +19,7 @@ func BuildQuery(cqr types.ConfigQueryResolver) string {
 		}
 		value, err := cqr.Get(key)
 
+
 		if err != nil || isPkr && pkr.IsDefault(key, value) {
 			continue
 		}
