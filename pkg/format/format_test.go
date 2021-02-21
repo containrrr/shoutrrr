@@ -4,7 +4,9 @@ import (
 	"errors"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/fatih/color"
+	"net/url"
 	"reflect"
+	"strings"
 
 	"testing"
 
@@ -14,11 +16,8 @@ import (
 
 var (
 	// logger *log.Logger
-	f = formatter{
-		EnumFormatters: map[string]types.EnumFormatter{
-			"TestEnum": testEnum,
-		},
-		MaxDepth: 2,
+	enums = map[string]types.EnumFormatter{
+		"TestEnum": testEnum,
 	}
 	ts *testStruct
 )
@@ -40,12 +39,14 @@ var _ = Describe("the format package", func() {
 		var (
 			tv reflect.Value
 		)
-		tt := reflect.TypeOf(testStruct{})
-		fields := f.getStructFieldInfo(tt)
+		testConfig := testStruct{}
+		tt := reflect.TypeOf(testConfig)
+		rootNode := getRootNode(&testConfig)
 
-		fieldMap := make(map[string]FieldInfo, len(fields))
-		for _, fi := range fields {
-			fieldMap[fi.Name] = fi
+		nodeMap := make(map[string]Node, len(rootNode.Items))
+		for _, item := range rootNode.Items {
+			field := item.Field()
+			nodeMap[field.Name] = item
 		}
 		When("updating a struct", func() {
 
@@ -58,7 +59,7 @@ var _ = Describe("the format package", func() {
 			When("setting an integer value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["Signed"], "3")
+						valid, err := SetConfigField(tv, *nodeMap["Signed"].Field(), "3")
 						Expect(valid).To(BeTrue())
 						Expect(err).NotTo(HaveOccurred())
 
@@ -68,7 +69,7 @@ var _ = Describe("the format package", func() {
 				When("the value is invalid", func() {
 					It("should return an error", func() {
 						ts.Signed = 2
-						valid, err := SetConfigField(tv, fieldMap["Signed"], "z7")
+						valid, err := SetConfigField(tv, *nodeMap["Signed"].Field(), "z7")
 						Expect(valid).To(BeFalse())
 						Expect(err).To(HaveOccurred())
 
@@ -80,7 +81,7 @@ var _ = Describe("the format package", func() {
 			When("setting an unsigned integer value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["Unsigned"], "6")
+						valid, err := SetConfigField(tv, *nodeMap["Unsigned"].Field(), "6")
 						Expect(valid).To(BeTrue())
 						Expect(err).NotTo(HaveOccurred())
 
@@ -90,7 +91,7 @@ var _ = Describe("the format package", func() {
 				When("the value is invalid", func() {
 					It("should return an error", func() {
 						ts.Unsigned = 2
-						valid, err := SetConfigField(tv, fieldMap["Unsigned"], "-3")
+						valid, err := SetConfigField(tv, *nodeMap["Unsigned"].Field(), "-3")
 
 						Expect(ts.Unsigned).To(Equal(uint(2)))
 						Expect(valid).To(BeFalse())
@@ -102,7 +103,7 @@ var _ = Describe("the format package", func() {
 			When("setting a string slice value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["StrSlice"], "meawannowalkalitabitalleh,meawannofeelalitabitstrongah")
+						valid, err := SetConfigField(tv, *nodeMap["StrSlice"].Field(), "meawannowalkalitabitalleh,meawannofeelalitabitstrongah")
 						Expect(valid).To(BeTrue())
 						Expect(err).NotTo(HaveOccurred())
 
@@ -114,21 +115,21 @@ var _ = Describe("the format package", func() {
 			When("setting a string array value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["StrArray"], "meawannowalkalitabitalleh,meawannofeelalitabitstrongah,meawannothinkalitabitsmartah")
+						valid, err := SetConfigField(tv, *nodeMap["StrArray"].Field(), "meawannowalkalitabitalleh,meawannofeelalitabitstrongah,meawannothinkalitabitsmartah")
 						Expect(valid).To(BeTrue())
 						Expect(err).NotTo(HaveOccurred())
 					})
 				})
 				When("the value has too many elements", func() {
 					It("should return an error", func() {
-						valid, err := SetConfigField(tv, fieldMap["StrArray"], "one,two,three,four?")
+						valid, err := SetConfigField(tv, *nodeMap["StrArray"].Field(), "one,two,three,four?")
 						Expect(valid).To(BeFalse())
 						Expect(err).To(HaveOccurred())
 					})
 				})
 				When("the value has too few elements", func() {
 					It("should return an error", func() {
-						valid, err := SetConfigField(tv, fieldMap["StrArray"], "one,two")
+						valid, err := SetConfigField(tv, *nodeMap["StrArray"].Field(), "one,two")
 						Expect(valid).To(BeFalse())
 						Expect(err).To(HaveOccurred())
 					})
@@ -136,9 +137,9 @@ var _ = Describe("the format package", func() {
 			})
 
 			When("setting a struct value", func() {
-				When("it implements ConfigProp", func() {
+				When("it doesn't implement ConfigProp", func() {
 					It("should return an error", func() {
-						valid, err := SetConfigField(tv, fieldMap["Sub"], "@awol")
+						valid, err := SetConfigField(tv, *nodeMap["Sub"].Field(), "@awol")
 						Expect(err).To(HaveOccurred())
 						Expect(valid).NotTo(BeTrue())
 					})
@@ -146,7 +147,7 @@ var _ = Describe("the format package", func() {
 				When("it implements ConfigProp", func() {
 					When("the value is valid", func() {
 						It("should set it", func() {
-							valid, err := SetConfigField(tv, fieldMap["SubProp"], "@awol")
+							valid, err := SetConfigField(tv, *nodeMap["SubProp"].Field(), "@awol")
 							Expect(err).NotTo(HaveOccurred())
 							Expect(valid).To(BeTrue())
 
@@ -155,7 +156,7 @@ var _ = Describe("the format package", func() {
 					})
 					When("the value is invalid", func() {
 						It("should return an error", func() {
-							valid, err := SetConfigField(tv, fieldMap["SubProp"], "missing initial at symbol")
+							valid, err := SetConfigField(tv, *nodeMap["SubProp"].Field(), "missing initial at symbol")
 							Expect(err).To(HaveOccurred())
 							Expect(valid).NotTo(BeTrue())
 						})
@@ -166,7 +167,7 @@ var _ = Describe("the format package", func() {
 			When("setting a struct slice value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["SubPropSlice"], "@alice,@merton")
+						valid, err := SetConfigField(tv, *nodeMap["SubPropSlice"].Field(), "@alice,@merton")
 						Expect(err).NotTo(HaveOccurred())
 						Expect(valid).To(BeTrue())
 
@@ -178,7 +179,7 @@ var _ = Describe("the format package", func() {
 			When("setting a struct pointer slice value", func() {
 				When("the value is valid", func() {
 					It("should set it", func() {
-						valid, err := SetConfigField(tv, fieldMap["SubPropPtrSlice"], "@the,@best")
+						valid, err := SetConfigField(tv, *nodeMap["SubPropPtrSlice"].Field(), "@the,@best")
 						Expect(err).NotTo(HaveOccurred())
 						Expect(valid).To(BeTrue())
 
@@ -195,49 +196,84 @@ var _ = Describe("the format package", func() {
 			})
 			When("setting and formatting", func() {
 				It("should format signed integers identical to input", func() {
-					testSetAndFormat(tv, fieldMap["Signed"], "-45", "-45")
+					testSetAndFormat(tv, nodeMap["Signed"], "-45", "-45")
 				})
 				It("should format unsigned integers identical to input", func() {
-					testSetAndFormat(tv, fieldMap["Unsigned"], "5", "5")
+					testSetAndFormat(tv, nodeMap["Unsigned"], "5", "5")
 				})
 				It("should format structs identical to input", func() {
-					testSetAndFormat(tv, fieldMap["SubProp"], "@whoa", "@whoa")
+					testSetAndFormat(tv, nodeMap["SubProp"], "@whoa", "@whoa")
 				})
 				It("should format enums identical to input", func() {
-					testSetAndFormat(tv, fieldMap["TestEnum"], "Foo", "Foo")
+					testSetAndFormat(tv, nodeMap["TestEnum"], "Foo", "Foo")
 				})
 				It("should format string slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["StrSlice"], "one,two,three,four", "[ one, two, three, four ]")
+					testSetAndFormat(tv, nodeMap["StrSlice"], "one,two,three,four", "[ one, two, three, four ]")
 				})
 				It("should format string arrays identical to input", func() {
-					testSetAndFormat(tv, fieldMap["StrArray"], "one,two,three", "[ one, two, three ]")
+					testSetAndFormat(tv, nodeMap["StrArray"], "one,two,three", "[ one, two, three ]")
 				})
 				It("should format prop struct slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["SubPropSlice"], "@be,@the,@best", "[ @be, @the, @best ]")
+					testSetAndFormat(tv, nodeMap["SubPropSlice"], "@be,@the,@best", "[ @be, @the, @best ]")
 				})
-				It("should format prop struct slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["SubPropPtrSlice"], "@diet,@glue", "[ @diet, @glue ]")
+				It("should format prop struct pointer slices identical to input", func() {
+					testSetAndFormat(tv, nodeMap["SubPropPtrSlice"], "@diet,@glue", "[ @diet, @glue ]")
 				})
-				It("should format prop struct slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["StrMap"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				It("should format string maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["StrMap"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+
+				It("should format int maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["IntMap"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format int8 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Int8Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format int16 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Int16Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format int32 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Int32Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format int64 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Int64Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+
+				It("should format uint maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["UintMap"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format uint8 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Uint8Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format uint16 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Uint16Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format uint32 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Uint32Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
+				})
+				It("should format uint64 maps identical to input", func() {
+					testSetAndFormat(tv, nodeMap["Uint64Map"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
 				})
 			})
 		})
 	})
 })
 
-func testSetAndFormat(tv reflect.Value, field FieldInfo, value string, prettyFormat string) {
-	_, _ = SetConfigField(tv, field, value)
-	fieldValue := tv.FieldByName(field.Name)
+func testSetAndFormat(tv reflect.Value, node Node, value string, prettyFormat string) {
+	field := node.Field()
+	_, _ = SetConfigField(tv, *field, value)
 
 	// Used for de-/serializing configuration
-	formatted, err := GetConfigFieldString(tv, field)
+	formatted, err := GetConfigFieldString(tv, *field)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(formatted).To(Equal(value))
 
+	node.Update(tv.FieldByName(field.Name))
+
 	// Used for pretty printing output, coloring etc.
-	formatted, _ = f.getStructFieldValueString(fieldValue, field, 0)
-	Expect(formatted).To(Equal(prettyFormat))
+	sb := strings.Builder{}
+	writeColoredNodeValue(&sb, node)
+	Expect(sb.String()).To(Equal(prettyFormat))
 }
 
 type testStruct struct {
@@ -253,6 +289,28 @@ type testStruct struct {
 	SubPropSlice    []subPropStruct
 	SubPropPtrSlice []*subPropStruct
 	StrMap          map[string]string
+	IntMap          map[string]int
+	Int8Map         map[string]int8
+	Int16Map        map[string]int16
+	Int32Map        map[string]int32
+	Int64Map        map[string]int64
+	UintMap         map[string]uint
+	Uint8Map        map[string]int8
+	Uint16Map       map[string]int16
+	Uint32Map       map[string]int32
+	Uint64Map       map[string]int64
+}
+
+func (t *testStruct) GetURL() *url.URL {
+	panic("not implemented")
+}
+
+func (t *testStruct) SetURL(_ *url.URL) error {
+	panic("not implemented")
+}
+
+func (t *testStruct) Enums() map[string]types.EnumFormatter {
+	return enums
 }
 
 type subStruct struct {

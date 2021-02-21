@@ -27,6 +27,7 @@ const (
 type Node interface {
 	Field() *FieldInfo
 	TokenType() NodeTokenType
+	Update(tv r.Value)
 }
 
 type ValueNode struct {
@@ -41,6 +42,12 @@ func (n *ValueNode) Field() *FieldInfo {
 
 func (n *ValueNode) TokenType() NodeTokenType {
 	return n.tokenType
+
+}
+func (n *ValueNode) Update(tv r.Value) {
+	value, token := getValueNodeValue(tv, n.FieldInfo)
+	n.Value = value
+	n.tokenType = token
 }
 
 type ContainerNode struct {
@@ -57,38 +64,55 @@ func (n *ContainerNode) TokenType() NodeTokenType {
 	return ContainerToken
 }
 
-func getArrayNode(arrayValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
-	itemCount := arrayValue.Len()
-	nodeItems := make([]Node, 0, itemCount)
-
-	for i := 0; i < itemCount; i++ {
-		key := strconv.Itoa(i)
-		val := arrayValue.Index(i)
-		nodeItems = append(nodeItems, getValueNode(val, &FieldInfo{
-			Name: key,
-			Type: val.Type(),
-		}))
-	}
-
-	return &ContainerNode{
-		FieldInfo:    fieldInfo,
-		Items:        nodeItems,
-		MaxKeyLength: 0,
+func (n *ContainerNode) Update(tv r.Value) {
+	switch n.FieldInfo.Type.Kind() {
+	case r.Array, r.Slice:
+		n.updateArrayNode(tv)
+	case r.Map:
+		n.updateMapNode(tv)
 	}
 }
 
-func getMapNode(mapValue r.Value, fieldInfo *FieldInfo) *ContainerNode {
-	if mapValue.Kind() == r.Ptr {
-		mapValue = mapValue.Elem()
+func (n *ContainerNode) updateArrayNode(arrayValue r.Value) {
+	itemCount := arrayValue.Len()
+	n.Items = make([]Node, 0, itemCount)
+
+	elemType := arrayValue.Type().Elem()
+	for i := 0; i < itemCount; i++ {
+		key := strconv.Itoa(i)
+		val := arrayValue.Index(i)
+		n.Items = append(n.Items, getValueNode(val, &FieldInfo{
+			Name: key,
+			Type: elemType,
+		}))
+	}
+}
+
+func getArrayNode(arrayValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
+	node = &ContainerNode{
+		FieldInfo:    fieldInfo,
+		MaxKeyLength: 0,
 	}
 
-	mapKeys := mapValue.MapKeys()
-	nodeItems := make([]Node, len(mapKeys))
-	base := fieldInfo.Base
+	node.updateArrayNode(arrayValue)
+
+	return node
+}
+
+func sortNodeItems(nodeItems []Node) {
+	sort.Slice(nodeItems, func(i, j int) bool {
+		return nodeItems[i].Field().Name < nodeItems[j].Field().Name
+	})
+}
+
+func (n *ContainerNode) updateMapNode(mapValue r.Value) {
+	base := n.FieldInfo.Base
 	if base == 0 {
 		base = 10
 	}
-
+	elemType := mapValue.Type().Elem()
+	mapKeys := mapValue.MapKeys()
+	nodeItems := make([]Node, len(mapKeys))
 	maxKeyLength := 0
 	for i, keyVal := range mapKeys {
 		// The keys will always be strings
@@ -96,13 +120,29 @@ func getMapNode(mapValue r.Value, fieldInfo *FieldInfo) *ContainerNode {
 		val := mapValue.MapIndex(keyVal)
 		nodeItems[i] = getValueNode(val, &FieldInfo{
 			Name: key,
-			Type: val.Type(),
+			Type: elemType,
 			Base: base,
 		})
 		maxKeyLength = util.Max(len(key), maxKeyLength)
 	}
+	sortNodeItems(nodeItems)
 
-	return sortedContainerNode(nodeItems, fieldInfo, maxKeyLength)
+	n.Items = nodeItems
+	n.MaxKeyLength = maxKeyLength
+}
+
+func getMapNode(mapValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
+	if mapValue.Kind() == r.Ptr {
+		mapValue = mapValue.Elem()
+	}
+
+	node = &ContainerNode{
+		FieldInfo: fieldInfo,
+	}
+
+	node.updateMapNode(mapValue)
+
+	return
 }
 
 func getNode(fieldVal r.Value, fieldInfo *FieldInfo) Node {
@@ -144,13 +184,7 @@ func getRootNode(config types.ServiceConfig) *ContainerNode {
 		maxKeyLength = util.Max(len(field.Name), maxKeyLength)
 	}
 
-	return sortedContainerNode(nodeItems, fieldInfo, maxKeyLength)
-}
-
-func sortedContainerNode(nodeItems []Node, fieldInfo *FieldInfo, maxKeyLength int) *ContainerNode {
-	sort.Slice(nodeItems, func(i, j int) bool {
-		return nodeItems[i].Field().Name < nodeItems[j].Field().Name
-	})
+	sortNodeItems(nodeItems)
 
 	return &ContainerNode{
 		FieldInfo:    fieldInfo,
@@ -197,8 +231,8 @@ func getValueNodeValue(fieldValue r.Value, fieldInfo *FieldInfo) (string, NodeTo
 		return PrintBool(val), FalseToken
 	case r.Array, r.Slice, r.Map:
 		return getContainerValueString(fieldValue, fieldInfo), UnknownToken
-	case r.Struct, r.Ptr:
-		if val, err := GetConfigPropString(fieldValue); err != nil {
+	case r.Ptr, r.Struct:
+		if val, err := GetConfigPropString(fieldValue); err == nil {
 			return val, PropToken
 		}
 		return "<ERR>", ErrorToken
@@ -213,12 +247,19 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 	var mapKeys []r.Value
 	if fieldInfo.Type.Kind() == r.Map {
 		mapKeys = fieldValue.MapKeys()
+		sort.Slice(mapKeys, func(a, b int) bool {
+			return mapKeys[a].String() < mapKeys[b].String()
+		})
 	}
 
 	sb := strings.Builder{}
 	var itemFieldInfo *FieldInfo
 	for i := 0; i < sliceLen; i++ {
 		var itemValue r.Value
+		if i > 0 {
+			sb.WriteRune(',')
+		}
+
 		if mapKeys != nil {
 			mapKey := mapKeys[i]
 			sb.WriteString(mapKey.String())
@@ -238,8 +279,6 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 			if itemFieldInfo.Base == 0 {
 				itemFieldInfo.Base = 10
 			}
-		} else {
-			sb.WriteRune(',')
 		}
 		strVal, _ := getValueNodeValue(itemValue, itemFieldInfo)
 		sb.WriteString(strVal)

@@ -185,11 +185,12 @@ func SetConfigField(config r.Value, field FieldInfo, inputValue string) (valid b
 }
 
 func getMapValue(valueType r.Type, valueRaw string) (r.Value, error) {
-	switch valueType.Kind() {
+	kind := valueType.Kind()
+	switch kind {
 	case r.Uint, r.Uint8, r.Uint16, r.Uint32, r.Uint64:
-		return getMapUintValue(valueRaw, valueType.Bits())
+		return getMapUintValue(valueRaw, valueType.Bits(), kind)
 	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-		return getMapIntValue(valueRaw, valueType.Bits())
+		return getMapIntValue(valueRaw, valueType.Bits(), kind)
 	case r.String:
 		return r.ValueOf(valueRaw), nil
 	default:
@@ -197,36 +198,42 @@ func getMapValue(valueType r.Type, valueRaw string) (r.Value, error) {
 	return r.Value{}, errors.New("map value format is not supported")
 }
 
-func getMapUintValue(valueRaw string, bits int) (r.Value, error) {
+func getMapUintValue(valueRaw string, bits int, kind r.Kind) (r.Value, error) {
 	number, base := util.StripNumberPrefix(valueRaw)
 	numValue, err := strconv.ParseUint(number, base, bits)
 
-	switch bits {
-	case 8:
+	switch kind {
+	case r.Uint:
+		return r.ValueOf(uint(numValue)), err
+	case r.Uint8:
 		return r.ValueOf(uint8(numValue)), err
-	case 16:
+	case r.Uint16:
 		return r.ValueOf(uint16(numValue)), err
-	case 32:
+	case r.Uint32:
 		return r.ValueOf(uint32(numValue)), err
+	case r.Uint64:
 	default:
-		return r.ValueOf(numValue), err
 	}
+	return r.ValueOf(numValue), err
 }
 
-func getMapIntValue(valueRaw string, bits int) (r.Value, error) {
+func getMapIntValue(valueRaw string, bits int, kind r.Kind) (r.Value, error) {
 	number, base := util.StripNumberPrefix(valueRaw)
 	numValue, err := strconv.ParseInt(number, base, bits)
 
-	switch bits {
-	case 8:
+	switch kind {
+	case r.Int:
+		return r.ValueOf(int(numValue)), err
+	case r.Int8:
 		return r.ValueOf(int8(numValue)), err
-	case 16:
+	case r.Int16:
 		return r.ValueOf(int16(numValue)), err
-	case 32:
+	case r.Int32:
 		return r.ValueOf(int32(numValue)), err
+	case r.Int64:
 	default:
-		return r.ValueOf(numValue), err
 	}
+	return r.ValueOf(numValue), err
 }
 
 // GetConfigFieldString serializes the config field value to a string representation
@@ -238,65 +245,4 @@ func GetConfigFieldString(config r.Value, field FieldInfo) (value string, err er
 		err = errors.New("invalid field value")
 	}
 	return strVal, err
-	//
-	//fieldKind := field.Type.Kind()
-	//if fieldKind == r.Ptr {
-	//	configField = configField.Elem()
-	//	fieldKind = field.Type.Elem().Kind()
-	//}
-	//
-	//if fieldKind == r.String {
-	//	return configField.String(), nil
-	//} else if field.EnumFormatter != nil {
-	//	return field.EnumFormatter.Print(int(configField.Int())), nil
-	//} else if fieldKind >= r.Uint && fieldKind <= r.Uint64 {
-	//	number := strconv.FormatUint(configField.Uint(), field.Base)
-	//	if field.Base == 16 {
-	//		number = "0x" + number
-	//	}
-	//	return number, nil
-	//} else if fieldKind >= r.Int && fieldKind <= r.Int64 {
-	//	return strconv.FormatInt(configField.Int(), field.Base), nil
-	//} else if fieldKind == r.Bool {
-	//	return PrintBool(configField.Bool()), nil
-	//} else if fieldKind == r.Map {
-	//	keyKind := field.Type.Key().Kind()
-	//	elemKind := field.Type.Elem().Kind()
-	//	if elemKind != r.String || keyKind != r.String {
-	//		return "", errors.New("field format is not supported")
-	//	}
-	//
-	//	kvPairs := []string{}
-	//	for _, key := range configField.MapKeys() {
-	//		value := configField.MapIndex(key).Interface()
-	//		kvPairs = append(kvPairs, fmt.Sprintf("%s:%s", key, value))
-	//	}
-	//	// Map key/value-pairs are sorted after concat as it should be identical to sorting the keys before
-	//	sort.Strings(kvPairs)
-	//	return strings.Join(kvPairs, ","), nil
-	//} else if fieldKind == r.Slice || fieldKind == r.Array {
-	//	sliceLen := configField.Len()
-	//	sliceValue := configField.Slice(0, sliceLen)
-	//	elemKind := field.Type.Elem().Kind()
-	//	var slice []string
-	//	if elemKind == r.Struct || elemKind == r.Ptr {
-	//		slice = make([]string, sliceLen)
-	//		for i := range slice {
-	//			strVal, err := GetConfigPropString(configField.Index(i))
-	//			if err != nil {
-	//				return "", err
-	//			}
-	//			slice[i] = strVal
-	//		}
-	//	} else if elemKind == r.String {
-	//		slice = sliceValue.Interface().([]string)
-	//	} else {
-	//		return "", errors.New("field format is not supported")
-	//	}
-	//	return strings.Join(slice, ","), nil
-	//} else if fieldKind == r.Struct {
-	//	return GetConfigPropString(configField)
-	//}
-	//return "", fmt.Errorf("field kind %x is not supported", fieldKind)
-
 }
