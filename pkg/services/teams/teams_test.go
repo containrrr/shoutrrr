@@ -87,7 +87,7 @@ var _ = Describe("the teams plugin", func() {
 				serviceURL, err := service.GetConfigURLFromCustom(customURL)
 				Expect(err).NotTo(HaveOccurred(), "converting")
 
-				Expect(serviceURL.String()).To(Equal(testURLBase + "?color=&host=publicservice.info&title="))
+				Expect(serviceURL.String()).To(Equal(testURLBase + "?host=publicservice.info"))
 			})
 			It("should preserve the query params in the generated service URL", func() {
 				service := Service{}

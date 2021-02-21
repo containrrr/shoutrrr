@@ -8,6 +8,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
+	"github.com/containrrr/shoutrrr/pkg/services/opsgenie"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
@@ -37,4 +38,5 @@ var serviceMap = map[string]func() t.Service{
 	"zulip":      func() t.Service { return &zulip.Service{} },
 	"join":       func() t.Service { return &join.Service{} },
 	"rocketchat": func() t.Service { return &rocketchat.Service{} },
+	"opsgenie":   func() t.Service { return &opsgenie.Service{} },
 }

@@ -19,7 +19,7 @@ func BuildQuery(cqr types.ConfigQueryResolver) string {
 		}
 		value, err := cqr.Get(key)
 
-		if err == nil {
+		if err == nil && value != "" {
 			query.Set(key, value)
 		}
 	}
