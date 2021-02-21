@@ -22,6 +22,7 @@ type FieldInfo struct {
 	Keys          []string
 }
 
+// IsEnum returns whether a EnumFormatter has been assigned to the field and that it is of a suitable type
 func (fi *FieldInfo) IsEnum() bool {
 	return fi.EnumFormatter != nil && fi.Type.Kind() == r.Int
 }

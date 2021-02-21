@@ -10,60 +10,80 @@ import (
 	"strings"
 )
 
+// NodeTokenType is used to represent the type of value that a node has for syntax highlighting
 type NodeTokenType int
 
 const (
+	// UnknownToken represents all unknown/unspecified tokens
 	UnknownToken NodeTokenType = iota
+	// NumberToken represents all numbers
 	NumberToken
+	// StringToken represents strings and keys
 	StringToken
+	// EnumToken represents enum values
 	EnumToken
+	// TrueToken represent boolean true
 	TrueToken
+	// FalseToken represent boolean false
 	FalseToken
+	// PropToken represent a serializable struct prop
 	PropToken
+	// ErrorToken represent a value that was not serializable or otherwise invalid
 	ErrorToken
+	// ContainerToken is used for Array/Slice and Map tokens
 	ContainerToken
 )
 
+// Node is the generic config tree item
 type Node interface {
 	Field() *FieldInfo
 	TokenType() NodeTokenType
 	Update(tv r.Value)
 }
 
+// ValueNode is a Node without any child items
 type ValueNode struct {
 	*FieldInfo
 	Value     string
 	tokenType NodeTokenType
 }
 
+// Field returns the inner FieldInfo
 func (n *ValueNode) Field() *FieldInfo {
 	return n.FieldInfo
 }
 
+// TokenType returns a NodeTokenType that matches the value
 func (n *ValueNode) TokenType() NodeTokenType {
 	return n.tokenType
 
 }
+
+// Update updates the value string from the provided value
 func (n *ValueNode) Update(tv r.Value) {
 	value, token := getValueNodeValue(tv, n.FieldInfo)
 	n.Value = value
 	n.tokenType = token
 }
 
+// ContainerNode is a Node with child items
 type ContainerNode struct {
 	*FieldInfo
 	Items        []Node
 	MaxKeyLength int
 }
 
+// Field returns the inner FieldInfo
 func (n *ContainerNode) Field() *FieldInfo {
 	return n.FieldInfo
 }
 
+// TokenType always returns ContainerToken for ContainerNode
 func (n *ContainerNode) TokenType() NodeTokenType {
 	return ContainerToken
 }
 
+// Update updates the items to match the provided value
 func (n *ContainerNode) Update(tv r.Value) {
 	switch n.FieldInfo.Type.Kind() {
 	case r.Array, r.Slice:
@@ -176,7 +196,7 @@ func getRootNode(config types.ServiceConfig) *ContainerNode {
 		field := infoFields[i]
 		if fieldInfo.Type.Field(fieldOffset + i).Anonymous {
 			// The current field is Anonymous and not present in the FieldInfo slice
-			fieldOffset += 1
+			fieldOffset++
 		}
 		fieldValue := structValue.Field(fieldOffset + i)
 
