@@ -1,5 +1,37 @@
 package cmd
 
+type Result struct {
+	ExitCode int
+	Message  string
+}
+
+func (e Result) Error() string {
+	return e.Message
+}
+
+var Success = Result{}
+
+func InvalidUsage(message string) Result {
+	return Result{
+		ExUsage,
+		message,
+	}
+}
+
+func TaskUnavailable(message string) Result {
+	return Result{
+		ExUnavailable,
+		message,
+	}
+}
+
+func ConfigurationError(message string) Result {
+	return Result{
+		ExConfig,
+		message,
+	}
+}
+
 const (
 	//ExSuccess is the exit code that signals that everything went as expected
 	ExSuccess = 0

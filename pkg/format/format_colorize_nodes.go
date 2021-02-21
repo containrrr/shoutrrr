@@ -10,6 +10,9 @@ import (
 func getColorFormattedTree(root *ContainerNode, withValues bool) string {
 
 	sb := strings.Builder{}
+	packageName := root.Type.String()
+	packageName = packageName[:strings.LastIndexByte(packageName, '.')+1]
+	println(packageName)
 
 	for _, node := range root.Items {
 		fieldKey := node.Field().Name
@@ -28,16 +31,16 @@ func getColorFormattedTree(root *ContainerNode, withValues bool) string {
 			valueLen = writeColoredNodeValue(&sb, node)
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
-			typeName := field.Type.String()
+			typeName := strings.TrimPrefix(field.Type.String(), packageName)
 			valueLen = len(typeName)
 			sb.WriteString(color.CyanString(typeName))
 		}
 
-		if len(field.Description) > 0 {
-			sb.WriteString(strings.Repeat(" ", util.Max(preLen-valueLen, 1)))
-			sb.WriteString(ColorizeDesc(field.Description))
-			sb.WriteString(strings.Repeat(" ", util.Max(60-len(field.Description), 1)))
-		}
+		//if len(field.Description) > 0 {
+		sb.WriteString(strings.Repeat(" ", util.Max(preLen-valueLen, 1)))
+		sb.WriteString(ColorizeDesc(field.Description))
+		sb.WriteString(strings.Repeat(" ", util.Max(60-len(field.Description), 1)))
+		//}
 
 		if len(field.Template) > 0 {
 			sb.WriteString(fmt.Sprintf(" <Template: %s>", ColorizeString(field.Template)))
