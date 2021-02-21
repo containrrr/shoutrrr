@@ -3,6 +3,7 @@ package format
 import (
 	"errors"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/fatih/color"
 	"reflect"
 
 	"testing"
@@ -30,6 +31,9 @@ func TestFormat(t *testing.T) {
 var _ = Describe("the format package", func() {
 	BeforeSuite(func() {
 		// logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
+
+		// Disable color output for tests to have them match the string format rather than the colors
+		color.NoColor = true
 	})
 
 	Describe("SetConfigField", func() {
@@ -215,7 +219,7 @@ var _ = Describe("the format package", func() {
 					testSetAndFormat(tv, fieldMap["SubPropPtrSlice"], "@diet,@glue", "[ @diet, @glue ]")
 				})
 				It("should format prop struct slices identical to input", func() {
-					testSetAndFormat(tv, fieldMap["StrMap"], "one:1,two:2", "{ one: 1, two: 2 }")
+					testSetAndFormat(tv, fieldMap["StrMap"], "a:1,b:2,c:3", "{ a: 1, b: 2, c: 3 }")
 				})
 			})
 		})
