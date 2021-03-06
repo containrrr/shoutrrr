@@ -9,15 +9,18 @@ import (
 	"net/url"
 )
 
+// Scheme is the identifying part of this service's configuration URL
 const Scheme = "matrix"
 
+// Service providing Matrix as a notification service
 type Service struct {
 	standard.Standard
 	config *Config
-	client *Client
+	client *client
 	pkr    format.PropKeyResolver
 }
 
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (s *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	s.SetLogger(logger)
 	s.config = &Config{}
@@ -27,12 +30,12 @@ func (s *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 		return err
 	}
 
-	s.client = NewClient(s.config.Host, s.config.DisableTLS, logger)
+	s.client = newClient(s.config.Host, s.config.DisableTLS, logger)
 	if s.config.User != "" {
-		return s.client.Login(s.config.User, s.config.Password)
+		return s.client.login(s.config.User, s.config.Password)
 	}
 
-	s.client.UseToken(s.config.Password)
+	s.client.useToken(s.config.Password)
 	return nil
 }
 
@@ -43,7 +46,7 @@ func (s *Service) Send(message string, params *t.Params) error {
 		return err
 	}
 
-	errors := s.client.SendMessage(message, s.config.Rooms)
+	errors := s.client.sendMessage(message, s.config.Rooms)
 
 	if len(errors) > 0 {
 		for _, err := range errors {

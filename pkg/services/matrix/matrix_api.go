@@ -1,80 +1,80 @@
 package matrix
 
-type MessageType string
-type FlowType string
-type IdentifierType string
+type messageType string
+type flowType string
+type identifierType string
 
 const (
-	APILogin       = "/_matrix/client/r0/login"
-	APIRoomJoin    = "/_matrix/client/r0/join/%s"
-	APISendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message"
-	APIJoinedRooms = "/_matrix/client/r0/joined_rooms"
+	apiLogin       = "/_matrix/client/r0/login"
+	apiRoomJoin    = "/_matrix/client/r0/join/%s"
+	apiSendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message"
+	apiJoinedRooms = "/_matrix/client/r0/joined_rooms"
 
-	ContentType = "application/json"
+	contentType = "application/json"
 
-	AccessTokenKey = "access_token"
+	accessTokenKey = "access_token"
 
-	MsgTypeText       MessageType    = "m.text"
-	FlowLoginPassword FlowType       = "m.login.password"
-	IDTypeUser        IdentifierType = "m.id.user"
+	msgTypeText       messageType    = "m.text"
+	flowLoginPassword flowType       = "m.login.password"
+	idTypeUser        identifierType = "m.id.user"
 )
 
-type APIResLoginFlows struct {
+type apiResLoginFlows struct {
 	Flows []flow `json:"flows"`
 }
 
-type APIReqLogin struct {
-	Type       FlowType    `json:"type"`
+type apiReqLogin struct {
+	Type       flowType    `json:"type"`
 	Identifier *identifier `json:"identifier"`
 	Password   string      `json:"password,omitempty"`
 	Token      string      `json:"token,omitempty"`
 }
 
-type APIResLogin struct {
+type apiResLogin struct {
 	AccessToken string `json:"access_token"`
 	HomeServer  string `json:"home_server"`
 	UserID      string `json:"user_id"`
 	DeviceID    string `json:"device_id"`
 }
 
-type APIReqSend struct {
-	MsgType MessageType `json:"msgtype"`
+type apiReqSend struct {
+	MsgType messageType `json:"msgtype"`
 	Body    string      `json:"body"`
 }
 
-type APIResRoom struct {
+type apiResRoom struct {
 	RoomID string `json:"room_id"`
 }
 
-type APIResJoinedRooms struct {
+type apiResJoinedRooms struct {
 	Rooms []string `json:"joined_rooms"`
 }
 
-type APIResEvent struct {
+type apiResEvent struct {
 	EventID string `json:"event_id"`
 }
 
-type APIResError struct {
+type apiResError struct {
 	Message string `json:"error"`
 	Code    string `json:"errcode"`
 }
 
-func (e *APIResError) Error() string {
+func (e *apiResError) Error() string {
 	return e.Message
 }
 
 type flow struct {
-	Type FlowType `json:"type"`
+	Type flowType `json:"type"`
 }
 
 type identifier struct {
-	Type IdentifierType `json:"type"`
+	Type identifierType `json:"type"`
 	User string         `json:"user,omitempty"`
 }
 
-func NewUserIdentifier(user string) (id *identifier) {
+func newUserIdentifier(user string) (id *identifier) {
 	return &identifier{
-		Type: IDTypeUser,
+		Type: idTypeUser,
 		User: user,
 	}
 }

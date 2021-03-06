@@ -11,14 +11,14 @@ import (
 	"strings"
 )
 
-type Client struct {
+type client struct {
 	apiURL      url.URL
 	accessToken string
 	logger      *log.Logger
 }
 
-func NewClient(host string, disableTLS bool, logger *log.Logger) (c *Client) {
-	c = &Client{
+func newClient(host string, disableTLS bool, logger *log.Logger) (c *client) {
+	c = &client{
 		logger: logger,
 		apiURL: url.URL{
 			Host:   host,
@@ -35,39 +35,39 @@ func NewClient(host string, disableTLS bool, logger *log.Logger) (c *Client) {
 	return c
 }
 
-func (c *Client) UseToken(token string) {
+func (c *client) useToken(token string) {
 	c.accessToken = token
 	c.updateAccessToken()
 }
 
-func (c *Client) Login(user string, password string) error {
+func (c *client) login(user string, password string) error {
 	c.apiURL.RawQuery = ""
 	defer c.updateAccessToken()
 
-	resLogin := APIResLoginFlows{}
-	if err := c.apiGet(APILogin, &resLogin); err != nil {
+	resLogin := apiResLoginFlows{}
+	if err := c.apiGet(apiLogin, &resLogin); err != nil {
 		return fmt.Errorf("failed to get login flows: %v", err)
 	}
 
 	var flows []string
 	for _, flow := range resLogin.Flows {
 		flows = append(flows, string(flow.Type))
-		if flow.Type == FlowLoginPassword {
+		if flow.Type == flowLoginPassword {
 			c.logf("Using login flow '%v'", flow.Type)
-			return c.LoginPassword(user, password)
+			return c.loginPassword(user, password)
 		}
 	}
 
 	return fmt.Errorf("none of the server login flows are supported: %v", strings.Join(flows, ", "))
 }
 
-func (c *Client) LoginPassword(user string, password string) error {
+func (c *client) loginPassword(user string, password string) error {
 
-	response := APIResLogin{}
-	if err := c.apiPost(APILogin, APIReqLogin{
-		Type:       FlowLoginPassword,
+	response := apiResLogin{}
+	if err := c.apiPost(apiLogin, apiReqLogin{
+		Type:       flowLoginPassword,
 		Password:   password,
-		Identifier: NewUserIdentifier(user),
+		Identifier: newUserIdentifier(user),
 	}, &response); err != nil {
 		return fmt.Errorf("failed to log in: %v", err)
 	}
@@ -85,22 +85,21 @@ func (c *Client) LoginPassword(user string, password string) error {
 	return nil
 }
 
-func (c *Client) SendMessage(message string, rooms []string) (errors []error) {
+func (c *client) sendMessage(message string, rooms []string) (errors []error) {
 	if len(rooms) > 0 {
 		return c.sendToExplicitRooms(rooms, message)
-	} else {
-		return c.sendToJoinedRooms(message)
 	}
+	return c.sendToJoinedRooms(message)
 }
 
-func (c *Client) sendToExplicitRooms(rooms []string, message string) (errors []error) {
+func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []error) {
 	var err error
 
 	for _, room := range rooms {
 		c.logf("Sending message to '%v'...\n", room)
 
 		var roomID string
-		if roomID, err = c.JoinRoom(room); err != nil {
+		if roomID, err = c.joinRoom(room); err != nil {
 			errors = append(errors, fmt.Errorf("error joining room %v: %v", roomID, err))
 			continue
 		}
@@ -109,7 +108,7 @@ func (c *Client) sendToExplicitRooms(rooms []string, message string) (errors []e
 			c.logf("Resolved room alias '%v' to ID '%v'", room, roomID)
 		}
 
-		if err := c.SendMessageToRoom(message, roomID); err != nil {
+		if err := c.sendMessageToRoom(message, roomID); err != nil {
 			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %v", roomID, err))
 		}
 	}
@@ -117,8 +116,8 @@ func (c *Client) sendToExplicitRooms(rooms []string, message string) (errors []e
 	return errors
 }
 
-func (c *Client) sendToJoinedRooms(message string) (errors []error) {
-	joinedRooms, err := c.GetJoinedRooms()
+func (c *client) sendToJoinedRooms(message string) (errors []error) {
+	joinedRooms, err := c.getJoinedRooms()
 	if err != nil {
 		return append(errors, fmt.Errorf("failed to get joined rooms: %v", err))
 	}
@@ -126,7 +125,7 @@ func (c *Client) sendToJoinedRooms(message string) (errors []error) {
 	// Send to all rooms that are joined
 	for _, roomID := range joinedRooms {
 		c.logf("Sending message to '%v'...\n", roomID)
-		if err := c.SendMessageToRoom(message, roomID); err != nil {
+		if err := c.sendMessageToRoom(message, roomID); err != nil {
 			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %v", roomID, err))
 		}
 	}
@@ -134,18 +133,18 @@ func (c *Client) sendToJoinedRooms(message string) (errors []error) {
 	return errors
 }
 
-func (c *Client) JoinRoom(room string) (roomID string, err error) {
-	resRoom := APIResRoom{}
-	if err = c.apiPost(fmt.Sprintf(APIRoomJoin, room), nil, &resRoom); err != nil {
+func (c *client) joinRoom(room string) (roomID string, err error) {
+	resRoom := apiResRoom{}
+	if err = c.apiPost(fmt.Sprintf(apiRoomJoin, room), nil, &resRoom); err != nil {
 		return "", err
 	}
 	return resRoom.RoomID, nil
 }
 
-func (c *Client) SendMessageToRoom(message string, roomID string) error {
-	resEvent := APIResEvent{}
-	if err := c.apiPost(fmt.Sprintf(APISendMessage, roomID), APIReqSend{
-		MsgType: MsgTypeText,
+func (c *client) sendMessageToRoom(message string, roomID string) error {
+	resEvent := apiResEvent{}
+	if err := c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
+		MsgType: msgTypeText,
 		Body:    message,
 	}, &resEvent); err != nil {
 		return err
@@ -154,7 +153,7 @@ func (c *Client) SendMessageToRoom(message string, roomID string) error {
 	return nil
 }
 
-func (c *Client) apiGet(path string, response interface{}) error {
+func (c *client) apiGet(path string, response interface{}) error {
 	c.apiURL.Path = path
 
 	var err error
@@ -169,7 +168,7 @@ func (c *Client) apiGet(path string, response interface{}) error {
 	body, err = ioutil.ReadAll(res.Body)
 
 	if res.StatusCode >= 400 {
-		resError := &APIResError{}
+		resError := &apiResError{}
 		if err == nil {
 			if err = json.Unmarshal(body, resError); err == nil {
 				return resError
@@ -186,7 +185,7 @@ func (c *Client) apiGet(path string, response interface{}) error {
 	return json.Unmarshal(body, response)
 }
 
-func (c *Client) apiPost(path string, request interface{}, response interface{}) error {
+func (c *client) apiPost(path string, request interface{}, response interface{}) error {
 	c.apiURL.Path = path
 
 	var err error
@@ -198,7 +197,7 @@ func (c *Client) apiPost(path string, request interface{}, response interface{})
 	}
 
 	var res *http.Response
-	res, err = http.Post(c.apiURL.String(), ContentType, bytes.NewReader(body))
+	res, err = http.Post(c.apiURL.String(), contentType, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -207,7 +206,7 @@ func (c *Client) apiPost(path string, request interface{}, response interface{})
 	body, err = ioutil.ReadAll(res.Body)
 
 	if res.StatusCode >= 400 {
-		resError := &APIResError{}
+		resError := &apiResError{}
 		if err == nil {
 			if err = json.Unmarshal(body, resError); err == nil {
 				return resError
@@ -224,19 +223,19 @@ func (c *Client) apiPost(path string, request interface{}, response interface{})
 	return json.Unmarshal(body, response)
 }
 
-func (c *Client) updateAccessToken() {
+func (c *client) updateAccessToken() {
 	query := c.apiURL.Query()
-	query.Set(AccessTokenKey, c.accessToken)
+	query.Set(accessTokenKey, c.accessToken)
 	c.apiURL.RawQuery = query.Encode()
 }
 
-func (c *Client) logf(format string, v ...interface{}) {
+func (c *client) logf(format string, v ...interface{}) {
 	c.logger.Printf(format, v...)
 }
 
-func (c *Client) GetJoinedRooms() ([]string, error) {
-	response := APIResJoinedRooms{}
-	if err := c.apiGet(APIJoinedRooms, &response); err != nil {
+func (c *client) getJoinedRooms() ([]string, error) {
+	response := apiResJoinedRooms{}
+	if err := c.apiGet(apiJoinedRooms, &response); err != nil {
 		return []string{}, err
 	}
 	return response.Rooms, nil

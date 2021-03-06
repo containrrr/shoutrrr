@@ -7,6 +7,7 @@ import (
 	"net/url"
 )
 
+// Config is the configuration for the matrix service
 type Config struct {
 	standard.EnumlessConfig
 

@@ -1,9 +1,8 @@
-package matrix_test
+package matrix
 
 import (
 	"fmt"
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	. "github.com/containrrr/shoutrrr/pkg/services/matrix"
 	"github.com/jarcoal/httpmock"
 	"net/url"
 
@@ -89,22 +88,22 @@ func setupMockResponders() {
 
 	httpmock.RegisterResponder(
 		"GET",
-		mockServer+APILogin,
+		mockServer+apiLogin,
 		httpmock.NewStringResponder(200, `{"flows": [ { "type": "m.login.password" } ] }`))
 
 	httpmock.RegisterResponder(
 		"POST",
-		mockServer+APILogin,
+		mockServer+apiLogin,
 		httpmock.NewStringResponder(200, `{ "access_token": "TOKEN", "home_server": "mockserver", "user_id": "test:mockerserver" }`))
 
 	httpmock.RegisterResponder(
 		"GET",
-		mockServer+APIJoinedRooms,
+		mockServer+apiJoinedRooms,
 		httpmock.NewStringResponder(200, `{ "joined_rooms": [ "!room:mockserver" ] }`))
 
 	httpmock.RegisterResponder(
 		"POST",
-		mockServer+fmt.Sprintf(APISendMessage, "%21room:mockserver"),
+		mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver"),
 		httpmock.NewStringResponder(200, `{ "event_id": "7" }`))
 
 }
