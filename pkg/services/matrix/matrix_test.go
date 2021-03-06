@@ -69,6 +69,18 @@ var _ = Describe("the matrix service", func() {
 			})
 		})
 
+		When("sending a message to explicit rooms", func() {
+			It("should not report any errors", func() {
+				setupMockResponders()
+				serviceURL, _ := url.Parse("matrix://user:pass@mockserver?rooms=room1,room2")
+				err := service.Initialize(serviceURL, logger)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = service.Send("Test message", nil)
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
@@ -101,9 +113,19 @@ func setupMockResponders() {
 		mockServer+apiJoinedRooms,
 		httpmock.NewStringResponder(200, `{ "joined_rooms": [ "!room:mockserver" ] }`))
 
-	httpmock.RegisterResponder(
-		"POST",
-		mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver"),
-		httpmock.NewStringResponder(200, `{ "event_id": "7" }`))
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver"),
+		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "7"}))
+
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "1"),
+		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "8"}))
+
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "2"),
+		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "9"}))
+
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23room1"),
+		httpmock.NewJsonResponderOrPanic(200, apiResRoom{RoomID: "1"}))
+
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23room2"),
+		httpmock.NewJsonResponderOrPanic(200, apiResRoom{RoomID: "2"}))
 
 }

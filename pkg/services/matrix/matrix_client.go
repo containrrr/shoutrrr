@@ -143,14 +143,10 @@ func (c *client) joinRoom(room string) (roomID string, err error) {
 
 func (c *client) sendMessageToRoom(message string, roomID string) error {
 	resEvent := apiResEvent{}
-	if err := c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
+	return c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
 		MsgType: msgTypeText,
 		Body:    message,
-	}, &resEvent); err != nil {
-		return err
-	}
-
-	return nil
+	}, &resEvent)
 }
 
 func (c *client) apiGet(path string, response interface{}) error {
