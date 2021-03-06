@@ -36,8 +36,8 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 	for i := 0; i < numFields; i++ {
 		fieldDef := structType.Field(i)
 
-		if fieldDef.Anonymous {
-			// This is an embedded field, which should not be part of the Config output
+		if isHiddenField(fieldDef) {
+			// This is an embedded or private field, which should not be part of the Config output
 			continue
 		}
 
@@ -90,6 +90,10 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 	}
 
 	return fields
+}
+
+func isHiddenField(field r.StructField) bool {
+	return field.Anonymous || strings.ToUpper(field.Name[0:1]) != field.Name[0:1]
 }
 
 func getFieldBase(field r.StructField) int {

@@ -12,7 +12,6 @@ func getColorFormattedTree(root *ContainerNode, withValues bool) string {
 	sb := strings.Builder{}
 	packageName := root.Type.String()
 	packageName = packageName[:strings.LastIndexByte(packageName, '.')+1]
-	println(packageName)
 
 	for _, node := range root.Items {
 		fieldKey := node.Field().Name

@@ -194,7 +194,7 @@ func getRootNode(config types.ServiceConfig) *ContainerNode {
 	fieldOffset := 0
 	for i := range infoFields {
 		field := infoFields[i]
-		if fieldInfo.Type.Field(fieldOffset + i).Anonymous {
+		for isHiddenField(fieldInfo.Type.Field(fieldOffset + i)) {
 			// The current field is Anonymous and not present in the FieldInfo slice
 			fieldOffset++
 		}
