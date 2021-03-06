@@ -49,6 +49,23 @@ var _ = Describe("the matrix service", func() {
 		When("given an url", func() {
 
 		})
+		When("parsing the configuration URL", func() {
+			It("should be identical after de-/serialization", func() {
+				testURL := "matrix://user:pass@mockserver?rooms=%23room1%2C%23room2"
+
+				url, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				config := &Config{}
+				err = config.SetURL(url)
+				Expect(err).NotTo(HaveOccurred(), "verifying")
+
+				outputURL := config.GetURL()
+
+				Expect(outputURL.String()).To(Equal(testURL))
+
+			})
+		})
 	})
 
 	Describe("the matrix client", func() {
@@ -79,6 +96,19 @@ var _ = Describe("the matrix service", func() {
 				err = service.Send("Test message", nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
+			When("sending to one room fails", func() {
+				It("should report one error", func() {
+					setupMockResponders()
+					serviceURL, _ := url.Parse("matrix://user:pass@mockserver?rooms=secret,room2")
+					err := service.Initialize(serviceURL, logger)
+					Expect(err).NotTo(HaveOccurred())
+
+					err = service.Send("Test message", nil)
+					Expect(err).To(HaveOccurred())
+
+				})
+			})
+
 		})
 
 		AfterEach(func() {
@@ -127,5 +157,11 @@ func setupMockResponders() {
 
 	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23room2"),
 		httpmock.NewJsonResponderOrPanic(200, apiResRoom{RoomID: "2"}))
+
+	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23secret"),
+		httpmock.NewJsonResponderOrPanic(403, apiResError{
+			Code:    "M_FORBIDDEN",
+			Message: "You are not invited to this room.",
+		}))
 
 }
