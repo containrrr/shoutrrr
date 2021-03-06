@@ -51,7 +51,7 @@ func BuildQueryWithCustomFields(cqr t.ConfigQueryResolver, query url.Values) url
 // them could not be used to set a config field, and with any escaped keys unescaped.
 // The error returned is the first error that occurred, subsequent errors are just discarded.
 func SetConfigPropsFromQuery(cqr t.ConfigQueryResolver, query url.Values) (url.Values, error) {
-	var firstError error = nil
+	var firstError error
 	if query == nil {
 		return url.Values{}, nil
 	}
