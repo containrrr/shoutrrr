@@ -19,9 +19,12 @@ func BuildQuery(cqr types.ConfigQueryResolver) string {
 		}
 		value, err := cqr.Get(key)
 
-		if err == nil && value != "" {
-			query.Set(key, value)
+
+		if err != nil || isPkr && pkr.IsDefault(key, value) {
+			continue
 		}
+
+		query.Set(key, value)
 	}
 
 	return query.Encode()

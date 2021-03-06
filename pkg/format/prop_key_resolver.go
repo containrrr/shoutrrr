@@ -20,10 +20,13 @@ type PropKeyResolver struct {
 // NewPropKeyResolver creates a new PropKeyResolver and initializes it using the provided config
 func NewPropKeyResolver(config types.ServiceConfig) PropKeyResolver {
 
-	_, fields := GetConfigFormat(config)
-	keyFields := make(map[string]FieldInfo, len(fields))
-	keys := make([]string, 0, len(fields))
-	for _, field := range fields {
+	configNode := GetConfigFormat(config)
+	items := configNode.Items
+
+	keyFields := make(map[string]FieldInfo, len(items))
+	keys := make([]string, 0, len(items))
+	for _, item := range items {
+		field := *item.Field()
 		for _, key := range field.Keys {
 			key = strings.ToLower(key)
 			if key != "" {
@@ -123,4 +126,9 @@ func GetConfigQueryResolver(config types.ServiceConfig) types.ConfigQueryResolve
 // KeyIsPrimary returns whether the key is the primary (and not an alias)
 func (pkr *PropKeyResolver) KeyIsPrimary(key string) bool {
 	return pkr.keyFields[key].Keys[0] == key
+}
+
+// IsDefault returns whether the specified key value is the default value
+func (pkr *PropKeyResolver) IsDefault(key string, value string) bool {
+	return pkr.keyFields[key].DefaultValue == value
 }

@@ -2,14 +2,11 @@ package verify
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"os"
-	"sort"
-	"strings"
-
 	"github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/fatih/color"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -42,16 +39,8 @@ func Run(cmd *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	configMap, maxKeyLen := format.GetConfigMap(service)
-	configKeys := make([]string, 0, len(configMap))
-	for key := range configMap {
-		configKeys = append(configKeys, key)
-	}
-	sort.Strings(configKeys)
+	config := format.GetServiceConfig(service)
+	configNode := format.GetConfigFormat(config)
 
-	for _, key := range configKeys {
-		value := configMap[key]
-		pad := strings.Repeat(" ", maxKeyLen-len(key))
-		_, _ = fmt.Fprintf(color.Output, "%s%s: %s\n", pad, key, value)
-	}
+	_, _ = fmt.Fprintf(color.Output, format.ColorFormatTree(configNode, true))
 }

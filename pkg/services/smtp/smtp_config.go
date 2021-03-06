@@ -3,6 +3,7 @@ package smtp
 import (
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/util"
 	"net/url"
 	"strconv"
 
@@ -13,14 +14,14 @@ import (
 // Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
 	Host        string    `desc:"SMTP server hostname or IP address"`
-	Username    string    `desc:"authentication username"`
-	Password    string    `desc:"authentication password or hash"`
+	Username    string    `desc:"authentication username" default:""`
+	Password    string    `desc:"authentication password or hash" default:""`
 	Port        uint16    `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
-	FromAddress string    `desc:"e-mail address that the mail are sent from" key:"fromaddress"`
+	FromAddress string    `desc:"e-mail address that the mail are sent from" key:"fromaddress,from"`
 	FromName    string    `desc:"name of the sender" optional:"yes" key:"fromname"`
-	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)" key:"toaddresses"`
+	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)" key:"toaddresses,to"`
 	Subject     string    `desc:"the subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
-	Auth        authType  `desc:"SMTP authentication method" key:"auth"`
+	Auth        authType  `desc:"SMTP authentication method" key:"auth" default:"Unknown"`
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
 	UseStartTLS bool      `desc:"attempt to use SMTP StartTLS encryption" default:"Yes" key:"starttls"`
 	UseHTML     bool      `desc:"whether the message being sent is in HTML" default:"No" key:"usehtml"`
@@ -41,7 +42,7 @@ func (config *Config) SetURL(url *url.URL) error {
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
-		User:       url.UserPassword(config.Username, config.Password),
+		User:       util.URLUserPassword(config.Username, config.Password),
 		Host:       fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Path:       "/",
 		Scheme:     Scheme,

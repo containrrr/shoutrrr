@@ -8,6 +8,7 @@ import (
 	"github.com/fatih/color"
 	"os"
 	"reflect"
+	"strings"
 )
 
 // Generator is the Basic Generator implementation
@@ -20,25 +21,26 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 
 	var err error
 
-	configType, fields := format.GetServiceConfigFormat(service)
-	configPtr := reflect.New(configType)
+	configNode := format.GetServiceConfigFormat(service)
+	configPtr := reflect.New(configNode.Type)
 	config := configPtr.Elem()
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	for _, field := range fields {
-
+	for _, item := range configNode.Items {
+		field := item.Field()
 		var inputValue string
 		valueValid := false
 
 		for !valueValid {
 			err = nil
 
-			if propValue, ok := props[field.Name]; ok && len(propValue) > 0 {
+			propKey := strings.ToLower(field.Name)
+			if propValue, ok := props[propKey]; ok && len(propValue) > 0 {
 				inputValue = propValue
 				_, _ = fmt.Fprint(color.Output, "Using property ", color.HiCyanString(propValue), " for ", color.HiMagentaString(field.Name), " field\n")
 				// Clear the property value to skip it next iteration in case of errors
-				props[field.Name] = ""
+				props[propKey] = ""
 			} else {
 				if len(field.DefaultValue) > 0 {
 					_, _ = fmt.Fprint(color.Output, color.HiWhiteString(field.Name), "[", field.DefaultValue, "]: ")
@@ -71,7 +73,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 				}
 			}
 
-			if valueValid, err = format.SetConfigField(config, field, inputValue); !valueValid && err == nil {
+			if valueValid, err = format.SetConfigField(config, *field, inputValue); !valueValid && err == nil {
 				_, _ = fmt.Fprint(color.Output, "Invalid type ", color.HiYellowString(field.Type.Kind().String()))
 				_, _ = fmt.Fprint(color.Output, " for field ", color.HiCyanString(field.Name), "\n\n")
 			}

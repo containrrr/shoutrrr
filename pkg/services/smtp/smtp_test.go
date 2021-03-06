@@ -43,7 +43,7 @@ var _ = Describe("the SMTP service", func() {
 	})
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=Auto&fromaddress=sender%40example.com&fromname=Sender&starttls=No&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=No"
+			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&starttls=No&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes"
 
 			url, err := url.Parse(testURL)
 			Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -98,7 +98,7 @@ var _ = Describe("the SMTP service", func() {
 
 		It("should have the exped number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
-			testutils.TestConfigGetFieldsCount(config, 9)
+			testutils.TestConfigGetFieldsCount(config, 11)
 		})
 	})
 

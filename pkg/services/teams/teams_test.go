@@ -47,7 +47,7 @@ var _ = Describe("the teams plugin", func() {
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := testURLBase + "?color=aabbcc&host=outlook.office.com&title=Test+title"
+				testURL := testURLBase + "?color=aabbcc&host=notdefault.outlook.office.com&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -99,7 +99,7 @@ var _ = Describe("the teams plugin", func() {
 				serviceURL, err := service.GetConfigURLFromCustom(customURL)
 				Expect(err).NotTo(HaveOccurred(), "converting")
 
-				Expect(serviceURL.String()).To(Equal(testURLBase + "?color=f008c1&host=outlook.office.com&title=TheTitle"))
+				Expect(serviceURL.String()).To(Equal(testURLBase + "?color=f008c1&title=TheTitle"))
 			})
 		})
 	})
