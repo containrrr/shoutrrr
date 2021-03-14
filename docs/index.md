@@ -14,4 +14,4 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 
 To make it easy and streamlined to consume shoutrrr regardless of the notification service you want to use,
 we've implemented a notification service url schema. To send notifications, instantiate the `ShoutrrrClient` using one of
-the service urls from the [overview](/services/overview).
+the service urls from the [overview](/shoutrrr/services/overview).
