@@ -17,7 +17,7 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 [![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr)
 [![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE)
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 </div>
@@ -89,6 +89,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/ellisab"><img src="https://avatars2.githubusercontent.com/u/1402047?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alexandru Bonini</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=ellisab" title="Code">💻</a></td>
     <td align="center"><a href="https://senan.xyz"><img src="https://avatars0.githubusercontent.com/u/6832539?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Senan Kelly</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=sentriz" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/JonasPf"><img src="https://avatars.githubusercontent.com/u/2216775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>JonasPf</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=JonasPf" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/claycooper"><img src="https://avatars.githubusercontent.com/u/3612906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>claycooper</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=claycooper" title="Documentation">📖</a></td>
   </tr>
 </table>
 
