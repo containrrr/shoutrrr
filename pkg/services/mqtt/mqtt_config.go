@@ -2,11 +2,12 @@ package mqtt
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
-	"strings"
-	"strconv"
 )
 
 // Config for use within the mqtt
@@ -48,10 +49,12 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 }
 
+// Split is used to get the fields of the url
 func Split(r rune) bool {
     return r == '/' || r == '?' || r == ':'
 }
 
+// getTopic is used to return the topic
 func getTopic(r rune) bool {
     return r == '='
 }

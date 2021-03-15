@@ -46,7 +46,10 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		DisableTLS:    true,
 	}
 	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+
+	err := service.config.setURL(&service.pkr, configURL)
+	
+	if err == nil {
 		return err
 	}
 
