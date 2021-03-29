@@ -31,8 +31,13 @@ type embedFooter struct {
 // CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
 func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint, omitted int) (WebhookPayload, error) {
 
+	metaCount := 1
+	if omitted < 1 && len(title) < 1 {
+		metaCount = 0
+	}
 	itemCount := util.Min(9, len(items))
-	embeds := make([]embedItem, 1, itemCount+1)
+
+	embeds := make([]embedItem, metaCount, itemCount+metaCount)
 
 	for _, item := range items {
 
