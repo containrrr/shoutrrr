@@ -99,3 +99,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## Related Project(s)
+- [watchtower](https://github.com/containrrr/watchtower) - process for automating Docker container base image updates that uses shoutrrr for notifications
+- [kured](https://github.com/weaveworks/kured) - kubernetes reboot daemon has adopted shoutrrr as their unified notification method starting with version 1.7.0.
