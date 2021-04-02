@@ -1,6 +1,6 @@
 # Services overview
 
-Click on the service for a more thorough explanation.
+Click on the service for a more thorough explanation. <!-- @formatter:off -->
 
 | Service                           | URL format                                                                                                                                      |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -19,3 +19,10 @@ Click on the service for a more thorough explanation.
 | [Teams](./teams.md)               | *teams://__`token-a`__/__`token-b`__/__`token-c`__*                                                                                             |
 | [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]*                                                                |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
+
+## Specialized services
+
+| Service                           | Description                                                                                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Logger](./not-documented.md)     | Writes notification to a configured go `log.Logger`                                                                                             |
+| [Generic Webhook](./generic.md)   | Sends notifications directly to a webhook                                                                                                       |
