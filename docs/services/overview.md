@@ -14,6 +14,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Pushbullet](./not-documented.md) | *pushbullet://__`api-token`__[/__`device`__/#__`channel`__/__`email`__]*                                                                        |
 | [IFTTT](./not-documented.md)      | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__*                         |
 | [Mattermost](./not-documented.md) | *mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*                                                               |
+| [Matrix](./matrix.md)             | *matrix://__`username`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]]*                                       |
 | [Hangouts Chat](./hangouts.md)    | *hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                       |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
 | [Join](./not-documented.md)       | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]*                          |
