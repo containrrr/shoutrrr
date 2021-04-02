@@ -2,6 +2,8 @@
 
 ## URL Format
 
+*mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*
+
 ## Creating a Webhook in MatterMost
 
 1. Open up the Integrations page by clicking on *Integrations* within the menu

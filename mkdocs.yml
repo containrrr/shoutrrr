@@ -14,15 +14,26 @@ markdown_extensions:
   - toc:
       permalink: True
       separator: '_'
-  - codehilite
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.snippets
 nav:
   - 'Home': 'index.md'
   - 'Getting started': 'getting-started.md'
-  - 'Overview': 'services/overview.md'
+  - 'Service Overview': 'services/overview.md'
   - Services:
       - Discord: 'services/discord.md'
+      - Email: 'services/email.md'
+      - Gotify: 'services/gotify.md'
       - Hangouts Chat: 'services/hangouts.md'
+      - IFTTT: 'services/ifttt.md'
+      - Join: 'services/join.md'
+      - Mattermost: 'services/mattermost.md'
+      - OpsGenie: 'services/opsgenie.md'
+      - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'
+      - Rocketchat: 'services/rocketchat.md'
+      - Slack: 'services/slack.md'
       - Teams: 'services/teams.md'
       - Telegram: 'services/telegram.md'
       - Zulip Chat: 'services/zulip.md'
