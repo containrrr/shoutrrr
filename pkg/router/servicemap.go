@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/services/generic"
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/hangouts"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
@@ -39,4 +40,5 @@ var serviceMap = map[string]func() t.Service{
 	"join":       func() t.Service { return &join.Service{} },
 	"rocketchat": func() t.Service { return &rocketchat.Service{} },
 	"opsgenie":   func() t.Service { return &opsgenie.Service{} },
+	"generic":    func() t.Service { return &generic.Service{} },
 }
