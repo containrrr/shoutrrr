@@ -228,7 +228,7 @@
   
     <li class="md-nav__item">
       <a href="../overview/" class="md-nav__link">
-        Overview
+        Service Overview
       </a>
     </li>
   
@@ -277,6 +277,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../email/" class="md-nav__link">
+        Email
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gotify/" class="md-nav__link">
+        Gotify
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../hangouts/" class="md-nav__link">
         Hangouts Chat
       </a>
@@ -289,8 +313,92 @@
   
   
     <li class="md-nav__item">
+      <a href="../ifttt/" class="md-nav__link">
+        IFTTT
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../join/" class="md-nav__link">
+        Join
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mattermost/" class="md-nav__link">
+        Mattermost
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opsgenie/" class="md-nav__link">
+        OpsGenie
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pushbullet/" class="md-nav__link">
+        Pushbullet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../pushover/" class="md-nav__link">
         Pushover
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rocketchat/" class="md-nav__link">
+        Rocketchat
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../slack/" class="md-nav__link">
+        Slack
       </a>
     </li>
   
@@ -473,7 +581,7 @@
 <p>zulip://<strong><code>bot-mail</code></strong>:<strong><code>bot-key</code></strong>@<strong><code>zulip-domain</code></strong>/?stream=<strong><code>name-or-id</code></strong>&amp;topic=<strong><code>name</code></strong></p>
 </blockquote>
 <p>Stream and topic are both optional and can be given as parameters to the Send method:</p>
-<div class="codehilite"><pre><span></span><code>  <span class="nx">sender</span><span class="p">,</span> <span class="nx">__</span> <span class="o">:=</span> <span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">CreateSender</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code>  <span class="nx">sender</span><span class="p">,</span> <span class="nx">__</span> <span class="o">:=</span> <span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">CreateSender</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
 
   <span class="nx">params</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">)</span>
   <span class="nx">params</span><span class="p">[</span><span class="s">&quot;stream&quot;</span><span class="p">]</span> <span class="p">=</span> <span class="s">&quot;mystream&quot;</span>
@@ -481,7 +589,6 @@
 
   <span class="nx">sender</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">params</span><span class="p">)</span>
 </code></pre></div>
-
 <p>Since <strong><code>bot-mail</code></strong>  is a mail address you need to URL escape the <code>@</code> in it to <code>%40</code>.</p>
 <p>An example service URL would look like:</p>
 <blockquote>

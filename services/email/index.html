@@ -9,14 +9,14 @@
       
       
       
-        <link rel="canonical" href="https://containrrr.dev/shoutrrr/services/overview/">
+        <link rel="canonical" href="https://containrrr.dev/shoutrrr/services/email/">
       
       <link rel="icon" href="../../favicon.ico">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.0">
     
     
       
-        <title>Service Overview - Shoutrrr</title>
+        <title>Email - Shoutrrr</title>
       
     
     
@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#services_overview" class="md-skip">
+        <a href="#email" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +92,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Service Overview
+              Email
             
           </span>
         </div>
@@ -225,20 +225,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
         Service Overview
       </a>
-      
     </li>
   
 
@@ -249,12 +240,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       <label class="md-nav__link" for="__nav_4">
         Services
@@ -282,11 +275,56 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../email/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Email
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Email
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    URL Format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional_props" class="md-nav__link">
+    Additional props
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -513,6 +551,28 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    URL Format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional_props" class="md-nav__link">
+    Additional props
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -523,83 +583,61 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/overview.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/email.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="services_overview">Services overview<a class="headerlink" href="#services_overview" title="Permanent link">&para;</a></h1>
-<p>Click on the service for a more thorough explanation.</p>
-<table>
-<thead>
-<tr>
-<th>Service</th>
-<th>URL format</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../discord/">Discord</a></td>
-<td><em>discord://<strong><code>token</code></strong>@<strong><code>id</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="../email/">Email</a></td>
-<td><em>smtp://<strong><code>username</code></strong>:<strong><code>password</code></strong>@<strong><code>host</code></strong>:<strong><code>port</code></strong>/?fromAddress=<strong><code>fromAddress</code></strong>&amp;toAddresses=<strong><code>recipient1</code></strong>[,<strong><code>recipient2</code></strong>,...]</em></td>
-</tr>
-<tr>
-<td><a href="../gotify/">Gotify</a></td>
-<td><em>gotify://<strong><code>gotify-host</code></strong>/<strong><code>token</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="../hangouts/">Hangouts Chat</a></td>
-<td><em>hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</em></td>
-</tr>
-<tr>
-<td><a href="../ifttt/">IFTTT</a></td>
-<td><em>ifttt://<strong><code>key</code></strong>/?events=<strong><code>event1</code></strong>[,<strong><code>event2</code></strong>,...]&amp;value1=<strong><code>value1</code></strong>&amp;value2=<strong><code>value2</code></strong>&amp;value3=<strong><code>value3</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="../join/">Join</a></td>
-<td><em>join://shoutrrr:<strong><code>api-key</code></strong>@join/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...][&amp;icon=<strong><code>icon</code></strong>][&amp;title=<strong><code>title</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="../mattermost/">Mattermost</a></td>
-<td><em>mattermost://[<strong><code>username</code></strong>@]<strong><code>mattermost-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="../opsgenie/">OpsGenie</a></td>
-<td><em>opsgenie://<strong><code>host</code></strong>/token?responders=<strong><code>responder1</code></strong>[,<strong><code>responder2</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="../pushbullet/">Pushbullet</a></td>
-<td><em>pushbullet://<strong><code>api-token</code></strong>[/<strong><code>device</code></strong>/#<strong><code>channel</code></strong>/<strong><code>email</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="../pushover/">Pushover</a></td>
-<td><em>pushover://shoutrrr:<strong><code>apiToken</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...]</em></td>
-</tr>
-<tr>
-<td><a href="../rocketchat/">Rocketchat</a></td>
-<td><em>rocketchat://[<strong><code>username</code></strong>@]<strong><code>rocketchat-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code>&#124;<code>@recipient</code></strong>]</em></td>
-</tr>
-<tr>
-<td><a href="../slack/">Slack</a></td>
-<td><em>slack://[<strong><code>botname</code></strong>@]<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="../teams/">Teams</a></td>
-<td><em>teams://<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em></td>
-</tr>
-<tr>
-<td><a href="../telegram/">Telegram</a></td>
-<td><em>telegram://<strong><code>token</code></strong>@telegram?channels=<strong><code>channel-1</code></strong>[,<strong><code>channel-2</code></strong>,...]</em></td>
-</tr>
-<tr>
-<td><a href="../zulip/">Zulip Chat</a></td>
-<td><em>zulip://<strong><code>bot-mail</code></strong>:<strong><code>bot-key</code></strong>@<strong><code>zulip-domain</code></strong>/?stream=<strong><code>name-or-id</code></strong>&amp;topic=<strong><code>name</code></strong></em></td>
-</tr>
-</tbody>
-</table>
+                <h1 id="email">Email<a class="headerlink" href="#email" title="Permanent link">&para;</a></h1>
+<h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<p><em>smtp://<strong><code>username</code></strong>:<strong><code>password</code></strong>@<strong><code>host</code></strong>:<strong><code>port</code></strong>/?fromAddress=<strong><code>fromAddress</code></strong>&amp;toAddresses=<strong><code>recipient1</code></strong>[,<strong><code>recipient2</code></strong>,...]</em></p>
+<h2 id="additional_props">Additional props<a class="headerlink" href="#additional_props" title="Permanent link">&para;</a></h2>
+<p><em>Can be either supplied using the params argument, or through the URL using ?key=value&amp;key=value etc.</em>.</p>
+<ul>
+<li>
+<p><strong>FromAddress</strong> - e-mail address that the mail are sent from (<strong>Required</strong>)<br />
+ Aliases: <code>from</code>  </p>
+</li>
+<li>
+<p><strong>ToAddresses</strong> - list of recipient e-mails separated by <code>,</code> (<strong>Required</strong>)<br />
+ Aliases: <code>to</code>  </p>
+</li>
+<li>
+<p><strong>Auth</strong> - SMTP authentication method<br />
+ Default: <code>Unknown</code><br />
+ Possible values: <code>None</code>, <code>Plain</code>, <code>CRAMMD5</code>, <code>Unknown</code>, <code>OAuth2</code>  </p>
+</li>
+<li>
+<p><strong>Encryption</strong> - Encryption method<br />
+ Default: <code>Auto</code><br />
+ Possible values: <code>None</code>, <code>ExplicitTLS</code>, <code>ImplicitTLS</code>, <code>Auto</code>  </p>
+</li>
+<li>
+<p><strong>FromName</strong> - name of the sender<br />
+ Default: <em>empty</em></p>
+</li>
+<li>
+<p><strong>Password</strong> - authentication password or hash<br />
+ Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Port</strong> - SMTP server port, common ones are 25, 465, 587 or 2525<br />
+ Default: <code>25</code>  </p>
+</li>
+<li>
+<p><strong>Subject</strong> - the subject of the sent mail<br />
+ Default: <code>Shoutrrr Notification</code><br />
+ Aliases: <code>title</code>  </p>
+</li>
+<li>
+<p><strong>UseHTML</strong> - whether the message being sent is in HTML<br />
+ Default: <code>No</code>  </p>
+</li>
+<li>
+<p><strong>UseStartTLS</strong> - attempt to use SMTP StartTLS encryption<br />
+ Default: <code>Yes</code>  </p>
+</li>
+</ul>
                 
               
               
@@ -618,7 +656,7 @@
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
-        <a href="../../getting-started/" class="md-footer__link md-footer__link--prev" rel="prev">
+        <a href="../discord/" class="md-footer__link md-footer__link--prev" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -627,19 +665,19 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Getting started
+              Discord
             </div>
           </div>
         </a>
       
       
-        <a href="../discord/" class="md-footer__link md-footer__link--next" rel="next">
+        <a href="../gotify/" class="md-footer__link md-footer__link--next" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Discord
+              Gotify
             </div>
           </div>
           <div class="md-footer__button md-icon">

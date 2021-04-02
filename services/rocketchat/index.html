@@ -16,7 +16,7 @@
     
     
       
-        <title>Rocket.chat - Shoutrrr</title>
+        <title>Rocketchat - Shoutrrr</title>
       
     
     
@@ -92,7 +92,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rocket.chat
+              Rocketchat
             
           </span>
         </div>
@@ -228,7 +228,7 @@
   
     <li class="md-nav__item">
       <a href="../overview/" class="md-nav__link">
-        Overview
+        Service Overview
       </a>
     </li>
   
@@ -240,12 +240,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       <label class="md-nav__link" for="__nav_4">
         Services
@@ -275,6 +277,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../email/" class="md-nav__link">
+        Email
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gotify/" class="md-nav__link">
+        Gotify
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../hangouts/" class="md-nav__link">
         Hangouts Chat
       </a>
@@ -287,8 +313,151 @@
   
   
     <li class="md-nav__item">
+      <a href="../ifttt/" class="md-nav__link">
+        IFTTT
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../join/" class="md-nav__link">
+        Join
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mattermost/" class="md-nav__link">
+        Mattermost
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opsgenie/" class="md-nav__link">
+        OpsGenie
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pushbullet/" class="md-nav__link">
+        Pushbullet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../pushover/" class="md-nav__link">
         Pushover
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Rocketchat
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Rocketchat
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    URL Format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating_a_webhook_in_rocketchat" class="md-nav__link">
+    Creating a Webhook in Rocket.chat
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional_url_configuration" class="md-nav__link">
+    Additional URL configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing_parameters_via_code" class="md-nav__link">
+    Passing parameters via code
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../slack/" class="md-nav__link">
+        Slack
       </a>
     </li>
   
@@ -449,6 +618,7 @@
                 
                 <h1 id="rocketchat">Rocket.chat<a class="headerlink" href="#rocketchat" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<p><em>rocketchat://[<strong><code>username</code></strong>@]<strong><code>rocketchat-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code>&#124;<code>@recipient</code></strong>]</em> </p>
 <h2 id="creating_a_webhook_in_rocketchat">Creating a Webhook in Rocket.chat<a class="headerlink" href="#creating_a_webhook_in_rocketchat" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
@@ -468,41 +638,38 @@
 <img alt="Screenshot 4" src="4.png" /></p>
 </li>
 <li>
-<p>Format the service URL</p>
-</li>
-</ol>
-<div class="codehilite"><pre><span></span><code>rocketchat://your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX
+<p>Format the service URL
+<div class="highlight"><pre><span></span><code>rocketchat://your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX
                              └────────────────────────────────────────────────────────────────┘
                                                            token
-</code></pre></div>
-
+</code></pre></div></p>
+</li>
+</ol>
 <h2 id="additional_url_configuration">Additional URL configuration<a class="headerlink" href="#additional_url_configuration" title="Permanent link">&para;</a></h2>
 <p>Rocket.chat provides functionality to post as another user or to another channel / user, compared to the webhook configuration.
 <br/>
 To do this, you can add a <em>sender</em> and/or <em>channel</em> / <em>receiver</em> to the service URL.</p>
-<div class="codehilite"><pre><span></span><code><span class="nl">rocketchat</span><span class="p">:</span><span class="o">//</span><span class="n">shoutrrrUser</span><span class="nv">@your</span><span class="o">-</span><span class="k">domain</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="mi">8</span><span class="n">eGdRzc9r4YYNyvge</span><span class="o">/</span><span class="mi">2</span><span class="n">XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX</span><span class="o">/</span><span class="n">shoutrrrChannel</span><span class="w"></span>
-<span class="w">             </span><span class="err">└──────────┘</span><span class="w">                 </span><span class="err">└────────────────────────────────────────────────────────────────┘</span><span class="w"> </span><span class="err">└─────────────┘</span><span class="w"></span>
-<span class="w">                </span><span class="n">sender</span><span class="w">                                                   </span><span class="n">token</span><span class="w">                                   </span><span class="n">channel</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code>rocketchat://shoutrrrUser@your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/shoutrrrChannel
+             └──────────┘                 └────────────────────────────────────────────────────────────────┘ └─────────────┘
+                sender                                                   token                                   channel
 
-<span class="nl">rocketchat</span><span class="p">:</span><span class="o">//</span><span class="n">shoutrrrUser</span><span class="nv">@your</span><span class="o">-</span><span class="k">domain</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="mi">8</span><span class="n">eGdRzc9r4YYNyvge</span><span class="o">/</span><span class="mi">2</span><span class="n">XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX</span><span class="o">/</span><span class="nv">@shoutrrrReceiver</span><span class="w"></span>
-<span class="w">             </span><span class="err">└──────────┘</span><span class="w">                 </span><span class="err">└────────────────────────────────────────────────────────────────┘</span><span class="w"> </span><span class="err">└───────────────┘</span><span class="w"></span>
-<span class="w">                </span><span class="n">sender</span><span class="w">                                                   </span><span class="n">token</span><span class="w">                                    </span><span class="n">receiver</span><span class="w"></span>
+rocketchat://shoutrrrUser@your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/@shoutrrrReceiver
+             └──────────┘                 └────────────────────────────────────────────────────────────────┘ └───────────────┘
+                sender                                                   token                                    receiver
 </code></pre></div>
-
 <h2 id="passing_parameters_via_code">Passing parameters via code<a class="headerlink" href="#passing_parameters_via_code" title="Permanent link">&para;</a></h2>
 <p>If you want to, you also have the possibility to pass parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">params</span><span class="w"> </span><span class="err">:</span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="p">.</span><span class="n">Params</span><span class="p">)(</span><span class="w"></span>
-<span class="w">    </span><span class="o">&amp;</span><span class="k">map</span><span class="o">[</span><span class="n">string</span><span class="o">]</span><span class="n">string</span><span class="err">{</span><span class="w"></span>
-<span class="w">        </span><span class="ss">&quot;username&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteUserName&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="ss">&quot;channel&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;overwriteChannel&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="err">}</span><span class="p">,</span><span class="w"></span>
-<span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code>params := (*types.Params)(
+    &amp;map[string]string{
+        &quot;username&quot;: &quot;overwriteUserName&quot;,
+        &quot;channel&quot;: &quot;overwriteChannel&quot;,
+    },
+)
 
-<span class="n">service</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="ss">&quot;this is a message&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+service.Send(&quot;this is a message&quot;, params)
 </code></pre></div>
-
 <p>This will overwrite any options, that you passed via URL.</p>
 <p>For more Rocket.chat Webhooks options see <a href="https://docs.rocket.chat/guides/administrator-guides/integrations">official guide</a>.</p>
                 
@@ -520,6 +687,39 @@ The following example contains all parameters that are currently supported.</p>
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../pushover/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Pushover
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../slack/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Slack
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

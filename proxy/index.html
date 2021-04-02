@@ -223,7 +223,7 @@
   
     <li class="md-nav__item">
       <a href="../services/overview/" class="md-nav__link">
-        Overview
+        Service Overview
       </a>
     </li>
   
@@ -270,6 +270,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../services/email/" class="md-nav__link">
+        Email
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/gotify/" class="md-nav__link">
+        Gotify
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../services/hangouts/" class="md-nav__link">
         Hangouts Chat
       </a>
@@ -282,8 +306,92 @@
   
   
     <li class="md-nav__item">
+      <a href="../services/ifttt/" class="md-nav__link">
+        IFTTT
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/join/" class="md-nav__link">
+        Join
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/mattermost/" class="md-nav__link">
+        Mattermost
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/opsgenie/" class="md-nav__link">
+        OpsGenie
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/pushbullet/" class="md-nav__link">
+        Pushbullet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../services/pushover/" class="md-nav__link">
         Pushover
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/rocketchat/" class="md-nav__link">
+        Rocketchat
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/slack/" class="md-nav__link">
+        Slack
       </a>
     </li>
   
@@ -402,26 +510,24 @@
                   <h1>Proxy</h1>
                 
                 <p>To use a proxy with shoutrrr, you could either set the proxy URL in the environment variable <code>HTTP_PROXY</code> or override the default HTTP client like this:</p>
-<p>```go
-    proxyurl, err := url.Parse("socks5://localhost:1337")
-    if err != nil {
-        log.Fatalf("Error parsing proxy URL: %q", err)
-    }</p>
-<div class="codehilite"><pre><span></span><code>http.DefaultClient.Transport = &amp;http.Transport{
-    Proxy: http.ProxyURL(proxyurl),
-    DialContext: (&amp;net.Dialer{
-        Timeout:   30 * time.Second,
-        KeepAlive: 30 * time.Second,
-    }).DialContext,
-    ForceAttemptHTTP2:     true,
-    MaxIdleConns:          100,
-    IdleConnTimeout:       90 * time.Second,
-    TLSHandshakeTimeout:   10 * time.Second,
-    ExpectContinueTimeout: 1 * time.Second,
-}
-</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nx">proxyurl</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">url</span><span class="p">.</span><span class="nx">Parse</span><span class="p">(</span><span class="s">&quot;socks5://localhost:1337&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nx">Fatalf</span><span class="p">(</span><span class="s">&quot;Error parsing proxy URL: %q&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="p">}</span>
 
-<p>```</p>
+<span class="nx">http</span><span class="p">.</span><span class="nx">DefaultClient</span><span class="p">.</span><span class="nx">Transport</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+    <span class="nx">Proxy</span><span class="p">:</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ProxyURL</span><span class="p">(</span><span class="nx">proxyurl</span><span class="p">),</span>
+    <span class="nx">DialContext</span><span class="p">:</span> <span class="p">(</span><span class="o">&amp;</span><span class="nx">net</span><span class="p">.</span><span class="nx">Dialer</span><span class="p">{</span>
+        <span class="nx">Timeout</span><span class="p">:</span>   <span class="mi">30</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+        <span class="nx">KeepAlive</span><span class="p">:</span> <span class="mi">30</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+    <span class="p">}).</span><span class="nx">DialContext</span><span class="p">,</span>
+    <span class="nx">ForceAttemptHTTP2</span><span class="p">:</span>     <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">MaxIdleConns</span><span class="p">:</span>          <span class="mi">100</span><span class="p">,</span>
+    <span class="nx">IdleConnTimeout</span><span class="p">:</span>       <span class="mi">90</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+    <span class="nx">TLSHandshakeTimeout</span><span class="p">:</span>   <span class="mi">10</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+    <span class="nx">ExpectContinueTimeout</span><span class="p">:</span> <span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
                 
               
               

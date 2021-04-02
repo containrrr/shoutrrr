@@ -228,7 +228,7 @@
   
     <li class="md-nav__item">
       <a href="../overview/" class="md-nav__link">
-        Overview
+        Service Overview
       </a>
     </li>
   
@@ -240,12 +240,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       <label class="md-nav__link" for="__nav_4">
         Services
@@ -275,6 +277,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../email/" class="md-nav__link">
+        Email
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gotify/" class="md-nav__link">
+        Gotify
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../hangouts/" class="md-nav__link">
         Hangouts Chat
       </a>
@@ -287,8 +313,144 @@
   
   
     <li class="md-nav__item">
+      <a href="../ifttt/" class="md-nav__link">
+        IFTTT
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../join/" class="md-nav__link">
+        Join
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mattermost/" class="md-nav__link">
+        Mattermost
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          OpsGenie
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        OpsGenie
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    URL Format
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating_a_rest_api_endpoint_in_opsgenie" class="md-nav__link">
+    Creating a REST API endpoint in OpsGenie
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing_parameters_via_code" class="md-nav__link">
+    Passing parameters via code
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pushbullet/" class="md-nav__link">
+        Pushbullet
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../pushover/" class="md-nav__link">
         Pushover
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rocketchat/" class="md-nav__link">
+        Rocketchat
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../slack/" class="md-nav__link">
+        Slack
       </a>
     </li>
   
@@ -464,36 +626,34 @@
 </ol>
 <p>The host can be either api.opsgenie.com or api.eu.opsgenie.com depending on the location of your instance. See
 the <a href="https://docs.opsgenie.com/docs/alert-api">OpsGenie documentation</a> for details.</p>
-<div class="codehilite"><pre><span></span><code>opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889
+<div class="highlight"><pre><span></span><code>opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889
                             └───────────────────────────────────┘
                                            token
 </code></pre></div>
-
 <h2 id="passing_parameters_via_code">Passing parameters via code<a class="headerlink" href="#passing_parameters_via_code" title="Permanent link">&para;</a></h2>
 <p>If you want to, you can pass additional parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">service</span>.<span class="k">Send</span><span class="ss">(</span><span class="s2">&quot;</span><span class="s">An example alert message</span><span class="s2">&quot;</span>, <span class="o">&amp;</span><span class="nv">types</span>.<span class="nb">Params</span>{
-    <span class="s2">&quot;</span><span class="s">alias</span><span class="s2">&quot;</span>:       <span class="s2">&quot;</span><span class="s">Life is too short for no alias</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">description</span><span class="s2">&quot;</span>: <span class="s2">&quot;</span><span class="s">Every alert needs a description</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">responders</span><span class="s2">&quot;</span>:  `[{<span class="s2">&quot;</span><span class="s">id</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">4513b7ea-3b91-438f-b7e4-e3e54af9147c</span><span class="s2">&quot;</span>,<span class="s2">&quot;</span><span class="s">type</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">team</span><span class="s2">&quot;</span>},{<span class="s2">&quot;</span><span class="s">name</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">NOC</span><span class="s2">&quot;</span>,<span class="s2">&quot;</span><span class="s">type</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">team</span><span class="s2">&quot;</span>}]`,
-    <span class="s2">&quot;</span><span class="s">visibleTo</span><span class="s2">&quot;</span>:   `[{<span class="s2">&quot;</span><span class="s">id</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">4513b7ea-3b91-438f-b7e4-e3e54af9147c</span><span class="s2">&quot;</span>,<span class="s2">&quot;</span><span class="s">type</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">team</span><span class="s2">&quot;</span>},{<span class="s2">&quot;</span><span class="s">name</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">rocket_team</span><span class="s2">&quot;</span>,<span class="s2">&quot;</span><span class="s">type</span><span class="s2">&quot;</span>:<span class="s2">&quot;</span><span class="s">team</span><span class="s2">&quot;</span>}]`,
-    <span class="s2">&quot;</span><span class="s">actions</span><span class="s2">&quot;</span>:     <span class="s2">&quot;</span><span class="s">An action</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">tags</span><span class="s2">&quot;</span>:        <span class="s2">&quot;</span><span class="s">tag1 tag2</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">details</span><span class="s2">&quot;</span>:     `{<span class="s2">&quot;</span><span class="s">key1</span><span class="s2">&quot;</span>: <span class="s2">&quot;</span><span class="s">value1</span><span class="s2">&quot;</span>, <span class="s2">&quot;</span><span class="s">key2</span><span class="s2">&quot;</span>: <span class="s2">&quot;</span><span class="s">value2</span><span class="s2">&quot;</span>}`,
-    <span class="s2">&quot;</span><span class="s">entity</span><span class="s2">&quot;</span>:      <span class="s2">&quot;</span><span class="s">An example entity</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">source</span><span class="s2">&quot;</span>:      <span class="s2">&quot;</span><span class="s">The source</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">priority</span><span class="s2">&quot;</span>:    <span class="s2">&quot;</span><span class="s">P1</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">user</span><span class="s2">&quot;</span>:        <span class="s2">&quot;</span><span class="s">Dracula</span><span class="s2">&quot;</span>,
-    <span class="s2">&quot;</span><span class="s">note</span><span class="s2">&quot;</span>:        <span class="s2">&quot;</span><span class="s">Here is a note</span><span class="s2">&quot;</span>,
-}<span class="ss">)</span>
+<div class="highlight"><pre><span></span><code>service.Send(&quot;An example alert message&quot;, &amp;types.Params{
+    &quot;alias&quot;:       &quot;Life is too short for no alias&quot;,
+    &quot;description&quot;: &quot;Every alert needs a description&quot;,
+    &quot;responders&quot;:  `[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;NOC&quot;,&quot;type&quot;:&quot;team&quot;}]`,
+    &quot;visibleTo&quot;:   `[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;rocket_team&quot;,&quot;type&quot;:&quot;team&quot;}]`,
+    &quot;actions&quot;:     &quot;An action&quot;,
+    &quot;tags&quot;:        &quot;tag1 tag2&quot;,
+    &quot;details&quot;:     `{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}`,
+    &quot;entity&quot;:      &quot;An example entity&quot;,
+    &quot;source&quot;:      &quot;The source&quot;,
+    &quot;priority&quot;:    &quot;P1&quot;,
+    &quot;user&quot;:        &quot;Dracula&quot;,
+    &quot;note&quot;:        &quot;Here is a note&quot;,
+})
 </code></pre></div>
-
 <h1 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h1>
 <p>You can optionally specify the parameters in the URL:
 opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&amp;description=Every+alert+needs+a+description&amp;actions=An+action&amp;tags=["tag1","tag2"]&amp;entity=An+example+entity&amp;source=The+source&amp;priority=P1&amp;user=Dracula&amp;note=Here+is+a+note</p>
 <p>Example using the command line:</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">shoutrrr</span> <span class="k">send</span> <span class="o">-</span><span class="nv">u</span> <span class="s1">&#39;</span><span class="s">opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]</span><span class="s1">&#39;</span> <span class="o">-</span><span class="nv">m</span> <span class="s2">&quot;</span><span class="s">Hello World6</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code>shoutrrr send -u &#39;opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]&#39; -m &quot;Hello World6&quot;
 </code></pre></div>
                 
               
@@ -510,6 +670,39 @@ opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../mattermost/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Mattermost
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../pushbullet/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Pushbullet
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
