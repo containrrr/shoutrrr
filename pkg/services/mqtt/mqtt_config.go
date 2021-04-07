@@ -17,7 +17,7 @@ import (
 // Config for use within the mqtt
 type Config struct {
 	Host       string `key:"host" default:"" desc:"MQTT broker server hostname or IP address"`
-	Port       uint16 `key:"port" default:"8883" desc:"SMTP server port, common ones are 8883, 1883"`
+	Port       uint16 `key:"port" default:"8883" desc:"MQTT server port, common ones are 8883, 1883"`
 	Topic      string `key:"topic" default:"" desc:"Topic where the message is sent"`
 	ClientID   string `key:"clientid" default:"" desc:"client's id from the message is sent"`
 	Username   string `key:"username" default:"" desc:"username for auth"`
