@@ -19,7 +19,7 @@ type Config struct {
 	Host       string `key:"host" default:"" desc:"MQTT broker server hostname or IP address"`
 	Port       uint16 `key:"port" default:"8883" desc:"SMTP server port, common ones are 8883, 1883"`
 	Topic      string `key:"topic" default:"" desc:"Topic where the message is sent"`
-	ClientId   string `key:"clientid" default:"" desc:"client's id from the message is sent"`
+	ClientID   string `key:"clientid" default:"" desc:"client's id from the message is sent"`
 	Username   string `key:"username" default:"" desc:"username for auth"`
 	Password   string `key:"password" default:"" desc:"password for auth"`
 	DisableTLS bool   `key:"disabletls" default:"No"`
@@ -81,14 +81,14 @@ func (config *Config) MqttURL() string {
 	return fmt.Sprintf("%s://%s:%d", scheme, MqttHost, MqttPort)
 }
 
-// MqttURL return the client options
+// GetClientConfig returns the client options
 func (config *Config) GetClientConfig(postURL string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 
 	opts.AddBroker(postURL)
 
-	if len(config.ClientId) > 0 {
-		opts.SetClientID(config.ClientId)
+	if len(config.ClientID) > 0 {
+		opts.SetClientID(config.ClientID)
 	}
 
 	if len(config.Username) > 0 {
@@ -100,7 +100,7 @@ func (config *Config) GetClientConfig(postURL string) *mqtt.ClientOptions {
 	}
 
 	if !config.DisableTLS {
-		tlsConfig := config.GetTlsConfig()
+		tlsConfig := config.GetTLSConfig()
 		opts.SetTLSConfig(tlsConfig)
 	}
 
@@ -108,7 +108,7 @@ func (config *Config) GetClientConfig(postURL string) *mqtt.ClientOptions {
 }
 
 // GetTlsConfig returns the configuration with the certificates for TLS
-func (config *Config) GetTlsConfig() *tls.Config {
+func (config *Config) GetTLSConfig() *tls.Config {
 	certpool := x509.NewCertPool()
 	ca, err := ioutil.ReadFile("ca.crt")
 

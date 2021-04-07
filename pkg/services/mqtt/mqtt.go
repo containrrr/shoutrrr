@@ -53,13 +53,12 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 		Port:       8883,
 	}
 	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
-		return err
-	}
+	err := service.config.setURL(&service.pkr, configURL)
 
-	return nil
+	return err
 }
 
+// MessageLimit returns a string with the maximum size and the amount of omitted characters
 func MessageLimit(message string) (string, int) {
 	size := util.Min(maxLength, len(message))
 	omitted := len(message) - size
@@ -78,7 +77,7 @@ func (service *Service) Publish(client mqtt.Client, topic string, message string
 	token.Wait()
 }
 
-// PublishMessageToTopic
+// PublishMessageToTopic initializes the client and publishes the message
 func (service *Service) PublishMessageToTopic(message string, config *Config) error {
 	postURL := config.MqttURL()
 	opts := config.GetClientConfig(postURL)

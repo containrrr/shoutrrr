@@ -6,8 +6,8 @@ _mqtt://**`host`**:**`port`**?topic=**`topic`**_
 
 ## Optional parameters
 
-You can optionally specify the **`disableTLS`**, **`clientId`**, **`username`** and **`password`** parameters in the URL:  
-_mqtt://**`host`**:**`port`**?topic=**`topic`**&disableTLS=true&clientId=**`clientId`**&username=**`username`**&password:**`password`**_
+You can optionally specify the **`disableTLS`**, **`clientID`**, **`username`** and **`password`** parameters in the URL:  
+_mqtt://**`host`**:**`port`**?topic=**`topic`**&disableTLS=true&clientID=**`clientID`**&username=**`username`**&password:**`password`**_
 
 ## Parameters Description
 
@@ -25,13 +25,13 @@ _mqtt://**`host`**:**`port`**?topic=**`topic`**&disableTLS=true&clientId=**`clie
 - **DisableTLS** - disable TLS/SSL Configurations  
   Default: `false`
 
-- **ClientID** - The client identifier (ClientId) identifies each MQTT client that connects to an MQTT  
+- **ClientID** - The client identifier (ClientID) identifies each MQTT client that connects to an MQTT  
   Default: _empty_
-  Aliases: `clientId`
+  Aliases: `clientID`
 
 - **Username** - name of the sender to auth  
   Default: _empty_
-  Aliases: `clientId`
+  Aliases: `clientID`
 
 - **Password** - authentication password or hash  
   Default: _empty_  
