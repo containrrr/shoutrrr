@@ -1,13 +1,12 @@
 package mqtt
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -15,7 +14,7 @@ import (
 )
 
 const (
-	maxlength = 4096
+	maxLength = 268435455
 )
 
 // Service sends notifications to mqtt topic
@@ -27,8 +26,11 @@ type Service struct {
 
 // Send notification to mqtt
 func (service *Service) Send(message string, params *types.Params) error {
-	if len(message) > maxlength {
-		return errors.New("message exceeds the max length")
+
+	message, omitted := MessageLimit(message)
+
+	if omitted > 0 {
+		service.Logf("omitted %v character(s) from the message", omitted)
 	}
 
 	config := *service.config
@@ -36,24 +38,33 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	return publishMessageToTopic(message, &config)
+	if err := service.PublishMessageToTopic(message, &config); err != nil {
+		return fmt.Errorf("an error occurred while sending notification to generic webhook: %s", err.Error())
+	}
+
+	return nil
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
-		DisableTLS:    true,
+		DisableTLS: false,
+		Port:       8883,
 	}
 	service.pkr = format.NewPropKeyResolver(service.config)
-
-	err := service.config.setURL(&service.pkr, configURL)
-	
-	if err == nil {
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func MessageLimit(message string) (string, int) {
+	size := util.Min(maxLength, len(message))
+	omitted := len(message) - size
+
+	return message[:size], omitted
 }
 
 // GetConfig returns the Config for the service
@@ -61,38 +72,18 @@ func (service *Service) GetConfig() *Config {
 	return service.config
 }
 
-// Handle Connection Lost
-var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-    fmt.Printf("Connect lost: %v", err)
-}
-
 // Publish to topic
-func publish(client mqtt.Client, topic string, data []byte) {
-	token := client.Publish(topic, 0, false, data)
+func (service *Service) Publish(client mqtt.Client, topic string, message string) {
+	token := client.Publish(topic, 0, false, message)
 	token.Wait()
 }
 
-// Publish payload
-func publishMessageToTopic(message string, config *Config) error {
-	postURL := fmt.Sprintf("tcp://%s:%d", config.Host, config.Port)
-	payload := createSendMessagePayload(message, config.Topic, config)
-	
-	jsonData, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-
-	// Config
-    opts := mqtt.NewClientOptions()
-
-    opts.AddBroker(postURL)
-
-	opts.OnConnectionLost = connectLostHandler
-    
-	// Start client
+// PublishMessageToTopic
+func (service *Service) PublishMessageToTopic(message string, config *Config) error {
+	postURL := config.MqttURL()
+	opts := config.GetClientConfig(postURL)
 	client := mqtt.NewClient(opts)
-    
-	token := client.Connect();
+	token := client.Connect()
 
 	if token.Error() != nil {
 		return token.Error()
@@ -100,9 +91,9 @@ func publishMessageToTopic(message string, config *Config) error {
 
 	token.Wait()
 
-    publish(client, config.Topic, jsonData)
+	service.Publish(client, config.Topic, message)
 
-    client.Disconnect(1)
+	client.Disconnect(250)
 
 	return nil
 }
