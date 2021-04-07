@@ -123,7 +123,7 @@ var _ = Describe("the discord service", func() {
 		When("given a message that exceeds the max length", func() {
 			It("should return a payload with chunked messages", func() {
 
-				payload, err := buildPayloadFromHundreds(42, false, "", dummyColors)
+				payload, err := buildPayloadFromHundreds(42, false, "Title", dummyColors)
 				Expect(err).ToNot(HaveOccurred())
 
 				meta := payload.Embeds[0]
@@ -152,6 +152,30 @@ var _ = Describe("the discord service", func() {
 				Expect(len(items[3].Content)).To(Equal(5))
 
 				Expect(meta.Footer.Text).To(ContainSubstring("200"))
+			})
+			When("no title is supplied and content fits", func() {
+				It("should return a payload without a meta chunk", func() {
+
+					payload, err := buildPayloadFromHundreds(42, false, "", dummyColors)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(payload.Embeds[0].Footer).To(BeNil())
+					Expect(payload.Embeds[0].Title).To(BeEmpty())
+				})
+			})
+			When("no title is supplied but content was omitted", func() {
+				It("should return a payload with a meta chunk", func() {
+
+					payload, err := buildPayloadFromHundreds(62, false, "", dummyColors)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(payload.Embeds[0].Footer).ToNot(BeNil())
+				})
+			})
+			When("title is supplied, but content fits", func() {
+				It("should return a payload with a meta chunk", func() {
+					payload, err := buildPayloadFromHundreds(42, false, "Title", dummyColors)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(payload.Embeds[0].Title).ToNot(BeEmpty())
+				})
 			})
 
 			It("rich test 1", func() {
@@ -214,6 +238,7 @@ func buildPayloadFromHundreds(hundreds int, split bool, title string, colors [ty
 	}
 
 	items, omitted := CreateItemsFromPlain(builder.String(), split)
+	println("Items:", len(items), "Omitted:", omitted)
 
 	return CreatePayloadFromItems(items, title, colors, omitted)
 }

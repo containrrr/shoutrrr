@@ -101,6 +101,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "claycooper",
+      "name": "claycooper",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3612906?v=4",
+      "profile": "https://github.com/claycooper",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
