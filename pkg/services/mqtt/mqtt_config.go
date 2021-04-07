@@ -74,7 +74,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 func (config *Config) MqttURL() string {
 	MqttHost := config.Host
 	MqttPort := config.Port
-	scheme := DefaultWebhookScheme
+	scheme := DefaultMQTTScheme
 	if config.DisableTLS {
 		scheme = Scheme[:4]
 	}
@@ -133,6 +133,6 @@ func (config *Config) GetTLSConfig() *tls.Config {
 const (
 	// Scheme is the identifying part of this service's configuration URL
 	Scheme = "mqtt"
-	// DefaultWebhookScheme is the scheme used for webhook URLs unless overridden
-	DefaultWebhookScheme = "mqtts"
+	// DefaultMQTTScheme is the scheme used for MQTT URLs unless overridden
+	DefaultMQTTScheme = "mqtts"
 )

@@ -39,7 +39,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	if err := service.PublishMessageToTopic(message, &config); err != nil {
-		return fmt.Errorf("an error occurred while sending notification to generic webhook: %s", err.Error())
+		return fmt.Errorf("an error occurred while sending notification to the MQTT topic: %s", err.Error())
 	}
 
 	return nil
