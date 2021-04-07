@@ -107,7 +107,7 @@ func (config *Config) GetClientConfig(postURL string) *mqtt.ClientOptions {
 	return opts
 }
 
-// GetTlsConfig returns the configuration with the certificates for TLS
+// GetTLSConfig returns the configuration with the certificates for TLS
 func (config *Config) GetTLSConfig() *tls.Config {
 	certpool := x509.NewCertPool()
 	ca, err := ioutil.ReadFile("ca.crt")
