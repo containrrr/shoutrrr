@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"reflect"
 	"strings"
@@ -13,26 +12,34 @@ import (
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
 type ServiceRouter struct {
-	logger   *log.Logger
+	logger   t.StdLogger
 	services []t.Service
 	queue    []string
 	Timeout  time.Duration
 }
 
 // New creates a new service router using the specified logger and service URLs
-func New(logger *log.Logger, serviceURLs ...string) (*ServiceRouter, error) {
+func New(logger t.StdLogger, serviceURLs ...string) (*ServiceRouter, error) {
 	router := ServiceRouter{
 		logger:  logger,
 		Timeout: 10 * time.Second,
 	}
+
 	for _, serviceURL := range serviceURLs {
-		service, err := router.initService(serviceURL)
-		if err != nil {
+		if err := router.AddService(serviceURL); err != nil {
 			return nil, fmt.Errorf("error initializing router services: %s", err)
 		}
-		router.services = append(router.services, service)
 	}
 	return &router, nil
+}
+
+// AddService initializes the specified service from its URL, and adds it if no errors occur
+func (router *ServiceRouter) AddService(serviceURL string) error {
+	service, err := router.initService(serviceURL)
+	if err == nil {
+		router.services = append(router.services, service)
+	}
+	return err
 }
 
 // Send sends the specified message using the routers underlying services
@@ -131,8 +138,11 @@ func (router *ServiceRouter) Flush(params *t.Params) {
 }
 
 // SetLogger sets the logger that the services will use to write progress logs
-func (router *ServiceRouter) SetLogger(logger *log.Logger) {
+func (router *ServiceRouter) SetLogger(logger t.StdLogger) {
 	router.logger = logger
+	for _, service := range router.services {
+		service.SetLogger(logger)
+	}
 }
 
 // ExtractServiceName from a notification URL

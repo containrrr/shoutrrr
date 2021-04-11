@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
-	"log"
 	"math/rand"
 	"net"
 	"net/smtp"
@@ -32,7 +31,7 @@ const (
 )
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
 		Port:        25,

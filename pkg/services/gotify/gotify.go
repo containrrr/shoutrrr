@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -25,7 +24,7 @@ type Service struct {
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
 		Title: "Shoutrrr notification",
