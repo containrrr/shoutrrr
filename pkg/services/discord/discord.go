@@ -105,7 +105,7 @@ func CreateAPIURLFromConfig(config *Config) string {
 	return fmt.Sprintf(
 		"%s/%s/%s",
 		hookURL,
-		config.Channel,
+		config.WebhookID,
 		config.Token)
 }
 
