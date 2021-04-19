@@ -2,7 +2,6 @@ package logger
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 
@@ -39,7 +38,7 @@ func (service *Service) doSend(params *types.Params) error {
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(_ *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(_ *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	return nil
