@@ -11,7 +11,7 @@ import (
 // Config is the configuration needed to send discord notifications
 type Config struct {
 	standard.EnumlessConfig
-	Channel    string
+	WebhookID  string
 	Token      string
 	Title      string `key:"title"      default:""`
 	Username   string `key:"username"   default:""        desc:"Override the webhook default username"`
@@ -51,7 +51,7 @@ func (config *Config) SetURL(url *url.URL) error {
 func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 	u = &url.URL{
 		User:       url.User(config.Token),
-		Host:       config.Channel,
+		Host:       config.WebhookID,
 		Scheme:     Scheme,
 		RawQuery:   format.BuildQuery(resolver),
 		ForceQuery: false,
@@ -67,7 +67,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
-	config.Channel = url.Host
+	config.WebhookID = url.Host
 	config.Token = url.User.Username()
 
 	if len(url.Path) > 0 {
@@ -80,8 +80,8 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		}
 	}
 
-	if config.Channel == "" {
-		return errors.New("channel missing from config URL")
+	if config.WebhookID == "" {
+		return errors.New("webhook ID missing from config URL")
 	}
 
 	if len(config.Token) < 1 {

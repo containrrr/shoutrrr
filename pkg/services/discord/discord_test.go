@@ -212,8 +212,8 @@ var _ = Describe("the discord service", func() {
 		})
 		It("should not report an error if the server accepts the payload", func() {
 			config := Config{
-				Channel: "1",
-				Token:   "dummyToken",
+				WebhookID: "1",
+				Token:     "dummyToken",
 			}
 			serviceURL := config.GetURL()
 			service := Service{}
