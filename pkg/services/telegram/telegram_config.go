@@ -16,6 +16,7 @@ type Config struct {
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
 	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
 	Channels     []string  `key:"channels"`
+	Title        string    `key:"title" default:"" desc:"notification title, optionally set by the sender"`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
