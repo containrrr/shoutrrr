@@ -20,7 +20,7 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
-	client *http.Client
+	Client *http.Client
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -32,7 +32,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 
-	service.client = &http.Client{
+	service.Client = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				// If DisableTLS is specified, we might still need to disable TLS verification
@@ -105,7 +105,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := service.client.Post(postURL, "application/json", jsonBuffer)
+	resp, err := service.Client.Post(postURL, "application/json", jsonBuffer)
 	if err != nil {
 		return fmt.Errorf("failed to send notification to Gotify: %s", err)
 	}
