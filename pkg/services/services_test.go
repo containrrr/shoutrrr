@@ -72,7 +72,7 @@ var _ = Describe("services", func() {
 				}
 
 				httpmock.Activate()
-				if key == "discord" {
+				if key == "discord" || key == "ifttt" {
 					// Always return a "No content" result, as the http request isn't what is under test
 					httpmock.RegisterNoResponder(httpmock.NewStringResponder(204, ""))
 				} else {
