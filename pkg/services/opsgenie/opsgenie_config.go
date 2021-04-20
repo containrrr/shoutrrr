@@ -28,6 +28,7 @@ type Config struct {
 	Priority    string            `key:"priority" desc:"Priority level of the alert. Possible values are P1, P2, P3, P4 and P5" optional:"true"`
 	Note        string            `key:"note" desc:"Additional note that will be added while creating the alert" optional:"true"`
 	User        string            `key:"user" desc:"Display name of the request owner" optional:"true"`
+	Title       string            `key:"title" default:"" desc:"notification title, optionally set by the sender"`
 }
 
 // Enums returns an empty map because the OpsGenie service doesn't use Enums
