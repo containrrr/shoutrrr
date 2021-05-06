@@ -25,6 +25,14 @@ type Config struct {
 	DisableTLS bool   `key:"disabletls" default:"No"`
 }
 
+// DefaultConfig creates a PropKeyResolver and uses it to populate the default values of a new Config, returning both
+func DefaultConfig() (*Config, format.PropKeyResolver) {
+	config := &Config{}
+	pkr := format.NewPropKeyResolver(config)
+	_ = pkr.SetDefaultProps(config)
+	return config, pkr
+}
+
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{}
