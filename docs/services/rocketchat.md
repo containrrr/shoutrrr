@@ -1,8 +1,11 @@
 # Rocket.chat
 
 ## URL Format
-*rocketchat://[__`username`__@]__`rocketchat-host`__/__`token`__[/__`channel`&#124;`@recipient`__]* 
 
+!!! info ""
+    rocketchat://[__`username`__@]__`rocketchat-host`__/__`token`__[/__`channel`&#124;`@recipient`__]* 
+
+--8<-- "docs/services/rocketchat/config.md"
 
 ## Creating a Webhook in Rocket.chat
 
