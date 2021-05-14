@@ -2,12 +2,14 @@ package docs
 
 import (
 	"fmt"
-	cli "github.com/containrrr/shoutrrr/cli/cmd"
-	f "github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/router"
+	"github.com/spf13/cobra"
+
+	cli "github.com/containrrr/shoutrrr/cli/cmd"
+	f "github.com/containrrr/shoutrrr/pkg/format"
 )
 
 var serviceRouter router.ServiceRouter
@@ -42,17 +44,13 @@ func Run(cmd *cobra.Command, args []string) {
 }
 
 func printDocs(format string, services []string) cli.Result {
-	var formatFunc func(root *f.ContainerNode) string
+	var renderer f.TreeRenderer
 
 	switch format {
 	case "console":
-		formatFunc = func(rootNode *f.ContainerNode) string {
-			return f.ColorFormatTree(rootNode, false)
-		}
+		renderer = f.ConsoleTreeRenderer{WithValues: false}
 	case "markdown":
-		formatFunc = func(rootNode *f.ContainerNode) string {
-			return f.MarkdownFormattedTree(rootNode)
-		}
+		renderer = f.MarkdownTreeRenderer{}
 	default:
 		return cli.InvalidUsage("invalid format")
 	}
@@ -64,8 +62,7 @@ func printDocs(format string, services []string) cli.Result {
 		}
 		config := f.GetServiceConfig(service)
 		configNode := f.GetConfigFormat(config)
-		fmt.Println(formatFunc(configNode))
-
+		fmt.Println(renderer.RenderTree(configNode, scheme))
 	}
 
 	return cli.Success

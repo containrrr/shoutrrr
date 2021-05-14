@@ -2,16 +2,20 @@ package format
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/fatih/color"
 	"strings"
+
+	"github.com/fatih/color"
+
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
-func getColorFormattedTree(root *ContainerNode, withValues bool) string {
+type ConsoleTreeRenderer struct {
+	WithValues bool
+}
+
+func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
 
 	sb := strings.Builder{}
-	packageName := root.Type.String()
-	packageName = packageName[:strings.LastIndexByte(packageName, '.')+1]
 
 	for _, node := range root.Items {
 		fieldKey := node.Field().Name
@@ -25,12 +29,12 @@ func getColorFormattedTree(root *ContainerNode, withValues bool) string {
 
 		field := node.Field()
 
-		if withValues {
+		if r.WithValues {
 			preLen = 30
-			valueLen = writeColoredNodeValue(&sb, node)
+			valueLen = r.writeNodeValue(&sb, node)
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
-			typeName := strings.TrimPrefix(field.Type.String(), packageName)
+			typeName := strings.TrimPrefix(field.Type.String(), scheme)
 			valueLen = len(typeName)
 			sb.WriteString(color.CyanString(typeName))
 		}
@@ -86,9 +90,9 @@ func getColorFormattedTree(root *ContainerNode, withValues bool) string {
 	return sb.String()
 }
 
-func writeColoredNodeValue(sb *strings.Builder, node Node) int {
+func (r ConsoleTreeRenderer) writeNodeValue(sb *strings.Builder, node Node) int {
 	if contNode, isContainer := node.(*ContainerNode); isContainer {
-		return writeColoredContainer(sb, contNode)
+		return r.writeContainer(sb, contNode)
 	}
 
 	if valNode, isValue := node.(*ValueNode); isValue {
@@ -100,7 +104,7 @@ func writeColoredNodeValue(sb *strings.Builder, node Node) int {
 	return 1
 }
 
-func writeColoredContainer(sb *strings.Builder, node *ContainerNode) int {
+func (r ConsoleTreeRenderer) writeContainer(sb *strings.Builder, node *ContainerNode) int {
 	kind := node.Type.Kind()
 
 	hasKeys := !util.IsCollection(kind)
@@ -122,7 +126,7 @@ func writeColoredContainer(sb *strings.Builder, node *ContainerNode) int {
 			sb.WriteString(": ")
 			totalLen += len(itemKey) + 2
 		}
-		valLen := writeColoredNodeValue(sb, itemNode)
+		valLen := r.writeNodeValue(sb, itemNode)
 		totalLen += valLen
 	}
 	if hasKeys {

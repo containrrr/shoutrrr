@@ -2,7 +2,7 @@
 
 for S in ./pkg/services/*; do
   SERVICE=$(basename $S)
-  if [[ "$SERVICE" == "standard" ]]; then
+  if [[ "$SERVICE" == "standard" ]] || [[ -f "$S" ]]; then
     continue
   fi
   DOCSPATH=./docs/services/$SERVICE
