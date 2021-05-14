@@ -1,6 +1,7 @@
 package format
 
 import (
+	"reflect"
 	"sort"
 	"strings"
 
@@ -148,6 +149,14 @@ func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldI
 		if field.DefaultValue == "" {
 			sb.WriteString("*empty*")
 		} else {
+			if field.Type.Kind() == reflect.Bool {
+				defaultValue, _ := ParseBool(field.DefaultValue, false)
+				if defaultValue {
+					sb.WriteString("✔ ")
+				} else {
+					sb.WriteString("❌ ")
+				}
+			}
 			sb.WriteRune('`')
 			sb.WriteString(field.DefaultValue)
 			sb.WriteRune('`')
