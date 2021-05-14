@@ -46,7 +46,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		r.writeFieldPrimary(&sb, field)
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
-		firstPart := true
+
 		for i, uf := range urlFields {
 			urlPart := URLPart(i)
 			if urlPart == URLQuery {
@@ -57,9 +57,16 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 			if uf == nil {
 				if urlPart == URLPath {
 					sb.WriteRune(urlPart.Suffix())
+				} else if urlPart == URLHost {
+					// Host cannot be empty
+					if urlFields[URLPassword] != nil || urlFields[URLUser] != nil {
+						sb.WriteRune(URLPassword.Suffix())
+					}
+					sb.WriteString(scheme)
 				}
 				continue
-			} else if urlPart > URLUser && !firstPart {
+			} else if urlPart == URLHost && urlFields[URLUser] == nil {
+			} else if urlPart > URLUser {
 				lastPart := urlPart - 1
 				sb.WriteRune(lastPart.Suffix())
 			}
@@ -79,7 +86,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 				sb.WriteString("</strong>")
 			}
 
-			firstPart = false
 		}
 		sb.WriteString("</code>  \n")
 
