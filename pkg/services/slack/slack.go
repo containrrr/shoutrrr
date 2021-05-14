@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,7 +39,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)

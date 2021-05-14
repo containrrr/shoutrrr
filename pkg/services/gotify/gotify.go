@@ -2,14 +2,15 @@ package gotify
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -19,16 +20,31 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+	Client *http.Client
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
 		Title: "Shoutrrr notification",
 	}
 	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
+
+	service.Client = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				// If DisableTLS is specified, we might still need to disable TLS verification
+				// since the default configuration of Gotify redirects HTTP to HTTPS
+				// Note that this cannot be overridden using params, only using the config URL
+				InsecureSkipVerify: service.config.DisableTLS,
+			},
+		},
+		// Set a reasonable timeout to prevent one bad transfer from block all subsequent ones
+		Timeout: 10 * time.Second,
+	}
+
 	return err
 }
 
@@ -89,7 +105,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := http.Post(postURL, "application/json", jsonBuffer)
+	resp, err := service.Client.Post(postURL, "application/json", jsonBuffer)
 	if err != nil {
 		return fmt.Errorf("failed to send notification to Gotify: %s", err)
 	}

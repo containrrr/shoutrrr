@@ -113,15 +113,13 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	Describe("sending the payload", func() {
 		var err error
 		var service Service
-		BeforeEach(func() {
-			httpmock.Activate()
-		})
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
 		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
+			httpmock.ActivateNonDefault(service.Client)
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
@@ -133,6 +131,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not panic if an error occurs when sending the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
+			httpmock.ActivateNonDefault(service.Client)
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
@@ -141,6 +140,5 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 			err = service.Send("Message", nil)
 			Expect(err).To(HaveOccurred())
 		})
-
 	})
 })

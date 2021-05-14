@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -57,7 +56,7 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
@@ -68,12 +67,12 @@ func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error
 // See: https://docs.opsgenie.com/docs/alert-api#create-alert
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
-	url := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
+	endpointURL := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
 	payload, err := service.newAlertPayload(message, params)
 	if err != nil {
 		return err
 	}
-	return service.sendAlert(url, config.APIKey, payload)
+	return service.sendAlert(endpointURL, config.APIKey, payload)
 }
 
 func (service *Service) newAlertPayload(message string, params *types.Params) (AlertPayload, error) {
@@ -88,10 +87,27 @@ func (service *Service) newAlertPayload(message string, params *types.Params) (A
 		return AlertPayload{}, err
 	}
 
+	// Use `Message` for the title if available, or if the message is too long
+	// Use `Description` for the message in these scenarios
+	title := payloadFields.Title
+	description := message
+	if title == "" {
+		if len(message) > 130 {
+			title = message[:130]
+		} else {
+			title = message
+			description = ""
+		}
+	}
+
+	if payloadFields.Description != "" && description != "" {
+		description = description + "\n"
+	}
+
 	result := AlertPayload{
-		Message:     message,
+		Message:     title,
 		Alias:       payloadFields.Alias,
-		Description: payloadFields.Description,
+		Description: description + payloadFields.Description,
 		Responders:  payloadFields.Responders,
 		VisibleTo:   payloadFields.VisibleTo,
 		Actions:     payloadFields.Actions,
