@@ -2,7 +2,6 @@ package mattermost
 
 import (
 	"errors"
-	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 	"strings"
@@ -11,17 +10,21 @@ import (
 //Config object holding all information
 type Config struct {
 	standard.EnumlessConfig
-	UserName string
-	Channel  string
-	Host     string
-	Token    string
+	UserName string `url:"user" optional:"" desc:"Override webhook user"`
+	Channel  string `url:"path2" optional:"" desc:"Override webhook channel"`
+	Host     string `url:"host,port" desc:"Mattermost server host"`
+	Token    string `url:"path1" desc:"Webhook token"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
+	path := config.Token
+	if config.Channel != "" {
+		path += "/" + config.Channel
+	}
 	return &url.URL{
 		Host:       config.Host,
-		Path:       fmt.Sprintf("/hooks/%s", config.Token),
+		Path:       path,
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}

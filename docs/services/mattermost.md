@@ -2,7 +2,12 @@
 
 ## URL Format
 
-*mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*
+!!! info ""
+    mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]
+
+--8<-- "docs/services/mattermost/config.md"
+
+
 
 ## Creating a Webhook in MatterMost
 
