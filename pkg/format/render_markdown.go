@@ -65,7 +65,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 					sb.WriteString(scheme)
 				}
 				continue
-			} else if urlPart == URLHost && urlFields[URLUser] == nil {
+			} else if urlPart == URLHost && urlFields[URLUser] == nil && urlFields[URLPassword] == nil {
 			} else if urlPart > URLUser {
 				lastPart := urlPart - 1
 				sb.WriteRune(lastPart.Suffix())
