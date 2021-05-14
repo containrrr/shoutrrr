@@ -17,21 +17,28 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
 	urlFields := make([]*FieldInfo, URLPath+1)
+	fieldsPrinted := make(map[string]bool)
 
 	for _, node := range root.Items {
 		field := node.Field()
-		if field.URLPart == URLQuery {
+		println(field.Name, len(field.URLParts))
+		for _, urlPart := range field.URLParts {
+			if urlPart == URLQuery {
+				queryFields = append(queryFields, field)
+			} else if urlPart == URLPath && urlFields[urlPart] != nil {
+				urlFields = append(urlFields, field)
+			} else {
+				urlFields[urlPart] = field
+			}
+		}
+		if len(field.URLParts) < 1 {
 			queryFields = append(queryFields, field)
-		} else if field.URLPart > URLPath {
-			urlFields = append(urlFields, field)
-		} else {
-			urlFields[field.URLPart] = field
 		}
 	}
 
 	sb.WriteString("## URL Fields\n\n")
 	for _, field := range urlFields {
-		if field == nil {
+		if field == nil || fieldsPrinted[field.Name] {
 			continue
 		}
 		r.writeFieldPrimary(&sb, field)
@@ -39,6 +46,9 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		sb.WriteString("  URL part: <code class=\"service-url\">")
 		for i, uf := range urlFields {
 			urlPart := URLPart(i)
+			if urlPart > URLPath {
+				urlPart = URLPath
+			}
 			if urlPart == URLQuery {
 				sb.WriteString(scheme)
 				sb.WriteString("://")
@@ -53,15 +63,17 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 				lastPart := urlPart - 1
 				sb.WriteRune(lastPart.Suffix())
 			}
-			if urlPart == field.URLPart {
+			if field.IsURLPart(urlPart) {
 				sb.WriteString("<strong>")
 			}
 			sb.WriteString(strings.ToLower(uf.Name))
-			if urlPart == field.URLPart {
+			if field.IsURLPart(urlPart) {
 				sb.WriteString("</strong>")
 			}
 		}
 		sb.WriteString("</code>  \n")
+
+		fieldsPrinted[field.Name] = true
 	}
 
 	sort.SliceStable(queryFields, func(i, j int) bool {

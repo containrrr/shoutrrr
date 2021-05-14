@@ -62,3 +62,13 @@ func ParseURLPart(s string) URLPart {
 		return URLQuery
 	}
 }
+
+// ParseURLParts returns the URLParts that matches the supplied string
+func ParseURLParts(s string) []URLPart {
+	rawParts := strings.Split(s, ",")
+	urlParts := make([]URLPart, len(rawParts))
+	for i, raw := range rawParts {
+		urlParts[i] = ParseURLPart(raw)
+	}
+	return urlParts
+}
