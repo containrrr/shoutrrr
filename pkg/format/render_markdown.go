@@ -10,6 +10,7 @@ import (
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
 type MarkdownTreeRenderer struct{}
 
+// RenderTree renders a ContainerNode tree into a markdown documentation string
 func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
 
 	sb := strings.Builder{}
@@ -77,7 +78,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	return sb.String()
 }
 
-func (_ MarkdownTreeRenderer) writeFieldExtras(sb *strings.Builder, field *FieldInfo) {
+func (MarkdownTreeRenderer) writeFieldExtras(sb *strings.Builder, field *FieldInfo) {
 	if len(field.Keys) > 1 {
 		sb.WriteString("  Aliases: `")
 		for i, key := range field.Keys {
@@ -106,7 +107,7 @@ func (_ MarkdownTreeRenderer) writeFieldExtras(sb *strings.Builder, field *Field
 	}
 }
 
-func (_ MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldInfo) {
+func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldInfo) {
 	fieldKey := field.Name
 
 	sb.WriteString("*  __")
