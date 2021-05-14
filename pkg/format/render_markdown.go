@@ -23,7 +23,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 	for _, node := range root.Items {
 		field := node.Field()
-		println(field.Name, len(field.URLParts))
 		for _, urlPart := range field.URLParts {
 			if urlPart == URLQuery {
 				queryFields = append(queryFields, field)
@@ -46,11 +45,9 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		r.writeFieldPrimary(&sb, field)
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
+		firstPart := true
 		for i, uf := range urlFields {
 			urlPart := URLPart(i)
-			if urlPart > URLPath {
-				// urlPart = URLPath
-			}
 			if urlPart == URLQuery {
 				sb.WriteString(scheme)
 				sb.WriteString("://")
@@ -61,17 +58,27 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 					sb.WriteRune(urlPart.Suffix())
 				}
 				continue
-			} else if urlPart > URLUser {
+			} else if urlPart > URLUser && !firstPart {
 				lastPart := urlPart - 1
 				sb.WriteRune(lastPart.Suffix())
 			}
 			if field.IsURLPart(urlPart) {
 				sb.WriteString("<strong>")
 			}
-			sb.WriteString(strings.ToLower(uf.Name))
+
+			slug := strings.ToLower(uf.Name)
+
+			// Hard coded override for host:port 😓
+			if slug == "host" && urlPart == URLPort {
+				slug = "port"
+			}
+			sb.WriteString(slug)
+
 			if field.IsURLPart(urlPart) {
 				sb.WriteString("</strong>")
 			}
+
+			firstPart = false
 		}
 		sb.WriteString("</code>  \n")
 
