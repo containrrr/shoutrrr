@@ -38,6 +38,24 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		}
 	}
 
+	sort.SliceStable(urlFields, func(i, j int) bool {
+		if urlFields[i] == nil || urlFields[j] == nil {
+			return false
+		}
+
+		urlPartA := URLQuery
+		if len(urlFields[i].URLParts) > 0 {
+			urlPartA = urlFields[i].URLParts[0]
+		}
+
+		urlPartB := URLQuery
+		if len(urlFields[j].URLParts) > 0 {
+			urlPartB = urlFields[j].URLParts[0]
+		}
+
+		return urlPartA < urlPartB
+	})
+
 	r.writeHeader(&sb, "URL Fields")
 	for _, field := range urlFields {
 		if field == nil || fieldsPrinted[field.Name] {
