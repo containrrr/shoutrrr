@@ -19,6 +19,7 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
   - pymdownx.superfences
+  - pymdownx.mark
   - pymdownx.snippets:
       check_paths: true
 nav:
