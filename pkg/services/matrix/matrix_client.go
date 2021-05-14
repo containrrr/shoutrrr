@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -14,10 +14,10 @@ import (
 type client struct {
 	apiURL      url.URL
 	accessToken string
-	logger      *log.Logger
+	logger      types.StdLogger
 }
 
-func newClient(host string, disableTLS bool, logger *log.Logger) (c *client) {
+func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client) {
 	c = &client{
 		logger: logger,
 		apiURL: url.URL{
