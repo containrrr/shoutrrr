@@ -1,5 +1,7 @@
 # Gotify
 
+## URL Format
+
 --8<-- "docs/services/gotify/config.md"
 
 ## Examples
@@ -11,7 +13,6 @@
     ```
 
 !!! example "With subpath"
-    Common usage:
     ```uri
     gotify://example.com:443/path/to/gotify/AzyoeNS.D4iJLVa/?title=Great+News&priority=1
     ```
