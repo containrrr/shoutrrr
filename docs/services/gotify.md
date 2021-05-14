@@ -1,4 +1,17 @@
 # Gotify
 
-## URL Format
-*gotify://__`gotify-host`__/__`token`__*   
+--8<-- "docs/services/gotify/config.md"
+
+## Examples
+
+!!! example "Common usage"
+    
+    ```uri
+    gotify://gotify.example.com:443/AzyoeNS.D4iJLVa/?title=Great+News&priority=1
+    ```
+
+!!! example "With subpath"
+    Common usage:
+    ```uri
+    gotify://example.com:443/path/to/gotify/AzyoeNS.D4iJLVa/?title=Great+News&priority=1
+    ```

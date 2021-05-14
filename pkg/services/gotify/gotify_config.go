@@ -12,9 +12,9 @@ import (
 // Config for use within the gotify plugin
 type Config struct {
 	standard.EnumlessConfig
-	Token      string
-	Host       string
-	Path       string `optional:""`
+	Token      string `url:"path2" desc:"Application token" required:""`
+	Host       string `url:"host,port" desc:"Server hostname (and optionally port)" required:""`
+	Path       string `optional:"" url:"path1" desc:"Server subpath"`
 	Priority   int    `key:"priority" default:"0"`
 	Title      string `key:"title" default:"Shoutrrr notification"`
 	DisableTLS bool   `key:"disabletls" default:"No"`
