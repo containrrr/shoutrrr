@@ -16,7 +16,8 @@ markdown_extensions:
       separator: '_'
   - pymdownx.highlight
   - pymdownx.superfences
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      check_paths: true
 nav:
   - 'Home': 'index.md'
   - 'Getting started': 'getting-started.md'

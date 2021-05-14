@@ -32,8 +32,8 @@ func GetConfigPropString(propPtr r.Value) (string, error) {
 
 	if propPtr.CanInterface() {
 		if configProp, ok := propPtr.Interface().(types.ConfigProp); ok {
-			return configProp.GetPropValue()
-		}
+	return configProp.GetPropValue()
+}
 	}
 
 	return "", errors.New("struct field cannot be used as a prop")

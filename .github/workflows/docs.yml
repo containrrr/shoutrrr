@@ -25,6 +25,10 @@ jobs:
             mkdocs \
             mkdocs-material \
             md-toc
+
+      - name: Generate service config docs
+        run: sh generate-service-config-docs.sh
+
       - name: Generate docs
         run: mkdocs build
 

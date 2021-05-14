@@ -249,6 +249,7 @@ func testSetAndFormat(tv reflect.Value, node Node, value string, prettyFormat st
 
 	// Used for pretty printing output, coloring etc.
 	sb := strings.Builder{}
-	writeColoredNodeValue(&sb, node)
+	renderer := ConsoleTreeRenderer{}
+	renderer.writeNodeValue(&sb, node)
 	Expect(sb.String()).To(Equal(prettyFormat))
 }

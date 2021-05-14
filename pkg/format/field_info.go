@@ -1,11 +1,12 @@
 package format
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // FieldInfo is the meta data about a config field
@@ -17,6 +18,7 @@ type FieldInfo struct {
 	DefaultValue  string
 	Template      string
 	Required      bool
+	URLPart       URLPart
 	Title         bool
 	Base          int
 	Keys          []string
@@ -71,6 +73,10 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 
 		if _, ok := fieldDef.Tag.Lookup("title"); ok {
 			info.Title = true
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("url"); ok {
+			info.URLPart = ParseURLPart(tag)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {
