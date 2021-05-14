@@ -8,7 +8,9 @@ import (
 )
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
-type MarkdownTreeRenderer struct{}
+type MarkdownTreeRenderer struct {
+	HeaderPrefix string
+}
 
 // RenderTree renders a ContainerNode tree into a markdown documentation string
 func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
@@ -36,7 +38,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		}
 	}
 
-	sb.WriteString("## URL Fields\n\n")
+	r.writeHeader(&sb, "URL Fields")
 	for _, field := range urlFields {
 		if field == nil || fieldsPrinted[field.Name] {
 			continue
@@ -80,7 +82,8 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		return queryFields[i].Required && !queryFields[j].Required
 	})
 
-	sb.WriteString("## Query/Param Props\n\n")
+	r.writeHeader(&sb, "Query/Param Props")
+	sb.WriteString("Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n\n")
 	for _, field := range queryFields {
 		r.writeFieldPrimary(&sb, field)
 		r.writeFieldExtras(&sb, field)
@@ -191,4 +194,10 @@ func (r MarkdownTreeRenderer) writeContainer(sb *strings.Builder, node *Containe
 		sb.WriteString(" ]")
 	}
 	return totalLen
+}
+
+func (r MarkdownTreeRenderer) writeHeader(sb *strings.Builder, text string) {
+	sb.WriteString(r.HeaderPrefix)
+	sb.WriteString(text)
+	sb.WriteString("\n\n")
 }
