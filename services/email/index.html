@@ -12,7 +12,7 @@
         <link rel="canonical" href="https://containrrr.dev/shoutrrr/services/email/">
       
       <link rel="icon" href="../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.4">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.6f955dcd.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bde7dde4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
@@ -317,8 +317,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#additional_props" class="md-nav__link">
-    Additional props
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
   </a>
   
 </li>
@@ -487,6 +494,18 @@
   
 
           
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generic.md" class="md-nav__link">
+        Generic Webhook
+      </a>
+    </li>
+  
+
+          
         </ul>
       </nav>
     </li>
@@ -568,8 +587,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#additional_props" class="md-nav__link">
-    Additional props
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
   </a>
   
 </li>
@@ -593,52 +619,58 @@
                 
                 <h1 id="email">Email<a class="headerlink" href="#email" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>smtp://<strong><code>username</code></strong>:<strong><code>password</code></strong>@<strong><code>host</code></strong>:<strong><code>port</code></strong>/?fromAddress=<strong><code>fromAddress</code></strong>&amp;toAddresses=<strong><code>recipient1</code></strong>[,<strong><code>recipient2</code></strong>,...]</em></p>
-<h2 id="additional_props">Additional props<a class="headerlink" href="#additional_props" title="Permanent link">&para;</a></h2>
-<p><em>Can be either supplied using the params argument, or through the URL using ?key=value&amp;key=value etc.</em>.</p>
+<p><em>smtp://<strong><code>username</code></strong>:<strong><code>password</code></strong>@<strong><code>host</code></strong>:<strong><code>port</code></strong>/?from=<strong><code>fromAddress</code></strong>&amp;to=<strong><code>recipient1</code></strong>[,<strong><code>recipient2</code></strong>,...]</em></p>
+<p>Props can be either supplied using the params argument, or through the URL using <code>?key=value&amp;key=value</code> etc.</p>
+<h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Username</strong> - SMTP server username<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">smtp://<strong>username</strong>:password@host:port/</code>  </li>
+<li><strong>Password</strong> - SMTP server password or hash (for OAuth2)<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">smtp://username:<strong>password</strong>@host:port/</code>  </li>
+<li><strong>Host</strong> - SMTP server hostname or IP address (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">smtp://username:password@<strong>host</strong>:port/</code>  </li>
+<li><strong>Port</strong> - SMTP server port, common ones are 25, 465, 587 or 2525<br />
+  Default: <code>25</code><br />
+  URL part: <code class="service-url">smtp://username:password@host:<strong>port</strong>/</code>  </li>
+</ul>
+<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
 <ul>
 <li>
-<p><strong>FromAddress</strong> - e-mail address that the mail are sent from (<strong>Required</strong>)<br />
- Aliases: <code>from</code>  </p>
+<p><strong>FromAddress</strong> - E-mail address that the mail are sent from (<strong>Required</strong>)<br />
+  Aliases: <code>from</code>  </p>
 </li>
 <li>
-<p><strong>ToAddresses</strong> - list of recipient e-mails separated by <code>,</code> (<strong>Required</strong>)<br />
- Aliases: <code>to</code>  </p>
+<p><strong>ToAddresses</strong> - List of recipient e-mails separated by "," (comma) (<strong>Required</strong>)<br />
+  Aliases: <code>to</code>  </p>
 </li>
 <li>
 <p><strong>Auth</strong> - SMTP authentication method<br />
- Default: <code>Unknown</code><br />
- Possible values: <code>None</code>, <code>Plain</code>, <code>CRAMMD5</code>, <code>Unknown</code>, <code>OAuth2</code>  </p>
+  Default: <code>Unknown</code><br />
+  Possible values: <code>None</code>, <code>Plain</code>, <code>CRAMMD5</code>, <code>Unknown</code>, <code>OAuth2</code>  </p>
 </li>
 <li>
 <p><strong>Encryption</strong> - Encryption method<br />
- Default: <code>Auto</code><br />
- Possible values: <code>None</code>, <code>ExplicitTLS</code>, <code>ImplicitTLS</code>, <code>Auto</code>  </p>
+  Default: <code>Auto</code><br />
+  Possible values: <code>None</code>, <code>ExplicitTLS</code>, <code>ImplicitTLS</code>, <code>Auto</code>  </p>
 </li>
 <li>
-<p><strong>FromName</strong> - name of the sender<br />
- Default: <em>empty</em></p>
+<p><strong>FromName</strong> - Name of the sender<br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
-<p><strong>Password</strong> - authentication password or hash<br />
- Default: <em>empty</em>  </p>
+<p><strong>Subject</strong> - The subject of the sent mail<br />
+  Default: <code>Shoutrrr Notification</code><br />
+  Aliases: <code>title</code>  </p>
 </li>
 <li>
-<p><strong>Port</strong> - SMTP server port, common ones are 25, 465, 587 or 2525<br />
- Default: <code>25</code>  </p>
+<p><strong>UseHTML</strong> - Whether the message being sent is in HTML<br />
+  Default: <code>No</code>  </p>
 </li>
 <li>
-<p><strong>Subject</strong> - the subject of the sent mail<br />
- Default: <code>Shoutrrr Notification</code><br />
- Aliases: <code>title</code>  </p>
-</li>
-<li>
-<p><strong>UseHTML</strong> - whether the message being sent is in HTML<br />
- Default: <code>No</code>  </p>
-</li>
-<li>
-<p><strong>UseStartTLS</strong> - attempt to use SMTP StartTLS encryption<br />
- Default: <code>Yes</code>  </p>
+<p><strong>UseStartTLS</strong> - Whether to use StartTLS encryption<br />
+  Default: <code>Yes</code>  </p>
 </li>
 </ul>
                 
@@ -709,10 +741,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.4fa0e4ee.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
+      <script src="../../assets/javascripts/bundle.1d3bfcf1.min.js"></script>
       
     
   </body>
