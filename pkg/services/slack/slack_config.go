@@ -12,10 +12,10 @@ import (
 // Config for the slack service
 type Config struct {
 	standard.EnumlessConfig
-	BotName string   `default:"" optional:""`
-	Token   []string `description:"List of comma separated token parts"`
-	Color   string   `key:"color" optional:""`
-	Title   string   `key:"title" optional:""`
+	BotName string   `default:"" optional:"" url:"user" desc:"Bot name (uses default if empty)"`
+	Token   []string `desc:"Webhook token parts" url:"host,path1,path2"`
+	Color   string   `key:"color" optional:"" desc:"Message left-hand border color"`
+	Title   string   `key:"title" optional:"" desc:"Prepended text above the message"`
 }
 
 // GetURL returns a URL representation of it's current field values

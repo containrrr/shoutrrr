@@ -52,7 +52,15 @@ func ParseURLPart(s string) URLPart {
 	case "port":
 		return URLPort
 	case "path":
+		fallthrough
+	case "path1":
 		return URLPath
+	case "path2":
+		return URLPath + 1
+	case "path3":
+		return URLPath + 2
+	case "path4":
+		return URLPath + 3
 	case "query":
 		fallthrough
 	case "":

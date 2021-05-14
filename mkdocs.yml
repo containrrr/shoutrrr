@@ -14,7 +14,10 @@ markdown_extensions:
   - toc:
       permalink: True
       separator: '_'
+  - admonition
+  - pymdownx.details
   - pymdownx.highlight
+  - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.snippets:
       check_paths: true

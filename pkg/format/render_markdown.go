@@ -25,7 +25,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		for _, urlPart := range field.URLParts {
 			if urlPart == URLQuery {
 				queryFields = append(queryFields, field)
-			} else if urlPart == URLPath && urlFields[urlPart] != nil {
+			} else if urlPart > URLPath {
 				urlFields = append(urlFields, field)
 			} else {
 				urlFields[urlPart] = field
@@ -47,7 +47,7 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		for i, uf := range urlFields {
 			urlPart := URLPart(i)
 			if urlPart > URLPath {
-				urlPart = URLPath
+				// urlPart = URLPath
 			}
 			if urlPart == URLQuery {
 				sb.WriteString(scheme)
