@@ -5,7 +5,6 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"log"
 	"net/url"
 )
 
@@ -21,7 +20,7 @@ type Service struct {
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (s *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (s *Service) Initialize(configURL *url.URL, logger t.StdLogger) error {
 	s.SetLogger(logger)
 	s.config = &Config{}
 
