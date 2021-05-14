@@ -9,10 +9,12 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
+// ConsoleTreeRenderer renders a ContainerNode tree into a ansi-colored console string
 type ConsoleTreeRenderer struct {
 	WithValues bool
 }
 
+// RenderTree renders a ContainerNode tree into a ansi-colored console string
 func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
 
 	sb := strings.Builder{}
@@ -39,11 +41,13 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) stri
 			sb.WriteString(color.CyanString(typeName))
 		}
 
-		//if len(field.Description) > 0 {
 		sb.WriteString(strings.Repeat(" ", util.Max(preLen-valueLen, 1)))
 		sb.WriteString(ColorizeDesc(field.Description))
 		sb.WriteString(strings.Repeat(" ", util.Max(60-len(field.Description), 1)))
-		//}
+
+		if field.URLPart != URLQuery {
+			sb.WriteString(fmt.Sprintf(" <URL: %s>", ColorizeEnum(field.URLPart)))
+		}
 
 		if len(field.Template) > 0 {
 			sb.WriteString(fmt.Sprintf(" <Template: %s>", ColorizeString(field.Template)))
