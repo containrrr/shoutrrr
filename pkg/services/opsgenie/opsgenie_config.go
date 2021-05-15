@@ -13,9 +13,9 @@ const defaultPort = 443
 
 // Config for use within the opsgenie service
 type Config struct {
-	APIKey      string            `desc:"The OpsGenie API key"`
-	Host        string            `desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
-	Port        uint16            `desc:"The OpsGenie API port." default:"443"`
+	APIKey      string            `url:"path" desc:"The OpsGenie API key"`
+	Host        string            `url:"host" desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
+	Port        uint16            `url:"port" desc:"The OpsGenie API port." default:"443"`
 	Alias       string            `key:"alias" desc:"Client-defined identifier of the alert" optional:"true"`
 	Description string            `key:"description" desc:"Description field of the alert" optional:"true"`
 	Responders  []Entity          `key:"responders" desc:"Teams, users, escalations and schedules that the alert will be routed to send notifications" optional:"true"`

@@ -9,8 +9,8 @@ import (
 
 // Config for the Pushover notification service service
 type Config struct {
-	Token    string
-	User     string
+	Token    string   `url:"pass" desc:"API Token/Key"`
+	User     string   `url:"host" desc:"User Key"`
 	Devices  []string `key:"devices" optional:""`
 	Priority int8     `key:"priority" default:"0"`
 	Title    string   `key:"title" optional:""`

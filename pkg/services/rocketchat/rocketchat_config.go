@@ -13,22 +13,24 @@ import (
 // Config for the rocket.chat service
 type Config struct {
 	standard.EnumlessConfig
-	UserName string
-	Host     string
-	Port     string
-	TokenA   string
-	Channel  string
-	TokenB   string
+	UserName string `url:"user" optional:""`
+	Host     string `url:"host"`
+	Port     string `url:"port"`
+	TokenA   string `url:"path1"`
+	Channel  string `url:"path3"`
+	TokenB   string `url:"path2"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
-	return &url.URL{
-		Host:       config.Host,
-		Path:       fmt.Sprintf("hooks/%s/%s", config.TokenA, config.TokenB),
+
+	u := &url.URL{
+		Host:       fmt.Sprintf("%s:%v", config.Host, config.Port),
+		Path:       fmt.Sprintf("%s/%s", config.TokenA, config.TokenB),
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}
+	return u
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values

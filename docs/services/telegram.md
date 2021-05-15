@@ -2,7 +2,10 @@
 
 ## URL Format
 
-*telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]*
+!!! info ""
+    telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]
+    
+--8<-- "docs/services/telegram/config.md"
 
 ## Getting a token for Telegram
 

@@ -1,8 +1,18 @@
 # Teams
 
+!!! attention Webhook URL scheme changed
+    Microsoft has changed the URL scheme for Teams webhooks. You will now have to specify the hostname using:
+    ```text
+    ?host=example.webhook.office.com
+    ```
+    Where `example` is your organization short name
+
 ## URL Format
 
-*teams://__`token-a`__/__`token-b`__/__`token-c`__*
+!!! info ""
+    teams://__`group`__@__`tenant`__/__`altId`__/__`groupOwner`__?host=example.webhook.office.com
+
+--8<-- "docs/services/teams/config.md"
 
 ## Setting up a webhook
 

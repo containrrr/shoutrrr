@@ -18,7 +18,7 @@ type FieldInfo struct {
 	DefaultValue  string
 	Template      string
 	Required      bool
-	URLPart       URLPart
+	URLParts      []URLPart
 	Title         bool
 	Base          int
 	Keys          []string
@@ -27,6 +27,16 @@ type FieldInfo struct {
 // IsEnum returns whether a EnumFormatter has been assigned to the field and that it is of a suitable type
 func (fi *FieldInfo) IsEnum() bool {
 	return fi.EnumFormatter != nil && fi.Type.Kind() == r.Int
+}
+
+// IsURLPart returns whether the field is serialized as the specified part of an URL
+func (fi *FieldInfo) IsURLPart(part URLPart) bool {
+	for _, up := range fi.URLParts {
+		if up == part {
+			return true
+		}
+	}
+	return false
 }
 
 func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter) []FieldInfo {
@@ -76,7 +86,7 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("url"); ok {
-			info.URLPart = ParseURLPart(tag)
+			info.URLParts = ParseURLParts(tag)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {

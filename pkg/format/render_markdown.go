@@ -1,6 +1,7 @@
 package format
 
 import (
+	"reflect"
 	"sort"
 	"strings"
 
@@ -8,7 +9,9 @@ import (
 )
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
-type MarkdownTreeRenderer struct{}
+type MarkdownTreeRenderer struct {
+	HeaderPrefix string
+}
 
 // RenderTree renders a ContainerNode tree into a markdown documentation string
 func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
@@ -17,26 +20,51 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
 	urlFields := make([]*FieldInfo, URLPath+1)
+	fieldsPrinted := make(map[string]bool)
 
 	for _, node := range root.Items {
 		field := node.Field()
-		if field.URLPart == URLQuery {
+		for _, urlPart := range field.URLParts {
+			if urlPart == URLQuery {
+				queryFields = append(queryFields, field)
+			} else if urlPart > URLPath {
+				urlFields = append(urlFields, field)
+			} else {
+				urlFields[urlPart] = field
+			}
+		}
+		if len(field.URLParts) < 1 {
 			queryFields = append(queryFields, field)
-		} else if field.URLPart > URLPath {
-			urlFields = append(urlFields, field)
-		} else {
-			urlFields[field.URLPart] = field
 		}
 	}
 
-	sb.WriteString("## URL Fields\n\n")
+	sort.SliceStable(urlFields, func(i, j int) bool {
+		if urlFields[i] == nil || urlFields[j] == nil {
+			return false
+		}
+
+		urlPartA := URLQuery
+		if len(urlFields[i].URLParts) > 0 {
+			urlPartA = urlFields[i].URLParts[0]
+		}
+
+		urlPartB := URLQuery
+		if len(urlFields[j].URLParts) > 0 {
+			urlPartB = urlFields[j].URLParts[0]
+		}
+
+		return urlPartA < urlPartB
+	})
+
+	r.writeHeader(&sb, "URL Fields")
 	for _, field := range urlFields {
-		if field == nil {
+		if field == nil || fieldsPrinted[field.Name] {
 			continue
 		}
 		r.writeFieldPrimary(&sb, field)
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
+
 		for i, uf := range urlFields {
 			urlPart := URLPart(i)
 			if urlPart == URLQuery {
@@ -47,28 +75,47 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 			if uf == nil {
 				if urlPart == URLPath {
 					sb.WriteRune(urlPart.Suffix())
+				} else if urlPart == URLHost {
+					// Host cannot be empty
+					if urlFields[URLPassword] != nil || urlFields[URLUser] != nil {
+						sb.WriteRune(URLPassword.Suffix())
+					}
+					sb.WriteString(scheme)
 				}
 				continue
+			} else if urlPart == URLHost && urlFields[URLUser] == nil && urlFields[URLPassword] == nil {
 			} else if urlPart > URLUser {
 				lastPart := urlPart - 1
 				sb.WriteRune(lastPart.Suffix())
 			}
-			if urlPart == field.URLPart {
+			if field.IsURLPart(urlPart) {
 				sb.WriteString("<strong>")
 			}
-			sb.WriteString(strings.ToLower(uf.Name))
-			if urlPart == field.URLPart {
+
+			slug := strings.ToLower(uf.Name)
+
+			// Hard coded override for host:port 😓
+			if slug == "host" && urlPart == URLPort {
+				slug = "port"
+			}
+			sb.WriteString(slug)
+
+			if field.IsURLPart(urlPart) {
 				sb.WriteString("</strong>")
 			}
+
 		}
 		sb.WriteString("</code>  \n")
+
+		fieldsPrinted[field.Name] = true
 	}
 
 	sort.SliceStable(queryFields, func(i, j int) bool {
 		return queryFields[i].Required && !queryFields[j].Required
 	})
 
-	sb.WriteString("## Query/Param Props\n\n")
+	r.writeHeader(&sb, "Query/Param Props")
+	sb.WriteString("Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n\n")
 	for _, field := range queryFields {
 		r.writeFieldPrimary(&sb, field)
 		r.writeFieldExtras(&sb, field)
@@ -126,6 +173,14 @@ func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldI
 		if field.DefaultValue == "" {
 			sb.WriteString("*empty*")
 		} else {
+			if field.Type.Kind() == reflect.Bool {
+				defaultValue, _ := ParseBool(field.DefaultValue, false)
+				if defaultValue {
+					sb.WriteString("✔ ")
+				} else {
+					sb.WriteString("❌ ")
+				}
+			}
 			sb.WriteRune('`')
 			sb.WriteString(field.DefaultValue)
 			sb.WriteRune('`')
@@ -179,4 +234,10 @@ func (r MarkdownTreeRenderer) writeContainer(sb *strings.Builder, node *Containe
 		sb.WriteString(" ]")
 	}
 	return totalLen
+}
+
+func (r MarkdownTreeRenderer) writeHeader(sb *strings.Builder, text string) {
+	sb.WriteString(r.HeaderPrefix)
+	sb.WriteString(text)
+	sb.WriteString("\n\n")
 }

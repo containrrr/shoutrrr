@@ -11,12 +11,12 @@ import (
 
 // Config for use within the telegram plugin
 type Config struct {
-	Token        string
+	Token        string    `url:"user"`
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
 	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
 	Channels     []string  `key:"channels"`
-	Title        string    `key:"title" default:"" desc:"notification title, optionally set by the sender"`
+	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values

@@ -15,7 +15,7 @@ type ConsoleTreeRenderer struct {
 }
 
 // RenderTree renders a ContainerNode tree into a ansi-colored console string
-func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) string {
+func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 
 	sb := strings.Builder{}
 
@@ -36,7 +36,7 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) stri
 			valueLen = r.writeNodeValue(&sb, node)
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
-			typeName := strings.TrimPrefix(field.Type.String(), scheme)
+			typeName := field.Type.String()
 			valueLen = len(typeName)
 			sb.WriteString(color.CyanString(typeName))
 		}
@@ -45,8 +45,18 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, scheme string) stri
 		sb.WriteString(ColorizeDesc(field.Description))
 		sb.WriteString(strings.Repeat(" ", util.Max(60-len(field.Description), 1)))
 
-		if field.URLPart != URLQuery {
-			sb.WriteString(fmt.Sprintf(" <URL: %s>", ColorizeEnum(field.URLPart)))
+		if len(field.URLParts) > 0 && field.URLParts[0] != URLQuery {
+			sb.WriteString(" <URL: ")
+			for i, part := range field.URLParts {
+				if i > 0 {
+					sb.WriteString(", ")
+				}
+				if part > URLPath {
+					part = URLPath
+				}
+				sb.WriteString(ColorizeEnum(part))
+			}
+			sb.WriteString(">")
 		}
 
 		if len(field.Template) > 0 {

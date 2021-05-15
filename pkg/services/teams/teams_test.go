@@ -27,20 +27,19 @@ func TestTeams(t *testing.T) {
 var _ = Describe("the teams plugin", func() {
 	When("creating the webhook URL", func() {
 		It("should match the expected output", func() {
-			config := Config{
-				WebhookParts: [4]string{
-					"11111111-4444-4444-8444-cccccccccccc",
-					"22222222-4444-4444-8444-cccccccccccc",
-					"33333333012222222222333333333344",
-					"44444444-4444-4444-8444-cccccccccccc",
-				},
-			}
-			apiURL := buildWebhookURL(DefaultHost, config.WebhookParts)
+			config := Config{}
+			config.setFromWebhookParts([4]string{
+				"11111111-4444-4444-8444-cccccccccccc",
+				"22222222-4444-4444-8444-cccccccccccc",
+				"33333333012222222222333333333344",
+				"44444444-4444-4444-8444-cccccccccccc",
+			})
+			apiURL := buildWebhookURL(DefaultHost, config.webhookParts())
 			Expect(apiURL).To(Equal(testWebhookURL))
 
 			parts, err := parseAndVerifyWebhookURL(apiURL)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(parts).To(Equal(config.WebhookParts))
+			Expect(parts).To(Equal(config.webhookParts()))
 		})
 	})
 

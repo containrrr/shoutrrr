@@ -50,7 +50,7 @@ func printDocs(format string, services []string) cli.Result {
 	case "console":
 		renderer = f.ConsoleTreeRenderer{WithValues: false}
 	case "markdown":
-		renderer = f.MarkdownTreeRenderer{}
+		renderer = f.MarkdownTreeRenderer{HeaderPrefix: "### "}
 	default:
 		return cli.InvalidUsage("invalid format")
 	}

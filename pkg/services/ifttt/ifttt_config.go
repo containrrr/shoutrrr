@@ -16,14 +16,14 @@ const (
 // Config is the configuration needed to send IFTTT notifications
 type Config struct {
 	standard.EnumlessConfig
-	WebHookID         string   `required:"true"`
+	WebHookID         string   `url:"host" required:"true"`
 	Events            []string `key:"events" required:"true"`
-	Value1            string   `key:"value1"`
-	Value2            string   `key:"value2"`
-	Value3            string   `key:"value3"`
-	UseMessageAsValue uint8    `key:"messagevalue" desc:"sets the corresponding value field to the notification message" default:"2"`
-	UseTitleAsValue   uint8    `key:"titlevalue" desc:"sets the corresponding value field to the notification title" default:"0"`
-	Title             string   `key:"title" default:"" desc:"notification title, optionally set by the sender"`
+	Value1            string   `key:"value1" optional:""`
+	Value2            string   `key:"value2" optional:""`
+	Value3            string   `key:"value3" optional:""`
+	UseMessageAsValue uint8    `key:"messagevalue" desc:"Sets the corresponding value field to the notification message" default:"2"`
+	UseTitleAsValue   uint8    `key:"titlevalue" desc:"Sets the corresponding value field to the notification title" default:"0"`
+	Title             string   `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
 // GetURL returns a URL representation of it's current field values

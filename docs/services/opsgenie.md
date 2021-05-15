@@ -2,6 +2,8 @@
 
 ## URL Format
 
+--8<-- "docs/services/opsgenie/config.md"
+
 ## Creating a REST API endpoint in OpsGenie
 
 1. Open up the Integration List page by clicking on *Settings => Integration List* within the menu
@@ -31,7 +33,7 @@ If you want to, you can pass additional parameters to the `send` function.
 <br/>
 The following example contains all parameters that are currently supported.
 
-```gotemplate
+```go
 service.Send("An example alert message", &types.Params{
     "alias":       "Life is too short for no alias",
     "description": "Every alert needs a description",
@@ -48,12 +50,17 @@ service.Send("An example alert message", &types.Params{
 })
 ```
 
-# Optional parameters
+## Optional parameters
 
 You can optionally specify the parameters in the URL:
-opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&actions=An+action&tags=["tag1","tag2"]&entity=An+example+entity&source=The+source&priority=P1&user=Dracula&note=Here+is+a+note
+
+!!! info ""
+    opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&actions=An+action&tags=["tag1","tag2"]&entity=An+example+entity&source=The+source&priority=P1&user=Dracula&note=Here+is+a+note
 
 Example using the command line:
 
-	shoutrrr send -u 'opsgenie://api.eu.opsgenie.com/token?tags=["tag1","tag2"]&description=testing&responders=[{"username":"superuser", "type": "user"}]&entity=Example Entity&source=Example Source&actions=["asdf", "bcde"]' -m "Hello World6"
+```shell
+shoutrrr send -u 'opsgenie://api.eu.opsgenie.com/token?tags=["tag1","tag2"]&description=testing&responders=[{"username":"superuser", "type": "user"}]&entity=Example Entity&source=Example Source&actions=["asdf", "bcde"]' -m "Hello World6"
+```
+
 
