@@ -554,35 +554,41 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>WebHookID</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">ifttt://<strong>webhookid</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
 <p><strong>Events</strong> (<strong>Required</strong>)  </p>
 </li>
 <li>
-<p><strong>Value1</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Value2</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Value3</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>WebHookID</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Title</strong> - notification title, optionally set by the sender<br />
+<p><strong>Title</strong> - Notification title, optionally set by the sender<br />
   Default: <em>empty</em>  </p>
 </li>
 <li>
-<p><strong>UseMessageAsValue</strong> - sets the corresponding value field to the notification message<br />
+<p><strong>UseMessageAsValue</strong> - Sets the corresponding value field to the notification message<br />
   Default: <code>2</code>  </p>
 </li>
 <li>
-<p><strong>UseTitleAsValue</strong> - sets the corresponding value field to the notification title<br />
+<p><strong>UseTitleAsValue</strong> - Sets the corresponding value field to the notification title<br />
   Default: <code>0</code>  </p>
+</li>
+<li>
+<p><strong>Value1</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Value2</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Value3</strong><br />
+  Default: <em>empty</em>  </p>
 </li>
 </ul>
                 

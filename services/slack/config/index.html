@@ -554,22 +554,24 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BotName</strong> - Bot name (uses default if empty)<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">slack://<strong>botname</strong>@token/token/token</code>  </li>
+<li><strong>Token</strong> - Webhook token parts (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">slack://botname@<strong>token</strong>/<strong>token</strong>/<strong>token</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>Token</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>BotName</strong><br />
+<p><strong>Color</strong> - Message left-hand border color<br />
   Default: <em>empty</em>  </p>
 </li>
 <li>
-<p><strong>Color</strong><br />
-  Default: <em>empty</em>  </p>
-</li>
-<li>
-<p><strong>Title</strong><br />
+<p><strong>Title</strong> - Prepended text above the message<br />
   Default: <em>empty</em>  </p>
 </li>
 </ul>

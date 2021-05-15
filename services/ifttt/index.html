@@ -350,6 +350,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -570,6 +590,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -591,7 +631,46 @@
                 
                 <h1 id="ifttt">IFTTT<a class="headerlink" href="#ifttt" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>ifttt://<strong><code>key</code></strong>/?events=<strong><code>event1</code></strong>[,<strong><code>event2</code></strong>,...]&amp;value1=<strong><code>value1</code></strong>&amp;value2=<strong><code>value2</code></strong>&amp;value3=<strong><code>value3</code></strong></em></p>
+<div class="admonition info">
+<p>ifttt://<strong><code>key</code></strong>/?events=<strong><code>event1</code></strong>[,<strong><code>event2</code></strong>,...]&amp;value1=<strong><code>value1</code></strong>&amp;value2=<strong><code>value2</code></strong>&amp;value3=<strong><code>value3</code></strong></p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>WebHookID</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">ifttt://<strong>webhookid</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Events</strong> (<strong>Required</strong>)  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Notification title, optionally set by the sender<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>UseMessageAsValue</strong> - Sets the corresponding value field to the notification message<br />
+  Default: <code>2</code>  </p>
+</li>
+<li>
+<p><strong>UseTitleAsValue</strong> - Sets the corresponding value field to the notification title<br />
+  Default: <code>0</code>  </p>
+</li>
+<li>
+<p><strong>Value1</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Value2</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Value3</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
                 
               
               

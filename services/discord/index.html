@@ -302,12 +302,25 @@
     URL Format
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#additional_props" class="md-nav__link">
-    Additional props
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -584,12 +597,25 @@
     URL Format
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#additional_props" class="md-nav__link">
-    Additional props
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -620,26 +646,64 @@
                 <h1 id="discord">Discord<a class="headerlink" href="#discord" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <p>Your Discord Webhook-URL will look like this:</p>
-<blockquote>
-<p>https://discordapp.com/api/webhooks/<strong><code>channel</code></strong>/<strong><code>token</code></strong>  </p>
-</blockquote>
+<div class="admonition info">
+<p>https://discordapp.com/api/webhooks/<strong><code>webhookid</code></strong>/<strong><code>token</code></strong>  </p>
+</div>
 <p>The shoutrrr service URL should look like this:  </p>
-<blockquote>
-<p>discord://<strong><code>token</code></strong>@<strong><code>channel</code></strong></p>
-</blockquote>
-<h2 id="additional_props">Additional props<a class="headerlink" href="#additional_props" title="Permanent link">&para;</a></h2>
-<p><em>Can be either supplied using the params argument, or through the URL using ?key=value&amp;key=value etc.</em>.</p>
+<div class="admonition info">
+<p>discord://<strong><code>token</code></strong>@<strong><code>webhookid</code></strong></p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Title</strong><br />
-   Type: <em>string</em>, Default: <em>empty</em></li>
-<li><strong>Username</strong> - Override the webhook default username
-    Type: <em>string</em>, Default: <em>empty</em></li>
-<li><strong>AvatarURL</strong> - Override the webhook default avatar<br />
-   Type: <em>string</em>, Default: <em>empty</em>        </li>
-<li><strong>Color</strong> - The color of the left border for plain messages
-   Type: <em>number</em>, Default: 0x50D9ff</li>
-<li><strong>SplitLines</strong> - Whether to send each line as a separate message item<br />
-   Type: <em>boolean</em>, Default: yes</li>
+<li><strong>Token</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">discord://<strong>token</strong>@webhookid/</code>  </li>
+<li><strong>WebhookID</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">discord://token@<strong>webhookid</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>AvatarURL</strong> - Override the webhook default avatar<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Color</strong> - The color of the left border for plain messages<br />
+  Default: <code>0x50D9ff</code>  </p>
+</li>
+<li>
+<p><strong>ColorDebug</strong> - The color of the left border for debug messages<br />
+  Default: <code>0x7b00ab</code>  </p>
+</li>
+<li>
+<p><strong>ColorError</strong> - The color of the left border for error messages<br />
+  Default: <code>0xd60510</code>  </p>
+</li>
+<li>
+<p><strong>ColorInfo</strong> - The color of the left border for info messages<br />
+  Default: <code>0x2488ff</code>  </p>
+</li>
+<li>
+<p><strong>ColorWarn</strong> - The color of the left border for warning messages<br />
+  Default: <code>0xffc441</code>  </p>
+</li>
+<li>
+<p><strong>JSON</strong> - Whether to send the whole message as the JSON payload instead of using it as the 'content' field<br />
+  Default: ❌ <code>No</code>  </p>
+</li>
+<li>
+<p><strong>SplitLines</strong> - Whether to send each line as a separate embedded item<br />
+  Default: ✔ <code>Yes</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Username</strong> - Override the webhook default username<br />
+  Default: <em>empty</em>  </p>
+</li>
 </ul>
 <h2 id="creating_a_webhook_in_discord">Creating a webhook in Discord<a class="headerlink" href="#creating_a_webhook_in_discord" title="Permanent link">&para;</a></h2>
 <ol>

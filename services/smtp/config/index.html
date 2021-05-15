@@ -554,7 +554,7 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Username</strong> - SMTP server username<br />
   Default: <em>empty</em><br />
@@ -568,7 +568,9 @@
   Default: <code>25</code><br />
   URL part: <code class="service-url">smtp://username:password@host:<strong>port</strong>/</code>  </li>
 </ul>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
 <p><strong>FromAddress</strong> - E-mail address that the mail are sent from (<strong>Required</strong>)<br />
@@ -599,11 +601,11 @@
 </li>
 <li>
 <p><strong>UseHTML</strong> - Whether the message being sent is in HTML<br />
-  Default: <code>No</code>  </p>
+  Default: ❌ <code>No</code>  </p>
 </li>
 <li>
 <p><strong>UseStartTLS</strong> - Whether to use StartTLS encryption<br />
-  Default: <code>Yes</code>  </p>
+  Default: ✔ <code>Yes</code>  </p>
 </li>
 </ul>
                 

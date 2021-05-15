@@ -554,18 +554,17 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li>
-<p><strong>JSON</strong> - Whether to send the whole message as the JSON payload instead of using it as the 'content' field (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Token</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>WebhookID</strong> (<strong>Required</strong>)  </p>
-</li>
+<li><strong>Token</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">discord://<strong>token</strong>@webhookid/</code>  </li>
+<li><strong>WebhookID</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">discord://token@<strong>webhookid</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
 <li>
 <p><strong>AvatarURL</strong> - Override the webhook default avatar<br />
   Default: <em>empty</em>  </p>
@@ -591,8 +590,12 @@
   Default: <code>0xffc441</code>  </p>
 </li>
 <li>
+<p><strong>JSON</strong> - Whether to send the whole message as the JSON payload instead of using it as the 'content' field<br />
+  Default: ❌ <code>No</code>  </p>
+</li>
+<li>
 <p><strong>SplitLines</strong> - Whether to send each line as a separate embedded item<br />
-  Default: <code>yes</code>  </p>
+  Default: ✔ <code>Yes</code>  </p>
 </li>
 <li>
 <p><strong>Title</strong><br />

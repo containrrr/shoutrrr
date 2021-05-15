@@ -446,6 +446,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -584,6 +604,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -618,8 +658,49 @@
                 
                 
                 <h1 id="teams">Teams<a class="headerlink" href="#teams" title="Permanent link">&para;</a></h1>
+<div class="admonition attention webhook url scheme changed">
+<p class="admonition-title">Attention</p>
+<p>Microsoft has changed the URL scheme for Teams webhooks. You will now have to specify the hostname using:
+<div class="highlight"><pre><span></span><code>?host=example.webhook.office.com
+</code></pre></div>
+Where <code>example</code> is your organization short name</p>
+</div>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>teams://<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em></p>
+<div class="admonition info">
+<p>teams://<strong><code>group</code></strong>@<strong><code>tenant</code></strong>/<strong><code>altId</code></strong>/<strong><code>groupOwner</code></strong>?host=example.webhook.office.com</p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Group</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">teams://<strong>group</strong>@tenant/altid/groupowner</code>  </li>
+<li><strong>Tenant</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">teams://group@<strong>tenant</strong>/altid/groupowner</code>  </li>
+<li><strong>AltID</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">teams://group@tenant/<strong>altid</strong>/groupowner</code>  </li>
+<li><strong>GroupOwner</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">teams://group@tenant/altid/<strong>groupowner</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Color</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Host</strong><br />
+  Default: <code>outlook.office.com</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 <h2 id="setting_up_a_webhook">Setting up a webhook<a class="headerlink" href="#setting_up_a_webhook" title="Permanent link">&para;</a></h2>
 <p>To be able to use the Microsoft Teams notification service, you first need to set up a custom webhook.
 Instructions on how to do this can be found in <a href="https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using#setting-up-a-custom-incoming-webhook">this guide</a></p>

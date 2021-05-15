@@ -434,6 +434,33 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
 </li>
       
     </ul>
@@ -570,6 +597,33 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
 </li>
       
     </ul>
@@ -590,8 +644,52 @@
                 
                 
                 <h1 id="slack">Slack<a class="headerlink" href="#slack" title="Permanent link">&para;</a></h1>
+<p>The slack notification service uses <a href="https://api.slack.com/messaging/webhooks">Slack Webhook</a>s to send messages.<br />
+Follow the <a href="https://api.slack.com/messaging/webhooks#getting_started">Getting started with Incoming Webhooks</a> guide and
+replace the initial <code>https://hooks.slack.com/services/</code> part of the webhook URL with <code>slack://</code> to get your Shoutrrr URL.</p>
+<p><em>Slack Webhook URL:</em></p>
+<div class="admonition info">
+<p>https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX</p>
+</div>
+<p>Shoutrrr URL:</p>
+<div class="admonition info">
+<p>slack://T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX</p>
+</div>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>slack://[<strong><code>botname</code></strong>@]<strong><code>token-a</code></strong>/<strong><code>token-b</code></strong>/<strong><code>token-c</code></strong></em>      </p>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BotName</strong> - Bot name (uses default if empty)<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">slack://<strong>botname</strong>@token/token/token</code>  </li>
+<li><strong>Token</strong> - Webhook token parts (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">slack://botname@<strong>token</strong>/<strong>token</strong>/<strong>token</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Color</strong> - Message left-hand border color<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Prepended text above the message<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Color format</p>
+<p>The format for the <code>Color</code> prop follows the <a href="https://api.slack.com/reference/messaging/attachments#fields">slack docs</a>
+but <code>#</code> needs to be escaped as <code>%23</code> when passed in a URL.<br />
+So <span style="background:#ff8000;width:.9em;height:.9em;display:inline-block;vertical-align:middle"></span><code>#ff8000</code> would be <code>%23ff8000</code> etc.</p>
+</div>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>All fields set:
+<div class="highlight"><pre><span></span><code>slack://ShoutrrrBot@T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX?color=good&amp;title=Great+News
+</code></pre></div></p>
+</div>
                 
               
               

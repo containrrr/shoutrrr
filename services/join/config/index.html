@@ -554,20 +554,25 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>APIKey</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">join://:<strong>apikey</strong>@join/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>APIKey</strong> (<strong>Required</strong>)  </p>
+<p><strong>Devices</strong> - Comma separated list of device IDs (<strong>Required</strong>)  </p>
 </li>
 <li>
-<p><strong>Devices</strong> (<strong>Required</strong>)  </p>
+<p><strong>Icon</strong> - Icon URL<br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
-<p><strong>Icon</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Title</strong> (<strong>Required</strong>)  </p>
+<p><strong>Title</strong> - If set creates a notification<br />
+  Default: <em>empty</em>  </p>
 </li>
 </ul>
                 

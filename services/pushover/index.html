@@ -410,6 +410,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -584,6 +604,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -619,7 +659,33 @@
                 
                 <h1 id="pushover">Pushover<a class="headerlink" href="#pushover" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>pushover://shoutrrr:<strong><code>apiToken</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...]</em></p>
+<div class="admonition info">
+<p>pushover://shoutrrr:<strong><code>apiToken</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...]</p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Token</strong> - API Token/Key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">pushover://:<strong>token</strong>@user/</code>  </li>
+<li><strong>User</strong> - User Key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">pushover://:token@<strong>user</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Devices</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Priority</strong><br />
+  Default: <code>0</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong><br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 <h2 id="getting_the_keys_from_pushover">Getting the keys from Pushover<a class="headerlink" href="#getting_the_keys_from_pushover" title="Permanent link">&para;</a></h2>
 <p>At your <a href="https://pushover.net/">Pushover dashboard</a> you can view your <strong><code>userKey</code></strong> in the top right.<br />
 <img alt="Screenshot 1" src="po-1.png" /></p>
@@ -632,7 +698,10 @@
 <h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
 <p>You can optionally specify the <strong><code>title</code></strong> and <strong><code>priority</code></strong> parameters in the URL:<br />
 <em>pushover://shoutrrr:<strong><code>token</code></strong>@<strong><code>userKey</code></strong>/?devices=<strong><code>device</code></strong>&amp;title=Custom+Title&amp;priority=1</em></p>
-<p><strong>Note:</strong> Only supply priority values between -1 and 1, since 2 requires additional parameters that are not supported yet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only supply priority values between -1 and 1, since 2 requires additional parameters that are not supported yet.</p>
+</div>
 <p>Please refer to the <a href="https://pushover.net/api#messages">Pushover API documentation</a> for more information.  </p>
                 
               

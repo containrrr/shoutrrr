@@ -362,6 +362,33 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guide" class="md-nav__link">
+    Guide
+  </a>
+  
 </li>
       
     </ul>
@@ -570,6 +597,33 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guide" class="md-nav__link">
+    Guide
+  </a>
+  
 </li>
       
     </ul>
@@ -591,7 +645,43 @@
                 
                 <h1 id="join">Join<a class="headerlink" href="#join" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>join://shoutrrr:<strong><code>api-key</code></strong>@join/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...][&amp;icon=<strong><code>icon</code></strong>][&amp;title=<strong><code>title</code></strong>]</em>    </p>
+<div class="admonition info">
+<p>join://shoutrrr:<strong><code>api-key</code></strong>@join/?devices=<strong><code>device1</code></strong>[,<strong><code>device2</code></strong>, ...][&amp;icon=<strong><code>icon</code></strong>][&amp;title=<strong><code>title</code></strong>]</p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>APIKey</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">join://:<strong>apikey</strong>@join/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Devices</strong> - Comma separated list of device IDs (<strong>Required</strong>)  </p>
+</li>
+<li>
+<p><strong>Icon</strong> - Icon URL<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - If set creates a notification<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
+<h2 id="guide">Guide<a class="headerlink" href="#guide" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Go to the <a href="https://joinjoaomgcd.appspot.com/">Join Webapp</a> </li>
+<li>Select your device</li>
+<li>Click <strong>Join API</strong> </li>
+<li>Your <code>deviceId</code> is shown in the top</li>
+<li>Click <strong>Show</strong> next to <code>API Key</code> to see your key </li>
+<li>Your Shoutrrr URL will then be:
+    <code>join://shoutrrr:</code><strong><code>api-key</code></strong><code>@join/?devices=</code><strong><code>deviceId</code></strong></li>
+</ol>
+<div class="admonition note">
+<p>Multiple <code>deviceId</code>s can be combined with a <code>,</code> (repeat steps 2-4).</p>
+</div>
                 
               
               

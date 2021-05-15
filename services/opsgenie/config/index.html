@@ -554,12 +554,21 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li>
-<p><strong>APIKey</strong> - The OpsGenie API key (<strong>Required</strong>)  </p>
-</li>
+<li><strong>Host</strong> - The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances<br />
+  Default: <code>api.opsgenie.com</code><br />
+  URL part: <code class="service-url">opsgenie://<strong>host</strong>:port/apikey</code>  </li>
+<li><strong>Port</strong> - The OpsGenie API port.<br />
+  Default: <code>443</code><br />
+  URL part: <code class="service-url">opsgenie://host:<strong>port</strong>/apikey</code>  </li>
+<li><strong>APIKey</strong> - The OpsGenie API key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">opsgenie://host:port/<strong>apikey</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
 <li>
 <p><strong>Actions</strong> - Custom actions that will be available for the alert<br />
   Default: <em>empty</em>  </p>
@@ -581,16 +590,8 @@
   Default: <em>empty</em>  </p>
 </li>
 <li>
-<p><strong>Host</strong> - The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances<br />
-  Default: <code>api.opsgenie.com</code>  </p>
-</li>
-<li>
 <p><strong>Note</strong> - Additional note that will be added while creating the alert<br />
   Default: <em>empty</em>  </p>
-</li>
-<li>
-<p><strong>Port</strong> - The OpsGenie API port.<br />
-  Default: <code>443</code>  </p>
 </li>
 <li>
 <p><strong>Priority</strong> - Priority level of the alert. Possible values are P1, P2, P3, P4 and P5<br />

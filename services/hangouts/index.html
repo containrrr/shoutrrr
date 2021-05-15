@@ -606,13 +606,13 @@
                 <h1 id="hangouts_chat">Hangouts Chat<a class="headerlink" href="#hangouts_chat" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <p>Your Hangouts Chat Incoming Webhook URL will look like this:</p>
-<blockquote>
-<p>https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</p>
-</blockquote>
+<div class="admonition info">
+<p>https://chat.googleapis.com/v1/spaces/<strong><code>FOO</code></strong>/messages?key=<strong><code>bar</code></strong>&amp;token=<strong><code>baz</code></strong></p>
+</div>
 <p>The shoutrrr service URL should look like this:</p>
-<blockquote>
-<p>hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&amp;token=baz</p>
-</blockquote>
+<div class="admonition info">
+<p>hangouts://chat.googleapis.com/v1/spaces/<strong><code>FOO</code></strong>/messages?key=<strong><code>bar</code></strong>&amp;token=<strong><code>baz</code></strong></p>
+</div>
 <p>In other words the incoming webhook URL with <code>https</code> replaced by <code>hangouts</code>.</p>
 <h2 id="creating_an_incoming_webhook_in_hangouts_chat">Creating an incoming webhook in Hangouts Chat<a class="headerlink" href="#creating_an_incoming_webhook_in_hangouts_chat" title="Permanent link">&para;</a></h2>
 <ol>

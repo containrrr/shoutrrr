@@ -386,6 +386,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -398,6 +418,13 @@
         <li class="md-nav__item">
   <a href="#passing_parameters_via_code" class="md-nav__link">
     Passing parameters via code
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    Optional parameters
   </a>
   
 </li>
@@ -584,6 +611,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -596,6 +643,13 @@
         <li class="md-nav__item">
   <a href="#passing_parameters_via_code" class="md-nav__link">
     Passing parameters via code
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    Optional parameters
   </a>
   
 </li>
@@ -619,6 +673,74 @@
                 
                 <h1 id="opsgenie">OpsGenie<a class="headerlink" href="#opsgenie" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Host</strong> - The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances<br />
+  Default: <code>api.opsgenie.com</code><br />
+  URL part: <code class="service-url">opsgenie://<strong>host</strong>:port/apikey</code>  </li>
+<li><strong>Port</strong> - The OpsGenie API port.<br />
+  Default: <code>443</code><br />
+  URL part: <code class="service-url">opsgenie://host:<strong>port</strong>/apikey</code>  </li>
+<li><strong>APIKey</strong> - The OpsGenie API key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">opsgenie://host:port/<strong>apikey</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Actions</strong> - Custom actions that will be available for the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Alias</strong> - Client-defined identifier of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Description</strong> - Description field of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Details</strong> - Map of key-value pairs to use as custom properties of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Entity</strong> - Entity field of the alert that is generally used to specify which domain the Source field of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Note</strong> - Additional note that will be added while creating the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Priority</strong> - Priority level of the alert. Possible values are P1, P2, P3, P4 and P5<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Responders</strong> - Teams, users, escalations and schedules that the alert will be routed to send notifications<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Source</strong> - Source field of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Tags</strong> - Tags of the alert<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - notification title, optionally set by the sender<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>User</strong> - Display name of the request owner<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>VisibleTo</strong> - Teams and users that the alert will become visible to without sending any notification<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 <h2 id="creating_a_rest_api_endpoint_in_opsgenie">Creating a REST API endpoint in OpsGenie<a class="headerlink" href="#creating_a_rest_api_endpoint_in_opsgenie" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
@@ -649,26 +771,28 @@ the <a href="https://docs.opsgenie.com/docs/alert-api">OpsGenie documentation</a
 <p>If you want to, you can pass additional parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<div class="highlight"><pre><span></span><code>service.Send(&quot;An example alert message&quot;, &amp;types.Params{
-    &quot;alias&quot;:       &quot;Life is too short for no alias&quot;,
-    &quot;description&quot;: &quot;Every alert needs a description&quot;,
-    &quot;responders&quot;:  `[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;NOC&quot;,&quot;type&quot;:&quot;team&quot;}]`,
-    &quot;visibleTo&quot;:   `[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;rocket_team&quot;,&quot;type&quot;:&quot;team&quot;}]`,
-    &quot;actions&quot;:     &quot;An action&quot;,
-    &quot;tags&quot;:        &quot;tag1 tag2&quot;,
-    &quot;details&quot;:     `{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}`,
-    &quot;entity&quot;:      &quot;An example entity&quot;,
-    &quot;source&quot;:      &quot;The source&quot;,
-    &quot;priority&quot;:    &quot;P1&quot;,
-    &quot;user&quot;:        &quot;Dracula&quot;,
-    &quot;note&quot;:        &quot;Here is a note&quot;,
-})
+<div class="highlight"><pre><span></span><code><span class="nx">service</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="s">&quot;An example alert message&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">{</span>
+    <span class="s">&quot;alias&quot;</span><span class="p">:</span>       <span class="s">&quot;Life is too short for no alias&quot;</span><span class="p">,</span>
+    <span class="s">&quot;description&quot;</span><span class="p">:</span> <span class="s">&quot;Every alert needs a description&quot;</span><span class="p">,</span>
+    <span class="s">&quot;responders&quot;</span><span class="p">:</span>  <span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;NOC&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span>
+    <span class="s">&quot;visibleTo&quot;</span><span class="p">:</span>   <span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;rocket_team&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span>
+    <span class="s">&quot;actions&quot;</span><span class="p">:</span>     <span class="s">&quot;An action&quot;</span><span class="p">,</span>
+    <span class="s">&quot;tags&quot;</span><span class="p">:</span>        <span class="s">&quot;tag1 tag2&quot;</span><span class="p">,</span>
+    <span class="s">&quot;details&quot;</span><span class="p">:</span>     <span class="s">`{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}`</span><span class="p">,</span>
+    <span class="s">&quot;entity&quot;</span><span class="p">:</span>      <span class="s">&quot;An example entity&quot;</span><span class="p">,</span>
+    <span class="s">&quot;source&quot;</span><span class="p">:</span>      <span class="s">&quot;The source&quot;</span><span class="p">,</span>
+    <span class="s">&quot;priority&quot;</span><span class="p">:</span>    <span class="s">&quot;P1&quot;</span><span class="p">,</span>
+    <span class="s">&quot;user&quot;</span><span class="p">:</span>        <span class="s">&quot;Dracula&quot;</span><span class="p">,</span>
+    <span class="s">&quot;note&quot;</span><span class="p">:</span>        <span class="s">&quot;Here is a note&quot;</span><span class="p">,</span>
+<span class="p">})</span>
 </code></pre></div>
-<h1 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h1>
-<p>You can optionally specify the parameters in the URL:
-opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&amp;description=Every+alert+needs+a+description&amp;actions=An+action&amp;tags=["tag1","tag2"]&amp;entity=An+example+entity&amp;source=The+source&amp;priority=P1&amp;user=Dracula&amp;note=Here+is+a+note</p>
+<h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
+<p>You can optionally specify the parameters in the URL:</p>
+<div class="admonition info">
+<p>opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&amp;description=Every+alert+needs+a+description&amp;actions=An+action&amp;tags=["tag1","tag2"]&amp;entity=An+example+entity&amp;source=The+source&amp;priority=P1&amp;user=Dracula&amp;note=Here+is+a+note</p>
+</div>
 <p>Example using the command line:</p>
-<div class="highlight"><pre><span></span><code>shoutrrr send -u &#39;opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]&#39; -m &quot;Hello World6&quot;
+<div class="highlight"><pre><span></span><code>shoutrrr send -u <span class="s1">&#39;opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]&#39;</span> -m <span class="s2">&quot;Hello World6&quot;</span>
 </code></pre></div>
                 
               

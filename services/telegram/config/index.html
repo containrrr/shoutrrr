@@ -554,18 +554,21 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Token</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">telegram://<strong>token</strong>@telegram/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
 <p><strong>Channels</strong> (<strong>Required</strong>)  </p>
 </li>
 <li>
-<p><strong>Token</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
 <p><strong>Notification</strong> - If disabled, sends message silently<br />
-  Default: <code>Yes</code>  </p>
+  Default: ✔ <code>Yes</code>  </p>
 </li>
 <li>
 <p><strong>ParseMode</strong> - How the text message should be parsed<br />
@@ -574,10 +577,10 @@
 </li>
 <li>
 <p><strong>Preview</strong> - If disabled, no web page preview will be displayed for URLs<br />
-  Default: <code>Yes</code>  </p>
+  Default: ✔ <code>Yes</code>  </p>
 </li>
 <li>
-<p><strong>Title</strong> - notification title, optionally set by the sender<br />
+<p><strong>Title</strong> - Notification title, optionally set by the sender<br />
   Default: <em>empty</em>  </p>
 </li>
 </ul>

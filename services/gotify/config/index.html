@@ -554,22 +554,23 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Host</strong> - Server hostname (and optionally port) (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">gotify://<strong>host</strong>:<strong>port</strong>/path/token</code>  </li>
+<li><strong>Path</strong> - Server subpath<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">gotify://host:port/<strong>path</strong>/token</code>  </li>
+<li><strong>Token</strong> - Application token (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">gotify://host:port/path/<strong>token</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>Host</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Token</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
 <p><strong>DisableTLS</strong><br />
-  Default: <code>No</code>  </p>
-</li>
-<li>
-<p><strong>Path</strong><br />
-  Default: <em>empty</em>  </p>
+  Default: ❌ <code>No</code>  </p>
 </li>
 <li>
 <p><strong>Priority</strong><br />

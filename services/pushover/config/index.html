@@ -554,15 +554,17 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li>
-<p><strong>Token</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>User</strong> (<strong>Required</strong>)  </p>
-</li>
+<li><strong>Token</strong> - API Token/Key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">pushover://:<strong>token</strong>@user/</code>  </li>
+<li><strong>User</strong> - User Key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">pushover://:token@<strong>user</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
 <li>
 <p><strong>Devices</strong><br />
   Default: <em>empty</em>  </p>

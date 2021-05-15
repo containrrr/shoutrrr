@@ -554,28 +554,25 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li>
-<p><strong>Channel</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Host</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Port</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>TokenA</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>TokenB</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>UserName</strong> (<strong>Required</strong>)  </p>
-</li>
+<li><strong>UserName</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">rocketchat://<strong>username</strong>@host:port/tokena/tokenb/channel</code>  </li>
+<li><strong>Host</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@<strong>host</strong>:port/tokena/tokenb/channel</code>  </li>
+<li><strong>Port</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:<strong>port</strong>/tokena/tokenb/channel</code>  </li>
+<li><strong>TokenA</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/<strong>tokena</strong>/tokenb/channel</code>  </li>
+<li><strong>TokenB</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/tokena/<strong>tokenb</strong>/channel</code>  </li>
+<li><strong>Channel</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/tokena/tokenb/<strong>channel</strong></code>  </li>
 </ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
                 
               
               

@@ -554,20 +554,22 @@
                 
                   <h1>Config</h1>
                 
-                <h2 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h2>
-<h2 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h2>
+                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BotMail</strong> - Bot e-mail address (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">zulip://<strong>botmail</strong>:botkey@host:port/</code>  </li>
+<li><strong>BotKey</strong> - API Key (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">zulip://botmail:<strong>botkey</strong>@host:port/</code>  </li>
+<li><strong>Host</strong> - API server hostname (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">zulip://botmail:botkey@<strong>host</strong>:<strong>port</strong>/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>BotKey</strong> - API Key (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>BotMail</strong> - Bot e-mail address (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Host</strong> - API server hostname (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Stream</strong> (<strong>Required</strong>)  </p>
+<p><strong>Stream</strong><br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
 <p><strong>Topic</strong><br />

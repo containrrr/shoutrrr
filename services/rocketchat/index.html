@@ -422,6 +422,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -591,6 +611,26 @@
     URL Format
   </a>
   
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    URL Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    Query/Param Props
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -633,7 +673,28 @@
                 
                 <h1 id="rocketchat">Rocket.chat<a class="headerlink" href="#rocketchat" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p><em>rocketchat://[<strong><code>username</code></strong>@]<strong><code>rocketchat-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code>&#124;<code>@recipient</code></strong>]</em> </p>
+<div class="admonition info">
+<p>rocketchat://[<strong><code>username</code></strong>@]<strong><code>rocketchat-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code>&#124;<code>@recipient</code></strong>]* </p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>UserName</strong><br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">rocketchat://<strong>username</strong>@host:port/tokena/tokenb/channel</code>  </li>
+<li><strong>Host</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@<strong>host</strong>:port/tokena/tokenb/channel</code>  </li>
+<li><strong>Port</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:<strong>port</strong>/tokena/tokenb/channel</code>  </li>
+<li><strong>TokenA</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/<strong>tokena</strong>/tokenb/channel</code>  </li>
+<li><strong>TokenB</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/tokena/<strong>tokenb</strong>/channel</code>  </li>
+<li><strong>Channel</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">rocketchat://username@host:port/tokena/tokenb/<strong>channel</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
 <h2 id="creating_a_webhook_in_rocketchat">Creating a Webhook in Rocket.chat<a class="headerlink" href="#creating_a_webhook_in_rocketchat" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
