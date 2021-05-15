@@ -21,8 +21,8 @@ type Config struct {
 	ColorWarn  uint   `key:"colorWarn"  default:"0xffc441" desc:"The color of the left border for warning messages" base:"16"`
 	ColorInfo  uint   `key:"colorInfo"  default:"0x2488ff" desc:"The color of the left border for info messages"    base:"16"`
 	ColorDebug uint   `key:"colorDebug" default:"0x7b00ab" desc:"The color of the left border for debug messages"   base:"16"`
-	SplitLines bool   `key:"splitLines" default:"yes"      desc:"Whether to send each line as a separate embedded item"`
-	JSON       bool   `key:"json"       default:"no"       desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
+	SplitLines bool   `key:"splitLines" default:"Yes"      desc:"Whether to send each line as a separate embedded item"`
+	JSON       bool   `key:"json"       default:"No"       desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
 }
 
 // LevelColors returns an array of colors with a MessageLevel index
