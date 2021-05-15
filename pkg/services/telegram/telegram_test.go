@@ -151,7 +151,7 @@ var _ = Describe("the telegram service", func() {
 		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?chats=channel-1&foo=bar")
 
 		testutils.TestConfigGetEnumsCount(&Config{}, 1)
-		testutils.TestConfigGetFieldsCount(&Config{}, 5)
+		testutils.TestConfigGetFieldsCount(&Config{}, 6)
 	})
 })
 
