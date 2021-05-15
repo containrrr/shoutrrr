@@ -29,6 +29,7 @@ func (fi *FieldInfo) IsEnum() bool {
 	return fi.EnumFormatter != nil && fi.Type.Kind() == r.Int
 }
 
+// IsURLPart returns whether the field is serialized as the specified part of an URL
 func (fi *FieldInfo) IsURLPart(part URLPart) bool {
 	for _, up := range fi.URLParts {
 		if up == part {

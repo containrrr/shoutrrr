@@ -16,7 +16,7 @@ type Config struct {
 	standard.EnumlessConfig
 	Group      string `url:"user" optional:""`
 	Tenant     string `url:"host" optional:""`
-	AltId      string `url:"path1" optional:""`
+	AltID      string `url:"path1" optional:""`
 	GroupOwner string `url:"path2" optional:""`
 
 	Title string `key:"title" optional:""`
@@ -25,7 +25,7 @@ type Config struct {
 }
 
 func (config *Config) webhookParts() [4]string {
-	return [4]string{config.Group, config.Tenant, config.AltId, config.GroupOwner}
+	return [4]string{config.Group, config.Tenant, config.AltID, config.GroupOwner}
 }
 
 // SetFromWebhookURL updates the config WebhookParts from a teams webhook URL
@@ -68,7 +68,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		User:       url.User(config.Group),
 		Host:       config.Tenant,
-		Path:       "/" + config.AltId + "/" + config.GroupOwner,
+		Path:       "/" + config.AltID + "/" + config.GroupOwner,
 		Scheme:     Scheme,
 		ForceQuery: false,
 		RawQuery:   format.BuildQuery(resolver),
@@ -110,7 +110,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 func (config *Config) setFromWebhookParts(parts [4]string) {
 	config.Group = parts[0]
 	config.Tenant = parts[1]
-	config.AltId = parts[2]
+	config.AltID = parts[2]
 	config.GroupOwner = parts[3]
 }
 
