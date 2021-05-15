@@ -13,8 +13,8 @@ import (
 type Config struct {
 	Token        string    `url:"user"`
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
-	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
-	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
+	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends Message silently"`
+	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text Message should be parsed"`
 	Chats        []string  `key:"chats,channels"`
 	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }

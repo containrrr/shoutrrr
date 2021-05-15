@@ -8,38 +8,41 @@ import (
 	"strings"
 )
 
+// Client for Telegram API
 type Client struct {
 	token string
 }
 
-func (c *Client) ApiURL(endpoint string) string {
+func (c *Client) apiURL(endpoint string) string {
 	return fmt.Sprintf(apiFormat, c.token, endpoint)
 }
 
+// GetBotInfo returns the bot User info
 func (c *Client) GetBotInfo() (*User, error) {
-	response := &UserResponse{}
-	err := jsonclient.Get(c.ApiURL("getMe"), response)
+	response := &userResponse{}
+	err := jsonclient.Get(c.apiURL("getMe"), response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(err.Body)
+		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
 	}
 
 	return &response.Result, nil
 }
 
+// SetCommands sets what commands are available in the bot
 func (c *Client) SetCommands(commands map[string]string) error {
 
-	var cmds []Command
+	var cmds []command
 	for cmd, desc := range commands {
-		cmds = append(cmds, Command{
+		cmds = append(cmds, command{
 			Command:     cmd,
 			Description: desc,
 		})
 	}
 
-	request := &CommandsRequest{Commands: cmds}
-	response := &ErrorResponse{}
-	if err := jsonclient.Post(c.ApiURL("setMyCommands"), request, response); err != nil {
+	request := &commandsRequest{Commands: cmds}
+	response := &errorResponse{}
+	if err := jsonclient.Post(c.apiURL("setMyCommands"), request, response); err != nil {
 		return err
 	}
 
@@ -50,28 +53,29 @@ func (c *Client) SetCommands(commands map[string]string) error {
 	return nil
 }
 
+// GetUpdates retrieves the latest updates
 func (c *Client) GetUpdates(offset int, limit int, timeout int, allowedUpdates []string) ([]Update, error) {
 
-	request := &UpdatesRequest{
+	request := &updatesRequest{
 		Offset:         offset,
 		Limit:          limit,
 		Timeout:        timeout,
 		AllowedUpdates: allowedUpdates,
 	}
-	response := &UpdatesResponse{}
-	err := jsonclient.Post(c.ApiURL("getUpdates"), request, response)
+	response := &updatesResponse{}
+	err := jsonclient.Post(c.apiURL("getUpdates"), request, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(err.Body)
+		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
 	}
 
 	return response.Result, nil
 }
 
-func (c *Client) ParseCommand(message *Message, botName string, private bool) (command string, params []string, err error) {
+func (c *Client) parseCommand(message *Message, botName string, private bool) (command string, params []string, err error) {
 	parts := strings.Split(message.Text, " ")
 	if len(parts) < 1 {
-		return "", nil, fmt.Errorf("message is empty")
+		return "", nil, fmt.Errorf("Message is empty")
 	}
 
 	atBot := "@" + botName
@@ -98,27 +102,29 @@ func (c *Client) ParseCommand(message *Message, botName string, private bool) (c
 	}
 
 	if len(command) < 1 || command[0] != '/' {
-		return "", nil, fmt.Errorf("message is not a command")
+		return "", nil, fmt.Errorf("Message is not a command")
 	}
 
 	return command[1:], params, nil
 }
 
+// SendMessage sends the specified Message
 func (c *Client) SendMessage(message *SendMessagePayload) (*Message, error) {
 
-	response := &MessageResponse{}
-	err := jsonclient.Post(c.ApiURL("sendMessage"), message, response)
+	response := &messageResponse{}
+	err := jsonclient.Post(c.apiURL("sendMessage"), message, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(err.Body)
+		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
 	}
 
 	return response.Result, nil
 }
 
-func (c *Client) UpdateMessage(update *UpdateMessagePayload) error {
-	response := &ErrorResponse{}
-	if err := jsonclient.Post(c.ApiURL("editMessageText"), update, response); err != nil {
+// UpdateMessage updates an already sent Message
+func (c *Client) UpdateMessage(update *updateMessagePayload) error {
+	response := &errorResponse{}
+	if err := jsonclient.Post(c.apiURL("editMessageText"), update, response); err != nil {
 		return err
 	}
 
@@ -129,6 +135,7 @@ func (c *Client) UpdateMessage(update *UpdateMessagePayload) error {
 	return nil
 }
 
+// Reply sends a Message containing another Message as a reply
 func (c *Client) Reply(original *Message, text string) (*Message, error) {
 	return c.SendMessage(&SendMessagePayload{
 		Text:      text,
@@ -138,9 +145,9 @@ func (c *Client) Reply(original *Message, text string) (*Message, error) {
 	})
 }
 
-func (c *Client) AnswerCallbackQuery(answer *CallbackQueryAnswer) error {
-	response := &ErrorResponse{}
-	if err := jsonclient.Post(c.ApiURL("answerCallbackQuery"), answer, response); err != nil {
+func (c *Client) answerCallbackQuery(answer *callbackQueryAnswer) error {
+	response := &errorResponse{}
+	if err := jsonclient.Post(c.apiURL("answerCallbackQuery"), answer, response); err != nil {
 		return err
 	}
 
@@ -151,11 +158,11 @@ func (c *Client) AnswerCallbackQuery(answer *CallbackQueryAnswer) error {
 	return nil
 }
 
+// GetErrorResponse retrieves the error message from a failed request
 func GetErrorResponse(body string) error {
-	response := &ErrorResponse{}
-	err := json.Unmarshal([]byte(body), response)
-	if err == nil {
-		err = fmt.Errorf("telegram API error: %v", response)
+	response := &errorResponse{}
+	if err := json.Unmarshal([]byte(body), response); err == nil {
+		return response
 	}
-	return err
+	return nil
 }

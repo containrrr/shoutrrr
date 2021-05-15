@@ -15,6 +15,7 @@ type parseModeVals struct {
 	Enum       types.EnumFormatter
 }
 
+// ParseModes is an enum helper for parseMode
 var ParseModes = &parseModeVals{
 	None:       0,
 	Markdown:   1,

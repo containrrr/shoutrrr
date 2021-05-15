@@ -43,10 +43,10 @@ var _ = Describe("the telegram service", func() {
 			serviceURL, _ := url.Parse(envTelegramURL)
 			err := telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
-			err = telegram.Send("This is an integration test message", nil)
+			err = telegram.Send("This is an integration test Message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
-		When("given a message that exceeds the max length", func() {
+		When("given a Message that exceeds the max length", func() {
 			It("should generate an error", func() {
 				if envTelegramURL == "" {
 					return
@@ -70,7 +70,7 @@ var _ = Describe("the telegram service", func() {
 			}
 			It("should generate a 401", func() {
 				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?chats=channel-id")
-				message := "this is a perfectly valid message"
+				message := "this is a perfectly valid Message"
 
 				err := telegram.Initialize(serviceURL, logger)
 				Expect(err).NotTo(HaveOccurred())

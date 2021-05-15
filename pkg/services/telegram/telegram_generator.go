@@ -12,6 +12,7 @@ import (
 	"strconv"
 )
 
+// Generator is the telegram-specific URL generator
 type Generator struct {
 	ud            *generator.UserDialog
 	client        *Client
@@ -24,6 +25,7 @@ type Generator struct {
 	botName       string
 }
 
+// Generate a telegram Shoutrrr configuration from a user dialog
 func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	var config Config
 
@@ -82,14 +84,14 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 				if message.From != nil {
 					source = message.From.Username
 				}
-				ud.Writeln("Got message '%v' from @%v in %v chat %v",
+				ud.Writeln("Got Message '%v' from @%v in %v chat %v",
 					f.ColorizeString(message.Text),
 					f.ColorizeProp(source),
 					f.ColorizeEnum(chat.Type),
 					f.ColorizeNumber(chat.ID))
 				ud.Writeln(g.addChat(chat))
 			} else {
-				ud.Writeln("Got unknown update. Ignored!")
+				ud.Writeln("Got unknown Update. Ignored!")
 			}
 		}
 
@@ -130,13 +132,13 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	return &config, nil
 }
 
-func (g *Generator) addChat(chat *Chat) (result string) {
+func (g *Generator) addChat(chat *chat) (result string) {
 	id := strconv.FormatInt(chat.ID, 10)
 	name := chat.Name()
 
 	for _, c := range g.chats {
 		if c == id {
-			return fmt.Sprintf("Chat %v is already selected!", f.ColorizeString(name))
+			return fmt.Sprintf("chat %v is already selected!", f.ColorizeString(name))
 		}
 	}
 	g.chats = append(g.chats, id)
@@ -146,18 +148,18 @@ func (g *Generator) addChat(chat *Chat) (result string) {
 	return fmt.Sprintf("Added new chat %v!", f.ColorizeString(name))
 }
 
-func (g *Generator) removeChat(chat *Chat) (result string) {
+func (g *Generator) removeChat(chat *chat) (result string) {
 	id := strconv.FormatInt(chat.ID, 10)
 
-	for i, chatId := range g.chats {
-		if chatId == id {
+	for i, chatID := range g.chats {
+		if chatID == id {
 			g.chats = append(g.chats[:i], g.chats[i+1:]...)
 			g.chatNames = append(g.chatNames[:i], g.chatNames[i+1:]...)
 			return fmt.Sprintf("Removed chat '%v'!", chat.Name())
 		}
 	}
 
-	return fmt.Sprintf("Chat '%v' not selected!", chat.Name())
+	return fmt.Sprintf("chat '%v' not selected!", chat.Name())
 }
 
 func (g *Generator) reply(original *Message, text string) {
