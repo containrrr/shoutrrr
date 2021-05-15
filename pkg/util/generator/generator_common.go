@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	f "github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/fatih/color"
 	"io"
 	re "regexp"
 	"strconv"
@@ -78,15 +80,18 @@ func (ud *UserDialog) QueryString(prompt string, validator func(string) error, k
 	answer, foundProp := ud.props[key]
 	if foundProp {
 		err := validator(answer)
+		colAnswer := f.ColorizeValue(answer, false)
+		colKey := f.ColorizeProp(key)
 		if err == nil {
-			ud.Writeln("Using prop value '%v' for '%v", answer, key)
+			ud.Writeln("Using prop value %v for %v", colAnswer, colKey)
 			return answer
 		}
-		ud.Writeln("Supplied prop value '%v' is not valid for '%v': %v", answer, key, err)
+		ud.Writeln("Supplied prop value %v is not valid for %v: %v", colAnswer, colKey, err)
 	}
 
 	for {
-		ud.Write(prompt)
+		ud.Write("%v ", prompt)
+		color.Set(color.FgHiWhite)
 		if !ud.scanner.Scan() {
 			if err := ud.scanner.Err(); err != nil {
 				ud.Writeln(err.Error())
@@ -97,6 +102,7 @@ func (ud *UserDialog) QueryString(prompt string, validator func(string) error, k
 			return ""
 		}
 		answer = ud.scanner.Text()
+		color.Unset()
 
 		if err := validator(answer); err != nil {
 			ud.Writeln("%v", err)
@@ -136,6 +142,18 @@ func (ud *UserDialog) QueryInt(prompt string, key string, bitSize int) (value in
 		value, err = strconv.ParseInt(number, base, bitSize)
 
 		return err
+	}, key)
+	return value
+}
+
+func (ud *UserDialog) QueryBool(prompt string, key string) (value bool) {
+	ud.QueryString(prompt, func(answer string) error {
+		parsed, ok := f.ParseBool(answer, false)
+		if ok {
+			value = parsed
+			return nil
+		}
+		return fmt.Errorf("answer using %v or %v", f.ColorizeTrue("yes"), f.ColorizeFalse("no"))
 	}, key)
 	return value
 }

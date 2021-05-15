@@ -29,6 +29,9 @@ var ColorizeError = ColorizeFalse
 // ColorizeContainer colorizes the input string as "Container"
 var ColorizeContainer = ColorizeDesc
 
+// ColorizeLink colorizes the input string as "Link"
+var ColorizeLink = color.New(color.FgHiBlue).SprintFunc()
+
 // ColorizeValue colorizes the input string according to what type appears to be
 func ColorizeValue(value string, isEnum bool) string {
 	if isEnum {

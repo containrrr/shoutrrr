@@ -15,7 +15,7 @@ type Config struct {
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
 	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
-	Channels     []string  `key:"channels"`
+	Chats        []string  `key:"chats,channels"`
 	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
@@ -67,7 +67,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		}
 	}
 
-	if len(config.Channels) < 1 {
+	if len(config.Chats) < 1 {
 		return errors.New("no channels defined in config URL")
 	}
 

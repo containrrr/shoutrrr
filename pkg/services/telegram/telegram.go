@@ -55,8 +55,8 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 }
 
 func (service *Service) sendMessageForChatIDs(message string, config *Config) error {
-	for _, channel := range service.config.Channels {
-		if err := sendMessageToAPI(message, channel, config); err != nil {
+	for _, chat := range service.config.Chats {
+		if err := sendMessageToAPI(message, chat, config); err != nil {
 			return err
 		}
 	}
@@ -68,10 +68,10 @@ func (service *Service) GetConfig() *Config {
 	return service.config
 }
 
-func sendMessageToAPI(message string, channel string, config *Config) error {
+func sendMessageToAPI(message string, chat string, config *Config) error {
 	postURL := fmt.Sprintf(apiFormat, config.Token, "sendMessage")
 
-	payload := createSendMessagePayload(message, channel, config)
+	payload := createSendMessagePayload(message, chat, config)
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
@@ -80,7 +80,7 @@ func sendMessageToAPI(message string, channel string, config *Config) error {
 
 	res, err := http.Post(postURL, "application/jsonData", bytes.NewBuffer(jsonData))
 	if err == nil && res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", channel, res.Status)
+		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", chat, res.Status)
 	}
 	return err
 }
