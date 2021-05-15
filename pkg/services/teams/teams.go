@@ -95,7 +95,7 @@ func (service *Service) doSend(config *Config, message string) error {
 	if host == "" {
 		host = DefaultHost
 	}
-	postURL := buildWebhookURL(host, config.WebhookParts)
+	postURL := buildWebhookURL(host, config.webhookParts())
 
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 	if err == nil && res.StatusCode != http.StatusOK {
