@@ -11,18 +11,18 @@ import (
 // Config is the configuration needed to send discord notifications
 type Config struct {
 	standard.EnumlessConfig
-	Channel    string
-	Token      string
+	WebhookID  string `url:"host"`
+	Token      string `url:"user"`
 	Title      string `key:"title"      default:""`
-	Username   string `key:"username"   default:""        desc:"Override the webhook default username"`
-	AvatarURL  string `key:"avatar"     default:""        desc:"Override the webhook default avatar"`
+	Username   string `key:"username"   default:""         desc:"Override the webhook default username"`
+	AvatarURL  string `key:"avatar"     default:""         desc:"Override the webhook default avatar"`
 	Color      uint   `key:"color"      default:"0x50D9ff" desc:"The color of the left border for plain messages"   base:"16"`
 	ColorError uint   `key:"colorError" default:"0xd60510" desc:"The color of the left border for error messages"   base:"16"`
 	ColorWarn  uint   `key:"colorWarn"  default:"0xffc441" desc:"The color of the left border for warning messages" base:"16"`
 	ColorInfo  uint   `key:"colorInfo"  default:"0x2488ff" desc:"The color of the left border for info messages"    base:"16"`
 	ColorDebug uint   `key:"colorDebug" default:"0x7b00ab" desc:"The color of the left border for debug messages"   base:"16"`
-	SplitLines bool   `key:"splitLines" default:"yes"     desc:"Whether to send each line as a separate embedded item"`
-	JSON       bool   `desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
+	SplitLines bool   `key:"splitLines" default:"Yes"      desc:"Whether to send each line as a separate embedded item"`
+	JSON       bool   `key:"json"       default:"No"       desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
 }
 
 // LevelColors returns an array of colors with a MessageLevel index
@@ -51,7 +51,7 @@ func (config *Config) SetURL(url *url.URL) error {
 func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 	u = &url.URL{
 		User:       url.User(config.Token),
-		Host:       config.Channel,
+		Host:       config.WebhookID,
 		Scheme:     Scheme,
 		RawQuery:   format.BuildQuery(resolver),
 		ForceQuery: false,
@@ -67,7 +67,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
-	config.Channel = url.Host
+	config.WebhookID = url.Host
 	config.Token = url.User.Username()
 
 	if len(url.Path) > 0 {
@@ -80,8 +80,8 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		}
 	}
 
-	if config.Channel == "" {
-		return errors.New("channel missing from config URL")
+	if config.WebhookID == "" {
+		return errors.New("webhook ID missing from config URL")
 	}
 
 	if len(config.Token) < 1 {

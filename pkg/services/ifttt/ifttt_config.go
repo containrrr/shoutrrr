@@ -16,12 +16,14 @@ const (
 // Config is the configuration needed to send IFTTT notifications
 type Config struct {
 	standard.EnumlessConfig
-	WebHookID         string
-	Events            []string `key:"events"`
-	Value1            string   `key:"value1"`
-	Value2            string   `key:"value2"`
-	Value3            string   `key:"value3"`
-	UseMessageAsValue uint8    `key:"messagevalue" desc:"" default:"2"`
+	WebHookID         string   `url:"host" required:"true"`
+	Events            []string `key:"events" required:"true"`
+	Value1            string   `key:"value1" optional:""`
+	Value2            string   `key:"value2" optional:""`
+	Value3            string   `key:"value3" optional:""`
+	UseMessageAsValue uint8    `key:"messagevalue" desc:"Sets the corresponding value field to the notification message" default:"2"`
+	UseTitleAsValue   uint8    `key:"titlevalue" desc:"Sets the corresponding value field to the notification title" default:"0"`
+	Title             string   `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -60,6 +62,14 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 
 	if config.UseMessageAsValue > 3 || config.UseMessageAsValue < 1 {
 		return errors.New("invalid value for messagevalue: only values 1-3 are supported")
+	}
+
+	if config.UseTitleAsValue > 3 {
+		return errors.New("invalid value for titlevalue: only values 1-3 or 0 (for disabling) are supported")
+	}
+
+	if config.UseTitleAsValue == config.UseMessageAsValue {
+		return errors.New("titlevalue cannot use the same number as messagevalue")
 	}
 
 	if len(config.Events) < 1 {

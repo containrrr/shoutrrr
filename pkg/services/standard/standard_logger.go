@@ -1,14 +1,13 @@
 package standard
 
 import (
-	"log"
-
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // Logger provides the utility methods Log* that maps to Logger.Print*
 type Logger struct {
-	logger *log.Logger
+	logger types.StdLogger
 }
 
 // Logf maps to the service loggers Logger.Printf function
@@ -22,7 +21,7 @@ func (sl *Logger) Log(v ...interface{}) {
 }
 
 // SetLogger maps the specified logger to the Log* helper methods
-func (sl *Logger) SetLogger(logger *log.Logger) {
+func (sl *Logger) SetLogger(logger types.StdLogger) {
 	if logger == nil {
 		sl.logger = util.DiscardLogger
 	} else {

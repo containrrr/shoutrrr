@@ -11,10 +11,10 @@ import (
 // Config for the zulip service
 type Config struct {
 	standard.EnumlessConfig
-	BotMail string `desc:"Bot e-mail address"`
-	BotKey  string `desc:"API Key"`
-	Host    string `desc:"API server hostname"`
-	Stream  string `key:"stream" description:"Target stream name"`
+	BotMail string `url:"user" desc:"Bot e-mail address"`
+	BotKey  string `url:"pass" desc:"API Key"`
+	Host    string `url:"host,port" desc:"API server hostname"`
+	Stream  string `key:"stream" optional:"" description:"Target stream name"`
 	Topic   string `key:"topic,title" default:""`
 }
 

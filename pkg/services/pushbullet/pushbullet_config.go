@@ -12,8 +12,8 @@ import (
 // Config ...
 type Config struct {
 	standard.EnumlessConfig
-	Targets []string
-	Token   string
+	Targets []string `url:"path"`
+	Token   string   `url:"host"`
 }
 
 // GetURL returns a URL representation of it's current field values

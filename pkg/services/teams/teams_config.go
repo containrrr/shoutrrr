@@ -14,10 +14,18 @@ import (
 // Config for use within the teams plugin
 type Config struct {
 	standard.EnumlessConfig
-	WebhookParts [4]string
-	Title        string `key:"title" optional:""`
-	Color        string `key:"color" optional:""`
-	Host         string `key:"host" optional:"" default:"outlook.office.com"`
+	Group      string `url:"user" optional:""`
+	Tenant     string `url:"host" optional:""`
+	AltID      string `url:"path1" optional:""`
+	GroupOwner string `url:"path2" optional:""`
+
+	Title string `key:"title" optional:""`
+	Color string `key:"color" optional:""`
+	Host  string `key:"host" optional:"" default:"outlook.office.com"`
+}
+
+func (config *Config) webhookParts() [4]string {
+	return [4]string{config.Group, config.Tenant, config.AltID, config.GroupOwner}
 }
 
 // SetFromWebhookURL updates the config WebhookParts from a teams webhook URL
@@ -27,7 +35,7 @@ func (config *Config) SetFromWebhookURL(webhookURL string) error {
 		return err
 	}
 
-	config.WebhookParts = parts
+	config.setFromWebhookParts(parts)
 	return nil
 }
 
@@ -57,12 +65,10 @@ func (config *Config) SetURL(url *url.URL) error {
 }
 
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
-	parts := config.WebhookParts
-
 	return &url.URL{
-		User:       url.User(parts[0]),
-		Host:       parts[1],
-		Path:       "/" + parts[2] + "/" + parts[3],
+		User:       url.User(config.Group),
+		Host:       config.Tenant,
+		Path:       "/" + config.AltID + "/" + config.GroupOwner,
 		Scheme:     Scheme,
 		ForceQuery: false,
 		RawQuery:   format.BuildQuery(resolver),
@@ -90,7 +96,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		return fmt.Errorf("invalid URL format: %v", err)
 	}
 
-	config.WebhookParts = webhookParts
+	config.setFromWebhookParts(webhookParts)
 
 	for key, vals := range url.Query() {
 		if err := resolver.Set(key, vals[0]); err != nil {
@@ -99,6 +105,13 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 	}
 
 	return nil
+}
+
+func (config *Config) setFromWebhookParts(parts [4]string) {
+	config.Group = parts[0]
+	config.Tenant = parts[1]
+	config.AltID = parts[2]
+	config.GroupOwner = parts[3]
 }
 
 func buildWebhookURL(host string, parts [4]string) string {

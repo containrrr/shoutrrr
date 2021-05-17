@@ -21,7 +21,6 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]*                                                                |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
 
-
 ## Specialized services
 
 | Service                           | Description                                                                                                                                     |

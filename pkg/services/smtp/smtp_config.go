@@ -13,18 +13,18 @@ import (
 
 // Config is the configuration needed to send e-mail notifications over SMTP
 type Config struct {
-	Host        string    `desc:"SMTP server hostname or IP address"`
-	Username    string    `desc:"authentication username" default:""`
-	Password    string    `desc:"authentication password or hash" default:""`
-	Port        uint16    `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25"`
-	FromAddress string    `desc:"e-mail address that the mail are sent from" key:"fromaddress,from"`
-	FromName    string    `desc:"name of the sender" optional:"yes" key:"fromname"`
-	ToAddresses []string  `desc:"list of recipient e-mails separated by \",\" (comma)" key:"toaddresses,to"`
-	Subject     string    `desc:"the subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
+	Host        string    `desc:"SMTP server hostname or IP address" url:"Host"`
+	Username    string    `desc:"SMTP server username" default:"" url:"User"`
+	Password    string    `desc:"SMTP server password or hash (for OAuth2)" default:"" url:"Pass"`
+	Port        uint16    `desc:"SMTP server port, common ones are 25, 465, 587 or 2525" default:"25" url:"Port"`
+	FromAddress string    `desc:"E-mail address that the mail are sent from" key:"fromaddress,from"`
+	FromName    string    `desc:"Name of the sender" optional:"yes" key:"fromname"`
+	ToAddresses []string  `desc:"List of recipient e-mails separated by \",\" (comma)" key:"toaddresses,to"`
+	Subject     string    `desc:"The subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
 	Auth        authType  `desc:"SMTP authentication method" key:"auth" default:"Unknown"`
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
-	UseStartTLS bool      `desc:"attempt to use SMTP StartTLS encryption" default:"Yes" key:"starttls"`
-	UseHTML     bool      `desc:"whether the message being sent is in HTML" default:"No" key:"usehtml"`
+	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"starttls"`
+	UseHTML     bool      `desc:"Whether the message being sent is in HTML" default:"No" key:"usehtml"`
 }
 
 // GetURL returns a URL representation of it's current field values

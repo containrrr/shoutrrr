@@ -8,7 +8,6 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -85,7 +84,7 @@ func CreateItemsFromPlain(plain string, splitLines bool) (items []types.MessageI
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
@@ -106,7 +105,7 @@ func CreateAPIURLFromConfig(config *Config) string {
 	return fmt.Sprintf(
 		"%s/%s/%s",
 		hookURL,
-		config.Channel,
+		config.WebhookID,
 		config.Token)
 }
 

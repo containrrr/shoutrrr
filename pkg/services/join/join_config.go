@@ -9,10 +9,10 @@ import (
 
 // Config for the Pushover notification service service
 type Config struct {
-	APIKey  string
-	Devices []string `key:"devices"`
-	Title   string   `key:"title"`
-	Icon    string   `key:"icon"`
+	APIKey  string   `url:"pass"`
+	Devices []string `key:"devices" desc:"Comma separated list of device IDs"`
+	Title   string   `key:"title" optional:"" desc:"If set creates a notification"`
+	Icon    string   `key:"icon" optional:"" desc:"Icon URL"`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values

@@ -3,25 +3,16 @@
 ## URL Format
 
 Your Discord Webhook-URL will look like this:
-> https://discordapp.com/api/webhooks/__`channel`__/__`token`__  
+
+!!! info ""
+    https://discordapp.com/api/webhooks/__`webhookid`__/__`token`__  
 
 The shoutrrr service URL should look like this:  
-> discord://__`token`__@__`channel`__
 
-## Additional props
+!!! info ""
+    discord://__`token`__@__`webhookid`__
 
-*Can be either supplied using the params argument, or through the URL using ?key=value&key=value etc.*.
-
- * **Title**  
-   Type: *string*, Default: _empty_
- * **Username** - Override the webhook default username
-    Type: *string*, Default: _empty_
- * **AvatarURL** - Override the webhook default avatar  
-   Type: *string*, Default: _empty_        
- * **Color** - The color of the left border for plain messages
-   Type: *number*, Default: 0x50D9ff
- * **SplitLines** - Whether to send each line as a separate message item  
-   Type: *boolean*, Default: yes
+--8<-- "docs/services/discord/config.md"
 
 ## Creating a webhook in Discord
 

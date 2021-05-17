@@ -1,7 +1,6 @@
 package xmpp
 
 import (
-	"log"
 	"net/url"
 
 	"gosrc.io/xmpp"
@@ -22,7 +21,7 @@ type Service struct {
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger *log.Logger) error {
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
 		Port:    5222,

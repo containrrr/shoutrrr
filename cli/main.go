@@ -2,6 +2,7 @@ package main
 
 import (
 	cli "github.com/containrrr/shoutrrr/cli/cmd"
+	"github.com/containrrr/shoutrrr/cli/cmd/docs"
 	"github.com/containrrr/shoutrrr/cli/cmd/generate"
 	"github.com/containrrr/shoutrrr/cli/cmd/send"
 	"github.com/containrrr/shoutrrr/cli/cmd/verify"
@@ -20,6 +21,7 @@ func init() {
 	cmd.AddCommand(verify.Cmd)
 	cmd.AddCommand(generate.Cmd)
 	cmd.AddCommand(send.Cmd)
+	cmd.AddCommand(docs.Cmd)
 }
 
 func main() {

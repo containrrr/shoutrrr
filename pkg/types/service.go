@@ -1,7 +1,6 @@
 package types
 
 import (
-	"log"
 	"net/url"
 )
 
@@ -9,5 +8,6 @@ import (
 type Service interface {
 	Sender
 	Templater
-	Initialize(serviceURL *url.URL, logger *log.Logger) error
+	Initialize(serviceURL *url.URL, logger StdLogger) error
+	SetLogger(logger StdLogger)
 }

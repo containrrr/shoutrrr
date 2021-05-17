@@ -4,11 +4,13 @@
 
 Your Hangouts Chat Incoming Webhook URL will look like this:
 
-> https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz
+!!! info ""
+    https://chat.googleapis.com/v1/spaces/__`FOO`__/messages?key=__`bar`__&token=__`baz`__
 
 The shoutrrr service URL should look like this:
 
-> hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz
+!!! info ""
+    hangouts://chat.googleapis.com/v1/spaces/__`FOO`__/messages?key=__`bar`__&token=__`baz`__
 
 In other words the incoming webhook URL with `https` replaced by `hangouts`.
 
