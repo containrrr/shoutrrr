@@ -2,10 +2,11 @@ package mqtt
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"log"
 	"net/url"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +15,6 @@ import (
 var (
 	logger  = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	service *Service
-	config  *Config
 )
 
 func TestMqtt(t *testing.T) {

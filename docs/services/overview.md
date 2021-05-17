@@ -1,6 +1,6 @@
 # Services overview
 
-Click on the service for a more thorough explanation.
+Click on the service for a more thorough explanation. <!-- @formatter:off -->
 
 | Service                           | URL format                                                                                                                                      |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20,3 +20,19 @@ Click on the service for a more thorough explanation.
 | [Teams](./teams.md)               | *teams://__`token-a`__/__`token-b`__/__`token-c`__*                                                                                             |
 | [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?channels=__`channel-1`__[,__`channel-2`__,...]*                                                                |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
+
+
+## Specialized services
+
+| Service                           | Description                                                                                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Logger](./logger.md)             | Writes notification to a configured go `log.Logger`                                                                                             |
+
+## Upcoming services
+
+*Note that these are not available in the current release*
+
+| Service                           | Description                                                                                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Generic Webhook](./generic.md)   | Sends notifications directly to a webhook                                                                                                       |
+| [Matrix](./matrix.md)             | *matrix://__`username`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]]*                                       |
