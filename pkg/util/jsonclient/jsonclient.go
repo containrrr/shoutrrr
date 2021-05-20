@@ -11,32 +11,27 @@ import (
 // ContentType is the default mime type for JSON
 const ContentType = "application/json"
 
-// Error contains additional http/JSON details
-type Error struct {
-	StatusCode int
-	Body       string
-	err        error
+// DefaultClient is the singleton instance of jsonclient using http.DefaultClient
+var DefaultClient = &Client{HTTPClient: http.DefaultClient}
+
+// Get fetches url using GET and unmarshals into the passed response using DefaultClient
+func Get(url string, response interface{}) error {
+	return DefaultClient.Get(url, response)
 }
 
-func (je *Error) Error() string {
-	return je.err.Error()
+// Post sends request as JSON and unmarshals the response JSON into the supplied struct using DefaultClient
+func Post(url string, request interface{}, response interface{}) error {
+	return DefaultClient.Post(url, request, response)
 }
 
-func (je *Error) String() string {
-	return je.err.Error()
-}
-
-// ErrorBody returns the request body from an Error
-func ErrorBody(e error) string {
-	if jsonError, ok := e.(*Error); ok {
-		return jsonError.Body
-	}
-	return ""
+// Client is a JSON wrapper around http.Client
+type Client struct {
+	HTTPClient *http.Client
 }
 
 // Get fetches url using GET and unmarshals into the passed response
-func Get(url string, response interface{}) error {
-	res, err := http.Get(url)
+func (c *Client) Get(url string, response interface{}) error {
+	res, err := c.HTTPClient.Get(url)
 	if err != nil {
 		return err
 	}
@@ -45,7 +40,7 @@ func Get(url string, response interface{}) error {
 }
 
 // Post sends request as JSON and unmarshals the response JSON into the supplied struct
-func Post(url string, request interface{}, response interface{}) error {
+func (c *Client) Post(url string, request interface{}, response interface{}) error {
 
 	var err error
 	var body []byte
@@ -56,7 +51,7 @@ func Post(url string, request interface{}, response interface{}) error {
 	}
 
 	var res *http.Response
-	res, err = http.Post(url, ContentType, bytes.NewReader(body))
+	res, err = c.HTTPClient.Post(url, ContentType, bytes.NewReader(body))
 	if err != nil {
 		return fmt.Errorf("error sending payload: %v", err)
 	}
@@ -64,7 +59,7 @@ func Post(url string, request interface{}, response interface{}) error {
 	return parseResponse(res, response)
 }
 
-func parseResponse(res *http.Response, response interface{}) *Error {
+func parseResponse(res *http.Response, response interface{}) error {
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 
@@ -80,7 +75,7 @@ func parseResponse(res *http.Response, response interface{}) *Error {
 		if body == nil {
 			body = []byte{}
 		}
-		return &Error{
+		return Error{
 			StatusCode: res.StatusCode,
 			Body:       string(body),
 			err:        err,

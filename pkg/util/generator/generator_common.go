@@ -23,6 +23,16 @@ func ValidateFormat(validator func(string) bool) func(string) error {
 	}
 }
 
+var errRequired = errors.New("field is required")
+
+// Required is a validator that checks whether the input contains any characters
+func Required(answer string) error {
+	if answer == "" {
+		return errRequired
+	}
+	return nil
+}
+
 // UserDialog is an abstraction for question/answer based user interaction
 type UserDialog struct {
 	reader  io.Reader
@@ -140,6 +150,9 @@ func (ud *UserDialog) QueryInt(prompt string, key string, bitSize int) (value in
 	validator := re.MustCompile(`^((0x|#)([0-9a-fA-F]+))|(-?[0-9]+)$`)
 	ud.QueryString(prompt, func(answer string) error {
 		groups := validator.FindStringSubmatch(answer)
+		if len(groups) < 1 {
+			return errors.New("not a number")
+		}
 		number := groups[0]
 		base := 0
 		if groups[2] == "#" {
