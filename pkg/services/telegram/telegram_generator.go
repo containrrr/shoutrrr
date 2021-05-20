@@ -147,24 +147,3 @@ func (g *Generator) addChat(chat *chat) (result string) {
 
 	return fmt.Sprintf("Added new chat %v!", f.ColorizeString(name))
 }
-
-func (g *Generator) removeChat(chat *chat) (result string) {
-	id := strconv.FormatInt(chat.ID, 10)
-
-	for i, chatID := range g.chats {
-		if chatID == id {
-			g.chats = append(g.chats[:i], g.chats[i+1:]...)
-			g.chatNames = append(g.chatNames[:i], g.chatNames[i+1:]...)
-			return fmt.Sprintf("Removed chat '%v'!", chat.Name())
-		}
-	}
-
-	return fmt.Sprintf("chat '%v' not selected!", chat.Name())
-}
-
-func (g *Generator) reply(original *Message, text string) {
-	// text = strings.ReplaceAll(text, "!", "\\!")
-	if _, err := g.client.Reply(original, text); err != nil {
-		g.ud.Writeln("Failed to send reply: %v", err)
-	}
-}

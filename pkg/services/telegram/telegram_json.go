@@ -21,14 +21,6 @@ type Message struct {
 	Chat      *chat  `json:"chat"`
 }
 
-type updateMessagePayload struct {
-	ChatID      string `json:"chat_id"`
-	MessageID   int64  `json:"message_id"`
-	Text        string `json:"text"`
-	ParseMode   string `json:"parse_mode,omitempty"`
-	ReplyMarkup string `json:"reply_markup,omitempty"`
-}
-
 type messageResponse struct {
 	OK     bool     `json:"ok"`
 	Result *Message `json:"result"`
@@ -86,15 +78,6 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
-type command struct {
-	Command     string `json:"command"`
-	Description string `json:"description"`
-}
-
-type commandsRequest struct {
-	Commands []command `json:"commands"`
-}
-
 type updatesRequest struct {
 	Offset         int      `json:"offset"`
 	Limit          int      `json:"limit"`
@@ -117,34 +100,6 @@ type inlineQuery struct {
 	// Offset of the results to be returned, can be controlled by the bot
 	Offset string `json:"offset"`
 }
-
-//type inlineQueryResult struct {
-//	Type    string               `json:"result"`
-//	ID      string               `json:"id"`
-//	Title   string               `json:"title"`
-//	Content *inputMessageContent `json:"input_message_content"`
-//}
-
-//type inputMessageContent struct {
-//	Text string `json:"message_text"`
-//}
-
-//type inlineQueryAnswer struct {
-//	// Unique identifier for the answered query
-//	InlineQueryID string `json:"inline_query_id"`
-//	// A JSON-serialized array of results for the inline query
-//	Results []inlineQueryResult `json:"results"`
-//	// Optional	The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
-//	CacheTime int `json:"cache_time"`
-//	// Optional	Pass True, if results may be cached on the server side only for the User that sent the query. By default, results may be returned to any User who sends the same query
-//	IsPersonal bool `json:"is_personal"`
-//	// Optional	Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don't support pagination. Offset length can't exceed 64 bytes.
-//	NextOffset string `json:"next_offset"`
-//	// Optional	If passed, clients will display a button with specified text that switches the User to a private chat with the bot and sends the bot a start Message with the parameter switch_pm_parameter
-//	SwitchPMText string `json:"switch_pm_text"`
-//	// Optional	Deep-linking parameter for the /start Message sent to the bot when User presses the switch button. 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
-//	SwitchPMParameter string `json:"switch_pm_parameter"`
-//}
 
 type chosenInlineResult struct{}
 
@@ -216,10 +171,4 @@ type callbackQuery struct {
 	From    *User    `json:"from"`
 	Message *Message `json:"Message"`
 	Data    string   `json:"data"`
-}
-
-type callbackQueryAnswer struct {
-	CallbackQueryID string `json:"callback_query_id"`
-	Text            string `json:"text,omitempty"`
-	ShowAlert       bool   `json:"show_alert,omitempty"`
 }
