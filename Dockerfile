@@ -9,4 +9,4 @@ COPY --from=alpine \
     /etc/ssl/certs/ca-certificates.crt
 COPY shoutrrr /
 
-ENTRYPOINT ["./shoutrrr"]
+ENTRYPOINT ["/shoutrrr"]
