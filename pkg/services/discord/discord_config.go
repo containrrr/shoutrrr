@@ -15,7 +15,7 @@ type Config struct {
 	Token      string `url:"user"`
 	Title      string `key:"title"      default:""`
 	Username   string `key:"username"   default:""         desc:"Override the webhook default username"`
-	AvatarURL  string `key:"avatar"     default:""         desc:"Override the webhook default avatar"`
+	Avatar     string `key:"avatar,avatarurl"     default:""         desc:"Override the webhook default avatar with specified URL"`
 	Color      uint   `key:"color"      default:"0x50D9ff" desc:"The color of the left border for plain messages"   base:"16"`
 	ColorError uint   `key:"colorError" default:"0xd60510" desc:"The color of the left border for error messages"   base:"16"`
 	ColorWarn  uint   `key:"colorWarn"  default:"0xffc441" desc:"The color of the left border for warning messages" base:"16"`
