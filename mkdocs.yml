@@ -30,7 +30,7 @@ nav:
       - Discord: 'services/discord.md'
       - Email: 'services/email.md'
       - Gotify: 'services/gotify.md'
-      - Hangouts Chat: 'services/hangouts.md'
+      - Google Chat: 'services/googlechat.md'
       - IFTTT: 'services/ifttt.md'
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
