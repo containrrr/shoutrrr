@@ -9,6 +9,8 @@ import (
 type JSON struct {
 	Text        string       `json:"text"`
 	BotName     string       `json:"username,omitempty"`
+	Channel     string       `json:"channel,omitempty"`
+	Emoji       string       `json:"icon_emoji,omitempty"`
 	Blocks      []block      `json:"blocks,omitempty"`
 	Attachments []attachment `json:"attachments,omitempty"`
 }
@@ -54,6 +56,8 @@ func CreateJSONPayload(config *Config, message string) ([]byte, error) {
 		JSON{
 			Text:        config.Title,
 			BotName:     config.BotName,
+			Channel:     config.Channel,
+			Emoji:       config.Emoji,
 			Attachments: atts,
 		})
 }

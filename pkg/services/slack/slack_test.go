@@ -105,7 +105,7 @@ var _ = Describe("the slack service", func() {
 	Describe("the slack config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456?color=3f00fe&title=Test+title"
+				testURL := "slack://testbot@AAAAAAAAA/BBBBBBBBB/123456789123456789123456?channel=foo&color=3f00fe&emoji=sunny&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")

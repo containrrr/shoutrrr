@@ -10,11 +10,11 @@ const (
 	TokenBMissing ErrorMessage = "second part of the API token is missing"
 	// TokenCMissing from the service URL
 	TokenCMissing ErrorMessage = "third part of the API token is missing."
-	// TokenAMalformed inthe service URL
+	// TokenAMalformed in the service URL
 	TokenAMalformed ErrorMessage = "first part of the API token is malformed"
-	// TokenBMalformed inthe service URL
+	// TokenBMalformed in the service URL
 	TokenBMalformed ErrorMessage = "second part of the API token is malformed"
-	// TokenCMalformed inthe service URL
+	// TokenCMalformed in the service URL
 	TokenCMalformed ErrorMessage = "third part of the API token is malformed"
 	// NotEnoughArguments provided in the service URL
 	NotEnoughArguments ErrorMessage = "the apiURL does not include enough arguments"
