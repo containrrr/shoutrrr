@@ -119,3 +119,31 @@ The target url for the notifications generated, see [overview](./services/overvi
 | Flags         | Env.           | Default | Required |
 | ------------- | -------------- | ------- | -------- |
 | `--url`, `-u` | `SHOUTRRR_URL` | N/A     | ✅       |
+
+## From a GitHub Actions workflow
+
+You can also use Shoutrrr from a GitHub Actions workflow.
+
+See this example and the [action on GitHub
+Marketplace](https://github.com/marketplace/actions/shoutrrr-action):
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Some other steps needed for deploying
+        run: ...
+      - name: Shoutrrr
+        uses: containrrr/shoutrrr-action@v1
+        with:
+          url: ${{ secrets.SHOUTRRR_URL }}
+          title: Deployed ${{ github.sha }}
+          message: See changes at ${{ github.event.compare }}.
+```
