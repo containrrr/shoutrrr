@@ -1,7 +1,7 @@
 site_name: Shoutrrr
 site_url: https://containrrr.dev/shoutrrr/
 repo_url: https://github.com/containrrr/shoutrrr/
-edit_uri: edit/main/docs/
+edit_uri: !!python/object/apply:os.getenv [DOCS_EDIT_URI, '/edit/main/docs/']
 theme:
   name: 'material'
   palette:
@@ -47,7 +47,6 @@ nav:
       - Teams: 'services/teams.md'
       - Telegram: 'services/telegram.md'
       - Zulip Chat: 'services/zulip.md'
-      - Generic Webhook: 'services/generic.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
 

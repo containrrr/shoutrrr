@@ -24,7 +24,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 
 | Service                           | Description                                                                                                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Logger](./logger.md)             | Writes notification to a configured go `log.Logger`                                                                                             |
+| Logger                            | Writes notification to a configured go `log.Logger`                                                                                             |
 
 ## Upcoming services
 
@@ -32,5 +32,5 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 
 | Service                           | Description                                                                                                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Generic Webhook](./generic.md)   | Sends notifications directly to a webhook                                                                                                       |
+| Generic Webhook                   | Sends notifications directly to a webhook                                                                                                       |
 | [Matrix](./matrix.md)             | *matrix://__`username`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]]*                                       |
