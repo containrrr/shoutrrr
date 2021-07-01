@@ -3,6 +3,7 @@ module github.com/containrrr/shoutrrr
 go 1.12
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.3.2 // indirect
 	github.com/fatih/color v1.10.0
 	github.com/google/uuid v1.1.5 // indirect
 	github.com/jarcoal/httpmock v1.0.4

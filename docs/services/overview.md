@@ -11,6 +11,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [IFTTT](./ifttt.md)               | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__*                         |
 | [Join](./join.md)                 | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]*                          |
 | [Mattermost](./mattermost.md)     | *mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*                                                               |
+| [MQTT](./mqtt.md)                 | *mqtt://__`host`__:__`port`__?topic=__`topic`__*
 | [OpsGenie](./opsgenie.md)         | *opsgenie://__`host`__/token?responders=__`responder1`__[,__`responder2`__]*                                                                    |
 | [Pushbullet](./pushbullet.md)     | *pushbullet://__`api-token`__[/__`device`__/#__`channel`__/__`email`__]*                                                                        |
 | [Pushover](./pushover.md)         | *pushover://shoutrrr:__`apiToken`__@__`userKey`__/?devices=__`device1`__[,__`device2`__, ...]*                                                  |

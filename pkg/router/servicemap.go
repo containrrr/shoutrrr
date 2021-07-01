@@ -10,6 +10,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/matrix"
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
+	"github.com/containrrr/shoutrrr/pkg/services/mqtt"
 	"github.com/containrrr/shoutrrr/pkg/services/opsgenie"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
@@ -34,6 +35,7 @@ var serviceMap = map[string]func() t.Service{
 	"logger":     func() t.Service { return &logger.Service{} },
 	"matrix":     func() t.Service { return &matrix.Service{} },
 	"mattermost": func() t.Service { return &mattermost.Service{} },
+	"mqtt":       func() t.Service { return &mqtt.Service{} },
 	"opsgenie":   func() t.Service { return &opsgenie.Service{} },
 	"pushbullet": func() t.Service { return &pushbullet.Service{} },
 	"pushover":   func() t.Service { return &pushover.Service{} },
