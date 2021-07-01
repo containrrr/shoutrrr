@@ -1,8 +1,0 @@
-[data-md-color-scheme="shoutrrr"] {
-    --md-primary-fg-color: hsl(193, 100%, 44%);
-    --md-primary-fg-color--light: hsl(193, 100%, 55%);
-    --md-primary-fg-color--dark: hsl(193, 76%, 33%);
-    --md-accent-fg-color: hsl(39, 84%, 44%);
-    --md-accent-fg-color--transparent: hsla(39, 84%, 58%, 0.1);
-    --md-typeset-a-color: var(--md-primary-fg-color--dark);
-}
