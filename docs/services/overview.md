@@ -7,7 +7,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Discord](./discord.md)           | *discord://__`token`__@__`id`__*                                                                                                                |
 | [Email](./email.md)               | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?fromAddress=__`fromAddress`__&toAddresses=__`recipient1`__[,__`recipient2`__,...]* |
 | [Gotify](./gotify.md)             | *gotify://__`gotify-host`__/__`token`__*                                                                                                        |
-| [Hangouts Chat](./hangouts.md)    | *hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                       |
+| [Google Chat](./googlechat.md)    | *googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                       |
 | [IFTTT](./ifttt.md)               | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__*                         |
 | [Join](./join.md)                 | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]*                          |
 | [Mattermost](./mattermost.md)     | *mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*                                                               |

@@ -1,4 +1,4 @@
-package hangouts
+package googlechat
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Service providing Hangouts Chat as a notification service.
+// Service providing Google Chat as a notification service.
 type Service struct {
 	standard.Standard
 	config *Config
@@ -27,14 +27,13 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	return err
 }
 
-// Send a notification message to Hangouts Chat.
+// Send a notification message to Google Chat.
 func (service *Service) Send(message string, _ *types.Params) error {
 	config := service.config
 
 	jsonBody, err := json.Marshal(JSON{
 		Text: message,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -43,15 +42,14 @@ func (service *Service) Send(message string, _ *types.Params) error {
 
 	jsonBuffer := bytes.NewBuffer(jsonBody)
 	resp, err := http.Post(postURL.String(), "application/json", jsonBuffer)
-
 	if err != nil {
-		return fmt.Errorf("failed to send notification to Hangouts Chat: %s", err)
+		return fmt.Errorf("failed to send notification to Google Chat: %s", err)
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Hangouts Chat API notification returned %d HTTP status code", resp.StatusCode)
+		return fmt.Errorf("Google Chat API notification returned %d HTTP status code", resp.StatusCode)
 	}
 
 	return nil

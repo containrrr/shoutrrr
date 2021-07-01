@@ -20,6 +20,7 @@ func TestServices(t *testing.T) {
 var serviceURLs = map[string]string{
 	"discord":    "discord://token@id",
 	"gotify":     "gotify://example.com/Aaa.bbb.ccc.ddd",
+	"googlechat": "googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"hangouts":   "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"ifttt":      "ifttt://key?events=event",
 	"join":       "join://:apikey@join/?devices=device",
