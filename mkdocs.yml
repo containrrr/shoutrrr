@@ -8,6 +8,11 @@ theme:
     scheme: shoutrrr
   logo: shoutrrr-180px.png
   favicon: favicon.ico
+  custom_dir: docs/overrides
+extra:
+  version:
+    provider: mike
+  generator: false
 extra_css:
   - stylesheets/theme.css
 markdown_extensions:
