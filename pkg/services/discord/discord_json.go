@@ -11,6 +11,7 @@ import (
 type WebhookPayload struct {
 	Embeds   []embedItem `json:"embeds"`
 	Username string      `json:"username,omitempty"`
+	AvatarURL string     `json:"avatar_url,omitempty"`
 }
 
 // JSON is the actual notification payload

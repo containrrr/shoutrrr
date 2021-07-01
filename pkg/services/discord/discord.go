@@ -63,6 +63,7 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 	}
 
 	payload.Username = config.Username
+	payload.AvatarURL = config.Avatar
 
 	var payloadBytes []byte
 	payloadBytes, err = json.Marshal(payload)
