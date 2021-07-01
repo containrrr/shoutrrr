@@ -39,6 +39,7 @@ nav:
       - IFTTT: 'services/ifttt.md'
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
+      - Matrix: 'services/matrix.md'
       - OpsGenie: 'services/opsgenie.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'

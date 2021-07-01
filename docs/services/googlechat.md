@@ -28,7 +28,7 @@ room menu.
 ![Screenshot 2](googlechat/hangouts-2.png)
 
 3. Name the webhook and save.
-![Screenshot 3](googkechat/hangouts-3.png)
+![Screenshot 3](googlechat/hangouts-3.png)
 
 4. Copy the URL.
 ![Screenshot 4](googlechat/hangouts-4.png)
