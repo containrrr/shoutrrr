@@ -2,11 +2,13 @@ package slack
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
+	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -20,7 +22,7 @@ type Service struct {
 }
 
 const (
-	apiURL = "https://hooks.slack.com/services"
+	apiPostMessage = "https://slack.com/api/chat.postMessage"
 )
 
 // Send a notification message to Slack
@@ -31,36 +33,13 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	if err := ValidateToken(config.Token); err != nil {
-		return err
-	}
+	payload := CreateJSONPayload(config, message)
 
-	return service.doSend(config, message)
-}
-
-// Initialize loads ServiceConfig from configURL and sets logger for this Service
-func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
-	service.Logger.SetLogger(logger)
-	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-	return service.config.setURL(&service.pkr, configURL)
-}
-
-func (service *Service) doSend(config *Config, message string) error {
-	postURL := service.getURL(config)
-	payload, err := CreateJSONPayload(config, message)
-
-	var res *http.Response
-	if err == nil {
-		res, err = http.Post(postURL, "application/json", bytes.NewBuffer(payload))
-	}
-
-	if res == nil && err == nil {
-		err = fmt.Errorf("unknown error")
-	}
-
-	if err == nil && res.StatusCode != http.StatusOK {
-		err = fmt.Errorf("response status code %s", res.Status)
+	var err error
+	if config.Token.IsAPIToken() {
+		err = service.sendApi(config, payload)
+	} else {
+		err = service.sendWebhook(config, payload)
 	}
 
 	if err != nil {
@@ -70,6 +49,65 @@ func (service *Service) doSend(config *Config, message string) error {
 	return nil
 }
 
-func (service *Service) getURL(config *Config) string {
-	return fmt.Sprintf("%s/%s", apiURL, strings.Join(config.Token, "/"))
+// Initialize loads ServiceConfig from configURL and sets logger for this Service
+func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
+	service.Logger.SetLogger(logger)
+	service.config = &Config{}
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service *Service) sendApi(config *Config, payload interface{}) error {
+	response := APIResponse{}
+	jsonClient := jsonclient.Client{
+		HTTPClient:          http.DefaultClient,
+		AuthorizationHeader: config.Token.Authorization(),
+	}
+
+	if err := jsonClient.Post(apiPostMessage, payload, &response); err != nil {
+		return err
+	}
+
+	if !response.Ok {
+		if response.Error != "" {
+			return fmt.Errorf("api response: %v", response.Error)
+		}
+		return fmt.Errorf("unknown error")
+	}
+
+	if response.Warning != "" {
+		service.Logger.Logf("Slack API warning: %q", response.Warning)
+	}
+
+	return nil
+}
+
+func (service *Service) sendWebhook(config *Config, payload interface{}) error {
+	payloadBytes, err := json.Marshal(payload)
+	var res *http.Response
+	res, err = http.Post(config.Token.WebhookURL(), jsonclient.ContentType, bytes.NewBuffer(payloadBytes))
+
+	if err != nil {
+		return fmt.Errorf("failed to invoke webhook: %v", err)
+	}
+	defer res.Body.Close()
+	resBytes, _ := ioutil.ReadAll(res.Body)
+	response := string(resBytes)
+
+	switch response {
+	case "":
+		if res.StatusCode != http.StatusOK {
+			return fmt.Errorf("webhook status: %v", res.Status)
+		}
+		// Treat status 200 as no error regardless of actual content
+		fallthrough
+	case "ok":
+		return nil
+	default:
+		return fmt.Errorf("webhook response: %v", response)
+	}
+
 }

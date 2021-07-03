@@ -1,21 +1,11 @@
 package slack
 
-// ErrorMessage for error events within the slack service
-type ErrorMessage string
+import "errors"
 
-const (
-	// TokenAMissing from the service URL
-	TokenAMissing ErrorMessage = "first part of the API token is missing"
-	// TokenBMissing from the service URL
-	TokenBMissing ErrorMessage = "second part of the API token is missing"
-	// TokenCMissing from the service URL
-	TokenCMissing ErrorMessage = "third part of the API token is missing."
-	// TokenAMalformed inthe service URL
-	TokenAMalformed ErrorMessage = "first part of the API token is malformed"
-	// TokenBMalformed inthe service URL
-	TokenBMalformed ErrorMessage = "second part of the API token is malformed"
-	// TokenCMalformed inthe service URL
-	TokenCMalformed ErrorMessage = "third part of the API token is malformed"
-	// NotEnoughArguments provided in the service URL
-	NotEnoughArguments ErrorMessage = "the apiURL does not include enough arguments"
+var (
+	// ErrorInvalidToken is returned whenever the specified token does not match any known formats
+	ErrorInvalidToken = errors.New("invalid slack token format")
+
+	// ErrorMismatchedTokenSeparators is returned if the token uses different separators between parts (of the recognized `/-,`)
+	ErrorMismatchedTokenSeparators = errors.New("invalid webhook token format")
 )

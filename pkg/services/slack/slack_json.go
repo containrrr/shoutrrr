@@ -1,16 +1,19 @@
 package slack
 
 import (
-	"encoding/json"
+	"regexp"
 	"strings"
 )
 
-// JSON used within the Slack service
-type JSON struct {
+// messagePayload used within the Slack service
+type messagePayload struct {
 	Text        string       `json:"text"`
 	BotName     string       `json:"username,omitempty"`
 	Blocks      []block      `json:"blocks,omitempty"`
 	Attachments []attachment `json:"attachments,omitempty"`
+	Channel     string       `json:"channel,omitempty"`
+	IconEmoji   string       `json:"icon_emoji,omitempty"`
+	IconURL     string       `json:"icon_url,omitempty"`
 }
 
 type block struct {
@@ -39,8 +42,19 @@ type legacyField struct {
 	Short bool   `json:"short,omitempty"`
 }
 
-// CreateJSONPayload compatible with the slack webhook api
-func CreateJSONPayload(config *Config, message string) ([]byte, error) {
+type APIResponse struct {
+	Ok       bool   `json:"ok"`
+	Error    string `json:"error"`
+	Warning  string `json:"warning"`
+	MetaData struct {
+		Warnings []string `json:"warnings"`
+	} `json:"response_metadata"`
+}
+
+var iconUrlPattern = regexp.MustCompile(`https?://`)
+
+// CreateJSONPayload compatible with the slack post message API
+func CreateJSONPayload(config *Config, message string) interface{} {
 
 	var atts []attachment
 	for _, line := range strings.Split(message, "\n") {
@@ -50,10 +64,23 @@ func CreateJSONPayload(config *Config, message string) ([]byte, error) {
 		})
 	}
 
-	return json.Marshal(
-		JSON{
-			Text:        config.Title,
-			BotName:     config.BotName,
-			Attachments: atts,
-		})
+	payload := messagePayload{
+		Text:        config.Title,
+		BotName:     config.BotName,
+		Attachments: atts,
+	}
+
+	if config.Icon != "" {
+		if iconUrlPattern.MatchString(config.Icon) {
+			payload.IconURL = config.Icon
+		} else {
+			payload.IconEmoji = config.Icon
+		}
+	}
+
+	if config.Channel != "webhook" {
+		payload.Channel = config.Channel
+	}
+
+	return payload
 }

@@ -1,21 +1,21 @@
 package slack
 
 import (
-	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
-	"strings"
 )
 
 // Config for the slack service
 type Config struct {
 	standard.EnumlessConfig
-	BotName string   `default:"" optional:"" url:"user" desc:"Bot name (uses default if empty)"`
-	Token   []string `desc:"Webhook token parts" url:"host,path1,path2"`
-	Color   string   `key:"color" optional:"" desc:"Message left-hand border color"`
-	Title   string   `key:"title" optional:"" desc:"Prepended text above the message"`
+	BotName string `optional:"uses bot default" key:"botname,username" desc:"Bot name"`
+	Icon    string `key:"icon,icon_emoji,icon_url" default:"" optional:"" desc:"Use emoji or URL as icon (based on presence of http(s):// prefix)"`
+	Token   Token  `desc:"API Bot token" url:"user,pass"`
+	Color   string `key:"color" optional:"default border color" desc:"Message left-hand border color"`
+	Title   string `key:"title" optional:"omitted" desc:"Prepended text above the message"`
+	Channel string `url:"host" desc:"Channel to send messages to in Cxxxxxxxxxx format"`
 }
 
 // GetURL returns a URL representation of it's current field values
@@ -32,9 +32,8 @@ func (config *Config) SetURL(url *url.URL) error {
 
 func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
-		User:       url.User(config.BotName),
-		Host:       config.Token[0],
-		Path:       fmt.Sprintf("/%s/%s", config.Token[1], config.Token[2]),
+		User:       config.Token.UserInfo(),
+		Host:       config.Channel,
 		Scheme:     Scheme,
 		ForceQuery: false,
 		RawQuery:   format.BuildQuery(resolver),
@@ -43,21 +42,21 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 func (config *Config) setURL(resolver types.ConfigQueryResolver, serviceURL *url.URL) error {
 
-	botName := serviceURL.User.Username()
+	var token string
+	var err error
 
-	host := serviceURL.Hostname()
+	if len(serviceURL.Path) > 1 {
+		// Reading legacy config URL format
+		token = serviceURL.Hostname() + serviceURL.Path
 
-	token := strings.Split(serviceURL.Path, "/")
-	token[0] = host
-
-	if len(token) < 2 {
-		token = []string{"", "", ""}
+		config.Channel = "webhook"
+		config.BotName = serviceURL.User.Username()
+	} else {
+		token = serviceURL.User.String()
+		config.Channel = serviceURL.Hostname()
 	}
 
-	config.BotName = botName
-	config.Token = token
-
-	if err := ValidateToken(config.Token); err != nil {
+	if err = config.Token.SetFromProp(token); err != nil {
 		return err
 	}
 
