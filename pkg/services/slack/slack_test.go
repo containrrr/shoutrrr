@@ -91,6 +91,11 @@ var _ = Describe("the slack service", func() {
 				})
 			})
 		})
+		When("the URL contains an invalid property", func() {
+			testURL := urlMust("slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?bass=dirty")
+			err := (&Config{}).SetURL(testURL)
+			Expect(err).To(HaveOccurred())
+		})
 		It("should be identical after de-/serialization", func() {
 			testURL := "slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?botname=testbot&color=3f00fe&title=Test+title"
 
@@ -136,6 +141,28 @@ var _ = Describe("the slack service", func() {
 				Expect(token.Authorization()).To(Equal(expected))
 			})
 		})
+	})
+
+	Describe("creating the payload", func() {
+		Describe("the icon fields", func() {
+			payload := MessagePayload{}
+			It("should set IconURL when the configured icon looks like an URL", func() {
+				payload.SetIcon("https://example.com/logo.png")
+				Expect(payload.IconURL).To(Equal("https://example.com/logo.png"))
+				Expect(payload.IconEmoji).To(BeEmpty())
+			})
+			It("should set IconEmoji when the configured icon does not look like an URL", func() {
+				payload.SetIcon("tanabata_tree")
+				Expect(payload.IconEmoji).To(Equal("tanabata_tree"))
+				Expect(payload.IconURL).To(BeEmpty())
+			})
+			It("should clear both fields when icon is empty", func() {
+				payload.SetIcon("")
+				Expect(payload.IconEmoji).To(BeEmpty())
+				Expect(payload.IconURL).To(BeEmpty())
+			})
+		})
+
 	})
 
 	Describe("sending the payload", func() {

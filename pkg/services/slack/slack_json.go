@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// messagePayload used within the Slack service
-type messagePayload struct {
+// MessagePayload used within the Slack service
+type MessagePayload struct {
 	Text        string       `json:"text"`
 	BotName     string       `json:"username,omitempty"`
 	Blocks      []block      `json:"blocks,omitempty"`
@@ -14,6 +14,19 @@ type messagePayload struct {
 	Channel     string       `json:"channel,omitempty"`
 	IconEmoji   string       `json:"icon_emoji,omitempty"`
 	IconURL     string       `json:"icon_url,omitempty"`
+}
+
+func (p *MessagePayload) SetIcon(icon string) {
+	p.IconURL = ""
+	p.IconEmoji = ""
+
+	if icon != "" {
+		if iconUrlPattern.MatchString(icon) {
+			p.IconURL = icon
+		} else {
+			p.IconEmoji = icon
+		}
+	}
 }
 
 type block struct {
@@ -64,19 +77,13 @@ func CreateJSONPayload(config *Config, message string) interface{} {
 		})
 	}
 
-	payload := messagePayload{
+	payload := MessagePayload{
 		Text:        config.Title,
 		BotName:     config.BotName,
 		Attachments: atts,
 	}
 
-	if config.Icon != "" {
-		if iconUrlPattern.MatchString(config.Icon) {
-			payload.IconURL = config.Icon
-		} else {
-			payload.IconEmoji = config.Icon
-		}
-	}
+	payload.SetIcon(config.Icon)
 
 	if config.Channel != "webhook" {
 		payload.Channel = config.Channel
