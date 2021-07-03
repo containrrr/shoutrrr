@@ -3,8 +3,12 @@ name: Deploy Docs
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Release Workflow"]
-    types: [completed]
+    workflows: [ "Release Workflow" ]
+    types: [ completed ]
+  push:
+    branches:
+      - main
+      - latest
 
 jobs:
   build:
@@ -20,20 +24,29 @@ jobs:
           python-version: '3.x'
 
       - name: Install mkdocs
+        env:
+          MKDOCSMAT_TOKEN: ${{ secrets.MKDOCSMAT_TOKEN }}
         run: |
           pip install \
             mkdocs \
-            mkdocs-material \
-            md-toc
+            mike \
+            md-toc \
+            git+https://$MKDOCSMAT_TOKEN@github.com/squidfunk/mkdocs-material-insiders.git
 
       - name: Generate service config docs
         run: bash generate-service-config-docs.sh
 
-      - name: Generate docs
-        run: mkdocs build
+      - name: Update env for docs (dev/main)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "DOCS_EDIT_URI=/edit/main/docs/" >> $GITHUB_ENV
+          echo "DOCS_VERSION=dev" >> $GITHUB_ENV
 
-      - name: Publish docs
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+      - name: Update env (latest)
+        if: ${{ github.ref == 'refs/heads/latest' }}
+        run: |
+          echo "DOCS_EDIT_URI=/edit/latest/docs/" >> $GITHUB_ENV
+          echo "DOCS_VERSION=latest" >> $GITHUB_ENV
+
+      - name: Deploy docs
+        run: mike deploy --push $DOCS_VERSION

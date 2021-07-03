@@ -8,6 +8,11 @@ theme:
     scheme: shoutrrr
   logo: shoutrrr-180px.png
   favicon: favicon.ico
+  custom_dir: docs/overrides
+extra:
+  version:
+    provider: mike
+  generator: false
 extra_css:
   - stylesheets/theme.css
 markdown_extensions:
@@ -34,6 +39,7 @@ nav:
       - IFTTT: 'services/ifttt.md'
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
+      - Matrix: 'services/matrix.md'
       - OpsGenie: 'services/opsgenie.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'
