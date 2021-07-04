@@ -42,11 +42,17 @@ jobs:
           echo "DOCS_EDIT_URI=/edit/main/docs/" >> $GITHUB_ENV
           echo "DOCS_VERSION=dev" >> $GITHUB_ENV
 
-      - name: Update env (latest)
+      - name: Update env for docs (latest)
         if: ${{ github.ref == 'refs/heads/latest' }}
         run: |
           echo "DOCS_EDIT_URI=/edit/latest/docs/" >> $GITHUB_ENV
           echo "DOCS_VERSION=latest" >> $GITHUB_ENV
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
 
       - name: Deploy docs
         run: mike deploy --push $DOCS_VERSION
