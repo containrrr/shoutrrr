@@ -1,13 +1,11 @@
 package pushbullet
 
 import (
-	"encoding/json"
-
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"regexp"
 )
 
-// JSON used within the Slack service
-type JSON struct {
+// PushRequest ...
+type PushRequest struct {
 	Type  string `json:"type"`
 	Title string `json:"title"`
 	Body  string `json:"body"`
@@ -17,39 +15,54 @@ type JSON struct {
 	DeviceIden string `json:"device_iden"`
 }
 
-// CreateJSONPayload compatible with the slack webhook api
-func CreateJSONPayload(target string, targetType TargetType, config *Config, message string, params *types.Params) ([]byte, error) {
-	baseMessage := JSON{
+type PushResponse struct {
+	Active                  bool    `json:"active"`
+	Body                    string  `json:"body"`
+	Created                 float64 `json:"created"`
+	Direction               string  `json:"direction"`
+	Dismissed               bool    `json:"dismissed"`
+	Iden                    string  `json:"iden"`
+	Modified                float64 `json:"modified"`
+	ReceiverEmail           string  `json:"receiver_email"`
+	ReceiverEmailNormalized string  `json:"receiver_email_normalized"`
+	ReceiverIden            string  `json:"receiver_iden"`
+	SenderEmail             string  `json:"sender_email"`
+	SenderEmailNormalized   string  `json:"sender_email_normalized"`
+	SenderIden              string  `json:"sender_iden"`
+	SenderName              string  `json:"sender_name"`
+	Title                   string  `json:"title"`
+	Type                    string  `json:"type"`
+}
+
+type ErrorResponse struct {
+	Error struct {
+		Cat     string `json:"cat"`
+		Message string `json:"message"`
+		Type    string `json:"type"`
+	} `json:"error"`
+}
+
+var emailPattern = regexp.MustCompile(`.*@.*\..*`)
+
+func (p *PushRequest) SetTarget(target string) {
+	if emailPattern.MatchString(target) {
+		p.Email = target
+		return
+	}
+
+	if len(target) > 0 && string(target[0]) == "#" {
+		p.ChannelTag = target[1:]
+		return
+	}
+
+	p.DeviceIden = target
+}
+
+// NewNotePush creates a new push request
+func NewNotePush(message, title string) *PushRequest {
+	return &PushRequest{
 		Type:  "note",
-		Title: getTitle(params),
+		Title: title,
 		Body:  message,
 	}
-
-	switch targetType {
-	case EmailTarget:
-		return CreateEmailPayload(config, target, baseMessage)
-	case ChannelTarget:
-		return CreateChannelPayload(config, target, baseMessage)
-	case DeviceTarget:
-		return CreateDevicePayload(config, target, baseMessage)
-	}
-	return json.Marshal(baseMessage)
-}
-
-//CreateChannelPayload from a base message
-func CreateChannelPayload(config *Config, target string, partialPayload JSON) ([]byte, error) {
-	partialPayload.ChannelTag = target[1:]
-	return json.Marshal(partialPayload)
-}
-
-//CreateDevicePayload from a base message
-func CreateDevicePayload(config *Config, target string, partialPayload JSON) ([]byte, error) {
-	partialPayload.DeviceIden = target
-	return json.Marshal(partialPayload)
-}
-
-//CreateEmailPayload from a base message
-func CreateEmailPayload(config *Config, target string, partialPayload JSON) ([]byte, error) {
-	partialPayload.Email = target
-	return json.Marshal(partialPayload)
 }

@@ -1,104 +1,72 @@
 package pushbullet
 
 import (
-	"bytes"
 	"fmt"
-	"net/http"
-	"net/url"
-	"regexp"
-
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
+	"net/url"
+)
+
+const (
+	pushesEndpoint = "https://api.pushbullet.com/v2/pushes"
 )
 
 // Service providing Pushbullet as a notification service
 type Service struct {
 	standard.Standard
+	client jsonclient.Client
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
+
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
+
+	service.client = jsonclient.NewClient()
+	service.client.Headers().Set("Access-Token", service.config.Token)
 
 	return nil
 }
 
-// Send ...
+// Send a push notification via Pushbullet
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
+	config := *service.config
+	if err := service.pkr.UpdateConfigFromParams(&config, params); err != nil {
+		return err
+	}
+
 	for _, target := range config.Targets {
-		if err := doSend(config, target, message, params); err != nil {
+		if err := doSend(&config, target, message, service.client); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func getTitle(params *types.Params) string {
-	title := "Shoutrrr notification"
-	if params != nil {
-		valParams := *params
-		title, ok := valParams["title"]
-		if !ok {
-			return title
+func doSend(config *Config, target string, message string, client jsonclient.Client) error {
+
+	push := NewNotePush(message, config.Title)
+	push.SetTarget(target)
+
+	response := PushResponse{}
+	if err := client.Post(pushesEndpoint, push, &response); err != nil {
+		errorResponse := ErrorResponse{}
+		if client.ErrorResponse(err, &errorResponse) {
+			return fmt.Errorf("API error: %v", errorResponse.Error.Message)
 		}
-	}
-	return title
-}
-
-func doSend(config *Config, target string, message string, params *types.Params) error {
-	targetType, err := getTargetType(target)
-	if err != nil {
-		return err
+		return fmt.Errorf("failed to push: %v", err)
 	}
 
-	apiURL := serviceURL
-	json, _ := CreateJSONPayload(target, targetType, config, message, params)
-	client := &http.Client{}
-	req, _ := http.NewRequest("POST", apiURL, bytes.NewReader(json))
-	req.Header.Add("Access-Token", config.Token)
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to service, response status code %s", res.Status)
-	}
-
-	if err != nil {
-		return fmt.Errorf("error occurred while posting to pushbullet: %s", err.Error())
-	}
+	// TODO: Look at response fields?
 
 	return nil
 }
-
-func getTargetType(target string) (TargetType, error) {
-	matchesEmail, err := regexp.MatchString(`.*@.*\..*`, target)
-
-	if matchesEmail && err == nil {
-		return EmailTarget, nil
-	}
-
-	if len(target) > 0 && string(target[0]) == "#" {
-		return ChannelTarget, nil
-	}
-
-	return DeviceTarget, nil
-}
-
-// TargetType ...
-type TargetType int
-
-const (
-	// EmailTarget ...
-	EmailTarget TargetType = 1
-	// ChannelTarget ...
-	ChannelTarget TargetType = 2
-	// DeviceTarget ...
-	DeviceTarget TargetType = 3
-)

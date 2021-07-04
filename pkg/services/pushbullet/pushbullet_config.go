@@ -3,6 +3,8 @@ package pushbullet
 import (
 	"errors"
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
 
@@ -14,62 +16,73 @@ type Config struct {
 	standard.EnumlessConfig
 	Targets []string `url:"path"`
 	Token   string   `url:"host"`
+	Title   string   `key:"title" default:"Shoutrrr notification"`
 }
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
-	return &url.URL{
-		Host:       config.Token,
-		Scheme:     Scheme,
-		ForceQuery: false,
-	}
+	resolver := format.NewPropKeyResolver(config)
+	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
-	splitBySlash := func(c rune) bool {
-		return c == '/'
+	resolver := format.NewPropKeyResolver(config)
+	return config.setURL(&resolver, url)
+}
+
+func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+	return &url.URL{
+		Host:       config.Token,
+		Path:       "/" + strings.Join(config.Targets, "/"),
+		Scheme:     Scheme,
+		ForceQuery: false,
+		RawQuery:   format.BuildQuery(resolver),
+	}
+}
+
+func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+	path := url.Path
+
+	if len(path) > 0 && path[0] == '/' {
+		// Remove initial slash to skip empty first target
+		path = path[1:]
 	}
 
-	path := strings.FieldsFunc(url.Path, splitBySlash)
 	if url.Fragment != "" {
-		path = append(path, fmt.Sprintf("#%s", url.Fragment))
-	}
-	if len(path) == 0 {
-		path = []string{""}
+		path += fmt.Sprintf("/#%s", url.Fragment)
 	}
 
-	config.Token = url.Host
-	config.Targets = path[0:]
+	targets := strings.Split(path, "/")
 
-	if err := validateToken(config.Token); err != nil {
+	token := url.Hostname()
+	if err := validateToken(token); err != nil {
 		return err
+	}
+
+	config.Token = token
+	config.Targets = targets
+
+	for key, vals := range url.Query() {
+		if err := resolver.Set(key, vals[0]); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func validateToken(token string) error {
-	if err := tokenHasCorrectSize(token); err != nil {
-		return err
-	}
-	return nil
-}
-
-func tokenHasCorrectSize(token string) error {
 	if len(token) != 34 {
-		return errors.New(string(TokenIncorrectSize))
+		return ErrorTokenIncorrectSize
 	}
 	return nil
 }
-
-//ErrorMessage for error events within the pushbullet service
-type ErrorMessage string
 
 const (
-	serviceURL = "https://api.pushbullet.com/v2/pushes"
 	//Scheme is the scheme part of the service configuration URL
 	Scheme = "pushbullet"
-	//TokenIncorrectSize for the serviceURL
-	TokenIncorrectSize ErrorMessage = "Token has incorrect size"
 )
+
+// ErrorTokenIncorrectSize is the error returned when the token size is incorrect
+var ErrorTokenIncorrectSize = errors.New("token has incorrect size")
