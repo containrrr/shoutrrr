@@ -31,7 +31,7 @@ jobs:
             mkdocs \
             mike \
             md-toc \
-            git+https://$MKDOCSMAT_TOKEN@github.com/squidfunk/mkdocs-material-insiders.git
+            git+https://${MKDOCSMAT_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
 
       - name: Generate service config docs
         run: bash generate-service-config-docs.sh
