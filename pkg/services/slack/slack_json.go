@@ -11,6 +11,7 @@ type JSON struct {
 	BotName     string       `json:"username,omitempty"`
 	Blocks      []block      `json:"blocks,omitempty"`
 	Attachments []attachment `json:"attachments,omitempty"`
+	ThreadTS    string       `json:"thread_ts,omitempty"`
 }
 
 type block struct {
@@ -52,6 +53,7 @@ func CreateJSONPayload(config *Config, message string) ([]byte, error) {
 
 	return json.Marshal(
 		JSON{
+			ThreadTS:    config.ThreadTS,
 			Text:        config.Title,
 			BotName:     config.BotName,
 			Attachments: atts,
