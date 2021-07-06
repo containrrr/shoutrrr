@@ -16,6 +16,8 @@ type Config struct {
 	Token   []string `desc:"Webhook token parts" url:"host,path1,path2"`
 	Color   string   `key:"color" optional:"" desc:"Message left-hand border color"`
 	Title   string   `key:"title" optional:"" desc:"Prepended text above the message"`
+	Channel string   `key:"channel" optional:"" desc:"Overridden channel name (e.g. shoutrrr) or ID (e.g. C8UJ12P4P)"`
+	Emoji   string   `key:"emoji" optional:"" desc:"Overridden emoji name (with or without colons) from the Slack workspace"`
 }
 
 // GetURL returns a URL representation of it's current field values
