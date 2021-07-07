@@ -2,20 +2,22 @@ package slack
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
-	"strings"
 )
 
 // Config for the slack service
 type Config struct {
 	standard.EnumlessConfig
-	BotName string   `default:"" optional:"" url:"user" desc:"Bot name (uses default if empty)"`
-	Token   []string `desc:"Webhook token parts" url:"host,path1,path2"`
-	Color   string   `key:"color" optional:"" desc:"Message left-hand border color"`
-	Title   string   `key:"title" optional:"" desc:"Prepended text above the message"`
+	BotName  string   `default:"" optional:"" url:"user" desc:"Bot name (uses default if empty)"`
+	Token    []string `desc:"Webhook token parts" url:"host,path1,path2"`
+	Color    string   `key:"color" optional:"" desc:"Message left-hand border color"`
+	Title    string   `key:"title" optional:"" desc:"Prepended text above the message"`
+	ThreadTS string   `key:"thread_ts" optional:"" desc:"ts value of the parent message (to send message as reply in thread)"`
 }
 
 // GetURL returns a URL representation of it's current field values
