@@ -11,6 +11,7 @@ type MessagePayload struct {
 	BotName     string       `json:"username,omitempty"`
 	Blocks      []block      `json:"blocks,omitempty"`
 	Attachments []attachment `json:"attachments,omitempty"`
+	ThreadTS    string       `json:"thread_ts,omitempty"`
 	Channel     string       `json:"channel,omitempty"`
 	IconEmoji   string       `json:"icon_emoji,omitempty"`
 	IconURL     string       `json:"icon_url,omitempty"`
@@ -78,6 +79,7 @@ func CreateJSONPayload(config *Config, message string) interface{} {
 	}
 
 	payload := MessagePayload{
+		ThreadTS:    config.ThreadTS,
 		Text:        config.Title,
 		BotName:     config.BotName,
 		Attachments: atts,

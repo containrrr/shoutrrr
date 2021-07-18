@@ -1,10 +1,11 @@
 package slack
 
 import (
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Config for the slack service
@@ -16,6 +17,7 @@ type Config struct {
 	Color   string `key:"color" optional:"default border color" desc:"Message left-hand border color"`
 	Title   string `key:"title" optional:"omitted" desc:"Prepended text above the message"`
 	Channel string `url:"host" desc:"Channel to send messages to in Cxxxxxxxxxx format"`
+	ThreadTS string   `key:"thread_ts" optional:"" desc:"ts value of the parent message (to send message as reply in thread)"`
 }
 
 // GetURL returns a URL representation of it's current field values
