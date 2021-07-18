@@ -62,10 +62,8 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 func (service *Service) sendApi(config *Config, payload interface{}) error {
 	response := APIResponse{}
-	jsonClient := jsonclient.Client{
-		HTTPClient:          http.DefaultClient,
-		AuthorizationHeader: config.Token.Authorization(),
-	}
+	jsonClient := jsonclient.NewClient()
+	jsonClient.Headers().Set("Authorization", config.Token.Authorization())
 
 	if err := jsonClient.Post(apiPostMessage, payload, &response); err != nil {
 		return err
