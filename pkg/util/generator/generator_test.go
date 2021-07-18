@@ -3,6 +3,7 @@ package generator_test
 import (
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
+	"github.com/mattn/go-colorable"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -37,51 +38,51 @@ func dumpBuffers() {
 }
 
 var _ = Describe("GeneratorCommon", func() {
-	Describe("attach to the data stream", func() {
+	BeforeEach(func() {
+		userOut = gbytes.NewBuffer()
+		userIn = gbytes.NewBuffer()
+		userInMono := colorable.NewNonColorable(userIn)
+		client = generator.NewUserDialog(userOut, userInMono, map[string]string{"propKey": "propVal"})
+	})
 
-		BeforeEach(func() {
-			userOut = gbytes.NewBuffer()
-			userIn = gbytes.NewBuffer()
-			client = generator.NewUserDialog(userOut, userIn, map[string]string{"propKey": "propVal"})
-		})
+	It("reprompt upon invalid answers", func() {
+		defer dumpBuffers()
+		answer := make(chan string)
+		go func() {
+			answer <- client.QueryString("name:", generator.Required, "")
+		}()
 
-		It("reprompt upon invalid answers", func() {
-			defer dumpBuffers()
-			answer := make(chan string)
-			go func() {
-				answer <- client.QueryString("name:", generator.Required, "")
-			}()
+		mockTyped("")
+		mockTyped("Normal Human Name")
 
-			mockTyped("")
-			mockTyped("Normal Human Name")
+		Eventually(userIn).Should(gbytes.Say(`name: `))
 
-			Eventually(userIn).Should(gbytes.Say(`name: `))
+		Eventually(userIn).Should(gbytes.Say(`field is required`))
+		Eventually(userIn).Should(gbytes.Say(`name: `))
+		Eventually(answer).Should(Receive(Equal("Normal Human Name")))
+	})
 
-			Eventually(userIn).Should(gbytes.Say(`field is required`))
-			Eventually(userIn).Should(gbytes.Say(`name: `))
-			Eventually(answer).Should(Receive(Equal("Normal Human Name")))
-		})
+	It("should accept any input when validator is nil", func() {
+		defer dumpBuffers()
+		answer := make(chan string)
+		go func() {
+			answer <- client.QueryString("name:", nil, "")
+		}()
+		mockTyped("")
+		Eventually(answer).Should(Receive(BeEmpty()))
+	})
 
-		It("should accept any input when validator is nil", func() {
-			defer dumpBuffers()
-			answer := make(chan string)
-			go func() {
-				answer <- client.QueryString("name:", nil, "")
-			}()
-			mockTyped("")
-			Eventually(answer).Should(Receive(BeEmpty()))
-		})
+	It("should use predefined prop value if key is present", func() {
+		defer dumpBuffers()
+		answer := make(chan string)
+		go func() {
+			answer <- client.QueryString("name:", generator.Required, "propKey")
+		}()
+		Eventually(answer).Should(Receive(Equal("propVal")))
+	})
 
-		It("should use predefined prop value if key is present", func() {
-			defer dumpBuffers()
-			answer := make(chan string)
-			go func() {
-				answer <- client.QueryString("name:", generator.Required, "propKey")
-			}()
-			Eventually(answer).Should(Receive(Equal("propVal")))
-		})
-
-		It("Query", func() {
+	Describe("Query", func() {
+		It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan []string)
 			query := "pick foo or bar:"
@@ -97,8 +98,10 @@ var _ = Describe("GeneratorCommon", func() {
 			Eventually(userIn).Should(gbytes.Say(query))
 			Eventually(answer).Should(Receive(ContainElement("foo")))
 		})
+	})
 
-		It("QueryAll", func() {
+	Describe("QueryAll", func() {
+		It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan [][]string)
 			query := "pick foo or bar:"
@@ -114,8 +117,10 @@ var _ = Describe("GeneratorCommon", func() {
 			Expect(matches).To(ContainElement([]string{"foobar", "bar"}))
 			Expect(matches).To(ContainElement([]string{"foobaz", "baz"}))
 		})
+	})
 
-		It("QueryStringPattern", func() {
+	Describe("QueryStringPattern", func() {
+		It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan string)
 			query := "type of bar:"
@@ -131,8 +136,10 @@ var _ = Describe("GeneratorCommon", func() {
 			Eventually(userIn).Should(gbytes.Say(query))
 			Eventually(answer).Should(Receive(Equal("foobar")))
 		})
+	})
 
-		It("QueryInt", func() {
+	Describe("QueryInt", func() {
+		It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan int64)
 			query := "number:"
@@ -148,8 +155,10 @@ var _ = Describe("GeneratorCommon", func() {
 			Eventually(userIn).Should(gbytes.Say(query))
 			Eventually(answer).Should(Receive(Equal(int64(32))))
 		})
+	})
 
-		It("QueryBool", func() {
+	Describe("QueryBool", func() {
+		It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan bool)
 			query := "cool?"

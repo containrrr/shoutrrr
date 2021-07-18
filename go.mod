@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.1.5 // indirect
 	github.com/jarcoal/httpmock v1.0.4
 	github.com/klauspost/compress v1.11.7 // indirect
+	github.com/mattn/go-colorable v0.1.8
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/nxadm/tail v1.4.6 // indirect
 	github.com/onsi/ginkgo v1.14.2

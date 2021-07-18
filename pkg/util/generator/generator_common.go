@@ -124,6 +124,7 @@ func (ud *UserDialog) QueryString(prompt string, validator func(string) error, k
 
 		if err := validator(answer); err != nil {
 			ud.Writeln("%v", err)
+			ud.Writeln("")
 			continue
 		}
 		return answer
