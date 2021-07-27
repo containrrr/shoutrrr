@@ -5,12 +5,12 @@ import (
 	"crypto/x509"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util"
 	"io"
 	"math/rand"
 	"net"
 	"net/smtp"
 	"net/url"
-	"runtime"
 	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -25,7 +25,6 @@ type Service struct {
 	multipartBoundary string
 	propKeyResolver   format.PropKeyResolver
 	certPool          *x509.CertPool
-	useCustomRootCAs  bool
 }
 
 const (
@@ -48,13 +47,6 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		UseHTML:     false,
 		Encryption:  EncMethods.Auto,
 	}
-	certPool, err := x509.SystemCertPool()
-	if err != nil {
-		logger.Printf(`error getting system certs: %v`, err)
-		certPool = x509.NewCertPool()
-	}
-	service.certPool = certPool
-	service.useCustomRootCAs = runtime.GOOS != `windows`
 
 	pkr := format.NewPropKeyResolver(service.config)
 
@@ -77,7 +69,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	client, err := getClientConnection(service.config, service.getCACertPool())
+	client, err := getClientConnection(service.config, service.certPool)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -90,23 +82,17 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(client, message, &config)
 }
 
-// AddTrustedCertificate adds the specified PEM certificate to the pool of trusted root CAs
-func (service *Service) AddTrustedCertificate(caPEM []byte) bool {
-	return service.certPool.AppendCertsFromPEM(caPEM)
-}
-
-// UseCustomRootCAs sets whether the HTTP client uses custom loaded certificates instead of the system ones
-// Note that on windows, enabling this will disable the system root CAs (for this service).
-// Because of this, custom root CAs are disabled on windows by default.
-func (service *Service) UseCustomRootCAs(enabled bool) {
-	service.useCustomRootCAs = enabled
-}
-
-func (service *Service) getCACertPool() *x509.CertPool {
-	if service.useCustomRootCAs {
-		return service.certPool
+// AddTrustedRootCertificate adds the specified PEM certificate to the pool of trusted root CAs
+func (service *Service) AddTrustedRootCertificate(caPEM []byte) bool {
+	if service.certPool == nil {
+		certPool, err := x509.SystemCertPool()
+		if err != nil {
+			service.Logf(`error getting system certs: %v`, err)
+			certPool = x509.NewCertPool()
+		}
+		service.certPool = certPool
 	}
-	return nil
+	return service.certPool.AppendCertsFromPEM(caPEM)
 }
 
 func getClientConnection(config *Config, pool *x509.CertPool) (*smtp.Client, error) {
@@ -117,10 +103,7 @@ func getClientConnection(config *Config, pool *x509.CertPool) (*smtp.Client, err
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
 	if useImplicitTLS(config.Encryption, config.Port) {
-		conn, err = tls.Dial("tcp", addr, &tls.Config{
-			ServerName: config.Host,
-			RootCAs:    pool,
-		})
+		conn, err = tls.Dial("tcp", addr, getTLSConfig(config.Host, pool))
 	} else {
 		conn, err = net.Dial("tcp", addr)
 	}
@@ -147,10 +130,7 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 		if supported, _ := client.Extension("StartTLS"); !supported {
 			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
 		} else {
-			if err := client.StartTLS(&tls.Config{
-				ServerName: config.Host,
-				RootCAs:    service.certPool,
-			}); err != nil {
+			if err := client.StartTLS(getTLSConfig(config.Host, service.certPool)); err != nil {
 				return fail(FailEnableStartTLS, err)
 			}
 		}
@@ -295,6 +275,15 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 		}
 	}
 	return nil
+}
+
+func getTLSConfig(hostname string, pool *x509.CertPool) *tls.Config {
+	tlsConfig := &tls.Config{
+		ServerName: hostname,
+		RootCAs:    pool,
+	}
+	util.ConfigureFallbackCertVerification(tlsConfig)
+	return tlsConfig
 }
 
 func writeMultipartHeader(wc io.WriteCloser, boundary string, contentType string) error {
