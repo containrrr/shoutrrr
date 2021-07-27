@@ -1,0 +1,30 @@
+
+.md-typeset li img {
+    display: inline-block;
+}
+
+.md-typeset figure {
+    background: var(--md-code-bg-color);
+    display: block;
+    width: 100%;
+}
+
+.md-typeset figure img {
+    box-shadow: 2px 2px 4px #00000080;
+    padding: 3px;
+    background: var(--md-code-bg-color);
+}
+
+
+.md-typeset li img:last-child {
+    margin: 10px 0;
+}
+
+.badges img {
+    height: 20px;
+    max-width: 100%;
+    display: inline-block;
+    padding: 0;
+    background: transparent;
+    border-radius: 3px;
+}

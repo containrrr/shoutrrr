@@ -15,7 +15,7 @@
         
       
       <link rel="icon" href="../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.10+insiders-2.10.0">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.1+insiders-2.12.0">
     
     
       
@@ -23,12 +23,13 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.204e8399.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f55811a5.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.73e53a79.min.css">
         
       
+      <link rel="preload" as="style" href="../../assets/stylesheets/vendor/mermaid.733f213f.min.css">
       
     
     
@@ -44,11 +45,14 @@
     
       <link rel="stylesheet" href="../../stylesheets/theme.css">
     
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
     <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"../..":"../.."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
     
       
 
 
+    
     
     
   </head>
@@ -625,12 +629,60 @@ You're not viewing the latest version.
       
       
         <label class="md-nav__link" for="__nav_5">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/slack/" class="md-nav__link">
+        Slack
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
           Advanced usage
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Advanced usage" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Advanced usage
         </label>
@@ -734,33 +786,43 @@ You're not viewing the latest version.
                 
                 
                 <h1 id="slack">Slack<a class="headerlink" href="#slack" title="Permanent link">&para;</a></h1>
-<p>The slack notification service uses <a href="https://api.slack.com/messaging/webhooks">Slack Webhook</a>s to send messages.<br />
-Follow the <a href="https://api.slack.com/messaging/webhooks#getting_started">Getting started with Incoming Webhooks</a> guide and
-replace the initial <code>https://hooks.slack.com/services/</code> part of the webhook URL with <code>slack://</code> to get your Shoutrrr URL.</p>
-<p><em>Slack Webhook URL:</em></p>
-<div class="admonition info">
-<p>https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX</p>
+<div class="admonition attention">
+<p class="admonition-title">New URL format</p>
+<p>The URL format for Slack has been changed to allow for API- as well as webhook tokens.<br />
+Using the old format (<code>slack://xxxx/yyyy/zzzz</code>) will still work as before and will automatically be upgraded to
+the new format when used.</p>
 </div>
-<p>Shoutrrr URL:</p>
-<div class="admonition info">
-<p>slack://T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX</p>
-</div>
+<p>The Slack notification service uses either <a href="https://api.slack.com/messaging/webhooks">Slack Webhooks</a> or the 
+<a href="https://api.slack.com/methods/chat.postMessage">Bot API</a> to send messages.  </p>
+<p>See the <a href="../../guides/slack/">guides</a> for information on how to get your <em>token</em> and <em>channel</em>.</p>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<div class="admonition note">
+<p>Note that the token uses a prefix to determine the type, usually either <code>hook</code> (for webhooks) or <code>xoxb</code> (for bot API).</p>
+</div>
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>BotName</strong> - Bot name (uses default if empty)<br />
-  Default: <em>empty</em><br />
-  URL part: <code class="service-url">slack://<strong>botname</strong>@token/token/token</code>  </li>
-<li><strong>Token</strong> - Webhook token parts (<strong>Required</strong>)<br />
-  URL part: <code class="service-url">slack://botname@<strong>token</strong>/<strong>token</strong>/<strong>token</strong></code>  </li>
+<li><strong>Token</strong> - API Bot token (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">slack://<strong>token</strong>:<strong>token</strong>@channel/</code>  </li>
+<li><strong>Channel</strong> - Channel to send messages to in Cxxxxxxxxxx format (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">slack://token:token@<strong>channel</strong>/</code>  </li>
 </ul>
 <h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
 <p>Props can be either supplied using the params argument, or through the URL using<br />
 <code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
+<p><strong>BotName</strong> - Bot name<br />
+  Default: <em>empty</em><br />
+  Aliases: <code>username</code>  </p>
+</li>
+<li>
 <p><strong>Color</strong> - Message left-hand border color<br />
   Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Icon</strong> - Use emoji or URL as icon (based on presence of http(s):// prefix)<br />
+  Default: <em>empty</em><br />
+  Aliases: <code>icon_emoji</code>, <code>icon_url</code>  </p>
 </li>
 <li>
 <p><strong>ThreadTS</strong> - ts value of the parent message (to send message as reply in thread)<br />
@@ -779,10 +841,14 @@ So <span style="background:#ff8000;width:.9em;height:.9em;display:inline-block;v
 </div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <div class="admonition example">
-<p class="admonition-title">Example</p>
-<p>All fields set:
-<div class="highlight"><pre><span></span><code>slack://ShoutrrrBot@T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX?color=good&amp;title=Great+News
-</code></pre></div></p>
+<p class="admonition-title">Bot API</p>
+<div class="highlight"><pre><span></span><code>slack://xoxb:123456789012-1234567890123-4mt0t4l1YL3g1T5L4cK70k3N@C001CH4NN3L?color=good&amp;title=Great+News&amp;icon=man-scientist&amp;botname=Shoutrrrbot
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Webhook</p>
+<div class="highlight"><pre><span></span><code>slack://hook:WNA3PBYV6-F20DUQND3RQ-Webc4MAvoacrpPakR8phF0zi@webhook?color=good&amp;title=Great+News&amp;icon=man-scientist&amp;botname=Shoutrrrbot
+</code></pre></div>
 </div>
                 
               
@@ -856,7 +922,7 @@ So <span style="background:#ff8000;width:.9em;height:.9em;display:inline-block;v
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.74af7bc3.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6bba7a82.min.js"></script>
+      <script src="../../assets/javascripts/bundle.1afabad3.min.js"></script>
       
     
   </body>
