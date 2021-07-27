@@ -17,9 +17,6 @@ type WriterFunc func(v interface{}) ([]byte, error)
 var _ types.TLSClient = &ClientService{}
 var _ types.HTTPService = &ClientService{}
 
-// JsonContentType is the default mime type for JSON
-const JsonContentType = "application/json"
-
 // ClientService is a Composable that adds a generic web request client to the service
 type ClientService struct {
 	client   *client

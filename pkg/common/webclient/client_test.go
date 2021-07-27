@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("JSONClient", func() {
+var _ = Describe("WebClient", func() {
 	var server *ghttp.Server
 
 	BeforeEach(func() {
@@ -43,6 +43,46 @@ var _ = Describe("JSONClient", func() {
 		server.AppendHandlers(ghttp.RespondWithJSONEncoded(http.StatusOK, mockResponse{Status: "OK"}))
 		res := &mockResponse{}
 		err := webclient.GetJson(server.URL(), &res)
+		Expect(server.ReceivedRequests()).Should(HaveLen(1))
+		Expect(err).ToNot(HaveOccurred())
+		Expect(res.Status).To(Equal("OK"))
+	})
+
+	It("should update the parser and writer", func() {
+		client := webclient.NewJSONClient()
+		client.SetParser(func(raw []byte, v interface{}) error {
+			return errors.New(`mock parser`)
+		})
+		server.AppendHandlers(ghttp.RespondWithJSONEncoded(http.StatusOK, mockResponse{Status: "OK"}))
+		err := client.Get(server.URL(), nil)
+		Expect(err).To(MatchError(`mock parser`))
+
+		client.SetWriter(func(v interface{}) ([]byte, error) {
+			return nil, errors.New(`mock writer`)
+		})
+		err = client.Post(server.URL(), nil, nil)
+		Expect(err).To(MatchError(`error creating payload: mock writer`))
+	})
+
+	It("should unwrap serialized error responses", func() {
+		client := webclient.NewJSONClient()
+		err := webclient.ClientError{Body: `{"Status": "BadStuff"}`}
+		res := &mockResponse{}
+		Expect(client.ErrorResponse(err, res)).To(BeTrue())
+		Expect(res.Status).To(Equal(`BadStuff`))
+	})
+
+	It("should send any additional headers that has been added", func() {
+		server.AppendHandlers(
+			ghttp.CombineHandlers(
+				ghttp.VerifyHeaderKV(`Authentication`, `you don't need to see my identification`),
+				ghttp.RespondWithJSONEncoded(http.StatusOK, mockResponse{Status: "OK"}),
+			),
+		)
+		client := webclient.NewJSONClient()
+		client.Headers().Set(`Authentication`, `you don't need to see my identification`)
+		res := &mockResponse{}
+		err := client.Get(server.URL(), &res)
 		Expect(server.ReceivedRequests()).Should(HaveLen(1))
 		Expect(err).ToNot(HaveOccurred())
 		Expect(res.Status).To(Equal("OK"))
