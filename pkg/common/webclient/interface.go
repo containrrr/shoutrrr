@@ -12,4 +12,5 @@ type WebClient interface {
 	ErrorResponse(err error, response interface{}) bool
 	SetParser(ParserFunc)
 	SetWriter(WriterFunc)
+	HTTPClient() *http.Client
 }

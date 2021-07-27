@@ -54,7 +54,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 }
 
 func (service *Service) sendMessageForChatIDs(message string, config *Config) error {
-	client := &Client{token: config.Token, WebClient: service.WebClient()}
+	client := &Client{Token: config.Token, WebClient: service.WebClient()}
 	for _, chat := range service.config.Chats {
 		payload := createSendMessagePayload(message, chat, config)
 		if _, err := client.SendMessage(&payload); err != nil {

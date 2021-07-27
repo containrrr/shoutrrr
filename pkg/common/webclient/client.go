@@ -12,7 +12,7 @@ import (
 type client struct {
 	headers    http.Header
 	indent     string
-	HttpClient http.Client
+	httpClient http.Client
 	parse      ParserFunc
 	write      WriterFunc
 }
@@ -32,9 +32,14 @@ func (c *client) Headers() http.Header {
 	return c.headers
 }
 
+// HTTPClient returns the underlying http.WebClient used by the WebClient
+func (c *client) HTTPClient() *http.Client {
+	return &c.httpClient
+}
+
 // Get fetches url using GET and unmarshals into the passed response
 func (c *client) Get(url string, response interface{}) error {
-	return c.request(url, response, nil)
+	return c.request(http.MethodGet, url, response, nil)
 }
 
 // Post sends a serialized representation of request and deserializes the result into response
@@ -44,7 +49,7 @@ func (c *client) Post(url string, request interface{}, response interface{}) err
 		return fmt.Errorf("error creating payload: %v", err)
 	}
 
-	return c.request(url, response, bytes.NewReader(body))
+	return c.request(http.MethodPost, url, response, bytes.NewReader(body))
 }
 
 // ErrorResponse tries to deserialize any response body into the supplied struct, returning whether successful or not
@@ -57,8 +62,8 @@ func (c *client) ErrorResponse(err error, response interface{}) bool {
 	return c.parse([]byte(jerr.Body), response) == nil
 }
 
-func (c *client) request(url string, response interface{}, payload io.Reader) error {
-	req, err := http.NewRequest(http.MethodPost, url, payload)
+func (c *client) request(method, url string, response interface{}, payload io.Reader) error {
+	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
 		return err
 	}
@@ -67,7 +72,7 @@ func (c *client) request(url string, response interface{}, payload io.Reader) er
 		req.Header.Set(key, val[0])
 	}
 
-	res, err := c.HttpClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("error sending payload: %v", err)
 	}

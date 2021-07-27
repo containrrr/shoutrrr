@@ -41,13 +41,14 @@ func createSendMessagePayload(message string, channel string, config *Config) Se
 	return payload
 }
 
-type errorResponse struct {
+// ErrorResponse is the generic response from the API when an error occurred
+type ErrorResponse struct {
 	OK          bool   `json:"ok"`
 	ErrorCode   int    `json:"error_code"`
 	Description string `json:"description"`
 }
 
-func (e *errorResponse) Error() string {
+func (e *ErrorResponse) Error() string {
 	return e.Description
 }
 

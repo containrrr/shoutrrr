@@ -26,7 +26,7 @@ type ClientService struct {
 // HTTPClient returns the underlying http.WebClient used in the Service
 func (s *ClientService) HTTPClient() *http.Client {
 	s.Initialize()
-	return &s.client.HttpClient
+	return s.client.HTTPClient()
 }
 
 // WebClient returns the WebClient instance, initializing it if necessary
@@ -42,7 +42,7 @@ func (s *ClientService) Initialize() {
 	}
 
 	s.client = &client{
-		HttpClient: http.Client{
+		httpClient: http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{},
 			},
@@ -66,7 +66,7 @@ func (s *ClientService) AddTrustedRootCertificate(caPEM []byte) bool {
 			certPool = x509.NewCertPool()
 		}
 		s.certPool = certPool
-		if tp, ok := s.client.HttpClient.Transport.(*http.Transport); ok {
+		if tp, ok := s.client.httpClient.Transport.(*http.Transport); ok {
 			tp.TLSClientConfig.RootCAs = s.certPool
 		}
 	}

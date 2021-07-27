@@ -8,11 +8,11 @@ import (
 // Client for Telegram API
 type Client struct {
 	WebClient webclient.WebClient
-	token     string
+	Token     string
 }
 
 func (c *Client) apiURL(endpoint string) string {
-	return fmt.Sprintf(apiFormat, c.token, endpoint)
+	return fmt.Sprintf(apiFormat, c.Token, endpoint)
 }
 
 // GetBotInfo returns the bot User info
@@ -61,7 +61,7 @@ func (c *Client) SendMessage(message *SendMessagePayload) (*Message, error) {
 
 // GetErrorResponse retrieves the error message from a failed request
 func (c *Client) getErrorResponse(err error) error {
-	var errResponse *errorResponse
+	errResponse := &ErrorResponse{}
 	if c.WebClient.ErrorResponse(err, errResponse) {
 		return errResponse
 	} else {
