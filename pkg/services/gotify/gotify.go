@@ -1,7 +1,6 @@
 package gotify
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,20 +30,18 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 
-	client := service.WebClient()
+	client := service.HTTPClient()
 	if service.config.DisableTLS {
-		client.SetTransport(&http.Transport{
-			TLSClientConfig: &tls.Config{
-				// If DisableTLS is specified, we might still need to disable TLS verification
-				// since the default configuration of Gotify redirects HTTP to HTTPS
-				// Note that this cannot be overridden using params, only using the config URL
-				InsecureSkipVerify: service.config.DisableTLS,
-			},
-		})
+		// If DisableTLS is specified, we might still need to disable TLS verification
+		// since the default configuration of Gotify redirects HTTP to HTTPS
+		// Note that this cannot be overridden using params, only using the config URL
+		if tp, ok := client.Transport.(*http.Transport); ok {
+			tp.TLSClientConfig.InsecureSkipVerify = true
+		}
 	}
 
-	// Set a reasonable timeout to prevent one bad transfer from block all subsequent ones
-	service.HTTPClient().Timeout = 10 * time.Second
+	// Set a reasonable timeout to prevent one bad transfer from blocking all subsequent ones
+	client.Timeout = 10 * time.Second
 
 	return err
 }
