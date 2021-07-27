@@ -1,10 +1,16 @@
-package jsonclient
+package webclient
 
-import "net/http"
+import (
+	"net/http"
+)
 
-type Client interface {
+// WebClient ...
+type WebClient interface {
 	Get(url string, response interface{}) error
 	Post(url string, request interface{}, response interface{}) error
 	Headers() http.Header
 	ErrorResponse(err error, response interface{}) bool
+	SetTransport(http.RoundTripper)
+	SetParser(ParserFunc)
+	SetWriter(WriterFunc)
 }
