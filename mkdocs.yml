@@ -15,6 +15,7 @@ extra:
   generator: false
 extra_css:
   - stylesheets/theme.css
+  - stylesheets/extra.css
 markdown_extensions:
   - toc:
       permalink: True
@@ -49,6 +50,8 @@ nav:
       - Telegram: 'services/telegram.md'
       - Zulip Chat: 'services/zulip.md'
       - Generic Webhook: 'services/generic.md'
+  - Guides:
+      - Slack: 'guides/slack/index.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
 
