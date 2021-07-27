@@ -2,10 +2,10 @@ package pushbullet
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 	"net/url"
 )
 
@@ -16,7 +16,7 @@ const (
 // Service providing Pushbullet as a notification service
 type Service struct {
 	standard.Standard
-	client jsonclient.Client
+	webclient.ClientService
 	config *Config
 	pkr    format.PropKeyResolver
 }
@@ -31,8 +31,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		return err
 	}
 
-	service.client = jsonclient.NewClient()
-	service.client.Headers().Set("Access-Token", service.config.Token)
+	service.WebClient().Headers().Set("Access-Token", service.config.Token)
 
 	return nil
 }
@@ -45,14 +44,14 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	for _, target := range config.Targets {
-		if err := doSend(&config, target, message, service.client); err != nil {
+		if err := doSend(&config, target, message, service.WebClient()); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func doSend(config *Config, target string, message string, client jsonclient.Client) error {
+func doSend(config *Config, target string, message string, client webclient.WebClient) error {
 
 	push := NewNotePush(message, config.Title)
 	push.SetTarget(target)

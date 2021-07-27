@@ -1,14 +1,14 @@
 package telegram
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
 )
 
 // Client for Telegram API
 type Client struct {
-	token string
+	WebClient webclient.WebClient
+	token     string
 }
 
 func (c *Client) apiURL(endpoint string) string {
@@ -18,10 +18,10 @@ func (c *Client) apiURL(endpoint string) string {
 // GetBotInfo returns the bot User info
 func (c *Client) GetBotInfo() (*User, error) {
 	response := &userResponse{}
-	err := jsonclient.Get(c.apiURL("getMe"), response)
+	err := c.WebClient.Get(c.apiURL("getMe"), response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, c.getErrorResponse(err)
 	}
 
 	return &response.Result, nil
@@ -37,10 +37,10 @@ func (c *Client) GetUpdates(offset int, limit int, timeout int, allowedUpdates [
 		AllowedUpdates: allowedUpdates,
 	}
 	response := &updatesResponse{}
-	err := jsonclient.Post(c.apiURL("getUpdates"), request, response)
+	err := c.WebClient.Post(c.apiURL("getUpdates"), request, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, c.getErrorResponse(err)
 	}
 
 	return response.Result, nil
@@ -50,20 +50,21 @@ func (c *Client) GetUpdates(offset int, limit int, timeout int, allowedUpdates [
 func (c *Client) SendMessage(message *SendMessagePayload) (*Message, error) {
 
 	response := &messageResponse{}
-	err := jsonclient.Post(c.apiURL("sendMessage"), message, response)
+	err := c.WebClient.Post(c.apiURL("sendMessage"), message, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, c.getErrorResponse(err)
 	}
 
 	return response.Result, nil
 }
 
 // GetErrorResponse retrieves the error message from a failed request
-func GetErrorResponse(body string) error {
-	response := &errorResponse{}
-	if err := json.Unmarshal([]byte(body), response); err == nil {
-		return response
+func (c *Client) getErrorResponse(err error) error {
+	var errResponse *errorResponse
+	if c.WebClient.ErrorResponse(err, errResponse) {
+		return errResponse
+	} else {
+		return err
 	}
-	return nil
 }

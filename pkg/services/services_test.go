@@ -2,7 +2,6 @@ package services_test
 
 import (
 	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
 	"log"
@@ -41,6 +40,8 @@ var serviceURLs = map[string]string{
 
 var serviceResponses = map[string]string{
 	"pushbullet": `{"created": 0}`,
+	"telegram":   `{"ok": true}`,
+	"gotify":     `{"id": 0}`,
 }
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
@@ -78,6 +79,7 @@ var _ = Describe("services", func() {
 				}
 
 				httpmock.Activate()
+
 				// Always return an "OK" result, as the http request isn't what is under test
 				respStatus := http.StatusOK
 				if key == "discord" || key == "ifttt" {
@@ -88,9 +90,8 @@ var _ = Describe("services", func() {
 				service, err := serviceRouter.Locate(configURL)
 				Expect(err).NotTo(HaveOccurred())
 
-				if key == "gotify" {
-					gotifyService := service.(*gotify.Service)
-					httpmock.ActivateNonDefault(gotifyService.Client)
+				if httpService, isHttpService := service.(types.HTTPService); isHttpService {
+					httpmock.ActivateNonDefault(httpService.HTTPClient())
 				}
 
 				err = service.Send("test", (*types.Params)(&map[string]string{

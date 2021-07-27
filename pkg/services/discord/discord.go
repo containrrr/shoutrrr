@@ -94,11 +94,9 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		return err
 	}
 
-	if err := service.config.SetURL(configURL); err != nil {
-		return err
-	}
+	err := service.config.SetURL(configURL)
 
-	return nil
+	return err
 }
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url

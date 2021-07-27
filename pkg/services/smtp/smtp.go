@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net"
 	"net/smtp"
 	"net/url"
+	"runtime"
 	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -22,6 +24,8 @@ type Service struct {
 	config            *Config
 	multipartBoundary string
 	propKeyResolver   format.PropKeyResolver
+	certPool          *x509.CertPool
+	useCustomRootCAs  bool
 }
 
 const (
@@ -29,6 +33,8 @@ const (
 	contentPlain     = "text/plain; charset=\"UTF-8\""
 	contentMultipart = "multipart/alternative; boundary=%s"
 )
+
+var _ types.TLSClient = &Service{}
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
@@ -42,6 +48,13 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		UseHTML:     false,
 		Encryption:  EncMethods.Auto,
 	}
+	certPool, err := x509.SystemCertPool()
+	if err != nil {
+		logger.Printf(`error getting system certs: %v`, err)
+		certPool = x509.NewCertPool()
+	}
+	service.certPool = certPool
+	service.useCustomRootCAs = runtime.GOOS != `windows`
 
 	pkr := format.NewPropKeyResolver(service.config)
 
@@ -64,7 +77,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	client, err := getClientConnection(service.config)
+	client, err := getClientConnection(service.config, service.getCACertPool())
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -77,7 +90,26 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(client, message, &config)
 }
 
-func getClientConnection(config *Config) (*smtp.Client, error) {
+// AddTrustedCertificate adds the specified PEM certificate to the pool of trusted root CAs
+func (service *Service) AddTrustedCertificate(caPEM []byte) bool {
+	return service.certPool.AppendCertsFromPEM(caPEM)
+}
+
+// UseCustomRootCAs sets whether the HTTP client uses custom loaded certificates instead of the system ones
+// Note that on windows, enabling this will disable the system root CAs (for this service).
+// Because of this, custom root CAs are disabled on windows by default.
+func (service *Service) UseCustomRootCAs(enabled bool) {
+	service.useCustomRootCAs = enabled
+}
+
+func (service *Service) getCACertPool() *x509.CertPool {
+	if service.useCustomRootCAs {
+		return service.certPool
+	}
+	return nil
+}
+
+func getClientConnection(config *Config, pool *x509.CertPool) (*smtp.Client, error) {
 
 	var conn net.Conn
 	var err error
@@ -87,6 +119,7 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 	if useImplicitTLS(config.Encryption, config.Port) {
 		conn, err = tls.Dial("tcp", addr, &tls.Config{
 			ServerName: config.Host,
+			RootCAs:    pool,
 		})
 	} else {
 		conn, err = net.Dial("tcp", addr)
@@ -116,6 +149,7 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 		} else {
 			if err := client.StartTLS(&tls.Config{
 				ServerName: config.Host,
+				RootCAs:    service.certPool,
 			}); err != nil {
 				return fail(FailEnableStartTLS, err)
 			}

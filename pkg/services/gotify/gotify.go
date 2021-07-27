@@ -1,15 +1,14 @@
 package gotify
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -18,9 +17,9 @@ import (
 // Service providing Gotify as a notification service
 type Service struct {
 	standard.Standard
+	webclient.ClientService
 	config *Config
 	pkr    format.PropKeyResolver
-	Client *http.Client
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -32,18 +31,20 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 
-	service.Client = &http.Client{
-		Transport: &http.Transport{
+	client := service.WebClient()
+	if service.config.DisableTLS {
+		client.SetTransport(&http.Transport{
 			TLSClientConfig: &tls.Config{
 				// If DisableTLS is specified, we might still need to disable TLS verification
 				// since the default configuration of Gotify redirects HTTP to HTTPS
 				// Note that this cannot be overridden using params, only using the config URL
 				InsecureSkipVerify: service.config.DisableTLS,
 			},
-		},
-		// Set a reasonable timeout to prevent one bad transfer from block all subsequent ones
-		Timeout: 10 * time.Second,
+		})
 	}
+
+	// Set a reasonable timeout to prevent one bad transfer from block all subsequent ones
+	service.HTTPClient().Timeout = 10 * time.Second
 
 	return err
 }
@@ -96,23 +97,21 @@ func (service *Service) Send(message string, params *types.Params) error {
 	if err != nil {
 		return err
 	}
-	jsonBody, err := json.Marshal(JSON{
+
+	res := JSON{}
+	req := JSON{
 		Message:  message,
 		Title:    config.Title,
 		Priority: config.Priority,
-	})
-	if err != nil {
-		return err
 	}
-	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := service.Client.Post(postURL, "application/json", jsonBuffer)
-	if err != nil {
-		return fmt.Errorf("failed to send notification to Gotify: %s", err)
-	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Gotify notification returned %d HTTP status code", resp.StatusCode)
+	err = service.WebClient().Post(postURL, &req, &res)
+	if err != nil {
+		errorRes := errorResponse{}
+		if service.WebClient().ErrorResponse(err, errorRes) {
+			err = errorRes
+		}
+		return fmt.Errorf("failed to send notification to Gotify: %s", err)
 	}
 
 	return nil

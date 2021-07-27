@@ -119,11 +119,11 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.HTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
-			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
+			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, `{"id":"1"}`))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -131,7 +131,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not panic if an error occurs when sending the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.HTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"

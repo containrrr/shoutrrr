@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"errors"
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
 
@@ -17,6 +18,7 @@ const (
 // Service sends notifications to a given telegram chat
 type Service struct {
 	standard.Standard
+	webclient.ClientService
 	config *Config
 	pkr    format.PropKeyResolver
 }
@@ -42,6 +44,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		Preview:      true,
 		Notification: true,
 	}
+	service.ClientService.Initialize()
 	service.pkr = format.NewPropKeyResolver(service.config)
 	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
@@ -51,8 +54,10 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 }
 
 func (service *Service) sendMessageForChatIDs(message string, config *Config) error {
+	client := &Client{token: config.Token, WebClient: service.WebClient()}
 	for _, chat := range service.config.Chats {
-		if err := sendMessageToAPI(message, chat, config); err != nil {
+		payload := createSendMessagePayload(message, chat, config)
+		if _, err := client.SendMessage(&payload); err != nil {
 			return err
 		}
 	}
@@ -62,11 +67,4 @@ func (service *Service) sendMessageForChatIDs(message string, config *Config) er
 // GetConfig returns the Config for the service
 func (service *Service) GetConfig() *Config {
 	return service.config
-}
-
-func sendMessageToAPI(message string, chat string, config *Config) error {
-	client := &Client{token: config.Token}
-	payload := createSendMessagePayload(message, chat, config)
-	_, err := client.SendMessage(&payload)
-	return err
 }

@@ -39,6 +39,7 @@ func TestLogger() *log.Logger {
 // DiscardLogger is a logger that discards any output written to it
 var DiscardLogger = log.New(ioutil.Discard, "", 0)
 
+// URLMust parses the specified URL and panics (with offset) if it fails
 func URLMust(rawURL string) *url.URL {
 	parsed, err := url.Parse(rawURL)
 	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
