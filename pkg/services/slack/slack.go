@@ -37,7 +37,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 
 	var err error
 	if config.Token.IsAPIToken() {
-		err = service.sendApi(config, payload)
+		err = service.sendAPI(config, payload)
 	} else {
 		err = service.sendWebhook(config, payload)
 	}
@@ -54,13 +54,12 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
-		return err
-	}
-	return nil
+
+	return service.config.setURL(&service.pkr, configURL)
+
 }
 
-func (service *Service) sendApi(config *Config, payload interface{}) error {
+func (service *Service) sendAPI(config *Config, payload interface{}) error {
 	response := APIResponse{}
 	jsonClient := jsonclient.NewClient()
 	jsonClient.Headers().Set("Authorization", config.Token.Authorization())

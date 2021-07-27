@@ -17,12 +17,15 @@ type MessagePayload struct {
 	IconURL     string       `json:"icon_url,omitempty"`
 }
 
+var iconURLPattern = regexp.MustCompile(`https?://`)
+
+// SetIcon sets the appropriate icon field in the payload based on whether the input is a URL or not
 func (p *MessagePayload) SetIcon(icon string) {
 	p.IconURL = ""
 	p.IconEmoji = ""
 
 	if icon != "" {
-		if iconUrlPattern.MatchString(icon) {
+		if iconURLPattern.MatchString(icon) {
 			p.IconURL = icon
 		} else {
 			p.IconEmoji = icon
@@ -56,6 +59,7 @@ type legacyField struct {
 	Short bool   `json:"short,omitempty"`
 }
 
+// APIResponse is the default generic response message sent from the API
 type APIResponse struct {
 	Ok       bool   `json:"ok"`
 	Error    string `json:"error"`
@@ -64,8 +68,6 @@ type APIResponse struct {
 		Warnings []string `json:"warnings"`
 	} `json:"response_metadata"`
 }
-
-var iconUrlPattern = regexp.MustCompile(`https?://`)
 
 // CreateJSONPayload compatible with the slack post message API
 func CreateJSONPayload(config *Config, message string) interface{} {
