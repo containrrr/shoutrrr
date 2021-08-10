@@ -76,7 +76,6 @@ var _ = Describe("the telegram service", func() {
 				Expect(err).NotTo(HaveOccurred())
 				err = telegram.Send(message, nil)
 				Expect(err).To(HaveOccurred())
-				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
 			})
 		})
@@ -160,7 +159,6 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	err := telegram.Initialize(serviceURL, logger)
 	Expect(err).To(HaveOccurred())
 	config := telegram.GetConfig()
-	fmt.Printf("Token: \"%+v\" \"%s\" \n", config.Token, config.Token)
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Chats)).To(BeZero())
 }

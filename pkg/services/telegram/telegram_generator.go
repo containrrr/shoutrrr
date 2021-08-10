@@ -4,12 +4,13 @@ import (
 	f "github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
-	"os/signal"
-	"syscall"
 
 	"fmt"
+	"io"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 )
 
 // Generator is the telegram-specific URL generator
@@ -23,13 +24,20 @@ type Generator struct {
 	owner         *User
 	statusMessage int64
 	botName       string
+	Reader        io.Reader
+	Writer        io.Writer
 }
 
 // Generate a telegram Shoutrrr configuration from a user dialog
 func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	var config Config
-
-	g.ud = generator.NewUserDialog(os.Stdin, os.Stdout, props)
+	if g.Reader == nil {
+		g.Reader = os.Stdin
+	}
+	if g.Writer == nil {
+		g.Writer = os.Stdout
+	}
+	g.ud = generator.NewUserDialog(g.Reader, g.Writer, props)
 	ud := g.ud
 
 	ud.Writeln("To start we need your bot token. If you haven't created a bot yet, you can use this link:")
@@ -50,7 +58,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	g.botName = botInfo.Username
 	ud.Writeln("")
 	ud.Writeln("Okay! %v will listen for any messages in PMs and group chats it is invited to.",
-		f.ColorizeString("@", g.botName, ":"))
+		f.ColorizeString("@", g.botName))
 
 	g.done = false
 	lastUpdate := 0
@@ -132,7 +140,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	return &config, nil
 }
 
-func (g *Generator) addChat(chat *chat) (result string) {
+func (g *Generator) addChat(chat *Chat) (result string) {
 	id := strconv.FormatInt(chat.ID, 10)
 	name := chat.Name()
 
