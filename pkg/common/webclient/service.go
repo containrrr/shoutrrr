@@ -48,7 +48,7 @@ func (s *ClientService) Initialize() {
 			},
 		},
 		headers: http.Header{
-			"Content-Type": []string{JsonContentType},
+			"Content-Type": []string{JSONContentType},
 		},
 		parse: json.Unmarshal,
 		write: func(v interface{}) ([]byte, error) {

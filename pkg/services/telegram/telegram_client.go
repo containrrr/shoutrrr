@@ -64,7 +64,6 @@ func (c *Client) getErrorResponse(err error) error {
 	errResponse := &ErrorResponse{}
 	if c.WebClient.ErrorResponse(err, errResponse) {
 		return errResponse
-	} else {
-		return err
 	}
+	return err
 }

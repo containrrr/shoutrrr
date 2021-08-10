@@ -90,7 +90,7 @@ var _ = Describe("services", func() {
 				service, err := serviceRouter.Locate(configURL)
 				Expect(err).NotTo(HaveOccurred())
 
-				if httpService, isHttpService := service.(types.HTTPService); isHttpService {
+				if httpService, isHTTPService := service.(types.HTTPService); isHTTPService {
 					httpmock.ActivateNonDefault(httpService.HTTPClient())
 				}
 

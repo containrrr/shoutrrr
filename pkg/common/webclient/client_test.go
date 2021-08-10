@@ -21,7 +21,7 @@ var _ = Describe("WebClient", func() {
 		It("should return an error", func() {
 			server.AppendHandlers(ghttp.RespondWith(http.StatusOK, "invalid json"))
 			res := &mockResponse{}
-			err := webclient.GetJson(server.URL(), &res)
+			err := webclient.GetJSON(server.URL(), &res)
 			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			Expect(err).To(MatchError("invalid character 'i' looking for beginning of value"))
 			Expect(res.Status).To(BeEmpty())
@@ -32,7 +32,7 @@ var _ = Describe("WebClient", func() {
 		It("should return an error", func() {
 			server.AppendHandlers(ghttp.RespondWith(http.StatusOK, nil))
 			res := &mockResponse{}
-			err := webclient.GetJson(server.URL(), &res)
+			err := webclient.GetJSON(server.URL(), &res)
 			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			Expect(err).To(MatchError("unexpected end of JSON input"))
 			Expect(res.Status).To(BeEmpty())
@@ -42,7 +42,7 @@ var _ = Describe("WebClient", func() {
 	It("should deserialize GET response", func() {
 		server.AppendHandlers(ghttp.RespondWithJSONEncoded(http.StatusOK, mockResponse{Status: "OK"}))
 		res := &mockResponse{}
-		err := webclient.GetJson(server.URL(), &res)
+		err := webclient.GetJSON(server.URL(), &res)
 		Expect(server.ReceivedRequests()).Should(HaveLen(1))
 		Expect(err).ToNot(HaveOccurred())
 		Expect(res.Status).To(Equal("OK"))
@@ -100,7 +100,7 @@ var _ = Describe("WebClient", func() {
 				ghttp.RespondWithJSONEncoded(http.StatusOK, &mockResponse{Status: "That's Numberwang!"})),
 			)
 
-			err := webclient.PostJson(server.URL(), &req, &res)
+			err := webclient.PostJSON(server.URL(), &req, &res)
 			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(res.Status).To(Equal("That's Numberwang!"))
@@ -108,14 +108,14 @@ var _ = Describe("WebClient", func() {
 
 		It("should return error on error status responses", func() {
 			server.AppendHandlers(ghttp.RespondWith(404, "Not found!"))
-			err := webclient.PostJson(server.URL(), &mockRequest{}, &mockResponse{})
+			err := webclient.PostJSON(server.URL(), &mockRequest{}, &mockResponse{})
 			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			Expect(err).To(MatchError("got HTTP 404 Not Found"))
 		})
 
 		It("should return error on invalid request", func() {
 			server.AppendHandlers(ghttp.VerifyRequest("POST", "/"))
-			err := webclient.PostJson(server.URL(), func() {}, &mockResponse{})
+			err := webclient.PostJSON(server.URL(), func() {}, &mockResponse{})
 			Expect(server.ReceivedRequests()).Should(HaveLen(0))
 			Expect(err).To(MatchError("error creating payload: json: unsupported type: func()"))
 		})
@@ -127,7 +127,7 @@ var _ = Describe("WebClient", func() {
 				ghttp.RespondWithJSONEncoded(http.StatusOK, res)),
 			)
 
-			err := webclient.PostJson(server.URL(), nil, &[]bool{})
+			err := webclient.PostJSON(server.URL(), nil, &[]bool{})
 			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			Expect(err).To(MatchError("json: cannot unmarshal object into Go value of type []bool"))
 			Expect(webclient.ErrorBody(err)).To(MatchJSON(`{"Status":"cool skirt"}`))
