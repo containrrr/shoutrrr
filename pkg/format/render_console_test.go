@@ -11,7 +11,7 @@ var _ = Describe("RenderConsole", func() {
 	renderer := ConsoleTreeRenderer{WithValues: false}
 
 	It("should render the expected output based on config reflection/tags", func() {
-		actual := testRenderTee(renderer, &struct {
+		actual := testRenderTree(renderer, &struct {
 			Name string `default:"notempty"`
 			Host string `url:"host"`
 		}{})
@@ -20,14 +20,12 @@ var _ = Describe("RenderConsole", func() {
 Host string                                                                       <URL: Host> <Required>
 Name string                                                                       <Default: notempty>
 `[1:]
-		println()
-		println(actual)
 
 		Expect(actual).To(Equal(expected))
 	})
 
 	It("should render url paths in sorted order", func() {
-		actual := testRenderTee(renderer, &struct {
+		actual := testRenderTree(renderer, &struct {
 			Host  string `url:"host"`
 			Path1 string `url:"path1"`
 			Path3 string `url:"path3"`
@@ -41,16 +39,6 @@ Path2 string                                                                    
 Path3 string                                                                       <URL: Path> <Required>
 `[1:]
 
-		println()
-		println(actual)
-
 		Expect(actual).To(Equal(expected))
 	})
 })
-
-/*
-
-*  __TestEnum__
-  Default: `+"`None`"+`
-  Possible values: `+"`None`, `Foo`, `Bar`"+`
-*/
