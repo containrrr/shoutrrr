@@ -114,14 +114,21 @@ func (config *Config) setFromWebhookParts(parts [4]string) {
 	config.GroupOwner = parts[3]
 }
 
-func buildWebhookURL(host string, parts [4]string) string {
+func buildWebhookURL(host, group, tenant, altID, groupOwner string) string {
+	// config.Group, config.Tenant, config.AltID, config.GroupOwner
+	path := Path
+	if host == LegacyHost {
+		path = LegacyPath
+	}
 	return fmt.Sprintf(
-		"https://%s/webhook/%s@%s/IncomingWebhook/%s/%s",
+		"https://%s/%s/%s@%s/%s/%s/%s",
 		host,
-		parts[0],
-		parts[1],
-		parts[2],
-		parts[3])
+		path,
+		group,
+		tenant,
+		ProviderName,
+		altID,
+		groupOwner)
 }
 
 func parseAndVerifyWebhookURL(webhookURL string) (parts [4]string, err error) {
@@ -142,6 +149,12 @@ func parseAndVerifyWebhookURL(webhookURL string) (parts [4]string, err error) {
 const (
 	// Scheme is the identifying part of this service's configuration URL
 	Scheme = "teams"
-	// DefaultHost is the default host for the webhook request
-	DefaultHost = "outlook.office.com"
+	// LegacyHost is the default host for legacy webhook requests
+	LegacyHost = "outlook.office.com"
+	// LegacyPath is the initial path of the webhook URL for legacy webhook requests
+	LegacyPath = "webhook"
+	// Path is the initial path of the webhook URL for domain-scoped webhook requests
+	Path = "webhookb2"
+	// ProviderName is the name of the Teams integration provider
+	ProviderName = "IncomingWebhook"
 )

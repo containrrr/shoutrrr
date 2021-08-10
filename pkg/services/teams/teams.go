@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // Service providing teams as a notification service
@@ -35,7 +36,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{
-		Host: DefaultHost,
+		Host: LegacyHost,
 	}
 
 	service.pkr = format.NewPropKeyResolver(service.config)
@@ -93,9 +94,12 @@ func (service *Service) doSend(config *Config, message string) error {
 
 	host := config.Host
 	if host == "" {
-		host = DefaultHost
+		host = LegacyHost
+		// Emit a warning to the log for now.
+		// TODO(v0.6): Remove legacy support as it should be fully deprecated now
+		service.Logf(`Warning: No host specified, update your Teams URL: %s`, util.DocsURL(`services/teams`))
 	}
-	postURL := buildWebhookURL(host, config.webhookParts())
+	postURL := buildWebhookURL(host, config.Group, config.Tenant, config.AltID, config.GroupOwner)
 
 	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
 	if err == nil && res.StatusCode != http.StatusOK {

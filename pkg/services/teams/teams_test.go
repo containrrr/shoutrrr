@@ -12,9 +12,11 @@ import (
 )
 
 const (
-	testWebhookURL = "https://outlook.office.com/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
-	customURL      = "teams+https://publicservice.info/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
-	testURLBase    = "teams://11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
+	legacyWebhookURL = "https://outlook.office.com/webhook/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
+	scopedWebhookURL = "https://test.webhook.office.com/webhookb2/11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/IncomingWebhook/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
+	scopedDomainHost = "test.webhook.office.com"
+	testURLBase      = "teams://11111111-4444-4444-8444-cccccccccccc@22222222-4444-4444-8444-cccccccccccc/33333333012222222222333333333344/44444444-4444-4444-8444-cccccccccccc"
+	scopedURLBase    = testURLBase + `?host=` + scopedDomainHost
 )
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
@@ -24,9 +26,9 @@ func TestTeams(t *testing.T) {
 	RunSpecs(t, "Shoutrrr Teams Suite")
 }
 
-var _ = Describe("the teams plugin", func() {
+var _ = Describe("the teams service", func() {
 	When("creating the webhook URL", func() {
-		It("should match the expected output", func() {
+		It("should match the expected output for legacy URLs", func() {
 			config := Config{}
 			config.setFromWebhookParts([4]string{
 				"11111111-4444-4444-8444-cccccccccccc",
@@ -34,8 +36,23 @@ var _ = Describe("the teams plugin", func() {
 				"33333333012222222222333333333344",
 				"44444444-4444-4444-8444-cccccccccccc",
 			})
-			apiURL := buildWebhookURL(DefaultHost, config.webhookParts())
-			Expect(apiURL).To(Equal(testWebhookURL))
+			apiURL := buildWebhookURL(LegacyHost, config.Group, config.Tenant, config.AltID, config.GroupOwner)
+			Expect(apiURL).To(Equal(legacyWebhookURL))
+
+			parts, err := parseAndVerifyWebhookURL(apiURL)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(parts).To(Equal(config.webhookParts()))
+		})
+		It("should match the expected output for custom URLs", func() {
+			config := Config{}
+			config.setFromWebhookParts([4]string{
+				"11111111-4444-4444-8444-cccccccccccc",
+				"22222222-4444-4444-8444-cccccccccccc",
+				"33333333012222222222333333333344",
+				"44444444-4444-4444-8444-cccccccccccc",
+			})
+			apiURL := buildWebhookURL(scopedDomainHost, config.Group, config.Tenant, config.AltID, config.GroupOwner)
+			Expect(apiURL).To(Equal(scopedWebhookURL))
 
 			parts, err := parseAndVerifyWebhookURL(apiURL)
 			Expect(err).ToNot(HaveOccurred())
@@ -46,18 +63,17 @@ var _ = Describe("the teams plugin", func() {
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := testURLBase + "?color=aabbcc&host=notdefault.outlook.office.com&title=Test+title"
+				testURL := testURLBase + "?color=aabbcc&host=test.outlook.office.com&title=Test+title"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
-				config := &Config{Host: DefaultHost}
+				config := &Config{Host: LegacyHost}
 				err = config.SetURL(url)
 				Expect(err).NotTo(HaveOccurred(), "verifying")
 
 				outputURL := config.GetURL()
 				Expect(outputURL.String()).To(Equal(testURL))
-
 			})
 		})
 	})
@@ -78,7 +94,7 @@ var _ = Describe("the teams plugin", func() {
 		When("a valid custom URL is provided", func() {
 			It("should set the host field from the custom URL", func() {
 				service := Service{}
-				testURL := customURL
+				testURL := `teams+` + scopedWebhookURL
 
 				customURL, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -86,11 +102,11 @@ var _ = Describe("the teams plugin", func() {
 				serviceURL, err := service.GetConfigURLFromCustom(customURL)
 				Expect(err).NotTo(HaveOccurred(), "converting")
 
-				Expect(serviceURL.String()).To(Equal(testURLBase + "?host=publicservice.info"))
+				Expect(serviceURL.String()).To(Equal(scopedURLBase))
 			})
 			It("should preserve the query params in the generated service URL", func() {
 				service := Service{}
-				testURL := "teams+" + testWebhookURL + "?color=f008c1&title=TheTitle"
+				testURL := "teams+" + legacyWebhookURL + "?color=f008c1&title=TheTitle"
 
 				customURL, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -113,11 +129,11 @@ var _ = Describe("the teams plugin", func() {
 			httpmock.DeactivateAndReset()
 		})
 		It("should not report an error if the server accepts the payload", func() {
-			serviceURL, _ := url.Parse(testURLBase)
+			serviceURL, _ := url.Parse(scopedURLBase)
 			err = service.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-			httpmock.RegisterResponder("POST", testWebhookURL, httpmock.NewStringResponder(200, ""))
+			httpmock.RegisterResponder("POST", scopedWebhookURL, httpmock.NewStringResponder(200, ""))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -127,7 +143,7 @@ var _ = Describe("the teams plugin", func() {
 			err = service.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-			httpmock.RegisterResponder("POST", testWebhookURL, httpmock.NewErrorResponder(errors.New("dummy error")))
+			httpmock.RegisterResponder("POST", legacyWebhookURL, httpmock.NewErrorResponder(errors.New("dummy error")))
 
 			err = service.Send("Message", nil)
 			Expect(err).To(HaveOccurred())
