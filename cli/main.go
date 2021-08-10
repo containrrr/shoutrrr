@@ -6,14 +6,16 @@ import (
 	"github.com/containrrr/shoutrrr/cli/cmd/generate"
 	"github.com/containrrr/shoutrrr/cli/cmd/send"
 	"github.com/containrrr/shoutrrr/cli/cmd/verify"
+	"github.com/containrrr/shoutrrr/internal/meta"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 )
 
 var cmd = &cobra.Command{
-	Use:   "shoutrrr",
-	Short: "Notification library for gophers and their furry friends",
+	Use:     "shoutrrr",
+	Version: meta.Version,
+	Short:   "Shoutrrr CLI",
 }
 
 func init() {
