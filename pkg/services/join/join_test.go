@@ -4,6 +4,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
 
 	"net/url"
 	"os"
@@ -109,6 +110,41 @@ var _ = Describe("the join config", func() {
 			fields := pkr.QueryFields()
 			Expect(fields).To(Equal([]string{"devices", "icon", "title"}))
 		})
+	})
+
+	When("parsing the configuration URL", func() {
+		It("should be identical after de-/serialization", func() {
+			input := "join://Token:apikey@join?devices=dev1%2Cdev2&icon=warning&title=hey"
+			config := &join.Config{}
+			Expect(config.SetURL(util.URLMust(input))).To(Succeed())
+			Expect(config.GetURL().String()).To(Equal(input))
+		})
+	})
+
+	Describe("sending the payload", func() {
+		var err error
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("should not report an error if the server accepts the payload", func() {
+			config := join.Config{
+				APIKey:  "apikey",
+				Devices: []string{"dev1"},
+			}
+			serviceURL := config.GetURL()
+			service := join.Service{}
+			err = service.Initialize(serviceURL, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush", httpmock.NewStringResponder(200, ``))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
 	})
 })
 
