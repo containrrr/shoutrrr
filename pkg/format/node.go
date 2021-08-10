@@ -176,8 +176,8 @@ func getNode(fieldVal r.Value, fieldInfo *FieldInfo) Node {
 	}
 }
 
-func getRootNode(config types.ServiceConfig) *ContainerNode {
-	structValue := r.ValueOf(config)
+func getRootNode(v interface{}) *ContainerNode {
+	structValue := r.ValueOf(v)
 	if structValue.Kind() == r.Ptr {
 		structValue = structValue.Elem()
 	}
@@ -186,7 +186,12 @@ func getRootNode(config types.ServiceConfig) *ContainerNode {
 		Type: structValue.Type(),
 	}
 
-	infoFields := getStructFieldInfo(fieldInfo.Type, config.Enums())
+	enums := map[string]types.EnumFormatter{}
+	if enummer, isEnummer := v.(types.Enummer); isEnummer {
+		enums = enummer.Enums()
+	}
+
+	infoFields := getStructFieldInfo(fieldInfo.Type, enums)
 
 	numFields := len(infoFields)
 	nodeItems := make([]Node, numFields)
