@@ -118,13 +118,9 @@ func testPartitionMessage(hundreds int, limits types.MessageLimit, distance int)
 
 	items, omitted = PartitionMessage(builder.String(), limits, distance)
 
-	println(hundreds, len(items), omitted)
-
 	contentSize := Min(hundreds*100, limits.TotalChunkSize)
 	expectedChunkCount := CeilDiv(contentSize, limits.ChunkSize-1)
 	expectedOmitted := Max(0, (hundreds*100)-contentSize)
-
-	println(contentSize, expectedChunkCount, expectedOmitted)
 
 	Expect(omitted).To(Equal(expectedOmitted))
 	Expect(len(items)).To(Equal(expectedChunkCount))

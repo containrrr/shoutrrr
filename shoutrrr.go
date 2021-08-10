@@ -1,6 +1,7 @@
 package shoutrrr
 
 import (
+	"github.com/containrrr/shoutrrr/internal/meta"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -31,4 +32,9 @@ func CreateSender(rawURLs ...string) (*router.ServiceRouter, error) {
 // to send to the services indicated by the supplied URLs
 func NewSender(logger types.StdLogger, serviceURLs ...string) (*router.ServiceRouter, error) {
 	return router.New(logger, serviceURLs...)
+}
+
+// Version returns the shoutrrr version
+func Version() string {
+	return meta.Version
 }
