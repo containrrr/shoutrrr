@@ -10,7 +10,8 @@ import (
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
 type MarkdownTreeRenderer struct {
-	HeaderPrefix string
+	HeaderPrefix     string
+	PropsDescription string
 }
 
 // RenderTree renders a ContainerNode tree into a markdown documentation string
@@ -20,7 +21,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
 	urlFields := make([]*FieldInfo, URLPath+1)
-	fieldsPrinted := make(map[string]bool)
 
 	for _, node := range root.Items {
 		field := node.Field()
@@ -37,6 +37,27 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 			queryFields = append(queryFields, field)
 		}
 	}
+
+	r.writeURLFields(&sb, urlFields, scheme)
+
+	sort.SliceStable(queryFields, func(i, j int) bool {
+		return queryFields[i].Required && !queryFields[j].Required
+	})
+
+	r.writeHeader(&sb, "Query/Param Props")
+	sb.WriteString(r.PropsDescription)
+	sb.WriteRune('\n')
+	for _, field := range queryFields {
+		r.writeFieldPrimary(&sb, field)
+		r.writeFieldExtras(&sb, field)
+		sb.WriteRune('\n')
+	}
+
+	return sb.String()
+}
+
+func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*FieldInfo, scheme string) {
+	fieldsPrinted := make(map[string]bool)
 
 	sort.SliceStable(urlFields, func(i, j int) bool {
 		if urlFields[i] == nil || urlFields[j] == nil {
@@ -56,12 +77,12 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		return urlPartA < urlPartB
 	})
 
-	r.writeHeader(&sb, "URL Fields")
+	r.writeHeader(sb, "URL Fields")
 	for _, field := range urlFields {
 		if field == nil || fieldsPrinted[field.Name] {
 			continue
 		}
-		r.writeFieldPrimary(&sb, field)
+		r.writeFieldPrimary(sb, field)
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
 
@@ -109,20 +130,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 		fieldsPrinted[field.Name] = true
 	}
-
-	sort.SliceStable(queryFields, func(i, j int) bool {
-		return queryFields[i].Required && !queryFields[j].Required
-	})
-
-	r.writeHeader(&sb, "Query/Param Props")
-	sb.WriteString("Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n\n")
-	for _, field := range queryFields {
-		r.writeFieldPrimary(&sb, field)
-		r.writeFieldExtras(&sb, field)
-		sb.WriteRune('\n')
-	}
-
-	return sb.String()
 }
 
 func (MarkdownTreeRenderer) writeFieldExtras(sb *strings.Builder, field *FieldInfo) {
