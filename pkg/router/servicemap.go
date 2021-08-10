@@ -18,14 +18,13 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/services/teams"
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
-	"github.com/containrrr/shoutrrr/pkg/services/xmpp"
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 )
 
 var serviceMap = map[string]func() t.Service{
 	"discord":    func() t.Service { return &discord.Service{} },
-  "generic":    func() t.Service { return &generic.Service{} },
+	"generic":    func() t.Service { return &generic.Service{} },
 	"gotify":     func() t.Service { return &gotify.Service{} },
 	"googlechat": func() t.Service { return &googlechat.Service{} },
 	"hangouts":   func() t.Service { return &googlechat.Service{} },
@@ -42,6 +41,5 @@ var serviceMap = map[string]func() t.Service{
 	"smtp":       func() t.Service { return &smtp.Service{} },
 	"teams":      func() t.Service { return &teams.Service{} },
 	"telegram":   func() t.Service { return &telegram.Service{} },
-	"xmpp":       func() t.Service { return &xmpp.Service{} },
 	"zulip":      func() t.Service { return &zulip.Service{} },
 }

@@ -18,13 +18,18 @@ type Config struct {
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
-	path := config.Token
-	if config.Channel != "" {
-		path += "/" + config.Channel
+	paths := []string{"", config.Token, config.Channel}
+	if config.Channel == "" {
+		paths = paths[:2]
+	}
+	var user *url.Userinfo
+	if config.UserName != "" {
+		user = url.User(config.UserName)
 	}
 	return &url.URL{
+		User:       user,
 		Host:       config.Host,
-		Path:       path,
+		Path:       strings.Join(paths, "/"),
 		Scheme:     Scheme,
 		ForceQuery: false,
 	}

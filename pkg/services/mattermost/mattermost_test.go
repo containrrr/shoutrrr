@@ -3,6 +3,7 @@ package mattermost
 import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/jarcoal/httpmock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/url"
@@ -31,7 +32,7 @@ var _ = Describe("the mattermost service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envMattermostURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
+			Expect(service.Initialize(serviceURL, util.TestLogger())).To(Succeed())
 			err := service.Send(
 				"this is an integration test",
 				nil,
@@ -113,7 +114,7 @@ var _ = Describe("the mattermost service", func() {
 		When("sending a message completely without parameters", func() {
 			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken")
 			config := &Config{}
-			config.SetURL(mattermostURL)
+			Expect(config.SetURL(mattermostURL)).To(Succeed())
 			It("should generate the correct url to call", func() {
 				generatedURL := buildURL(config)
 				Expect(generatedURL).To(Equal("https://mattermost.my-domain.com/hooks/thisshouldbeanapitoken"))
@@ -127,7 +128,7 @@ var _ = Describe("the mattermost service", func() {
 		When("sending a message with pre set username and channel", func() {
 			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
-			config.SetURL(mattermostURL)
+			Expect(config.SetURL(mattermostURL)).To(Succeed())
 			It("should generate the correct JSON body", func() {
 				json, err := CreateJSONPayload(config, "this is a message", nil)
 				Expect(err).NotTo(HaveOccurred())
@@ -137,7 +138,7 @@ var _ = Describe("the mattermost service", func() {
 		When("sending a message with pre set username and channel but overwriting them with parameters", func() {
 			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
-			config.SetURL(mattermostURL)
+			Expect(config.SetURL(mattermostURL)).To(Succeed())
 			It("should generate the correct JSON body", func() {
 				params := (*types.Params)(&map[string]string{"username": "overwriteUserName", "channel": "overwriteChannel"})
 				json, err := CreateJSONPayload(config, "this is a message", params)
@@ -145,5 +146,41 @@ var _ = Describe("the mattermost service", func() {
 				Expect(string(json)).To(Equal("{\"text\":\"this is a message\",\"username\":\"overwriteUserName\",\"channel\":\"overwriteChannel\"}"))
 			})
 		})
+	})
+
+	When("parsing the configuration URL", func() {
+		It("should be identical after de-/serialization", func() {
+			input := "mattermost://bot@mattermost.host/token/channel"
+
+			config := &Config{}
+			Expect(config.SetURL(util.URLMust(input))).To(Succeed())
+			Expect(config.GetURL().String()).To(Equal(input))
+		})
+	})
+
+	Describe("sending the payload", func() {
+		var err error
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+		It("should not report an error if the server accepts the payload", func() {
+			config := Config{
+				Host:  "mattermost.host",
+				Token: "token",
+			}
+			serviceURL := config.GetURL()
+			service := Service{}
+			err = service.Initialize(serviceURL, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", "https://mattermost.host/hooks/token", httpmock.NewStringResponder(200, ``))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
 	})
 })
