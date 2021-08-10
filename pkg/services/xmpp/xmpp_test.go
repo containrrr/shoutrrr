@@ -1,3 +1,5 @@
+//+build xmpp
+
 package xmpp
 
 import (

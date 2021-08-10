@@ -20,7 +20,7 @@ fi
 
 for S in ./pkg/services/*; do
   SERVICE=$(basename "$S")
-  if [[ "$SERVICE" == "standard" ]] || [[ -f "$S" ]]; then
+  if [[ "$SERVICE" == "standard" ]] || [[ "$SERVICE" == "xmpp" ]]  || [[ -f "$S" ]]; then
     continue
   fi
   generate_docs "$SERVICE"
