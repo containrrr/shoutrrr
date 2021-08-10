@@ -18,7 +18,7 @@ type Message struct {
 	MessageID int64  `json:"message_id"`
 	Text      string `json:"text"`
 	From      *User  `json:"from"`
-	Chat      *chat  `json:"chat"`
+	Chat      *Chat  `json:"chat"`
 }
 
 type messageResponse struct {
@@ -133,14 +133,16 @@ type Update struct {
 	*/
 }
 
-type chat struct {
+// Chat represents a telegram conversation
+type Chat struct {
 	ID       int64  `json:"id"`
 	Type     string `json:"type"`
 	Title    string `json:"title"`
 	Username string `json:"username"`
 }
 
-func (c *chat) Name() string {
+// Name returns the name of the channel based on its type
+func (c *Chat) Name() string {
 	if c.Type == "private" || c.Type == "channel" {
 		return "@" + c.Username
 	}
