@@ -7,10 +7,10 @@ import (
 )
 
 var _ = Describe("RenderMarkdown", func() {
-	gformat.CharactersAroundMismatchToInclude = 30
+	gformat.CharactersAroundMismatchToInclude = 10
 
 	It("should render the expected output based on config reflection/tags", func() {
-		actual := testRenderTee(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
+		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
 			Name string `default:"notempty"`
 			Host string `url:"host"`
 		}{})
@@ -32,7 +32,7 @@ var _ = Describe("RenderMarkdown", func() {
 	})
 
 	It("should render url paths in sorted order", func() {
-		actual := testRenderTee(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
+		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
 			Host  string `url:"host"`
 			Path1 string `url:"path1"`
 			Path3 string `url:"path3"`
@@ -57,11 +57,42 @@ var _ = Describe("RenderMarkdown", func() {
 
 		Expect(actual).To(Equal(expected))
 	})
+
+	It("should render prop aliases", func() {
+		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
+			Name string `key:"name,handle,title,target"`
+		}{})
+
+		expected := `
+### URL Fields
+
+### Query/Param Props
+
+
+*  __Name__ (**Required**)  
+  Aliases: `[1:] + "`handle`, `title`, `target`" + `  
+
+`
+
+		Expect(actual).To(Equal(expected))
+	})
+
+	It("should render possible enum values", func() {
+		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &testEnummer{})
+
+		expected := `
+### URL Fields
+
+### Query/Param Props
+
+
+*  __Choice__  
+  Default: `[1:] + "`Maybe`" + `  
+  Possible values: ` + "`Yes`, `No`, `Maybe`" + `  
+
+`
+		println()
+		println(actual)
+		Expect(actual).To(Equal(expected))
+	})
 })
-
-/*
-
-*  __TestEnum__
-  Default: `+"`None`"+`
-  Possible values: `+"`None`, `Foo`, `Bar`"+`
-*/

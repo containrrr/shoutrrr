@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-
-	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
@@ -194,53 +192,6 @@ func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldI
 		}
 		sb.WriteString("  \n")
 	}
-}
-
-func (r MarkdownTreeRenderer) writeNodeValue(sb *strings.Builder, node Node) int {
-	if contNode, isContainer := node.(*ContainerNode); isContainer {
-		return r.writeContainer(sb, contNode)
-	}
-
-	if valNode, isValue := node.(*ValueNode); isValue {
-		sb.WriteString(valNode.Value)
-		return len(valNode.Value)
-	}
-
-	sb.WriteRune('?')
-	return 1
-}
-
-func (r MarkdownTreeRenderer) writeContainer(sb *strings.Builder, node *ContainerNode) int {
-	kind := node.Type.Kind()
-
-	hasKeys := !util.IsCollection(kind)
-
-	totalLen := 4
-	if hasKeys {
-		sb.WriteString("{ ")
-	} else {
-		sb.WriteString("[ ")
-	}
-	for i, itemNode := range node.Items {
-		if i != 0 {
-			sb.WriteString(", ")
-			totalLen += 2
-		}
-		if hasKeys {
-			itemKey := itemNode.Field().Name
-			sb.WriteString(itemKey)
-			sb.WriteString(": ")
-			totalLen += len(itemKey) + 2
-		}
-		valLen := r.writeNodeValue(sb, itemNode)
-		totalLen += valLen
-	}
-	if hasKeys {
-		sb.WriteString(" }")
-	} else {
-		sb.WriteString(" ]")
-	}
-	return totalLen
 }
 
 func (r MarkdownTreeRenderer) writeHeader(sb *strings.Builder, text string) {
