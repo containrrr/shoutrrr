@@ -23,6 +23,12 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        id: go
+        with:
+          go-version: 1.13
+
       - name: Install mkdocs
         env:
           MKDOCSMAT_TOKEN: ${{ secrets.MKDOCSMAT_TOKEN }}
@@ -40,13 +46,11 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "DOCS_EDIT_URI=/edit/main/docs/" >> $GITHUB_ENV
-          echo "DOCS_VERSION=dev" >> $GITHUB_ENV
 
       - name: Update env for docs (latest)
         if: ${{ github.ref == 'refs/heads/latest' }}
         run: |
           echo "DOCS_EDIT_URI=/edit/latest/docs/" >> $GITHUB_ENV
-          echo "DOCS_VERSION=latest" >> $GITHUB_ENV
 
       - name: Setup Git
         env:
@@ -58,4 +62,4 @@ jobs:
 
 
       - name: Deploy docs
-        run: mike deploy --push $DOCS_VERSION
+        run: mike deploy --push $(go run ./cli docs -V)

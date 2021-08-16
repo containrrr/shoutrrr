@@ -2,6 +2,8 @@ package docs
 
 import (
 	"fmt"
+	"github.com/containrrr/shoutrrr/internal/meta"
+	"github.com/mattn/go-isatty"
 	"os"
 	"strings"
 
@@ -21,6 +23,9 @@ var Cmd = &cobra.Command{
 	Short: "Print documentation for services",
 	Run:   Run,
 	Args: func(cmd *cobra.Command, args []string) error {
+		if showVersion, _ := cmd.Flags().GetBool("version"); showVersion {
+			return nil
+		}
 		serviceList := strings.Join(services, ", ")
 		cmd.SetUsageTemplate(cmd.UsageTemplate() + "\nAvailable services: \n  " + serviceList + "\n")
 		return cobra.MinimumNArgs(1)(cmd, args)
@@ -30,11 +35,21 @@ var Cmd = &cobra.Command{
 
 func init() {
 	Cmd.Flags().StringP("format", "f", "console", "Output format")
+	Cmd.Flags().BoolP("version", "V", false, "Show docs version")
 }
 
 // Run the docs command
 func Run(cmd *cobra.Command, args []string) {
 	format, _ := cmd.Flags().GetString("format")
+
+	if showVersion, _ := cmd.Flags().GetBool("version"); showVersion {
+		_, _ = os.Stdout.WriteString(meta.DocsVersion)
+		if isatty.IsTerminal(os.Stdout.Fd()) {
+			// write a newline if the output is not being redirected
+			_, _ = os.Stdout.WriteString("\n")
+		}
+		os.Exit(cli.ExSuccess)
+	}
 
 	res := printDocs(format, args)
 	if res.ExitCode != 0 {
