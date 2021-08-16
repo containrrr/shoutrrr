@@ -36,10 +36,27 @@ var _ = Describe("the telegram service", func() {
 					})
 				})
 				When("it's set to None", func() {
-					It("no parse_mode should be present in payload", func() {
-						payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&parsemode=None", "Message", logger)
+					When("no title has been provided", func() {
+						It("no parse_mode should be present in payload", func() {
+							payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&parsemode=None", "Message", logger)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(payload).NotTo(ContainSubstring("parse_mode"))
+						})
+					})
+					When("a title has been provided", func() {
+						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(payload).NotTo(ContainSubstring("parse_mode"))
+						It("should have parse_mode set to HTML", func() {
+							Expect(payload.ParseMode).To(Equal("HTML"))
+						})
+						It("should contain the title prepended in the message", func() {
+							Expect(payload.Text).To(ContainSubstring("MessageTitle"))
+						})
+						It("should escape the message HTML tags", func() {
+							Expect(payload.Text).To(ContainSubstring("&lt;3"))
+							Expect(payload.Text).To(ContainSubstring("Cool &amp; stuff"))
+							Expect(payload.Text).To(ContainSubstring("-&gt;"))
+						})
 					})
 				})
 			})
