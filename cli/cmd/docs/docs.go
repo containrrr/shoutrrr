@@ -51,8 +51,9 @@ func printDocs(format string, services []string) cli.Result {
 		renderer = f.ConsoleTreeRenderer{WithValues: false}
 	case "markdown":
 		renderer = f.MarkdownTreeRenderer{
-			HeaderPrefix:     "### ",
-			PropsDescription: "Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n",
+			HeaderPrefix:      "### ",
+			PropsDescription:  "Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n",
+			PropsEmptyMessage: "*The services does not support any query/param props*",
 		}
 	default:
 		return cli.InvalidUsage("invalid format")

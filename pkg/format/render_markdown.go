@@ -8,8 +8,9 @@ import (
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
 type MarkdownTreeRenderer struct {
-	HeaderPrefix     string
-	PropsDescription string
+	HeaderPrefix      string
+	PropsDescription  string
+	PropsEmptyMessage string
 }
 
 // RenderTree renders a ContainerNode tree into a markdown documentation string
@@ -43,7 +44,11 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	})
 
 	r.writeHeader(&sb, "Query/Param Props")
-	sb.WriteString(r.PropsDescription)
+	if len(queryFields) > 0 {
+		sb.WriteString(r.PropsDescription)
+	} else {
+		sb.WriteString(r.PropsEmptyMessage)
+	}
 	sb.WriteRune('\n')
 	for _, field := range queryFields {
 		r.writeFieldPrimary(&sb, field)
