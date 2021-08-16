@@ -1,5 +1,10 @@
 package telegram
 
+import (
+	"fmt"
+	"html"
+)
+
 // SendMessagePayload is the notification payload for the telegram notification service
 type SendMessagePayload struct {
 	Text                string       `json:"text"`
@@ -34,8 +39,20 @@ func createSendMessagePayload(message string, channel string, config *Config) Se
 		DisablePreview:      !config.Preview,
 	}
 
-	if config.ParseMode != ParseModes.None {
-		payload.ParseMode = config.ParseMode.String()
+	parseMode := config.ParseMode
+	if config.ParseMode == ParseModes.None && config.Title != "" {
+		parseMode = ParseModes.HTML
+		// no parse mode has been provided, treat message as unescaped HTML
+		message = html.EscapeString(message)
+	}
+
+	if parseMode != ParseModes.None {
+		payload.ParseMode = parseMode.String()
+	}
+
+	// only HTML parse mode is supported for titles
+	if parseMode == ParseModes.HTML {
+		payload.Text = fmt.Sprintf("<b>%v</b>\n%v", html.EscapeString(config.Title), message)
 	}
 
 	return payload
