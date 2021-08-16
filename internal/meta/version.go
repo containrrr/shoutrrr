@@ -1,7 +1,7 @@
 package meta
 
 // Version of Shoutrrr
-const Version = `0.5-dev`
+const Version = `0.5`
 
 // DocsVersion is prepended to documentation URLs and usually equals MAJOR.MINOR of Version
-const DocsVersion = `dev`
+const DocsVersion = `v0.5`
