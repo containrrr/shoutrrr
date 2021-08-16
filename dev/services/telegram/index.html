@@ -15,7 +15,7 @@
         
       
       <link rel="icon" href="../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.3+insiders-2.13.0">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.4+insiders-2.13.0">
     
     
       
@@ -574,6 +574,19 @@ You're not viewing the latest version.
     Optional parameters
   </a>
   
+    <nav class="md-nav" aria-label="Optional parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parse_mode_and_title" class="md-nav__link">
+    Parse Mode and Title
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -779,6 +792,19 @@ You're not viewing the latest version.
     Optional parameters
   </a>
   
+    <nav class="md-nav" aria-label="Optional parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parse_mode_and_title" class="md-nav__link">
+    Parse Mode and Title
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -838,10 +864,21 @@ You're not viewing the latest version.
 <h2 id="getting_a_token_for_telegram">Getting a token for Telegram<a class="headerlink" href="#getting_a_token_for_telegram" title="Permanent link">&para;</a></h2>
 <p>Talk to <a href="https://core.telegram.org/bots#6-botfather">the botfather</a>.</p>
 <h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
-<p>You can optionally specify the <strong><code>notification</code></strong>, <strong><code>parseMode</code></strong> and <strong><code>preview</code></strong> parameters in the URL:<br />
-<em>telegram://<strong><code>token</code></strong>@<strong><code>telegram</code></strong>/?channels=<strong><code>channel</code></strong>&amp;notification=no&amp;preview=false&amp;parseMode=markDownv2</em></p>
+<p>You can optionally specify the <strong><code>notification</code></strong>, <strong><code>parseMode</code></strong> and <strong><code>preview</code></strong> parameters in the URL:  </p>
+<div class="admonition info">
+<p><pre>telegram://<strong><code>token</code></strong>@<strong><code>telegram</code></strong>/?channels=<strong><code>channel</code></strong>&amp;notification=no&amp;preview=false&amp;parseMode=html</pre></p>
+</div>
 <p>See <a href="https://core.telegram.org/bots/api#sendmessage">the telegram documentation</a> for more information.</p>
-<p><strong>Note:</strong> <code>preview</code> and <code>notification</code> are inverted in regards to their API counterparts (<code>disable_web_page_preview</code> and <code>disable_notification</code>)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>preview</code> and <code>notification</code> are inverted in regards to their API counterparts (<code>disable_web_page_preview</code> and <code>disable_notification</code>)</p>
+</div>
+<h3 id="parse_mode_and_title">Parse Mode and Title<a class="headerlink" href="#parse_mode_and_title" title="Permanent link">&para;</a></h3>
+<p>If a parse mode is specified, the message needs to be escaped as per the corresponding sections in
+<a href="https://core.telegram.org/bots/api#formatting-options">Formatting options</a>.</p>
+<p>When a title has been specified, it will be prepended to the message, but this is only supported for
+the <code>HTML</code> parse mode. Note that, if no parse mode is specified, the message will be escaped and sent using <code>HTML</code>.</p>
+<p>Since the markdown modes are really hard to escape correctly, it's recommended to stick to <code>HTML</code> parse mode.</p>
                 
               
               
@@ -914,7 +951,7 @@ You're not viewing the latest version.
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.61ac8e46.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.55761dd8.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d120d6e9.min.js"></script>
       
     
   </body>
