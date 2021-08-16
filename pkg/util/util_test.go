@@ -1,12 +1,14 @@
 package util_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/containrrr/shoutrrr/internal/meta"
 	. "github.com/containrrr/shoutrrr/pkg/util"
 )
 
@@ -89,6 +91,17 @@ var _ = Describe("the util package", func() {
 		})
 		It("should be false if supplied a constant string", func() {
 			Expect(IsNumeric(reflect.TypeOf("3").Kind())).To(BeFalse())
+		})
+	})
+
+	When("calling function DocsURL", func() {
+		It("should return the expected URL", func() {
+			expectedBase := fmt.Sprintf(`https://containrrr.dev/shoutrrr/%s/`, meta.DocsVersion)
+			Expect(DocsURL(``)).To(Equal(expectedBase))
+			Expect(DocsURL(`services/logger`)).To(Equal(expectedBase + `services/logger`))
+		})
+		It("should strip the leading slash from the path", func() {
+			Expect(DocsURL(`/foo`)).To(Equal(DocsURL(`foo`)))
 		})
 	})
 })

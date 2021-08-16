@@ -186,7 +186,7 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 	}
 
 	if configURL.Scheme != scheme {
-		router.logger.Println("Got custom URL:", configURL.String())
+		router.log("Got custom URL:", configURL.String())
 		customURLService, ok := service.(t.CustomURLService)
 		if !ok {
 			return nil, fmt.Errorf("custom URLs are not supported by '%s' service", scheme)
@@ -195,7 +195,7 @@ func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		router.logger.Println("Converted service URL:", configURL.String())
+		router.log("Converted service URL:", configURL.String())
 	}
 
 	err = service.Initialize(configURL, router.logger)
@@ -237,4 +237,11 @@ func (router *ServiceRouter) ListServices() []string {
 func (router *ServiceRouter) Locate(rawURL string) (t.Service, error) {
 	service, err := router.initService(rawURL)
 	return service, err
+}
+
+func (router *ServiceRouter) log(v ...interface{}) {
+	if router.logger == nil {
+		return
+	}
+	router.logger.Println(v...)
 }

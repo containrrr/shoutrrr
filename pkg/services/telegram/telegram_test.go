@@ -43,16 +43,16 @@ var _ = Describe("the telegram service", func() {
 			serviceURL, _ := url.Parse(envTelegramURL)
 			err := telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
-			err = telegram.Send("This is an integration test message", nil)
+			err = telegram.Send("This is an integration test Message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
-		When("given a message that exceeds the max length", func() {
+		When("given a Message that exceeds the max length", func() {
 			It("should generate an error", func() {
 				if envTelegramURL == "" {
 					return
 				}
 				hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
-				serviceURL, _ := url.Parse("telegram://12345:mock-token/channel-1")
+				serviceURL, _ := url.Parse("telegram://12345:mock-token/?chats=channel-1")
 				builder := strings.Builder{}
 				for i := 0; i < 42; i++ {
 					builder.WriteString(hundredChars)
@@ -69,14 +69,13 @@ var _ = Describe("the telegram service", func() {
 				return
 			}
 			It("should generate a 401", func() {
-				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?channels=channel-id")
-				message := "this is a perfectly valid message"
+				serviceURL, _ := url.Parse("telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram/?chats=channel-id")
+				message := "this is a perfectly valid Message"
 
 				err := telegram.Initialize(serviceURL, logger)
 				Expect(err).NotTo(HaveOccurred())
 				err = telegram.Send(message, nil)
 				Expect(err).To(HaveOccurred())
-				fmt.Println(err.Error())
 				Expect(strings.Contains(err.Error(), "401 Unauthorized")).To(BeTrue())
 			})
 		})
@@ -99,7 +98,7 @@ var _ = Describe("the telegram service", func() {
 				var err error
 
 				BeforeEach(func() {
-					serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
+					serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1,channel-2,channel-3")
 					err = telegram.Initialize(serviceURL, logger)
 					config = telegram.GetConfig()
 				})
@@ -113,9 +112,9 @@ var _ = Describe("the telegram service", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(config.Token).To(Equal("12345:mock-token"))
 				})
-				It("should add every subsequent argument as a channel id", func() {
+				It("should add every chats query field as a chat ID", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(config.Channels).To(Equal([]string{
+					Expect(config.Chats).To(Equal([]string{
 						"channel-1",
 						"channel-2",
 						"channel-3",
@@ -134,7 +133,7 @@ var _ = Describe("the telegram service", func() {
 			httpmock.DeactivateAndReset()
 		})
 		It("should not report an error if the server accepts the payload", func() {
-			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?channels=channel-1,channel-2,channel-3")
+			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1,channel-2,channel-3")
 			err = telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -148,10 +147,10 @@ var _ = Describe("the telegram service", func() {
 
 	It("should implement basic service API methods correctly", func() {
 		testutils.TestConfigGetInvalidQueryValue(&Config{})
-		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?channels=channel-1&foo=bar")
+		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?chats=channel-1&foo=bar")
 
 		testutils.TestConfigGetEnumsCount(&Config{}, 1)
-		testutils.TestConfigGetFieldsCount(&Config{}, 5)
+		testutils.TestConfigGetFieldsCount(&Config{}, 6)
 	})
 })
 
@@ -160,9 +159,8 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	err := telegram.Initialize(serviceURL, logger)
 	Expect(err).To(HaveOccurred())
 	config := telegram.GetConfig()
-	fmt.Printf("Token: \"%+v\" \"%s\" \n", config.Token, config.Token)
 	Expect(config.Token).To(BeEmpty())
-	Expect(len(config.Channels)).To(BeZero())
+	Expect(len(config.Chats)).To(BeZero())
 }
 
 func setupResponder(endpoint string, token string, code int, body string) {

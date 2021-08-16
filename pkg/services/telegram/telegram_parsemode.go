@@ -15,7 +15,8 @@ type parseModeVals struct {
 	Enum       types.EnumFormatter
 }
 
-var parseModes = &parseModeVals{
+// ParseModes is an enum helper for parseMode
+var ParseModes = &parseModeVals{
 	None:       0,
 	Markdown:   1,
 	HTML:       2,
@@ -30,5 +31,5 @@ var parseModes = &parseModeVals{
 }
 
 func (pm parseMode) String() string {
-	return parseModes.Enum.Print(int(pm))
+	return ParseModes.Enum.Print(int(pm))
 }

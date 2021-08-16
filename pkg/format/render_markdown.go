@@ -4,13 +4,13 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-
-	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
 type MarkdownTreeRenderer struct {
-	HeaderPrefix string
+	HeaderPrefix      string
+	PropsDescription  string
+	PropsEmptyMessage string
 }
 
 // RenderTree renders a ContainerNode tree into a markdown documentation string
@@ -20,7 +20,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
 	urlFields := make([]*FieldInfo, URLPath+1)
-	fieldsPrinted := make(map[string]bool)
 
 	for _, node := range root.Items {
 		field := node.Field()
@@ -37,6 +36,31 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 			queryFields = append(queryFields, field)
 		}
 	}
+
+	r.writeURLFields(&sb, urlFields, scheme)
+
+	sort.SliceStable(queryFields, func(i, j int) bool {
+		return queryFields[i].Required && !queryFields[j].Required
+	})
+
+	r.writeHeader(&sb, "Query/Param Props")
+	if len(queryFields) > 0 {
+		sb.WriteString(r.PropsDescription)
+	} else {
+		sb.WriteString(r.PropsEmptyMessage)
+	}
+	sb.WriteRune('\n')
+	for _, field := range queryFields {
+		r.writeFieldPrimary(&sb, field)
+		r.writeFieldExtras(&sb, field)
+		sb.WriteRune('\n')
+	}
+
+	return sb.String()
+}
+
+func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*FieldInfo, scheme string) {
+	fieldsPrinted := make(map[string]bool)
 
 	sort.SliceStable(urlFields, func(i, j int) bool {
 		if urlFields[i] == nil || urlFields[j] == nil {
@@ -56,12 +80,12 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 		return urlPartA < urlPartB
 	})
 
-	r.writeHeader(&sb, "URL Fields")
+	r.writeHeader(sb, "URL Fields")
 	for _, field := range urlFields {
 		if field == nil || fieldsPrinted[field.Name] {
 			continue
 		}
-		r.writeFieldPrimary(&sb, field)
+		r.writeFieldPrimary(sb, field)
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
 
@@ -109,20 +133,6 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 
 		fieldsPrinted[field.Name] = true
 	}
-
-	sort.SliceStable(queryFields, func(i, j int) bool {
-		return queryFields[i].Required && !queryFields[j].Required
-	})
-
-	r.writeHeader(&sb, "Query/Param Props")
-	sb.WriteString("Props can be either supplied using the params argument, or through the URL using  \n`?key=value&key=value` etc.\n\n")
-	for _, field := range queryFields {
-		r.writeFieldPrimary(&sb, field)
-		r.writeFieldExtras(&sb, field)
-		sb.WriteRune('\n')
-	}
-
-	return sb.String()
 }
 
 func (MarkdownTreeRenderer) writeFieldExtras(sb *strings.Builder, field *FieldInfo) {
@@ -187,53 +197,6 @@ func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldI
 		}
 		sb.WriteString("  \n")
 	}
-}
-
-func (r MarkdownTreeRenderer) writeNodeValue(sb *strings.Builder, node Node) int {
-	if contNode, isContainer := node.(*ContainerNode); isContainer {
-		return r.writeContainer(sb, contNode)
-	}
-
-	if valNode, isValue := node.(*ValueNode); isValue {
-		sb.WriteString(valNode.Value)
-		return len(valNode.Value)
-	}
-
-	sb.WriteRune('?')
-	return 1
-}
-
-func (r MarkdownTreeRenderer) writeContainer(sb *strings.Builder, node *ContainerNode) int {
-	kind := node.Type.Kind()
-
-	hasKeys := !util.IsCollection(kind)
-
-	totalLen := 4
-	if hasKeys {
-		sb.WriteString("{ ")
-	} else {
-		sb.WriteString("[ ")
-	}
-	for i, itemNode := range node.Items {
-		if i != 0 {
-			sb.WriteString(", ")
-			totalLen += 2
-		}
-		if hasKeys {
-			itemKey := itemNode.Field().Name
-			sb.WriteString(itemKey)
-			sb.WriteString(": ")
-			totalLen += len(itemKey) + 2
-		}
-		valLen := r.writeNodeValue(sb, itemNode)
-		totalLen += valLen
-	}
-	if hasKeys {
-		sb.WriteString(" }")
-	} else {
-		sb.WriteString(" ]")
-	}
-	return totalLen
 }
 
 func (r MarkdownTreeRenderer) writeHeader(sb *strings.Builder, text string) {

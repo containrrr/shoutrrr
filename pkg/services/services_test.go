@@ -6,6 +6,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
 	"log"
+	"net/http"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -20,6 +21,7 @@ func TestServices(t *testing.T) {
 var serviceURLs = map[string]string{
 	"discord":    "discord://token@id",
 	"gotify":     "gotify://example.com/Aaa.bbb.ccc.ddd",
+	"googlechat": "googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"hangouts":   "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"ifttt":      "ifttt://key?events=event",
 	"join":       "join://:apikey@join/?devices=device",
@@ -35,6 +37,10 @@ var serviceURLs = map[string]string{
 	"telegram":   "telegram://000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@telegram?channels=channel",
 	"xmpp":       "xmpp://",
 	"zulip":      "zulip://mail:key@example.com/?stream=foo&topic=bar",
+}
+
+var serviceResponses = map[string]string{
+	"pushbullet": `{"created": 0}`,
 }
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
@@ -72,13 +78,12 @@ var _ = Describe("services", func() {
 				}
 
 				httpmock.Activate()
+				// Always return an "OK" result, as the http request isn't what is under test
+				respStatus := http.StatusOK
 				if key == "discord" || key == "ifttt" {
-					// Always return a "No content" result, as the http request isn't what is under test
-					httpmock.RegisterNoResponder(httpmock.NewStringResponder(204, ""))
-				} else {
-					// Always return an "OK" result, as the http request isn't what is under test
-					httpmock.RegisterNoResponder(httpmock.NewStringResponder(200, ""))
+					respStatus = http.StatusNoContent
 				}
+				httpmock.RegisterNoResponder(httpmock.NewStringResponder(respStatus, serviceResponses[key]))
 
 				service, err := serviceRouter.Locate(configURL)
 				Expect(err).NotTo(HaveOccurred())

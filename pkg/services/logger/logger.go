@@ -17,18 +17,21 @@ type Service struct {
 
 // Send a notification message to log
 func (service *Service) Send(message string, params *types.Params) error {
-	if params == nil {
-		params = &types.Params{}
+	data := types.Params{}
+	if params != nil {
+		for key, value := range *params {
+			data[key] = value
+		}
 	}
-	(*params)["message"] = message
-	return service.doSend(params)
+	data["message"] = message
+	return service.doSend(data)
 }
 
-func (service *Service) doSend(params *types.Params) error {
-	msg := (*params)["message"]
+func (service *Service) doSend(data types.Params) error {
+	msg := data["message"]
 	if tpl, found := service.GetTemplate("message"); found {
 		wc := &strings.Builder{}
-		if err := tpl.Execute(wc, params); err != nil {
+		if err := tpl.Execute(wc, data); err != nil {
 			return fmt.Errorf("failed to write template to log: %s", err)
 		}
 		msg = wc.String()

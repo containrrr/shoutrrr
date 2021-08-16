@@ -15,6 +15,7 @@ extra:
   generator: false
 extra_css:
   - stylesheets/theme.css
+  - stylesheets/extra.css
 markdown_extensions:
   - toc:
       permalink: True
@@ -35,10 +36,11 @@ nav:
       - Discord: 'services/discord.md'
       - Email: 'services/email.md'
       - Gotify: 'services/gotify.md'
-      - Hangouts Chat: 'services/hangouts.md'
+      - Google Chat: 'services/googlechat.md'
       - IFTTT: 'services/ifttt.md'
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
+      - Matrix: 'services/matrix.md'
       - OpsGenie: 'services/opsgenie.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'
@@ -47,6 +49,9 @@ nav:
       - Teams: 'services/teams.md'
       - Telegram: 'services/telegram.md'
       - Zulip Chat: 'services/zulip.md'
+      - Generic Webhook: 'services/generic.md'
+  - Guides:
+      - Slack: 'guides/slack/index.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
 

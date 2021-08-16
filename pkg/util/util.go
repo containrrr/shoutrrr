@@ -1,9 +1,11 @@
 package util
 
 import (
+	"github.com/onsi/gomega"
 	"io/ioutil"
 	"log"
 	"math"
+	"net/url"
 
 	"github.com/onsi/ginkgo"
 )
@@ -36,3 +38,9 @@ func TestLogger() *log.Logger {
 
 // DiscardLogger is a logger that discards any output written to it
 var DiscardLogger = log.New(ioutil.Discard, "", 0)
+
+func URLMust(rawURL string) *url.URL {
+	parsed, err := url.Parse(rawURL)
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	return parsed
+}

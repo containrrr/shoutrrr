@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://github.com/containrrr/shoutrrr">
-    <img src="https://raw.githubusercontent.com/containrrr/shoutrrr/master/docs/shoutrrr-logotype.png" width="450" />
+    <img src="https://raw.githubusercontent.com/containrrr/shoutrrr/main/docs/shoutrrr-logotype.png" width="450" />
 </a>
 
 # Shoutrrr
@@ -10,12 +10,12 @@ Notification library for gophers and their furry friends.
 Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</a>.
 
 ![github actions workflow status](https://github.com/containrrr/shoutrrr/workflows/Main%20Workflow/badge.svg)
-[![codecov](https://codecov.io/gh/containrrr/shoutrrr/branch/master/graph/badge.svg)](https://codecov.io/gh/containrrr/shoutrrr)
+[![codecov](https://codecov.io/gh/containrrr/shoutrrr/branch/main/graph/badge.svg)](https://codecov.io/gh/containrrr/shoutrrr)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/47eed72de79448e2a6e297d770355544)](https://www.codacy.com/gh/containrrr/shoutrrr/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=containrrr/shoutrrr&amp;utm_campaign=Badge_Grade)
 [![report card](https://goreportcard.com/badge/github.com/containrrr/shoutrrr)](https://goreportcard.com/badge/github.com/containrrr/shoutrrr)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/containrrr/shoutrrr)
 [![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr)
-[![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/main/LICENSE)
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->

@@ -13,16 +13,16 @@ import (
 type Config struct {
 	Token        string    `url:"user"`
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
-	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends message silently"`
-	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text message should be parsed"`
-	Channels     []string  `key:"channels"`
+	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends Message silently"`
+	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text Message should be parsed"`
+	Chats        []string  `key:"chats,channels"`
 	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"ParseMode": parseModes.Enum,
+		"ParseMode": ParseModes.Enum,
 	}
 }
 
@@ -67,7 +67,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		}
 	}
 
-	if len(config.Channels) < 1 {
+	if len(config.Chats) < 1 {
 		return errors.New("no channels defined in config URL")
 	}
 

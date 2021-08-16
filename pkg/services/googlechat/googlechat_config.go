@@ -1,4 +1,4 @@
-package hangouts
+package googlechat
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Config for use within the Hangouts Chat plugin.
+// Config for use within the Google Chat plugin.
 type Config struct {
 	standard.EnumlessConfig
 	Host  string `default:"chat.googleapis.com"`
@@ -65,5 +65,5 @@ func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
 
 const (
 	// Scheme is the identifying part of this service's configuration URL.
-	Scheme = "hangouts"
+	Scheme = "googlechat"
 )

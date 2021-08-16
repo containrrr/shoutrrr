@@ -1,12 +1,8 @@
 package telegram
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/format"
-	"net/http"
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -14,7 +10,7 @@ import (
 )
 
 const (
-	apiBase   = "https://api.telegram.org/bot"
+	apiFormat = "https://api.telegram.org/bot%s/%s"
 	maxlength = 4096
 )
 
@@ -28,7 +24,7 @@ type Service struct {
 // Send notification to Telegram
 func (service *Service) Send(message string, params *types.Params) error {
 	if len(message) > maxlength {
-		return errors.New("message exceeds the max length")
+		return errors.New("Message exceeds the max length")
 	}
 
 	config := *service.config
@@ -55,8 +51,8 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 }
 
 func (service *Service) sendMessageForChatIDs(message string, config *Config) error {
-	for _, channel := range service.config.Channels {
-		if err := sendMessageToAPI(message, channel, config); err != nil {
+	for _, chat := range service.config.Chats {
+		if err := sendMessageToAPI(message, chat, config); err != nil {
 			return err
 		}
 	}
@@ -68,19 +64,9 @@ func (service *Service) GetConfig() *Config {
 	return service.config
 }
 
-func sendMessageToAPI(message string, channel string, config *Config) error {
-	postURL := fmt.Sprintf("%s%s/sendMessage", apiBase, config.Token)
-
-	payload := createSendMessagePayload(message, channel, config)
-
-	jsonData, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-
-	res, err := http.Post(postURL, "application/jsonData", bytes.NewBuffer(jsonData))
-	if err == nil && res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to \"%s\", response status code %s", channel, res.Status)
-	}
+func sendMessageToAPI(message string, chat string, config *Config) error {
+	client := &Client{token: config.Token}
+	payload := createSendMessagePayload(message, chat, config)
+	_, err := client.SendMessage(&payload)
 	return err
 }
