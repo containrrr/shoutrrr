@@ -91,8 +91,63 @@ var _ = Describe("RenderMarkdown", func() {
   Possible values: ` + "`Yes`, `No`, `Maybe`" + `  
 
 `
-		println()
-		println(actual)
+
 		Expect(actual).To(Equal(expected))
 	})
+
+	When("there are no query props", func() {
+		It("should prepend an empty-message instead of props description", func() {
+			actual := testRenderTree(MarkdownTreeRenderer{
+				HeaderPrefix:      `### `,
+				PropsDescription:  "Feel free to set these:",
+				PropsEmptyMessage: "There is nothing to set!",
+			}, &struct {
+				Host string `url:"host"`
+			}{})
+
+			expected := `
+### URL Fields
+
+*  __Host__ (**Required**)  
+  URL part: <code class="service-url">mock://<strong>host</strong>/</code>  
+### Query/Param Props
+
+There is nothing to set!
+`[1:] // Remove initial newline
+
+			//_ = actual == expected
+			//println()
+			//println(actual)
+			Expect(actual).To(Equal(expected))
+		})
+	})
+
+	When("there are query props", func() {
+		It("should prepend the props description", func() {
+			actual := testRenderTree(MarkdownTreeRenderer{
+				HeaderPrefix:      `### `,
+				PropsDescription:  "Feel free to set these:",
+				PropsEmptyMessage: "There is nothing to set!",
+			}, &struct {
+				Host     string `url:"host"`
+				CoolMode bool   `key:"coolmode" optional:""`
+			}{})
+
+			expected := `
+### URL Fields
+
+*  __Host__ (**Required**)  
+  URL part: <code class="service-url">mock://<strong>host</strong>/</code>  
+### Query/Param Props
+
+Feel free to set these:
+*  __CoolMode__  
+  Default: *empty*  
+
+`[1:] // Remove initial newline
+
+			Expect(actual).To(Equal(expected))
+		})
+	})
+
 })
