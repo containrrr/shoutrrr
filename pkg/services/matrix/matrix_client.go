@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -26,11 +27,15 @@ func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client)
 		},
 	}
 
+	if c.logger == nil {
+		c.logger = util.DiscardLogger
+	}
+
 	if disableTLS {
 		c.apiURL.Scheme = c.apiURL.Scheme[:4]
 	}
 
-	logger.Printf("Using server: %v\n", c.apiURL.String())
+	c.logger.Printf("Using server: %v\n", c.apiURL.String())
 
 	return c
 }
