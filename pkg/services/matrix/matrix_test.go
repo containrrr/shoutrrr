@@ -77,6 +77,7 @@ var _ = Describe("the matrix service", func() {
 
 		When("not providing a logger", func() {
 			It("should not crash", func() {
+				setupMockResponders()
 				serviceURL := util.URLMust("matrix://user:pass@mockserver")
 				Expect(service.Initialize(serviceURL, nil)).To(Succeed())
 			})
