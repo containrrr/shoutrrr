@@ -3,6 +3,7 @@ package matrix
 import (
 	"fmt"
 	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/jarcoal/httpmock"
 	"net/url"
 
@@ -72,6 +73,13 @@ var _ = Describe("the matrix service", func() {
 
 		BeforeEach(func() {
 			httpmock.Activate()
+		})
+
+		When("not providing a logger", func() {
+			It("should not crash", func() {
+				serviceURL := util.URLMust("matrix://user:pass@mockserver")
+				Expect(service.Initialize(serviceURL, nil)).To(Succeed())
+			})
 		})
 
 		When("sending a message", func() {
