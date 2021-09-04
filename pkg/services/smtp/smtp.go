@@ -219,7 +219,7 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 		"Date":         time.Now().Format(time.RFC1123Z),
 		"To":           toAddress,
 		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
-		"MIME-version": "1.0;",
+		"MIME-version": "1.0",
 		"Content-Type": contentType,
 	}
 }
