@@ -47,8 +47,26 @@ var _ = Describe("the matrix service", func() {
 	})
 
 	Describe("creating configurations", func() {
-		When("given an url", func() {
+		When("given an url with title prop", func() {
+			It("should not throw an error", func() {
+				serviceURL := util.URLMust(`matrix://user:pass@mockserver?rooms=room1&title=Better%20Off%20Alone`)
+				Expect((&Config{}).SetURL(serviceURL)).To(Succeed())
+			})
+		})
 
+		When("given an url with the prop `room`", func() {
+			It("should treat is as an alias for `rooms`", func() {
+				serviceURL := util.URLMust(`matrix://user:pass@mockserver?room=room1`)
+				config := Config{}
+				Expect(config.SetURL(serviceURL)).To(Succeed())
+				Expect(config.Rooms).To(ContainElement("#room1"))
+			})
+		})
+		When("given an url with invalid props", func() {
+			It("should return an error", func() {
+				serviceURL := util.URLMust(`matrix://user:pass@mockserver?channels=room1,room2`)
+				Expect((&Config{}).SetURL(serviceURL)).To(HaveOccurred())
+			})
 		})
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
@@ -130,7 +148,7 @@ var _ = Describe("the matrix service", func() {
 		testutils.TestConfigSetInvalidQueryValue(&Config{}, "matrix://user:pass@host/?foo=bar")
 
 		testutils.TestConfigGetEnumsCount(&Config{}, 0)
-		testutils.TestConfigGetFieldsCount(&Config{}, 2)
+		testutils.TestConfigGetFieldsCount(&Config{}, 4)
 	})
 })
 
