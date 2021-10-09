@@ -15,7 +15,7 @@ type Config struct {
 	Password   string
 	DisableTLS bool `key:"disableTLS" default:"No"`
 	Host       string
-	Rooms      []string `key:"rooms" optional:""`
+	Rooms      []string `key:"rooms,room" optional:""`
 	Title      string   `key:"title" default:""`
 }
 
