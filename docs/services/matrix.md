@@ -4,6 +4,8 @@
 
 *matrix://__`user`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]][&disableTLS=yes]*
 
+--8<-- "docs/services/matrix/config.md"
+
 ## Authentication
 
 If no `user` is specified, the `password` is treated as the authentication token. This means that no matter what login
