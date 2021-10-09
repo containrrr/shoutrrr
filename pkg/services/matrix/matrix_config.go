@@ -16,6 +16,7 @@ type Config struct {
 	DisableTLS bool `key:"disableTLS" default:"No"`
 	Host       string
 	Rooms      []string `key:"rooms" optional:""`
+	Title      string   `key:"title" default:""`
 }
 
 // GetURL returns a URL representation of it's current field values
