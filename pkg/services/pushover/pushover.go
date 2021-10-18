@@ -51,7 +51,7 @@ func (service *Service) sendToDevice(device string, message string, config *Conf
 		data.Set("title", config.Title)
 	}
 
-	if config.Priority > 0 {
+	if config.Priority >= -2 && config.Priority <= 1 {
 		data.Set("priority", strconv.FormatInt(int64(config.Priority), 10))
 	}
 
