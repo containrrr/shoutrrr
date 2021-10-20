@@ -2,14 +2,15 @@ package pushover_test
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/pushover"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/services/pushover"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -41,7 +42,7 @@ var _ = Describe("the pushover service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envPushoverURL.String())
-			var err = service.Initialize(serviceURL, util.TestLogger())
+			var err = service.Initialize(serviceURL, test.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 			err = service.Send("this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())

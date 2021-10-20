@@ -1,7 +1,6 @@
 package ifttt
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
@@ -12,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -30,7 +29,7 @@ var (
 var _ = Describe("the ifttt package", func() {
 	BeforeSuite(func() {
 		envTestURL = os.Getenv("SHOUTRRR_IFTTT_URL")
-		logger = util.TestLogger()
+		logger = test.TestLogger()
 	})
 	BeforeEach(func() {
 		service = &Service{}
@@ -145,7 +144,7 @@ var _ = Describe("the ifttt package", func() {
 		It("should not error if the response code is 204", func() {
 			httpmock.Activate()
 			defer httpmock.DeactivateAndReset()
-			setupResponder("foo", "dummy", 204, "")
+			setupResponder("foo", "dummy", 204, "{}")
 
 			URL, _ := url.Parse("ifttt://dummy/?events=foo")
 
@@ -160,17 +159,12 @@ var _ = Describe("the ifttt package", func() {
 	When("creating a json payload", func() {
 		When("given config values \"a\", \"b\" and \"c\"", func() {
 			It("should return a valid jsonPayload string with values \"a\", \"b\" and \"c\"", func() {
-				bytes, err := createJSONToSend(&Config{
+				payload := createJSONToSend(&Config{
 					Value1:            "a",
 					Value2:            "b",
 					Value3:            "c",
 					UseMessageAsValue: 0,
 				}, "d", nil)
-				Expect(err).ToNot(HaveOccurred())
-
-				payload := jsonPayload{}
-				err = json.Unmarshal(bytes, &payload)
-				Expect(err).ToNot(HaveOccurred())
 
 				Expect(payload.Value1).To(Equal("a"))
 				Expect(payload.Value2).To(Equal("b"))
@@ -187,12 +181,7 @@ var _ = Describe("the ifttt package", func() {
 
 				for i := 1; i <= 3; i++ {
 					config.UseMessageAsValue = uint8(i)
-					bytes, err := createJSONToSend(config, "d", nil)
-					Expect(err).ToNot(HaveOccurred())
-
-					payload := jsonPayload{}
-					err = json.Unmarshal(bytes, &payload)
-					Expect(err).ToNot(HaveOccurred())
+					payload := createJSONToSend(config, "d", nil)
 
 					if i == 1 {
 						Expect(payload.Value1).To(Equal("d"))
@@ -207,7 +196,7 @@ var _ = Describe("the ifttt package", func() {
 		})
 		When("given a param overrides for value1, value2 and value3", func() {
 			It("should return a jsonPayload string with value1, value2 and value3 overridden", func() {
-				bytes, err := createJSONToSend(&Config{
+				payload := createJSONToSend(&Config{
 					Value1:            "a",
 					Value2:            "b",
 					Value3:            "c",
@@ -217,11 +206,6 @@ var _ = Describe("the ifttt package", func() {
 					"value2": "f",
 					"value3": "g",
 				}))
-				Expect(err).ToNot(HaveOccurred())
-
-				payload := &jsonPayload{}
-				err = json.Unmarshal(bytes, payload)
-				Expect(err).ToNot(HaveOccurred())
 
 				Expect(payload.Value1).To(Equal("e"))
 				Expect(payload.Value2).To(Equal("f"))

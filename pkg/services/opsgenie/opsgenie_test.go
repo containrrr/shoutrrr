@@ -47,8 +47,10 @@ var _ = Describe("the OpsGenie service", func() {
 			body, err := ioutil.ReadAll(r.Body)
 			Expect(err).To(BeNil())
 			defer r.Body.Close()
+			defer GinkgoRecover()
 
 			checkRequest(string(body), r.Header)
+			w.Write([]byte("{}"))
 		}
 		mockServer = httptest.NewTLSServer(http.HandlerFunc(httpHandler))
 
@@ -85,7 +87,9 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{"message":"hello world"}`))
+					Expect(body).To(Equal(`{
+"message": "hello world"
+}`))
 				}
 
 				err := service.Send("hello world", &types.Params{})
@@ -98,21 +102,52 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{"` +
-						`message":"An example alert message",` +
-						`"alias":"Life is too short for no alias",` +
-						`"description":"Every alert needs a description",` +
-						`"responders":[{"type":"team","id":"4513b7ea-3b91-438f-b7e4-e3e54af9147c"},{"type":"team","name":"NOC"},{"type":"user","username":"Donald"},{"type":"user","id":"696f0759-3b0f-4a15-b8c8-19d3dfca33f2"}],` +
-						`"visibleTo":[{"type":"team","name":"rocket"}],` +
-						`"actions":["action1","action2"],` +
-						`"tags":["tag1","tag2"],` +
-						`"details":{"key1":"value1","key2":"value2"},` +
-						`"entity":"An example entity",` +
-						`"source":"The source",` +
-						`"priority":"P1",` +
-						`"user":"Dracula",` +
-						`"note":"Here is a note"` +
-						`}`))
+					Expect(body).To(Equal(`{
+"message": "An example alert message",
+"alias": "Life is too short for no alias",
+"description": "Every alert needs a description",
+"responders": [
+{
+"type": "team",
+"id": "4513b7ea-3b91-438f-b7e4-e3e54af9147c"
+},
+{
+"type": "team",
+"name": "NOC"
+},
+{
+"type": "user",
+"username": "Donald"
+},
+{
+"type": "user",
+"id": "696f0759-3b0f-4a15-b8c8-19d3dfca33f2"
+}
+],
+"visibleTo": [
+{
+"type": "team",
+"name": "rocket"
+}
+],
+"actions": [
+"action1",
+"action2"
+],
+"tags": [
+"tag1",
+"tag2"
+],
+"details": {
+"key1": "value1",
+"key2": "value2"
+},
+"entity": "An example entity",
+"source": "The source",
+"priority": "P1",
+"user": "Dracula",
+"note": "Here is a note"
+}`))
 				}
 
 				err := service.Send("An example alert message", &types.Params{
@@ -150,21 +185,40 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{` +
-						`"message":"An example alert message",` +
-						`"alias":"query-alias",` +
-						`"description":"query-description",` +
-						`"responders":[{"type":"team","name":"query_team"}],` +
-						`"visibleTo":[{"type":"user","username":"query_user"}],` +
-						`"actions":["queryAction1","queryAction2"],` +
-						`"tags":["queryTag1","queryTag2"],` +
-						`"details":{"queryKey1":"queryValue1","queryKey2":"queryValue2"},` +
-						`"entity":"query-entity",` +
-						`"source":"query-source",` +
-						`"priority":"P2",` +
-						`"user":"query-user",` +
-						`"note":"query-note"` +
-						`}`))
+					Expect(body).To(Equal(`{
+"message": "An example alert message",
+"alias": "query-alias",
+"description": "query-description",
+"responders": [
+{
+"type": "team",
+"name": "query_team"
+}
+],
+"visibleTo": [
+{
+"type": "user",
+"username": "query_user"
+}
+],
+"actions": [
+"queryAction1",
+"queryAction2"
+],
+"tags": [
+"queryTag1",
+"queryTag2"
+],
+"details": {
+"queryKey1": "queryValue1",
+"queryKey2": "queryValue2"
+},
+"entity": "query-entity",
+"source": "query-source",
+"priority": "P2",
+"user": "query-user",
+"note": "query-note"
+}`))
 				}
 
 				err := service.Send("An example alert message", &types.Params{})
@@ -177,21 +231,52 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{"` +
-						`message":"An example alert message",` +
-						`"alias":"Life is too short for no alias",` +
-						`"description":"Every alert needs a description",` +
-						`"responders":[{"type":"team","id":"4513b7ea-3b91-438f-b7e4-e3e54af9147c"},{"type":"team","name":"NOC"},{"type":"user","username":"Donald"},{"type":"user","id":"696f0759-3b0f-4a15-b8c8-19d3dfca33f2"}],` +
-						`"visibleTo":[{"type":"team","name":"rocket"}],` +
-						`"actions":["action1","action2"],` +
-						`"tags":["tag1","tag2"],` +
-						`"details":{"key1":"value1","key2":"value2"},` +
-						`"entity":"An example entity",` +
-						`"source":"The source",` +
-						`"priority":"P1",` +
-						`"user":"Dracula",` +
-						`"note":"Here is a note"` +
-						`}`))
+					Expect(body).To(Equal(`{
+"message": "An example alert message",
+"alias": "Life is too short for no alias",
+"description": "Every alert needs a description",
+"responders": [
+{
+"type": "team",
+"id": "4513b7ea-3b91-438f-b7e4-e3e54af9147c"
+},
+{
+"type": "team",
+"name": "NOC"
+},
+{
+"type": "user",
+"username": "Donald"
+},
+{
+"type": "user",
+"id": "696f0759-3b0f-4a15-b8c8-19d3dfca33f2"
+}
+],
+"visibleTo": [
+{
+"type": "team",
+"name": "rocket"
+}
+],
+"actions": [
+"action1",
+"action2"
+],
+"tags": [
+"tag1",
+"tag2"
+],
+"details": {
+"key1": "value1",
+"key2": "value2"
+},
+"entity": "An example entity",
+"source": "The source",
+"priority": "P1",
+"user": "Dracula",
+"note": "Here is a note"
+}`))
 				}
 
 				err := service.Send("An example alert message", &types.Params{
@@ -222,21 +307,40 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{"` +
-						`message":"1",` +
-						`"alias":"1",` +
-						`"description":"1",` +
-						`"responders":[{"type":"team","name":"1"}],` +
-						`"visibleTo":[{"type":"team","name":"1"}],` +
-						`"actions":["action1","action2"],` +
-						`"tags":["tag1","tag2"],` +
-						`"details":{"key1":"value1","key2":"value2"},` +
-						`"entity":"1",` +
-						`"source":"1",` +
-						`"priority":"P1",` +
-						`"user":"1",` +
-						`"note":"1"` +
-						`}`))
+					Expect(body).To(Equal(`{
+"message": "1",
+"alias": "1",
+"description": "1",
+"responders": [
+{
+"type": "team",
+"name": "1"
+}
+],
+"visibleTo": [
+{
+"type": "team",
+"name": "1"
+}
+],
+"actions": [
+"action1",
+"action2"
+],
+"tags": [
+"tag1",
+"tag2"
+],
+"details": {
+"key1": "value1",
+"key2": "value2"
+},
+"entity": "1",
+"source": "1",
+"priority": "P1",
+"user": "1",
+"note": "1"
+}`))
 				}
 
 				err := service.Send("1", &types.Params{
@@ -258,21 +362,40 @@ var _ = Describe("the OpsGenie service", func() {
 				checkRequest = func(body string, header http.Header) {
 					Expect(header["Authorization"][0]).To(Equal("GenieKey " + mockAPIKey))
 					Expect(header["Content-Type"][0]).To(Equal("application/json"))
-					Expect(body).To(Equal(`{` +
-						`"message":"2",` +
-						`"alias":"query-alias",` +
-						`"description":"query-description",` +
-						`"responders":[{"type":"team","name":"query_team"}],` +
-						`"visibleTo":[{"type":"user","username":"query_user"}],` +
-						`"actions":["queryAction1","queryAction2"],` +
-						`"tags":["queryTag1","queryTag2"],` +
-						`"details":{"queryKey1":"queryValue1","queryKey2":"queryValue2"},` +
-						`"entity":"query-entity",` +
-						`"source":"query-source",` +
-						`"priority":"P2",` +
-						`"user":"query-user",` +
-						`"note":"query-note"` +
-						`}`))
+					Expect(body).To(Equal(`{
+"message": "2",
+"alias": "query-alias",
+"description": "query-description",
+"responders": [
+{
+"type": "team",
+"name": "query_team"
+}
+],
+"visibleTo": [
+{
+"type": "user",
+"username": "query_user"
+}
+],
+"actions": [
+"queryAction1",
+"queryAction2"
+],
+"tags": [
+"queryTag1",
+"queryTag2"
+],
+"details": {
+"queryKey1": "queryValue1",
+"queryKey2": "queryValue2"
+},
+"entity": "query-entity",
+"source": "query-source",
+"priority": "P2",
+"user": "query-user",
+"note": "query-note"
+}`))
 				}
 
 				err = service.Send("2", nil)

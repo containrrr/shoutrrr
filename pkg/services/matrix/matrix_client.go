@@ -1,15 +1,13 @@
 package matrix
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
 type client struct {
@@ -156,72 +154,12 @@ func (c *client) sendMessageToRoom(message string, roomID string) error {
 
 func (c *client) apiGet(path string, response interface{}) error {
 	c.apiURL.Path = path
-
-	var err error
-	var res *http.Response
-	res, err = http.Get(c.apiURL.String())
-	if err != nil {
-		return err
-	}
-
-	var body []byte
-	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
-
-	if res.StatusCode >= 400 {
-		resError := &apiResError{}
-		if err == nil {
-			if err = json.Unmarshal(body, resError); err == nil {
-				return resError
-			}
-		}
-
-		return fmt.Errorf("got HTTP %v", res.Status)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, response)
+	return jsonclient.Get(c.apiURL.String(), response)
 }
 
 func (c *client) apiPost(path string, request interface{}, response interface{}) error {
 	c.apiURL.Path = path
-
-	var err error
-	var body []byte
-
-	body, err = json.Marshal(request)
-	if err != nil {
-		return err
-	}
-
-	var res *http.Response
-	res, err = http.Post(c.apiURL.String(), contentType, bytes.NewReader(body))
-	if err != nil {
-		return err
-	}
-
-	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
-
-	if res.StatusCode >= 400 {
-		resError := &apiResError{}
-		if err == nil {
-			if err = json.Unmarshal(body, resError); err == nil {
-				return resError
-			}
-		}
-
-		return fmt.Errorf("got HTTP %v", res.Status)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, response)
+	return jsonclient.Post(c.apiURL.String(), request, response)
 }
 
 func (c *client) updateAccessToken() {

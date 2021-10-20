@@ -21,6 +21,11 @@ const (
 	topicMaxLength = 60    // characters
 )
 
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
+}
+
 // Send a notification message to Zulip
 func (service *Service) Send(message string, params *types.Params) error {
 	// Clone the config because we might modify stream and/or

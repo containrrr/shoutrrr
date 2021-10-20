@@ -3,7 +3,7 @@ package zulip_test
 import (
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	. "github.com/containrrr/shoutrrr/pkg/services/zulip"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
 
 	"net/url"
 	"os"
@@ -38,7 +38,7 @@ var _ = Describe("the zulip service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envZulipURL.String())
-			err := service.Initialize(serviceURL, util.TestLogger())
+			err := service.Initialize(serviceURL, test.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -75,7 +75,7 @@ var _ = Describe("the zulip service", func() {
 		It("should not return an error", func() {
 			zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar")
 			Expect(err).NotTo(HaveOccurred())
-			err = service.Initialize(zulipURL, util.TestLogger())
+			err = service.Initialize(zulipURL, test.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -154,7 +154,7 @@ var _ = Describe("the zulip service", func() {
 })
 
 func expectErrorMessageGivenURL(msg ErrorMessage, zulipURL *url.URL) {
-	err := service.Initialize(zulipURL, util.TestLogger())
+	err := service.Initialize(zulipURL, test.TestLogger())
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(Equal(string(msg)))
 }

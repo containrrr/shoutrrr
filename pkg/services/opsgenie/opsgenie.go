@@ -1,16 +1,13 @@
 package opsgenie
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
 const (
@@ -24,32 +21,19 @@ type Service struct {
 	pkr    format.PropKeyResolver
 }
 
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
+}
+
 func (service *Service) sendAlert(url string, apiKey string, payload AlertPayload) error {
-	jsonBody, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
+	client := jsonclient.NewClient()
+	client.Headers().Add("Authorization", "GenieKey "+apiKey)
+	response := &map[string]interface{}{}
 
-	jsonBuffer := bytes.NewBuffer(jsonBody)
-
-	req, err := http.NewRequest("POST", url, jsonBuffer)
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Authorization", "GenieKey "+apiKey)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
+	if err := client.Post(url, payload, response); err != nil {
+		service.Logf("Got response: %v", response)
 		return fmt.Errorf("failed to send notification to OpsGenie: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("OpsGenie notification returned %d HTTP status code. Cannot read body: %s", resp.StatusCode, err)
-		}
-		return fmt.Errorf("OpsGenie notification returned %d HTTP status code: %s", resp.StatusCode, body)
 	}
 
 	return nil

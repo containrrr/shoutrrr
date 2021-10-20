@@ -2,10 +2,11 @@ package slack_test
 
 import (
 	"errors"
-	. "github.com/containrrr/shoutrrr/pkg/services/slack"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 	"log"
+
+	. "github.com/containrrr/shoutrrr/pkg/services/slack"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
+	"github.com/jarcoal/httpmock"
 
 	"net/url"
 	"os"
@@ -43,7 +44,7 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			err := service.Initialize(serviceURL, util.TestLogger())
+			err := service.Initialize(serviceURL, test.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 
 			err = service.Send("This is an integration test message", nil)
@@ -256,7 +257,7 @@ func tokenMust(rawToken string) *Token {
 }
 
 func expectErrorMessageGivenURL(expected error, rawURL string) {
-	err := service.Initialize(urlMust(rawURL), util.TestLogger())
+	err := service.Initialize(urlMust(rawURL), test.TestLogger())
 	ExpectWithOffset(1, err).To(HaveOccurred())
 	ExpectWithOffset(1, err).To(Equal(expected))
 }

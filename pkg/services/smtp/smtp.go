@@ -3,13 +3,14 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
 	"math/rand"
 	"net"
 	"net/smtp"
 	"net/url"
 	"time"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -29,6 +30,11 @@ const (
 	contentPlain     = "text/plain; charset=\"UTF-8\""
 	contentMultipart = "multipart/alternative; boundary=%s"
 )
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
+}
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {

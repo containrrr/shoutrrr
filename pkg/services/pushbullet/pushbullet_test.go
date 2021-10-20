@@ -2,15 +2,17 @@ package pushbullet_test
 
 import (
 	"errors"
+
 	. "github.com/containrrr/shoutrrr/pkg/services/pushbullet"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
 	"github.com/jarcoal/httpmock"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/url"
 	"os"
 	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestPushbullet(t *testing.T) {
@@ -38,7 +40,7 @@ var _ = Describe("the pushbullet service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envPushbulletURL.String())
-			err := service.Initialize(serviceURL, util.TestLogger())
+			err := service.Initialize(serviceURL, test.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 			err = service.Send("This is an integration test message", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -80,7 +82,7 @@ var _ = Describe("the pushbullet service", func() {
 				testURL := "pushbullet://tokentokentokentokentokentokentoke/device?title=Great+News"
 
 				config := &Config{}
-				err := config.SetURL(util.URLMust(testURL))
+				err := config.SetURL(test.URLMust(testURL))
 				Expect(err).NotTo(HaveOccurred(), "verifying")
 
 				outputURL := config.GetURL()
@@ -148,5 +150,5 @@ var _ = Describe("the pushbullet service", func() {
 func initService(rawURL string) error {
 	serviceURL, err := url.Parse(rawURL)
 	ExpectWithOffset(1, err).NotTo(HaveOccurred())
-	return service.Initialize(serviceURL, util.TestLogger())
+	return service.Initialize(serviceURL, test.TestLogger())
 }

@@ -7,4 +7,5 @@ type Client interface {
 	Post(url string, request interface{}, response interface{}) error
 	Headers() http.Header
 	ErrorResponse(err error, response interface{}) bool
+	HttpClient() interface{}
 }

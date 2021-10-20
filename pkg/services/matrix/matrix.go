@@ -2,10 +2,12 @@ package matrix
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Scheme is the identifying part of this service's configuration URL
@@ -17,6 +19,11 @@ type Service struct {
 	config *Config
 	client *client
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service

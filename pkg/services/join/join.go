@@ -2,10 +2,11 @@ package join
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -21,6 +22,11 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Send a notification message to Pushover
@@ -68,17 +74,10 @@ func (service *Service) sendToDevices(devices string, message string, title stri
 
 	apiURL.RawQuery = data.Encode()
 
-	res, err := http.Post(
-		apiURL.String(),
-		contentType,
-		nil)
+	err = jsonclient.Post(apiURL.String(), nil, nil)
 
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to join devices %q, response status %q", devices, res.Status)
+	if err = jsonclient.Post(apiURL.String(), nil, nil); err != nil {
+		return fmt.Errorf("failed to send notification to join devices %q: %v", devices, err)
 	}
 
 	return nil

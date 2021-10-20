@@ -2,11 +2,12 @@ package pushover
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util/webclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -22,6 +23,11 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Send a notification message to Pushover
@@ -41,11 +47,12 @@ func (service *Service) Send(message string, params *types.Params) error {
 
 func (service *Service) sendToDevice(device string, message string, config *Config) error {
 
-	data := url.Values{}
-	data.Set("device", device)
-	data.Set("user", config.User)
-	data.Set("token", config.Token)
-	data.Set("message", message)
+	data := url.Values{
+		"device":  []string{device},
+		"user":    []string{config.User},
+		"token":   []string{config.Token},
+		"message": []string{message},
+	}
 
 	if len(config.Title) > 0 {
 		data.Set("title", config.Title)
@@ -55,17 +62,10 @@ func (service *Service) sendToDevice(device string, message string, config *Conf
 		data.Set("priority", strconv.FormatInt(int64(config.Priority), 10))
 	}
 
-	res, err := http.Post(
-		hookURL,
-		contentType,
-		strings.NewReader(data.Encode()))
-
-	if err != nil {
+	response := new(string)
+	if err := webclient.PostUrl(hookURL, data, response); err != nil {
+		service.Logf("Response: %q", *response)
 		return err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send notification to pushover device %q, response status %q", device, res.Status)
 	}
 
 	return nil

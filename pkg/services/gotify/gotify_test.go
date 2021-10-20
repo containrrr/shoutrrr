@@ -2,10 +2,12 @@ package gotify
 
 import (
 	"errors"
-	"github.com/jarcoal/httpmock"
 	"log"
+	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -119,7 +121,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.Client.HttpClient().(*http.Client))
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
@@ -131,7 +133,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not panic if an error occurs when sending the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.Client.HttpClient().(*http.Client))
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"

@@ -1,11 +1,11 @@
 package ifttt
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -20,6 +20,11 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -42,16 +47,10 @@ func (service *Service) Send(message string, params *types.Params) error {
 	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
 		return err
 	}
-
-	payload, err := createJSONToSend(config, message, params)
-	fmt.Printf("%+v", payload)
-	if err != nil {
-		return err
-	}
+	request := createJSONToSend(config, message, params)
 	for _, event := range config.Events {
 		apiURL := service.createAPIURLForEvent(event)
-		err := doSend(payload, apiURL)
-		if err != nil {
+		if err := jsonclient.Post(apiURL, request, nil); err != nil {
 			return fmt.Errorf("failed to send IFTTT event \"%s\": %s", event, err)
 		}
 	}
@@ -65,15 +64,4 @@ func (service *Service) createAPIURLForEvent(event string) string {
 		event,
 		service.config.WebHookID,
 	)
-}
-
-func doSend(payload []byte, postURL string) error {
-	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-	if res.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("got response status code %s", res.Status)
-	}
-	return nil
 }

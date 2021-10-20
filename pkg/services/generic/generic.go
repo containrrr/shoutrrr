@@ -3,13 +3,13 @@ package generic
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"net/url"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"io"
-	"net/http"
-	"net/url"
-	"strings"
 )
 
 // Service providing a generic notification service
@@ -17,6 +17,11 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Send a notification message to a generic webhook endpoint
@@ -55,21 +60,6 @@ func (*Service) GetConfigURLFromCustom(customURL *url.URL) (serviceURL *url.URL,
 		return nil, err
 	}
 	return config.getURL(&pkr), nil
-}
-
-func (service *Service) doSend(config *Config, message string, params *types.Params) error {
-	postURL := config.WebhookURL().String()
-	payload, err := service.getPayload(config.Template, message, params)
-	if err != nil {
-		return err
-	}
-
-	res, err := http.Post(postURL, config.ContentType, payload)
-	if err == nil && res.StatusCode != http.StatusOK {
-		err = fmt.Errorf("server returned response status code %s", res.Status)
-	}
-
-	return err
 }
 
 func (service *Service) getPayload(template string, message string, params *types.Params) (io.Reader, error) {

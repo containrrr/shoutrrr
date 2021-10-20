@@ -3,7 +3,6 @@ package router
 import (
 	"fmt"
 	"net/url"
-	"reflect"
 	"strings"
 	"time"
 
@@ -12,10 +11,11 @@ import (
 
 // ServiceRouter is responsible for routing a message to a specific notification service using the notification URL
 type ServiceRouter struct {
-	logger   t.StdLogger
-	services []t.Service
-	queue    []string
-	Timeout  time.Duration
+	logger       t.StdLogger
+	services     []t.Service
+	serviceNames []string
+	queue        []string
+	Timeout      time.Duration
 }
 
 // New creates a new service router using the specified logger and service URLs
@@ -35,9 +35,10 @@ func New(logger t.StdLogger, serviceURLs ...string) (*ServiceRouter, error) {
 
 // AddService initializes the specified service from its URL, and adds it if no errors occur
 func (router *ServiceRouter) AddService(serviceURL string) error {
-	service, err := router.initService(serviceURL)
+	service, scheme, err := router.initService(serviceURL)
 	if err == nil {
 		router.services = append(router.services, service)
+		router.serviceNames = append(router.serviceNames, scheme)
 	}
 	return err
 }
@@ -91,8 +92,8 @@ func (router *ServiceRouter) SendAsync(message string, params *t.Params) chan er
 	if params == nil {
 		params = &t.Params{}
 	}
-	for _, service := range router.services {
-		go sendToService(service, proxy, router.Timeout, message, *params)
+	for i, service := range router.services {
+		go sendToService(service, router.serviceNames[i], proxy, router.Timeout, message, *params)
 	}
 
 	go func() {
@@ -105,12 +106,8 @@ func (router *ServiceRouter) SendAsync(message string, params *t.Params) chan er
 	return errors
 }
 
-func sendToService(service t.Service, results chan error, timeout time.Duration, message string, params t.Params) {
+func sendToService(service t.Service, serviceName string, results chan error, timeout time.Duration, message string, params t.Params) {
 	result := make(chan error)
-
-	// TODO: There really ought to be a better way to name the services
-	pkg := reflect.TypeOf(service).Elem().PkgPath()
-	serviceName := pkg[strings.LastIndex(pkg, "/")+1:]
 
 	go func() { result <- service.Send(message, &params) }()
 
@@ -173,37 +170,37 @@ func (router *ServiceRouter) Route(rawURL string, message string) error {
 	return service.Send(message, nil)
 }
 
-func (router *ServiceRouter) initService(rawURL string) (t.Service, error) {
+func (router *ServiceRouter) initService(rawURL string) (t.Service, string, error) {
 
 	scheme, configURL, err := router.ExtractServiceName(rawURL)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	service, err := newService(scheme)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if configURL.Scheme != scheme {
 		router.log("Got custom URL:", configURL.String())
 		customURLService, ok := service.(t.CustomURLService)
 		if !ok {
-			return nil, fmt.Errorf("custom URLs are not supported by '%s' service", scheme)
+			return nil, "", fmt.Errorf("custom URLs are not supported by '%s' service", scheme)
 		}
 		configURL, err = customURLService.GetConfigURLFromCustom(configURL)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		router.log("Converted service URL:", configURL.String())
 	}
 
 	err = service.Initialize(configURL, router.logger)
 	if err != nil {
-		return service, err
+		return service, scheme, err
 	}
 
-	return service, nil
+	return service, scheme, nil
 }
 
 // NewService returns a new uninitialized service instance
@@ -235,7 +232,7 @@ func (router *ServiceRouter) ListServices() []string {
 
 // Locate returns the service implementation that corresponds to the given service URL
 func (router *ServiceRouter) Locate(rawURL string) (t.Service, error) {
-	service, err := router.initService(rawURL)
+	service, _, err := router.initService(rawURL)
 	return service, err
 }
 

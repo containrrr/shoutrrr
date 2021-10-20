@@ -1,9 +1,10 @@
 package googlechat
 
 import (
-	"github.com/jarcoal/httpmock"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -62,7 +63,7 @@ var _ = Describe("Google Chat Service", func() {
 			err = service.Initialize(serviceURL, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			httpmock.RegisterResponder("POST", "https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz", httpmock.NewStringResponder(200, ``))
+			httpmock.RegisterResponder("POST", "https://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz", httpmock.NewStringResponder(200, `{}`))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())

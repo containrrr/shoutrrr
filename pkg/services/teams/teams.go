@@ -21,6 +21,11 @@ type Service struct {
 	pkr    format.PropKeyResolver
 }
 
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
+}
+
 // Send a notification message to Microsoft Teams
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config

@@ -2,8 +2,9 @@ package telegram
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -19,6 +20,11 @@ type Service struct {
 	standard.Standard
 	config *Config
 	pkr    format.PropKeyResolver
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Send notification to Telegram

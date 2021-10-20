@@ -13,7 +13,7 @@ import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -35,7 +35,7 @@ var _ = Describe("the SMTP service", func() {
 	BeforeSuite(func() {
 
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
-		logger = util.TestLogger()
+		logger = test.TestLogger()
 	})
 	BeforeEach(func() {
 		service = &Service{}

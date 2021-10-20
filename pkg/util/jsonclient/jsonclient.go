@@ -40,6 +40,10 @@ func NewClient() Client {
 	}
 }
 
+func (c *client) HttpClient() interface{} {
+	return c.httpClient
+}
+
 // Headers return the default headers for requests
 func (c *client) Headers() http.Header {
 	return c.headers
@@ -60,9 +64,11 @@ func (c *client) Post(url string, request interface{}, response interface{}) err
 	var err error
 	var body []byte
 
-	body, err = json.MarshalIndent(request, "", c.indent)
-	if err != nil {
-		return fmt.Errorf("error creating payload: %v", err)
+	if request != nil {
+		body, err = json.MarshalIndent(request, "", c.indent)
+		if err != nil {
+			return fmt.Errorf("error creating payload: %v", err)
+		}
 	}
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
@@ -100,7 +106,7 @@ func parseResponse(res *http.Response, response interface{}) error {
 		err = fmt.Errorf("got HTTP %v", res.Status)
 	}
 
-	if err == nil {
+	if err == nil && response != nil {
 		err = json.Unmarshal(body, response)
 	}
 

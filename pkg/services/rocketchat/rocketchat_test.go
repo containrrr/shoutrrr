@@ -1,13 +1,14 @@
 package rocketchat
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/url"
 	"os"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/test"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var (
@@ -31,7 +32,7 @@ var _ = Describe("the rocketchat service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envRocketchatURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
+			service.Initialize(serviceURL, test.TestLogger())
 			err := service.Send(
 				"this is an integration test",
 				nil,
@@ -136,9 +137,8 @@ var _ = Describe("the rocketchat service", func() {
 				Expect(generatedURL).To(Equal("https://rocketchat.my-domain.com/hooks/tokenA/tokenB"))
 			})
 			It("should generate the correct JSON body", func() {
-				json, err := CreateJSONPayload(config, "this is a message", nil)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(string(json)).To(Equal("{\"text\":\"this is a message\"}"))
+				json := CreateJSONPayload(config, "this is a message", nil)
+				Expect(json.Text).To(Equal("this is a message"))
 			})
 		})
 		When("sending a message with pre set username and channel", func() {
@@ -146,9 +146,10 @@ var _ = Describe("the rocketchat service", func() {
 			config := &Config{}
 			config.SetURL(rocketchatURL)
 			It("should generate the correct JSON body", func() {
-				json, err := CreateJSONPayload(config, "this is a message", nil)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(string(json)).To(Equal("{\"text\":\"this is a message\",\"username\":\"testUserName\",\"channel\":\"#testChannel\"}"))
+				json := CreateJSONPayload(config, "this is a message", nil)
+				Expect(json.Text).To(Equal("this is a message"))
+				Expect(json.UserName).To(Equal("testUserName"))
+				Expect(json.Channel).To(Equal("#testChannel"))
 			})
 		})
 		When("sending a message with pre set username and channel but overwriting them with parameters", func() {
@@ -157,9 +158,9 @@ var _ = Describe("the rocketchat service", func() {
 			config.SetURL(rocketchatURL)
 			It("should generate the correct JSON body", func() {
 				params := (*types.Params)(&map[string]string{"username": "overwriteUserName", "channel": "overwriteChannel"})
-				json, err := CreateJSONPayload(config, "this is a message", params)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(string(json)).To(Equal("{\"text\":\"this is a message\",\"username\":\"overwriteUserName\",\"channel\":\"overwriteChannel\"}"))
+				json := CreateJSONPayload(config, "this is a message", params)
+				Expect(json.UserName).To(Equal("overwriteUserName"))
+				Expect(json.Channel).To(Equal("overwriteChannel"))
 			})
 		})
 		When("sending to an URL which contains HOST:PORT", func() {
@@ -173,15 +174,15 @@ var _ = Describe("the rocketchat service", func() {
 		})
 		When("sending to an URL with badly syntaxed #channel name", func() {
 			It("should properly parse the Channel", func() {
-                rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
-			    config := &Config{}
-  			    config.SetURL(rocketchatURL)
+				rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
+				config := &Config{}
+				config.SetURL(rocketchatURL)
 				Expect(config.Channel).To(ContainSubstring("###########################testChannel"))
 			})
 			It("should properly parse the Channel", func() {
-			    rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
-			    config := &Config{}
-  			    config.SetURL(rocketchatURL)
+				rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
+				config := &Config{}
+				config.SetURL(rocketchatURL)
 				Expect(config.Channel).To(ContainSubstring("#testChannel"))
 			})
 		})

@@ -1,8 +1,6 @@
 package mattermost
 
 import (
-	"encoding/json"
-
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
@@ -14,7 +12,7 @@ type JSON struct {
 }
 
 // CreateJSONPayload for usage with the mattermost service
-func CreateJSONPayload(config *Config, message string, params *types.Params) ([]byte, error) {
+func CreateJSONPayload(config *Config, message string, params *types.Params) *JSON {
 	payload := JSON{
 		Text:     message,
 		UserName: config.UserName,
@@ -29,5 +27,5 @@ func CreateJSONPayload(config *Config, message string, params *types.Params) ([]
 			payload.Channel = value
 		}
 	}
-	return json.Marshal(payload)
+	return &payload
 }

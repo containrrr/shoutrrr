@@ -1,20 +1,23 @@
 package googlechat
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
 // Service providing Google Chat as a notification service.
 type Service struct {
 	standard.Standard
 	config *Config
+}
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service.
@@ -31,25 +34,14 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 func (service *Service) Send(message string, _ *types.Params) error {
 	config := service.config
 
-	jsonBody, err := json.Marshal(JSON{
+	request := payload{
 		Text: message,
-	})
-	if err != nil {
-		return err
 	}
 
 	postURL := getAPIURL(config)
 
-	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := http.Post(postURL.String(), "application/json", jsonBuffer)
-	if err != nil {
+	if err := jsonclient.Post(postURL.String(), request, nil); err != nil {
 		return fmt.Errorf("failed to send notification to Google Chat: %s", err)
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Google Chat API notification returned %d HTTP status code", resp.StatusCode)
 	}
 
 	return nil

@@ -10,4 +10,5 @@ type Service interface {
 	Templater
 	Initialize(serviceURL *url.URL, logger StdLogger) error
 	SetLogger(logger StdLogger)
+	EmptyConfig() ServiceConfig
 }

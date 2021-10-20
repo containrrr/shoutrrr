@@ -1,15 +1,14 @@
 package discord
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"net/http"
-	"net/url"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
 // Service providing Discord as a notification service
@@ -30,6 +29,11 @@ const (
 	// Only search this many runes for a good split position
 	maxSearchRunes = 100
 )
+
+// EmptyConfig returns an empty types.ServiceConfig for the service
+func (service *Service) EmptyConfig() types.ServiceConfig {
+	return &Config{}
+}
 
 // Send a notification message to discord
 func (service *Service) Send(message string, params *types.Params) error {
@@ -65,14 +69,8 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 	payload.Username = config.Username
 	payload.AvatarURL = config.Avatar
 
-	var payloadBytes []byte
-	payloadBytes, err = json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-
 	postURL := CreateAPIURLFromConfig(&config)
-	return doSend(payloadBytes, postURL)
+	return doSend(payload, postURL)
 }
 
 // CreateItemsFromPlain creates a set of MessageItems that is compatible with Discords webhook payload
@@ -110,18 +108,10 @@ func CreateAPIURLFromConfig(config *Config) string {
 		config.Token)
 }
 
-func doSend(payload []byte, postURL string) error {
-	res, err := http.Post(postURL, "application/json", bytes.NewBuffer(payload))
+type payloadResponse struct{}
 
-	if res == nil && err == nil {
-		err = fmt.Errorf("unknown error")
-	}
-
-	if err == nil && res.StatusCode != http.StatusNoContent {
-		err = fmt.Errorf("response status code %s", res.Status)
-	}
-
-	if err != nil {
+func doSend(payload interface{}, postURL string) error {
+	if err := jsonclient.Post(postURL, payload, nil); err != nil {
 		return fmt.Errorf("failed to send discord notification: %v", err)
 	}
 

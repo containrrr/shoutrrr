@@ -3,33 +3,17 @@ package format
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"strconv"
 	"strings"
-	"unsafe"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // GetServiceConfig returns the inner config of a service
 func GetServiceConfig(service types.Service) types.ServiceConfig {
-	serviceValue := r.Indirect(r.ValueOf(service))
-	configField, _ := serviceValue.Type().FieldByName("config")
-	configRef := serviceValue.FieldByIndex(configField.Index)
-
-	var ourRef r.Value
-	if configRef.IsNil() {
-		configType := configField.Type
-		if configType.Kind() == r.Ptr {
-			configType = configType.Elem()
-		}
-		ourRef = r.New(configType)
-	} else {
-		ourRef = r.NewAt(configRef.Type(), unsafe.Pointer(configRef.UnsafeAddr())).Elem()
-	}
-
-	//
-	return ourRef.Interface().(types.ServiceConfig)
+	return service.EmptyConfig()
 }
 
 // ColorFormatTree returns a color highlighted string representation of a node tree

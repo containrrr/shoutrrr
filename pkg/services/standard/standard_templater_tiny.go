@@ -1,45 +1,37 @@
-//go:build !tinygo
-// +build !tinygo
+//go:build tinygo
+// +build tinygo
 
 package standard
 
 import (
-	"io/ioutil"
-	"text/template"
+	"errors"
+	"io"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
+var NotSupportedError = errors.New("not supported in TinyGO")
+
 // Templater is the standard implementation of ApplyTemplate using the "text/template" library
-type Templater struct {
-	templates map[string]*template.Template
+type Templater struct{}
+
+type FakeTemplate struct{}
+
+func (*FakeTemplate) Execute(wr io.Writer, data interface{}) error {
+	return NotSupportedError
 }
 
 // GetTemplate attempts to retrieve the template identified with id
 func (templater *Templater) GetTemplate(id string) (template types.StdTemplate, found bool) {
-	tpl, found := templater.templates[id]
-	return tpl, found
+	return &FakeTemplate{}, false
 }
 
 // SetTemplateString creates a new template from the body and assigning it the id
 func (templater *Templater) SetTemplateString(id string, body string) error {
-	tpl, err := template.New("").Parse(body)
-	if err != nil {
-		return err
-	}
-	if templater.templates == nil {
-		templater.templates = make(map[string]*template.Template, 1)
-	}
-
-	templater.templates[id] = tpl
-	return nil
+	return NotSupportedError
 }
 
 // SetTemplateFile creates a new template from the file and assigning it the id
 func (templater *Templater) SetTemplateFile(id string, file string) error {
-	bytes, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-	return templater.SetTemplateString(id, string(bytes))
+	return NotSupportedError
 }
