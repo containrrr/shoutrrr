@@ -15,7 +15,7 @@
         
       
       <link rel="icon" href="../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4+insiders-3.1.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6+insiders-3.2.2">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2b73a8c3.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.b941530a.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.1d832a92.min.css">
@@ -508,6 +508,8 @@ You're not viewing the latest version.
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -727,6 +729,8 @@ You're not viewing the latest version.
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -809,7 +813,7 @@ Where <code>example</code> is your organization short name</p>
 </div>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
-<p>teams://<strong><code>group</code></strong>@<strong><code>tenant</code></strong>/<strong><code>altId</code></strong>/<strong><code>groupOwner</code></strong>?host=example.webhook.office.com</p>
+<p>teams://<strong><code>group</code></strong>@<strong><code>tenant</code></strong>/<strong><code>altId</code></strong>/<strong><code>groupOwner</code></strong>?host=<strong><code>organization</code></strong>.webhook.office.com</p>
 </div>
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
@@ -848,12 +852,10 @@ Where <code>example</code> is your organization short name</p>
 Instructions on how to do this can be found in <a href="https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using#setting-up-a-custom-incoming-webhook">this guide</a></p>
 <h2 id="extracting_the_token">Extracting the token<a class="headerlink" href="#extracting_the_token" title="Permanent link">&para;</a></h2>
 <p>The token is extracted from your webhook URL:</p>
-<div class="highlight"><pre><span></span><code>  https://outlook.office.com/webhook/{tokenA}/IncomingWebhook/{tokenB}/{tokenC}
-</code></pre></div>
+<pre><code>https://<b>&lt;organization&gt;</b>.webhook.office.com/webhookb2/<b>&lt;group&gt;</b>@<b>&lt;tenant&gt;</b>/IncomingWebhook/<b>&lt;altId&gt;</b>/<b>&lt;groupOwner&gt;</b></code></pre>
                 
-                  
 
-                
+
                 
               
               
@@ -926,7 +928,7 @@ Instructions on how to do this can be found in <a href="https://docs.microsoft.c
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.d5944110.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.4b1ed6f7.min.js"></script>
+      <script src="../../assets/javascripts/bundle.e1f47d4a.min.js"></script>
       
     
   </body>
