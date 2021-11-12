@@ -10,7 +10,7 @@
 ## URL Format
 
 !!! info ""
-    teams://__`group`__@__`tenant`__/__`altId`__/__`groupOwner`__?host=example.webhook.office.com
+    teams://__`group`__@__`tenant`__/__`altId`__/__`groupOwner`__?host=__`organization`__.webhook.office.com
 
 --8<-- "docs/services/teams/config.md"
 
@@ -23,6 +23,4 @@ Instructions on how to do this can be found in [this guide](https://docs.microso
 
 The token is extracted from your webhook URL:
 
-```
-  https://outlook.office.com/webhook/{tokenA}/IncomingWebhook/{tokenB}/{tokenC}
-```
+<pre><code>https://<b>&lt;organization&gt;</b>.webhook.office.com/webhookb2/<b>&lt;group&gt;</b>@<b>&lt;tenant&gt;</b>/IncomingWebhook/<b>&lt;altId&gt;</b>/<b>&lt;groupOwner&gt;</b></code></pre>
