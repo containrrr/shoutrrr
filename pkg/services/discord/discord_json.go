@@ -31,19 +31,15 @@ type embedFooter struct {
 }
 
 // CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
-func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint, omitted int) (WebhookPayload, error) {
+func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint) (WebhookPayload, error) {
 
 	if len(items) < 1 {
 		return WebhookPayload{}, fmt.Errorf("message is empty")
 	}
 
-	metaCount := 1
-	if omitted < 1 && len(title) < 1 {
-		metaCount = 0
-	}
 	itemCount := util.Min(9, len(items))
 
-	embeds := make([]embedItem, metaCount, itemCount+metaCount)
+	embeds := make([]embedItem, 0, itemCount)
 
 	for _, item := range items {
 
@@ -73,12 +69,6 @@ func CreatePayloadFromItems(items []types.MessageItem, title string, colors [typ
 	// This should not happen, but it's better to leave the index check before dereferencing the array
 	if len(embeds) > 0 {
 		embeds[0].Title = title
-
-		if omitted > 0 {
-			embeds[0].Footer = &embedFooter{
-				Text: fmt.Sprintf("... (%v character(s) were omitted)", omitted),
-			}
-		}
 	}
 
 	return WebhookPayload{

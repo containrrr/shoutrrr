@@ -119,17 +119,19 @@ var _ = Describe("the discord service", func() {
 		When("given a blank message", func() {
 			When("split lines is enabled", func() {
 				It("should return an error", func() {
-					items, omitted := CreateItemsFromPlain("", true)
+					// batches := CreateItemsFromPlain("", true)
+					items := []types.MessageItem{}
 					Expect(items).To(BeEmpty())
-					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					_, err := CreatePayloadFromItems(items, "title", dummyColors)
 					Expect(err).To(HaveOccurred())
 				})
 			})
 			When("split lines is disabled", func() {
 				It("should return an error", func() {
-					items, omitted := CreateItemsFromPlain("", false)
+					batches := CreateItemsFromPlain("", false)
+					items := batches[0]
 					Expect(items).To(BeEmpty())
-					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					_, err := CreatePayloadFromItems(items, "title", dummyColors)
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -140,24 +142,20 @@ var _ = Describe("the discord service", func() {
 				payload, err := buildPayloadFromHundreds(42, false, "Title", dummyColors)
 				Expect(err).ToNot(HaveOccurred())
 
-				meta := payload.Embeds[0]
-				items := payload.Embeds[1:]
+				items := payload.Embeds
 
 				Expect(items).To(HaveLen(3))
 
 				Expect(items[0].Content).To(HaveLen(1994))
 				Expect(items[1].Content).To(HaveLen(1999))
 				Expect(items[2].Content).To(HaveLen(205))
-
-				Expect(meta.Footer).To(BeNil())
 			})
 			It("omit characters above total max", func() {
 
 				payload, err := buildPayloadFromHundreds(62, false, "", dummyColors)
 				Expect(err).ToNot(HaveOccurred())
 
-				meta := payload.Embeds[0]
-				items := payload.Embeds[1:]
+				items := payload.Embeds
 
 				Expect(items).To(HaveLen(4))
 				Expect(items[0].Content).To(HaveLen(1994))
@@ -165,7 +163,7 @@ var _ = Describe("the discord service", func() {
 				Expect(len(items[2].Content)).To(Equal(1999))
 				Expect(len(items[3].Content)).To(Equal(5))
 
-				Expect(meta.Footer.Text).To(ContainSubstring("200"))
+				// Expect(meta.Footer.Text).To(ContainSubstring("200"))
 			})
 			When("no title is supplied and content fits", func() {
 				It("should return a payload without a meta chunk", func() {
@@ -174,14 +172,6 @@ var _ = Describe("the discord service", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(payload.Embeds[0].Footer).To(BeNil())
 					Expect(payload.Embeds[0].Title).To(BeEmpty())
-				})
-			})
-			When("no title is supplied but content was omitted", func() {
-				It("should return a payload with a meta chunk", func() {
-
-					payload, err := buildPayloadFromHundreds(62, false, "", dummyColors)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(payload.Embeds[0].Footer).ToNot(BeNil())
 				})
 			})
 			When("title is supplied, but content fits", func() {
@@ -202,15 +192,14 @@ var _ = Describe("the discord service", func() {
 						Level:     types.Warning,
 					},
 				}
-				payload, err := CreatePayloadFromItems(items, "Title", dummyColors, 0)
+				payload, err := CreatePayloadFromItems(items, "Title", dummyColors)
 				Expect(err).ToNot(HaveOccurred())
 
-				meta := payload.Embeds[0]
-				item := payload.Embeds[1]
+				item := payload.Embeds[0]
 
-				Expect(payload.Embeds).To(HaveLen(2))
+				Expect(payload.Embeds).To(HaveLen(1))
 				Expect(item.Footer.Text).To(Equal(types.Warning.String()))
-				Expect(meta.Title).To(Equal("Title"))
+				Expect(item.Title).To(Equal("Title"))
 				Expect(item.Color).To(Equal(dummyColors[types.Warning]))
 			})
 		})
@@ -267,10 +256,10 @@ func buildPayloadFromHundreds(hundreds int, split bool, title string, colors [ty
 		builder.WriteString(hundredChars)
 	}
 
-	items, omitted := CreateItemsFromPlain(builder.String(), split)
-	println("Items:", len(items), "Omitted:", omitted)
+	batches := CreateItemsFromPlain(builder.String(), split)
+	items := batches[0]
 
-	return CreatePayloadFromItems(items, title, colors, omitted)
+	return CreatePayloadFromItems(items, title, colors)
 }
 
 func setupResponder(config *Config, code int, body string) {
