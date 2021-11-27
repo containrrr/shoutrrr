@@ -1,15 +1,11 @@
 package slack
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -17,6 +13,7 @@ import (
 // Service sends notifications to a pre-configured channel or user
 type Service struct {
 	standard.Standard
+	webclient.ClientService
 	config *Config
 	pkr    format.PropKeyResolver
 }
@@ -55,16 +52,25 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
 
-	return service.config.setURL(&service.pkr, configURL)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+		return err
+	}
+
+	client := service.WebClient()
+	if service.config.Token.IsAPIToken() {
+		client.Headers().Set("Authorization", service.config.Token.Authorization())
+	} else {
+		client.SetParser(parseWebhookResponse)
+	}
+
+	return nil
 
 }
 
 func (service *Service) sendAPI(config *Config, payload interface{}) error {
 	response := APIResponse{}
-	jsonClient := jsonclient.NewClient()
-	jsonClient.Headers().Set("Authorization", config.Token.Authorization())
 
-	if err := jsonClient.Post(apiPostMessage, payload, &response); err != nil {
+	if err := service.WebClient().Post(apiPostMessage, payload, &response); err != nil {
 		return err
 	}
 
@@ -83,22 +89,15 @@ func (service *Service) sendAPI(config *Config, payload interface{}) error {
 }
 
 func (service *Service) sendWebhook(config *Config, payload interface{}) error {
-	payloadBytes, err := json.Marshal(payload)
-	var res *http.Response
-	res, err = http.Post(config.Token.WebhookURL(), jsonclient.ContentType, bytes.NewBuffer(payloadBytes))
+	var response *string
+	err := service.WebClient().Post(config.Token.WebhookURL(), payload, &response)
 
 	if err != nil {
 		return fmt.Errorf("failed to invoke webhook: %v", err)
 	}
-	defer res.Body.Close()
-	resBytes, _ := ioutil.ReadAll(res.Body)
-	response := string(resBytes)
 
-	switch response {
+	switch *response {
 	case "":
-		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("webhook status: %v", res.Status)
-		}
 		// Treat status 200 as no error regardless of actual content
 		fallthrough
 	case "ok":

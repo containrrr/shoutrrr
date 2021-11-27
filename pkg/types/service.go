@@ -1,6 +1,7 @@
 package types
 
 import (
+	"net/http"
 	"net/url"
 )
 
@@ -10,4 +11,9 @@ type Service interface {
 	Templater
 	Initialize(serviceURL *url.URL, logger StdLogger) error
 	SetLogger(logger StdLogger)
+}
+
+// HTTPService is the common interface for services that use a http.Client to send notifications
+type HTTPService interface {
+	HTTPClient() *http.Client
 }
