@@ -5,16 +5,16 @@ const postsEndpoint = "posts.json"
 type createPostPayload struct {
 	Title            string `json:"title"`
 	Raw              string `json:"raw"`
-	TopicId          *int   `json:"topic_id,omitempty"`
+	TopicID          *int   `json:"topic_id,omitempty"`
 	Category         *int   `json:"category,omitempty"`
 	TargetRecipients string `json:"target_recipients,omitempty"`
 	Archetype        string `json:"archetype,omitempty"`
 	CreatedAt        string `json:"created_at"`
-	EmbedUrl         string `json:"embed_url"`
+	EmbedURL         string `json:"embed_url"`
 }
 
 type createPostResponse struct {
-	Id           int    `json:"id"`
+	ID           int    `json:"id"`
 	Name         string `json:"name"`
 	Username     string `json:"username"`
 	CreatedAt    string `json:"created_at"`
@@ -27,7 +27,7 @@ type createPostResponse struct {
 	ReadersCount int    `json:"readers_count"`
 	Score        int    `json:"score"`
 	Yours        bool   `json:"yours"`
-	TopicId      int    `json:"topic_id"`
+	TopicID      int    `json:"topic_id"`
 	TopicSlug    string `json:"topic_slug"`
 	Version      int    `json:"version"`
 }

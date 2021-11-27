@@ -37,14 +37,14 @@ func (service *Service) Send(message string, params *types.Params) error {
 		TargetRecipients: config.Recipients,
 		Archetype:        config.Type.Archetype(),
 		CreatedAt:        "",
-		EmbedUrl:         config.EmbedURL,
+		EmbedURL:         config.EmbedURL,
 	}
 
 	if config.Category != 0 {
 		payload.Category = &config.Category
 	}
 	if config.Topic != 0 {
-		payload.TopicId = &config.Topic
+		payload.TopicID = &config.Topic
 	}
 
 	response := createPostResponse{}
@@ -66,7 +66,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
-	service.Logf("Created new post #%v in topic %q (%v)", response.PostNumber, response.TopicSlug, response.TopicId)
+	service.Logf("Created new post #%v in topic %q (%v)", response.PostNumber, response.TopicSlug, response.TopicID)
 
 	return nil
 }
