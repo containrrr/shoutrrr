@@ -34,6 +34,7 @@ nav:
   - 'Service Overview': 'services/overview.md'
   - Services:
       - Discord: 'services/discord.md'
+      - Discourse: 'services/discourse.md'
       - Email: 'services/email.md'
       - Gotify: 'services/gotify.md'
       - Google Chat: 'services/googlechat.md'
