@@ -6,7 +6,7 @@
 *.dll
 *.so
 *.dylib
-/shoutrrr
+/shoutrrr/shoutrrr
 
 # Test binary, build with `go test -c`
 # ---

@@ -7,11 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cli "github.com/containrrr/shoutrrr/cli/cmd"
 	u "github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
+	cli "github.com/containrrr/shoutrrr/shoutrrr/cmd"
 )
 
 // Cmd sends a notification using a service url
@@ -82,5 +82,4 @@ func Run(cmd *cobra.Command, _ []string) {
 	}
 
 	os.Exit(exitCode)
-
 }
