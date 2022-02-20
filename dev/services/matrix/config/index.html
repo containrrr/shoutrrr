@@ -912,31 +912,30 @@ You're not viewing the latest version.
   <h1>Config</h1>
 
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>User</strong> - Username or empty when using access token<br />
+  Default: <em>empty</em><br />
+  URL part: <code class="service-url">matrix://<strong>user</strong>:password@host/</code>  </li>
+<li><strong>Password</strong> - Password or access token (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">matrix://user:<strong>password</strong>@host/</code>  </li>
+<li><strong>Host</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">matrix://user:password@<strong>host</strong>/</code>  </li>
+</ul>
 <h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
 <p>Props can be either supplied using the params argument, or through the URL using<br />
 <code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>Host</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
-<p><strong>Password</strong> (<strong>Required</strong>)  </p>
-</li>
-<li>
 <p><strong>DisableTLS</strong><br />
   Default: ❌ <code>No</code>  </p>
 </li>
 <li>
-<p><strong>Rooms</strong><br />
+<p><strong>Rooms</strong> - Room aliases, or with ! prefix, room IDs<br />
   Default: <em>empty</em><br />
   Aliases: <code>room</code>  </p>
 </li>
 <li>
 <p><strong>Title</strong><br />
-  Default: <em>empty</em>  </p>
-</li>
-<li>
-<p><strong>User</strong><br />
   Default: <em>empty</em>  </p>
 </li>
 </ul>

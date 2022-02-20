@@ -758,6 +758,33 @@ You're not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#identifying_the_target_chatschannels" class="md-nav__link">
+    Identifying the target chats/channels
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifying the target chats/channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channels" class="md-nav__link">
+    Channels
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chats" class="md-nav__link">
+    Chats
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#optional_parameters" class="md-nav__link">
     Optional parameters
   </a>
@@ -1009,6 +1036,33 @@ You're not viewing the latest version.
 </li>
       
         <li class="md-nav__item">
+  <a href="#identifying_the_target_chatschannels" class="md-nav__link">
+    Identifying the target chats/channels
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifying the target chats/channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channels" class="md-nav__link">
+    Channels
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chats" class="md-nav__link">
+    Chats
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#optional_parameters" class="md-nav__link">
     Optional parameters
   </a>
@@ -1049,7 +1103,7 @@ You're not viewing the latest version.
 <h1 id="telegram">Telegram<a class="headerlink" href="#telegram" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
-<p>telegram://<strong><code>token</code></strong>@telegram?channels=<strong><code>channel-1</code></strong>[,<strong><code>channel-2</code></strong>,...]</p>
+<p>telegram://<strong><code>token</code></strong>@telegram?chats=<strong><code>channel-1</code></strong>[,<strong><code>chat-id-1</code></strong>,...]</p>
 </div>
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1061,7 +1115,7 @@ You're not viewing the latest version.
 <code>?key=value&amp;key=value</code> etc.</p>
 <ul>
 <li>
-<p><strong>Chats</strong> (<strong>Required</strong>)<br />
+<p><strong>Chats</strong> - Chat IDs or Channel names (using @channel-name) (<strong>Required</strong>)<br />
   Aliases: <code>channels</code>  </p>
 </li>
 <li>
@@ -1084,6 +1138,26 @@ You're not viewing the latest version.
 </ul>
 <h2 id="getting_a_token_for_telegram">Getting a token for Telegram<a class="headerlink" href="#getting_a_token_for_telegram" title="Permanent link">&para;</a></h2>
 <p>Talk to <a href="https://core.telegram.org/bots#6-botfather">the botfather</a>.</p>
+<h2 id="identifying_the_target_chatschannels">Identifying the target chats/channels<a class="headerlink" href="#identifying_the_target_chatschannels" title="Permanent link">&para;</a></h2>
+<p>The <code>chats</code> param consists of one or more <code>Chat ID</code>s or <code>channel name</code>s. </p>
+<h3 id="channels">Channels<a class="headerlink" href="#channels" title="Permanent link">&para;</a></h3>
+<p>The channel names can be retrieved in the telegram client in the <code>Channel info</code> section. 
+Replace the <code>t.me/</code> prefix from the link with a <code>@</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Channels names need to be prefixed by <code>@</code> to identify them as such.</p>
+</div>
+<h3 id="chats">Chats<a class="headerlink" href="#chats" title="Permanent link">&para;</a></h3>
+<p>Group chats and private chats are identifieds by <code>Chat ID</code>s. Unfortunatly, they are generally not visible in the
+telegram clients.
+The easiest way to retrieve them is by using the <code>shoutrrr generate telegram</code> command which will guide you through
+creating a URL with your target chats.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can use the <code>containrrr/shoutrrr</code> image in docker to run it without download/installing the <code>shoutrrr</code> CLI using:
+<div class="highlight"><pre><span></span><code>docker run --rm -it containrrr/shoutrrr generate telegram
+</code></pre></div></p>
+</div>
 <h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
 <p>You can optionally specify the <strong><code>notification</code></strong>, <strong><code>parseMode</code></strong> and <strong><code>preview</code></strong> parameters in the URL:  </p>
 <div class="admonition info">
