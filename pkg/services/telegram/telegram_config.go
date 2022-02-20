@@ -3,10 +3,11 @@ package telegram
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config for use within the telegram plugin
@@ -15,7 +16,7 @@ type Config struct {
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends Message silently"`
 	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text Message should be parsed"`
-	Chats        []string  `key:"chats,channels"`
+	Chats        []string  `key:"chats,channels" desc:"Chat IDs or Channel names (using @channel-name)"`
 	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
