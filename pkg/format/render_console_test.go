@@ -24,6 +24,16 @@ Name string                                                                     
 		Expect(actual).To(Equal(expected))
 	})
 
+	It(`should render enum types as "option"`, func() {
+		actual := testRenderTree(renderer, &testEnummer{})
+
+		expected := `
+Choice option                                                                       <Default: Maybe> [Yes, No, Maybe]
+`[1:]
+
+		Expect(actual).To(Equal(expected))
+	})
+
 	It("should render url paths in sorted order", func() {
 		actual := testRenderTree(renderer, &struct {
 			Host  string `url:"host"`

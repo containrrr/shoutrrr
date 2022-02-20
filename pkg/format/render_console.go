@@ -37,6 +37,12 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 		} else {
 			// Since no values was supplied, let's substitute the value with the type
 			typeName := field.Type.String()
+
+			// If the value is an enum type, providing the name is a bit pointless
+			// Instead, use a common string "option" to signify the type
+			if field.EnumFormatter != nil {
+				typeName = "option"
+			}
 			valueLen = len(typeName)
 			sb.WriteString(color.CyanString(typeName))
 		}
