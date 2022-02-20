@@ -8,14 +8,13 @@
       
       
       
-      
         <link rel="canonical" href="https://containrrr.dev/shoutrrr/dev/services/opsgenie/config/">
       
       
         
       
       <link rel="icon" href="../../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6+insiders-3.2.2">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.1+insiders-4.8.3">
     
     
       
@@ -23,13 +22,12 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.b941530a.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.a3608ae2.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.1d832a92.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
         
       
-      <link rel="preload" as="style" href="../../../assets/stylesheets/vendor/mermaid.733f213f.min.css">
       
     
     
@@ -38,19 +36,17 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
-    
     
     
       <link rel="stylesheet" href="../../../stylesheets/theme.css">
     
       <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"../../..":"../../.."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-
 
     
     
@@ -65,6 +61,96 @@
     
     <body dir="ltr" data-md-color-scheme="shoutrrr" data-md-color-primary="" data-md-color-accent="">
   
+    
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -83,8 +169,8 @@
     </div>
     
       <div data-md-component="outdated" hidden>
-        <aside class="md-banner md-banner--warning">
-          
+        
+          <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
               
 You're not viewing the latest version.
@@ -95,8 +181,8 @@ You're not viewing the latest version.
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
-          
-        </aside>
+          </aside>
+        
       </div>
     
     
@@ -134,8 +220,7 @@ You're not viewing the latest version.
       <label class="md-header__button md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -167,11 +252,10 @@ You're not viewing the latest version.
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -212,11 +296,10 @@ You're not viewing the latest version.
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -230,12 +313,18 @@ You're not viewing the latest version.
       
       
 
+
   
   
   
     <li class="md-nav__item">
       <a href="../../.." class="md-nav__link">
-        Home
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+
       </a>
     </li>
   
@@ -244,13 +333,19 @@ You're not viewing the latest version.
       
       
       
+
 
   
   
   
     <li class="md-nav__item">
       <a href="../../../getting-started/" class="md-nav__link">
-        Getting started
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+
       </a>
     </li>
   
@@ -259,13 +354,19 @@ You're not viewing the latest version.
       
       
       
+
 
   
   
   
     <li class="md-nav__item">
       <a href="../../overview/" class="md-nav__link">
-        Service Overview
+        
+  
+  <span class="md-ellipsis">
+    Service Overview
+  </span>
+
       </a>
     </li>
   
@@ -274,6 +375,7 @@ You're not viewing the latest version.
       
       
       
+
 
   
   
@@ -288,7 +390,12 @@ You're not viewing the latest version.
       
       
         <label class="md-nav__link" for="__nav_4">
-          Services
+          
+  
+  <span class="md-ellipsis">
+    Services
+  </span>
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
@@ -306,7 +413,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../discord/" class="md-nav__link">
-        Discord
+        
+  
+  <span class="md-ellipsis">
+    Discord
+  </span>
+
       </a>
     </li>
   
@@ -320,7 +432,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../email/" class="md-nav__link">
-        Email
+        
+  
+  <span class="md-ellipsis">
+    Email
+  </span>
+
       </a>
     </li>
   
@@ -334,7 +451,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../gotify/" class="md-nav__link">
-        Gotify
+        
+  
+  <span class="md-ellipsis">
+    Gotify
+  </span>
+
       </a>
     </li>
   
@@ -348,7 +470,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../googlechat/" class="md-nav__link">
-        Google Chat
+        
+  
+  <span class="md-ellipsis">
+    Google Chat
+  </span>
+
       </a>
     </li>
   
@@ -362,7 +489,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../ifttt/" class="md-nav__link">
-        IFTTT
+        
+  
+  <span class="md-ellipsis">
+    IFTTT
+  </span>
+
       </a>
     </li>
   
@@ -376,7 +508,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../join/" class="md-nav__link">
-        Join
+        
+  
+  <span class="md-ellipsis">
+    Join
+  </span>
+
       </a>
     </li>
   
@@ -390,7 +527,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../mattermost/" class="md-nav__link">
-        Mattermost
+        
+  
+  <span class="md-ellipsis">
+    Mattermost
+  </span>
+
       </a>
     </li>
   
@@ -404,7 +546,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../matrix/" class="md-nav__link">
-        Matrix
+        
+  
+  <span class="md-ellipsis">
+    Matrix
+  </span>
+
       </a>
     </li>
   
@@ -418,7 +565,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../" class="md-nav__link">
-        OpsGenie
+        
+  
+  <span class="md-ellipsis">
+    OpsGenie
+  </span>
+
       </a>
     </li>
   
@@ -432,7 +584,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../pushbullet/" class="md-nav__link">
-        Pushbullet
+        
+  
+  <span class="md-ellipsis">
+    Pushbullet
+  </span>
+
       </a>
     </li>
   
@@ -446,7 +603,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../pushover/" class="md-nav__link">
-        Pushover
+        
+  
+  <span class="md-ellipsis">
+    Pushover
+  </span>
+
       </a>
     </li>
   
@@ -460,7 +622,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../rocketchat/" class="md-nav__link">
-        Rocketchat
+        
+  
+  <span class="md-ellipsis">
+    Rocketchat
+  </span>
+
       </a>
     </li>
   
@@ -474,7 +641,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../slack/" class="md-nav__link">
-        Slack
+        
+  
+  <span class="md-ellipsis">
+    Slack
+  </span>
+
       </a>
     </li>
   
@@ -488,7 +660,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../teams/" class="md-nav__link">
-        Teams
+        
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+
       </a>
     </li>
   
@@ -502,7 +679,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../telegram/" class="md-nav__link">
-        Telegram
+        
+  
+  <span class="md-ellipsis">
+    Telegram
+  </span>
+
       </a>
     </li>
   
@@ -516,7 +698,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../zulip/" class="md-nav__link">
-        Zulip Chat
+        
+  
+  <span class="md-ellipsis">
+    Zulip Chat
+  </span>
+
       </a>
     </li>
   
@@ -530,7 +717,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../generic/" class="md-nav__link">
-        Generic Webhook
+        
+  
+  <span class="md-ellipsis">
+    Generic Webhook
+  </span>
+
       </a>
     </li>
   
@@ -547,6 +739,7 @@ You're not viewing the latest version.
       
       
 
+
   
   
   
@@ -560,7 +753,12 @@ You're not viewing the latest version.
       
       
         <label class="md-nav__link" for="__nav_5">
-          Guides
+          
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
@@ -578,7 +776,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../../guides/slack/" class="md-nav__link">
-        Slack
+        
+  
+  <span class="md-ellipsis">
+    Slack
+  </span>
+
       </a>
     </li>
   
@@ -595,6 +798,7 @@ You're not viewing the latest version.
       
       
 
+
   
   
   
@@ -608,7 +812,12 @@ You're not viewing the latest version.
       
       
         <label class="md-nav__link" for="__nav_6">
-          Advanced usage
+          
+  
+  <span class="md-ellipsis">
+    Advanced usage
+  </span>
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
@@ -626,7 +835,12 @@ You're not viewing the latest version.
   
     <li class="md-nav__item">
       <a href="../../../proxy/" class="md-nav__link">
-        Proxy
+        
+  
+  <span class="md-ellipsis">
+    Proxy
+  </span>
+
       </a>
     </li>
   
@@ -651,7 +865,6 @@ You're not viewing the latest version.
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
-
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -690,15 +903,15 @@ You're not viewing the latest version.
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/opsgenie/config.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                
-                  <h1>Config</h1>
-                
-                <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/opsgenie/config.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+  <h1>Config</h1>
+
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Host</strong> - The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances<br />
   Default: <code>api.opsgenie.com</code><br />
@@ -766,13 +979,8 @@ You're not viewing the latest version.
   Default: <em>empty</em>  </p>
 </li>
 </ul>
-                
 
 
-                
-              
-              
-                
 
 
               
@@ -783,16 +991,14 @@ You're not viewing the latest version.
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        
-        
-      </div>
+      <div class="md-copyright">
+  
+  
+</div>
       
     </div>
   </div>
@@ -803,10 +1009,10 @@ You're not viewing the latest version.
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.d5944110.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.5c9dbbf3.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.e1f47d4a.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.25f1df3e.min.js"></script>
       
     
   </body>
