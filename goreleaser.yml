@@ -1,6 +1,6 @@
 build:
-  dir: .
-  main: ./shoutrrr
+  dir: ./shoutrrr
+  main: .
   binary: shoutrrr
   goos:
     - linux
@@ -10,6 +10,9 @@ build:
     - 386
     - arm
     - arm64
+  ignore:
+    - goos: windows
+      goarch: arm
 archives:
   - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}'
     format: tar.gz
@@ -27,36 +30,28 @@ dockers:
   - goos: linux
     goarch: amd64
     goarm: ''
-    dockerfile: Dockerfile
+    dockerfile: shoutrrr/Dockerfile
     image_templates:
       - containrrr/shoutrrr:amd64-{{ .Version }}
       - containrrr/shoutrrr:amd64-latest
-    binaries:
-      - shoutrrr
   - goos: linux
     goarch: 386
     goarm: ''
-    dockerfile: Dockerfile
+    dockerfile: shoutrrr/Dockerfile
     image_templates:
       - containrrr/shoutrrr:i386-{{ .Version }}
       - containrrr/shoutrrr:i386-latest
-    binaries:
-      - shoutrrr
   - goos: linux
     goarch: arm
     goarm: 6
-    dockerfile: Dockerfile
+    dockerfile: shoutrrr/Dockerfile
     image_templates:
       - containrrr/shoutrrr:armhf-{{ .Version }}
       - containrrr/shoutrrr:armhf-latest
-    binaries:
-      - shoutrrr
   - goos: linux
     goarch: arm64
     goarm: ''
-    dockerfile: Dockerfile
+    dockerfile: shoutrrr/Dockerfile
     image_templates:
       - containrrr/shoutrrr:arm64v8-{{ .Version }}
       - containrrr/shoutrrr:arm64v8-latest
-    binaries:
-      - shoutrrr

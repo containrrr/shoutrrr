@@ -7,6 +7,6 @@ FROM scratch
 COPY --from=alpine \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/ssl/certs/ca-certificates.crt
-COPY shoutrrr/shoutrrr /
+COPY shoutrrr /
 
 ENTRYPOINT ["/shoutrrr"]
