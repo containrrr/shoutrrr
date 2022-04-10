@@ -35,7 +35,7 @@ jobs:
       - name: Install goreleaser
         run: |
           cd .. && \
-          wget https://github.com/goreleaser/goreleaser/releases/download/v0.138.0/goreleaser_Linux_x86_64.tar.gz && \
+          wget https://github.com/goreleaser/goreleaser/releases/download/v1.6.3/goreleaser_Linux_x86_64.tar.gz && \
           tar -xvf goreleaser_Linux_x86_64.tar.gz && \
           ./goreleaser -v
 
