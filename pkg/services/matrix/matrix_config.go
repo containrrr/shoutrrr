@@ -1,21 +1,22 @@
 package matrix
 
 import (
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Config is the configuration for the matrix service
 type Config struct {
 	standard.EnumlessConfig
 
-	User       string `optional:""`
-	Password   string
-	DisableTLS bool `key:"disableTLS" default:"No"`
-	Host       string
-	Rooms      []string `key:"rooms,room" optional:""`
+	User       string   `optional:"" url:"user" desc:"Username or empty when using access token"`
+	Password   string   `url:"password" desc:"Password or access token"`
+	DisableTLS bool     `key:"disableTLS" default:"No"`
+	Host       string   `url:"host"`
+	Rooms      []string `key:"rooms,room" optional:"" desc:"Room aliases, or with ! prefix, room IDs"`
 	Title      string   `key:"title" default:""`
 }
 

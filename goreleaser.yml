@@ -1,6 +1,6 @@
 build:
   dir: .
-  main: ./cli
+  main: ./shoutrrr
   binary: shoutrrr
   goos:
     - linux

@@ -99,6 +99,13 @@ var _ = Describe("the pushover config", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(config.Priority).To(Equal(int8(1)))
 		})
+		It("should update priority when a negative number is supplied", func() {
+			Expect(keyResolver.Set("priority", "-1")).To(Succeed())
+			Expect(config.Priority).To(BeEquivalentTo(-1))
+
+			Expect(keyResolver.Set("priority", "-2")).To(Succeed())
+			Expect(config.Priority).To(BeEquivalentTo(-2))
+		})
 		It("should update the title when it is supplied", func() {
 			err := keyResolver.Set("title", "new title")
 			Expect(err).NotTo(HaveOccurred())

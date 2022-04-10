@@ -63,6 +63,13 @@ Usage:
 Possible actions: send, verify, generate
 ```
 
+On a system with Go installed you can install the latest Shoutrrr CLI
+command with:
+
+```shell
+go install github.com/containrrr/shoutrrr/shoutrrr@latest
+```
+
 ### Commands
 
 #### Send

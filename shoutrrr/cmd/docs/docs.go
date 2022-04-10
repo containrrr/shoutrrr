@@ -10,12 +10,14 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/spf13/cobra"
 
-	cli "github.com/containrrr/shoutrrr/cli/cmd"
 	f "github.com/containrrr/shoutrrr/pkg/format"
+	cli "github.com/containrrr/shoutrrr/shoutrrr/cmd"
 )
 
-var serviceRouter router.ServiceRouter
-var services = serviceRouter.ListServices()
+var (
+	serviceRouter router.ServiceRouter
+	services      = serviceRouter.ListServices()
+)
 
 // Cmd prints documentation for services
 var Cmd = &cobra.Command{
