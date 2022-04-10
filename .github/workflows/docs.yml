@@ -62,4 +62,4 @@ jobs:
 
 
       - name: Deploy docs
-        run: mike deploy --push $(go run ./cli docs -V)
+        run: mike deploy --push $(go run ./shoutrrr docs -V)
