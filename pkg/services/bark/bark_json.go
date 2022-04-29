@@ -21,5 +21,5 @@ type apiResponse struct {
 }
 
 func (e *apiResponse) Error() string {
-	return e.Message
+	return "server response: " + e.Message
 }

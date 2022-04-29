@@ -64,7 +64,8 @@ func (service *Service) sendAPI(config *Config, message string) error {
 
 	if err := jsonClient.Post(config.GetAPIURL("push"), &request, &response); err != nil {
 		if jsonClient.ErrorResponse(err, &response) {
-			return fmt.Errorf("server response: %v", response.Message)
+			// apiResponse implements Error
+			return &response
 		}
 		return err
 	}

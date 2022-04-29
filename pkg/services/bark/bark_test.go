@@ -1,16 +1,17 @@
 package bark
 
 import (
-	"log"
-
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"testing"
 
+	"github.com/jarcoal/httpmock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gomegaformat "github.com/onsi/gomega/format"
@@ -72,6 +73,15 @@ var _ = Describe("the bark service", func() {
 				}))
 			})
 		})
+		When("parsing the configuration URL", func() {
+			It("should be identical after de-/serialization", func() {
+				testURL := "bark://:device-key@example.com:2225/?badge=5&category=CAT&group=GROUP&scheme=http&title=TITLE&url=URL"
+				config := &Config{}
+				pkr := format.NewPropKeyResolver(config)
+				Expect(config.setURL(&pkr, util.URLMust(testURL))).To(Succeed(), "verifying")
+				Expect(config.GetURL().String()).To(Equal(testURL))
+			})
+		})
 	})
 
 	When("sending the push payload", func() {
@@ -93,7 +103,7 @@ var _ = Describe("the bark service", func() {
 
 			Expect(service.Send("Message", nil)).To(Succeed())
 		})
-		It("should not panic if an error occurs when sending the payload", func() {
+		It("should not panic if a server error occurs", func() {
 			serviceURL := util.URLMust("bark://:devicekey@hostname")
 			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 
@@ -104,6 +114,31 @@ var _ = Describe("the bark service", func() {
 
 			Expect(service.Send("Message", nil)).To(HaveOccurred())
 		})
+		It("should not panic if a server responds with an unkown message", func() {
+			serviceURL := util.URLMust("bark://:devicekey@hostname")
+			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
+
+			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), util.JSONRespondMust(200, apiResponse{
+				Code:    500,
+				Message: "For some reason, the response code and HTTP code is different?",
+			}))
+
+			Expect(service.Send("Message", nil)).To(HaveOccurred())
+		})
+		It("should not panic if a communication error occurs", func() {
+			httpmock.DeactivateAndReset()
+			serviceURL := util.URLMust("bark://:devicekey@nonresolvablehostname")
+			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
+			Expect(service.Send("Message", nil)).To(HaveOccurred())
+		})
+	})
+
+	It("should implement basic service API methods correctly", func() {
+		testutils.TestConfigGetInvalidQueryValue(&Config{})
+		testutils.TestConfigSetInvalidQueryValue(&Config{}, "bark://:mock-device@host/?foo=bar")
+
+		testutils.TestConfigGetEnumsCount(&Config{}, 0)
+		testutils.TestConfigGetFieldsCount(&Config{}, 9)
 	})
 })
 

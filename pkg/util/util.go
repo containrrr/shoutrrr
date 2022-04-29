@@ -7,9 +7,8 @@ import (
 	"net/url"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/onsi/gomega"
-
 	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 )
 
 // Min returns the smallest of a and b
