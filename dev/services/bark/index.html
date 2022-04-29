@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://containrrr.dev/shoutrrr/dev/services/googlechat/">
+        <link rel="canonical" href="https://containrrr.dev/shoutrrr/dev/services/bark/">
       
       
         
@@ -18,7 +18,7 @@
     
     
       
-        <title>Google Chat - Shoutrrr</title>
+        <title>Bark - Shoutrrr</title>
       
     
     
@@ -165,7 +165,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#google_chat" class="md-skip">
+        <a href="#bark" class="md-skip">
           Skip to content
         </a>
       
@@ -214,7 +214,7 @@ You're not viewing the latest version.
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Google Chat
+              Bark
             
           </span>
         </div>
@@ -385,14 +385,12 @@ You're not viewing the latest version.
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
       
       
       
@@ -475,28 +473,9 @@ You're not viewing the latest version.
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Google Chat
-  </span>
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../googlechat/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -504,44 +483,6 @@ You're not viewing the latest version.
   </span>
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#url_format" class="md-nav__link">
-    <span class="md-ellipsis">
-      URL Format
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating_an_incoming_webhook_in_google_chat" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating an incoming webhook in Google Chat
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -951,14 +892,29 @@ You're not viewing the latest version.
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating_an_incoming_webhook_in_google_chat" class="md-nav__link">
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating an incoming webhook in Google Chat
+      URL Fields
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query/Param Props
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -974,49 +930,66 @@ You're not viewing the latest version.
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/googlechat.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/containrrr/shoutrrr/edit/main/docs/services/bark.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
 
-<h1 id="google_chat">Google Chat<a class="headerlink" href="#google_chat" title="Permanent link">&para;</a></h1>
+<h1 id="bark">Bark<a class="headerlink" href="#bark" title="Permanent link">&para;</a></h1>
+<p>Upstream docs: https://github.com/Finb/Bark</p>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
-<p>Your Google Chat Incoming Webhook URL will look like this:</p>
-<div class="admonition info">
-<p>https://chat.googleapis.com/v1/spaces/<strong><code>FOO</code></strong>/messages?key=<strong><code>bar</code></strong>&amp;token=<strong><code>baz</code></strong></p>
-</div>
-<p>The shoutrrr service URL should look like this:</p>
-<div class="admonition info">
-<p>googlechat://chat.googleapis.com/v1/spaces/<strong><code>FOO</code></strong>/messages?key=<strong><code>bar</code></strong>&amp;token=<strong><code>baz</code></strong></p>
-</div>
-<p>In other words the incoming webhook URL with <code>https</code> replaced by <code>googlechat</code>.</p>
-<p>Google Chat was previously known as Hangouts Chat. Using <code>hangouts</code> in
-the service URL instead <code>googlechat</code> is still supported, although
-deprecated.</p>
-<h2 id="creating_an_incoming_webhook_in_google_chat">Creating an incoming webhook in Google Chat<a class="headerlink" href="#creating_an_incoming_webhook_in_google_chat" title="Permanent link">&para;</a></h2>
-<ol>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>DeviceKey</strong> - The key for each device (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">bark://:<strong>devicekey</strong>@host/path</code>  </li>
+<li><strong>Host</strong> - Server hostname and port (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">bark://:devicekey@<strong>host</strong>/path</code>  </li>
+<li><strong>Path</strong> - Server path<br />
+  Default: <code>/</code><br />
+  URL part: <code class="service-url">bark://:devicekey@host/<strong>path</strong></code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
 <li>
-<p>Open the room you would like to add Shoutrrr to and open the chat
-room menu.
-<img alt="Screenshot 1" src="hangouts-1.png" /></p>
+<p><strong>Badge</strong> - The number displayed next to App icon<br />
+  Default: <code>0</code>  </p>
 </li>
 <li>
-<p>Then click on <em>Configure webhooks</em>.
-<img alt="Screenshot 2" src="hangouts-2.png" /></p>
+<p><strong>Category</strong> - Reserved field, no use yet<br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
-<p>Name the webhook and save.
-<img alt="Screenshot 3" src="hangouts-3.png" /></p>
+<p><strong>Copy</strong> - The value to be copied<br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
-<p>Copy the URL.
-<img alt="Screenshot 4" src="hangouts-4.png" /></p>
+<p><strong>Group</strong> - The group of the notification<br />
+  Default: <em>empty</em>  </p>
 </li>
 <li>
-<p>Format the service URL by replacing <code>https</code> with <code>googlechat</code>.</p>
+<p><strong>Icon</strong> - An url to the icon, available only on iOS 15 or later<br />
+  Default: <em>empty</em>  </p>
 </li>
-</ol>
+<li>
+<p><strong>Scheme</strong> - Server protocol, http or https<br />
+  Default: <code>https</code>  </p>
+</li>
+<li>
+<p><strong>Sound</strong> - Value from https://github.com/Finb/Bark/tree/master/Sounds<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Notification title, optionally set by the sender<br />
+  Default: <em>empty</em>  </p>
+</li>
+<li>
+<p><strong>URL</strong> - Url that will jump when click notification<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 
 
 
@@ -1030,41 +1003,6 @@ room menu.
       </main>
       
         <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../gotify/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Gotify" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Gotify
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../ifttt/" class="md-footer__link md-footer__link--next" aria-label="Next: IFTTT" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              IFTTT
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
