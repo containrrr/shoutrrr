@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/common/webclient"
 	f "github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
@@ -49,7 +50,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	ud.Writeln("Fetching bot info...")
 	// ud.Writeln("Session token: %v", g.sessionToken)
 
-	g.client = &Client{token: token}
+	g.client = &Client{Token: token, WebClient: webclient.NewJSONClient()}
 	botInfo, err := g.client.GetBotInfo()
 	if err != nil {
 		return &Config{}, err

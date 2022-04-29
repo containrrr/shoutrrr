@@ -31,9 +31,11 @@ var (
 var _ = Describe("the slack service", func() {
 
 	BeforeSuite(func() {
-		service = &Service{}
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envSlackURL, _ = url.Parse(os.Getenv("SHOUTRRR_SLACK_URL"))
+	})
+	BeforeEach(func() {
+		service = &Service{}
 	})
 
 	When("running integration tests", func() {
@@ -169,7 +171,7 @@ var _ = Describe("the slack service", func() {
 		When("sending via webhook URL", func() {
 			var err error
 			BeforeEach(func() {
-				httpmock.Activate()
+				httpmock.ActivateNonDefault(service.HTTPClient())
 			})
 			AfterEach(func() {
 				httpmock.DeactivateAndReset()
@@ -181,7 +183,7 @@ var _ = Describe("the slack service", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				targetURL := "https://hooks.slack.com/services/AAAAAAAAA/BBBBBBBBB/123456789123456789123456"
-				httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
+				httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ``))
 
 				err = service.Send("Message", nil)
 				Expect(err).NotTo(HaveOccurred())
@@ -202,6 +204,7 @@ var _ = Describe("the slack service", func() {
 			var err error
 			BeforeEach(func() {
 				httpmock.Activate()
+				httpmock.ActivateNonDefault(service.HTTPClient())
 			})
 			AfterEach(func() {
 				httpmock.DeactivateAndReset()
