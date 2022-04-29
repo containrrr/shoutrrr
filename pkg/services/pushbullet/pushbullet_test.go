@@ -1,13 +1,14 @@
 package pushbullet_test
 
 import (
-	"errors"
-	. "github.com/containrrr/shoutrrr/pkg/services/pushbullet"
+	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"errors"
 	"net/url"
 	"os"
 	"testing"
@@ -19,14 +20,14 @@ func TestPushbullet(t *testing.T) {
 }
 
 var (
-	service          *Service
+	service          *pushbullet.Service
 	envPushbulletURL *url.URL
 )
 
 var _ = Describe("the pushbullet service", func() {
 
 	BeforeSuite(func() {
-		service = &Service{}
+		service = &pushbullet.Service{}
 		envPushbulletURL, _ = url.Parse(os.Getenv("SHOUTRRR_PUSHBULLET_URL"))
 
 	})
@@ -49,7 +50,7 @@ var _ = Describe("the pushbullet service", func() {
 		When("generating a config object", func() {
 			It("should set token", func() {
 				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke")
-				config := Config{}
+				config := pushbullet.Config{}
 				err := config.SetURL(pushbulletURL)
 
 				Expect(config.Token).To(Equal("tokentokentokentokentokentokentoke"))
@@ -57,7 +58,7 @@ var _ = Describe("the pushbullet service", func() {
 			})
 			It("should set the device from path", func() {
 				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke/test")
-				config := Config{}
+				config := pushbullet.Config{}
 				err := config.SetURL(pushbulletURL)
 
 				Expect(err).NotTo(HaveOccurred())
@@ -66,7 +67,7 @@ var _ = Describe("the pushbullet service", func() {
 			})
 			It("should set the channel from path", func() {
 				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke/foo#bar")
-				config := Config{}
+				config := pushbullet.Config{}
 				err := config.SetURL(pushbulletURL)
 
 				Expect(err).NotTo(HaveOccurred())
@@ -79,7 +80,7 @@ var _ = Describe("the pushbullet service", func() {
 			It("should be identical after de-/serialization", func() {
 				testURL := "pushbullet://tokentokentokentokentokentokentoke/device?title=Great+News"
 
-				config := &Config{}
+				config := &pushbullet.Config{}
 				err := config.SetURL(util.URLMust(testURL))
 				Expect(err).NotTo(HaveOccurred(), "verifying")
 
@@ -92,21 +93,21 @@ var _ = Describe("the pushbullet service", func() {
 
 	Describe("building the payload", func() {
 		It("Email target should only populate one the correct field", func() {
-			push := PushRequest{}
+			push := pushbullet.PushRequest{}
 			push.SetTarget("iam@email.com")
 			Expect(push.Email).To(Equal("iam@email.com"))
 			Expect(push.DeviceIden).To(BeEmpty())
 			Expect(push.ChannelTag).To(BeEmpty())
 		})
 		It("Device target should only populate one the correct field", func() {
-			push := PushRequest{}
+			push := pushbullet.PushRequest{}
 			push.SetTarget("device")
 			Expect(push.Email).To(BeEmpty())
 			Expect(push.DeviceIden).To(Equal("device"))
 			Expect(push.ChannelTag).To(BeEmpty())
 		})
 		It("Channel target should only populate one the correct field", func() {
-			push := PushRequest{}
+			push := pushbullet.PushRequest{}
 			push.SetTarget("#channel")
 			Expect(push.Email).To(BeEmpty())
 			Expect(push.DeviceIden).To(BeEmpty())
@@ -118,7 +119,7 @@ var _ = Describe("the pushbullet service", func() {
 		var err error
 		targetURL := "https://api.pushbullet.com/v2/pushes"
 		BeforeEach(func() {
-			httpmock.Activate()
+			httpmock.ActivateNonDefault(service.HTTPClient())
 		})
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
@@ -127,7 +128,7 @@ var _ = Describe("the pushbullet service", func() {
 			err = initService("pushbullet://tokentokentokentokentokentokentoke/test")
 			Expect(err).NotTo(HaveOccurred())
 
-			responder, _ := httpmock.NewJsonResponder(200, &PushResponse{})
+			responder, _ := httpmock.NewJsonResponder(200, &pushbullet.PushResponse{})
 			httpmock.RegisterResponder("POST", targetURL, responder)
 
 			err = service.Send("Message", nil)

@@ -5,6 +5,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | Service                           | URL format                                                                                                                                      |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Discord](./discord.md)           | *discord://__`token`__@__`id`__*                                                                                                                |
+| [Discourse](./discourse.md)       | *discourse://__`username`__:__`token`__@__`host`__:__`port`__*                                                                                  |
 | [Email](./email.md)               | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?fromAddress=__`fromAddress`__&toAddresses=__`recipient1`__[,__`recipient2`__,...]* |
 | [Gotify](./gotify.md)             | *gotify://__`gotify-host`__/__`token`__*                                                                                                        |
 | [Google Chat](./googlechat.md)    | *googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                     |

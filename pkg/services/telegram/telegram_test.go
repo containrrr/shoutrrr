@@ -127,7 +127,7 @@ var _ = Describe("the telegram service", func() {
 	Describe("sending the payload", func() {
 		var err error
 		BeforeEach(func() {
-			httpmock.Activate()
+			httpmock.ActivateNonDefault(telegram.HTTPClient())
 		})
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
@@ -137,7 +137,7 @@ var _ = Describe("the telegram service", func() {
 			err = telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-			setupResponder("sendMessage", telegram.GetConfig().Token, 200, "")
+			setupResponder("sendMessage", telegram.GetConfig().Token, 200, `{"ok": true}`)
 
 			err = telegram.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
