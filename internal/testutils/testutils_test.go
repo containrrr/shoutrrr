@@ -10,6 +10,7 @@ import (
 
 func TestTestUtils(t *testing.T) {
 	RegisterFailHandler(Fail)
+
 	RunSpecs(t, "Shoutrrr TestUtils Suite")
 }
 
@@ -20,6 +21,23 @@ var _ = Describe("the testutils package", func() {
 		})
 		It("should have the prefix \"Test\"", func() {
 			Expect(TestLogger().Prefix()).To(Equal("Test"))
+		})
+	})
+
+	Describe("Must helpers", func() {
+		Describe("URLMust", func() {
+			It("should panic when an invalid URL is passed", func() {
+				failures := InterceptGomegaFailures(func() { URLMust(":") })
+				Expect(failures).To(HaveLen(1))
+			})
+		})
+
+		Describe("JSONRespondMust", func() {
+			It("should panic when an invalid struct is passed", func() {
+				notAValidJSONSource := func() {}
+				failures := InterceptGomegaFailures(func() { JSONRespondMust(200, notAValidJSONSource) })
+				Expect(failures).To(HaveLen(1))
+			})
 		})
 	})
 })

@@ -1,12 +1,12 @@
 package testutils
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
 
-	Ω "github.com/onsi/gomega"
-
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
+
+	Ω "github.com/onsi/gomega"
 )
 
 // TestConfigGetInvalidQueryValue tests whether the config returns an error when an invalid query value is requested
@@ -22,6 +22,13 @@ func TestConfigSetInvalidQueryValue(config types.ServiceConfig, rawInvalidURL st
 	Ω.ExpectWithOffset(1, err).ToNot(Ω.HaveOccurred(), "the test URL did not parse correctly")
 
 	err = config.SetURL(invalidURL)
+	Ω.ExpectWithOffset(1, err).To(Ω.HaveOccurred())
+}
+
+// TestConfigSetInvalidParamValue tests whether the config returns an error when an invalid param key/value is passed
+func TestConfigSetInvalidParamValue(config types.ServiceConfig, key string, value string) {
+	pkr := format.NewPropKeyResolver(config)
+	err := pkr.UpdateConfigFromParams(config, &types.Params{key: value})
 	Ω.ExpectWithOffset(1, err).To(Ω.HaveOccurred())
 }
 
