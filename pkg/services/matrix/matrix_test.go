@@ -2,16 +2,17 @@ package matrix
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 	"net/url"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/jarcoal/httpmock"
+
 	"log"
 	"os"
 	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestMatrix(t *testing.T) {
@@ -49,14 +50,14 @@ var _ = Describe("the matrix service", func() {
 	Describe("creating configurations", func() {
 		When("given an url with title prop", func() {
 			It("should not throw an error", func() {
-				serviceURL := util.URLMust(`matrix://user:pass@mockserver?rooms=room1&title=Better%20Off%20Alone`)
+				serviceURL := testutils.URLMust(`matrix://user:pass@mockserver?rooms=room1&title=Better%20Off%20Alone`)
 				Expect((&Config{}).SetURL(serviceURL)).To(Succeed())
 			})
 		})
 
 		When("given an url with the prop `room`", func() {
 			It("should treat is as an alias for `rooms`", func() {
-				serviceURL := util.URLMust(`matrix://user:pass@mockserver?room=room1`)
+				serviceURL := testutils.URLMust(`matrix://user:pass@mockserver?room=room1`)
 				config := Config{}
 				Expect(config.SetURL(serviceURL)).To(Succeed())
 				Expect(config.Rooms).To(ContainElement("#room1"))
@@ -64,7 +65,7 @@ var _ = Describe("the matrix service", func() {
 		})
 		When("given an url with invalid props", func() {
 			It("should return an error", func() {
-				serviceURL := util.URLMust(`matrix://user:pass@mockserver?channels=room1,room2`)
+				serviceURL := testutils.URLMust(`matrix://user:pass@mockserver?channels=room1,room2`)
 				Expect((&Config{}).SetURL(serviceURL)).To(HaveOccurred())
 			})
 		})
@@ -96,7 +97,7 @@ var _ = Describe("the matrix service", func() {
 		When("not providing a logger", func() {
 			It("should not crash", func() {
 				setupMockResponders()
-				serviceURL := util.URLMust("matrix://user:pass@mockserver")
+				serviceURL := testutils.URLMust("matrix://user:pass@mockserver")
 				Expect(service.Initialize(serviceURL, nil)).To(Succeed())
 			})
 		})

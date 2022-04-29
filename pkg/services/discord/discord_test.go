@@ -1,12 +1,13 @@
 package discord_test
 
 import (
-	. "github.com/containrrr/shoutrrr/pkg/services/discord"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"time"
+
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	. "github.com/containrrr/shoutrrr/pkg/services/discord"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
 
 	"net/url"
 	"os"
@@ -42,7 +43,7 @@ var _ = Describe("the discord service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envDiscordURL.String())
-			err := service.Initialize(serviceURL, util.TestLogger())
+			err := service.Initialize(serviceURL, testutils.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 
 			err = service.Send(

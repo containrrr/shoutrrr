@@ -1,10 +1,10 @@
 package logger_test
 
 import (
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	unit "github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/types"
 
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/onsi/gomega/gbytes"
 
 	"log"
@@ -26,7 +26,7 @@ var _ = Describe("the logger service", func() {
 		It("should output the message to the log", func() {
 			logbuf := gbytes.NewBuffer()
 			service := &unit.Service{}
-			_ = service.Initialize(util.URLMust(`logger://`), log.New(logbuf, "", 0))
+			_ = service.Initialize(testutils.URLMust(`logger://`), log.New(logbuf, "", 0))
 
 			err := service.Send(`Failed - Requires Toaster Repair Level 10`, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -36,7 +36,7 @@ var _ = Describe("the logger service", func() {
 
 		It("should not mutate the passed params", func() {
 			service := &unit.Service{}
-			_ = service.Initialize(util.URLMust(`logger://`), nil)
+			_ = service.Initialize(testutils.URLMust(`logger://`), nil)
 			params := types.Params{}
 			err := service.Send(`Failed - Requires Toaster Repair Level 10`, &params)
 			Expect(err).NotTo(HaveOccurred())
@@ -48,7 +48,7 @@ var _ = Describe("the logger service", func() {
 			It("should render template with params", func() {
 				logbuf := gbytes.NewBuffer()
 				service := &unit.Service{}
-				_ = service.Initialize(util.URLMust(`logger://`), log.New(logbuf, "", 0))
+				_ = service.Initialize(testutils.URLMust(`logger://`), log.New(logbuf, "", 0))
 				err := service.SetTemplateString(`message`, `{{.level}}: {{.message}}`)
 				Expect(err).NotTo(HaveOccurred())
 

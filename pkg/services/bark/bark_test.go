@@ -3,7 +3,6 @@ package bark
 import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/util"
 
 	"log"
 	"net/http"
@@ -33,7 +32,7 @@ var _ = Describe("the bark service", func() {
 
 	BeforeSuite(func() {
 		service = &Service{}
-		logger = util.TestLogger()
+		logger = testutils.TestLogger()
 		envBarkURL, _ = url.Parse(os.Getenv("SHOUTRRR_BARK_URL"))
 	})
 
@@ -44,7 +43,7 @@ var _ = Describe("the bark service", func() {
 				return
 			}
 
-			configURL := util.URLMust(envBarkURL.String())
+			configURL := testutils.URLMust(envBarkURL.String())
 			Expect(service.Initialize(configURL, logger)).To(Succeed())
 			Expect(service.Send("This is an integration test message", nil)).To(Succeed())
 		})
@@ -63,7 +62,7 @@ var _ = Describe("the bark service", func() {
 		})
 		When("only required fields are set", func() {
 			It("should set the optional fields to the defaults", func() {
-				serviceURL := util.URLMust("bark://:devicekey@hostname")
+				serviceURL := testutils.URLMust("bark://:devicekey@hostname")
 				Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 
 				Expect(*service.config).To(Equal(Config{
@@ -78,7 +77,7 @@ var _ = Describe("the bark service", func() {
 				testURL := "bark://:device-key@example.com:2225/?badge=5&category=CAT&group=GROUP&scheme=http&title=TITLE&url=URL"
 				config := &Config{}
 				pkr := format.NewPropKeyResolver(config)
-				Expect(config.setURL(&pkr, util.URLMust(testURL))).To(Succeed(), "verifying")
+				Expect(config.setURL(&pkr, testutils.URLMust(testURL))).To(Succeed(), "verifying")
 				Expect(config.GetURL().String()).To(Equal(testURL))
 			})
 		})
@@ -93,10 +92,10 @@ var _ = Describe("the bark service", func() {
 		})
 
 		It("should not report an error if the server accepts the payload", func() {
-			serviceURL := util.URLMust("bark://:devicekey@hostname")
+			serviceURL := testutils.URLMust("bark://:devicekey@hostname")
 			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 
-			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), util.JSONRespondMust(200, apiResponse{
+			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), testutils.JSONRespondMust(200, apiResponse{
 				Code:    http.StatusOK,
 				Message: "OK",
 			}))
@@ -104,10 +103,10 @@ var _ = Describe("the bark service", func() {
 			Expect(service.Send("Message", nil)).To(Succeed())
 		})
 		It("should not panic if a server error occurs", func() {
-			serviceURL := util.URLMust("bark://:devicekey@hostname")
+			serviceURL := testutils.URLMust("bark://:devicekey@hostname")
 			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 
-			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), util.JSONRespondMust(500, apiResponse{
+			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), testutils.JSONRespondMust(500, apiResponse{
 				Code:    500,
 				Message: "someone turned off the internet",
 			}))
@@ -115,10 +114,10 @@ var _ = Describe("the bark service", func() {
 			Expect(service.Send("Message", nil)).To(HaveOccurred())
 		})
 		It("should not panic if a server responds with an unkown message", func() {
-			serviceURL := util.URLMust("bark://:devicekey@hostname")
+			serviceURL := testutils.URLMust("bark://:devicekey@hostname")
 			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 
-			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), util.JSONRespondMust(200, apiResponse{
+			httpmock.RegisterResponder("POST", service.config.GetAPIURL("push"), testutils.JSONRespondMust(200, apiResponse{
 				Code:    500,
 				Message: "For some reason, the response code and HTTP code is different?",
 			}))
@@ -127,7 +126,7 @@ var _ = Describe("the bark service", func() {
 		})
 		It("should not panic if a communication error occurs", func() {
 			httpmock.DeactivateAndReset()
-			serviceURL := util.URLMust("bark://:devicekey@nonresolvablehostname")
+			serviceURL := testutils.URLMust("bark://:devicekey@nonresolvablehostname")
 			Expect(service.Initialize(serviceURL, logger)).To(Succeed())
 			Expect(service.Send("Message", nil)).To(HaveOccurred())
 		})
