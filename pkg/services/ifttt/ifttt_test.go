@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -30,7 +30,7 @@ var (
 var _ = Describe("the ifttt package", func() {
 	BeforeSuite(func() {
 		envTestURL = os.Getenv("SHOUTRRR_IFTTT_URL")
-		logger = util.TestLogger()
+		logger = testutils.TestLogger()
 	})
 	BeforeEach(func() {
 		service = &Service{}

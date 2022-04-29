@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/containrrr/shoutrrr/pkg/services/bark"
 	"github.com/containrrr/shoutrrr/pkg/services/discord"
 	"github.com/containrrr/shoutrrr/pkg/services/generic"
 	"github.com/containrrr/shoutrrr/pkg/services/googlechat"
@@ -23,6 +24,7 @@ import (
 )
 
 var serviceMap = map[string]func() t.Service{
+	"bark":       func() t.Service { return &bark.Service{} },
 	"discord":    func() t.Service { return &discord.Service{} },
 	"generic":    func() t.Service { return &generic.Service{} },
 	"gotify":     func() t.Service { return &gotify.Service{} },

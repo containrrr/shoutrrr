@@ -1,9 +1,9 @@
 package join_test
 
 import (
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/join"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"github.com/jarcoal/httpmock"
 
 	"net/url"
@@ -36,7 +36,7 @@ var _ = Describe("the join service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envJoinURL.String())
-			var err = service.Initialize(serviceURL, util.TestLogger())
+			var err = service.Initialize(serviceURL, testutils.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 			err = service.Send("this is an integration test", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -116,7 +116,7 @@ var _ = Describe("the join config", func() {
 		It("should be identical after de-/serialization", func() {
 			input := "join://Token:apikey@join?devices=dev1%2Cdev2&icon=warning&title=hey"
 			config := &join.Config{}
-			Expect(config.SetURL(util.URLMust(input))).To(Succeed())
+			Expect(config.SetURL(testutils.URLMust(input))).To(Succeed())
 			Expect(config.GetURL().String()).To(Equal(input))
 		})
 	})

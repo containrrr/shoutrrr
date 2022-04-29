@@ -1,14 +1,15 @@
 package mattermost
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/url"
 	"os"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var (
@@ -32,7 +33,7 @@ var _ = Describe("the mattermost service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envMattermostURL.String())
-			Expect(service.Initialize(serviceURL, util.TestLogger())).To(Succeed())
+			Expect(service.Initialize(serviceURL, testutils.TestLogger())).To(Succeed())
 			err := service.Send(
 				"this is an integration test",
 				nil,
@@ -153,7 +154,7 @@ var _ = Describe("the mattermost service", func() {
 			input := "mattermost://bot@mattermost.host/token/channel"
 
 			config := &Config{}
-			Expect(config.SetURL(util.URLMust(input))).To(Succeed())
+			Expect(config.SetURL(testutils.URLMust(input))).To(Succeed())
 			Expect(config.GetURL().String()).To(Equal(input))
 		})
 	})

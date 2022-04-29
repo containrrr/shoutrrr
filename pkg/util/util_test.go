@@ -35,14 +35,6 @@ var _ = Describe("the util package", func() {
 		})
 	})
 
-	When("calling function TestLogger", func() {
-		It("should not return nil", func() {
-			Expect(TestLogger()).NotTo(Equal(nil))
-		})
-		It("should have the prefix \"Test\"", func() {
-			Expect(TestLogger().Prefix()).To(Equal("Test"))
-		})
-	})
 	When("checking if a supplied kind is of the signed integer kind", func() {
 		It("should be true if the kind is Int", func() {
 			Expect(IsSignedInt(reflect.Int)).To(BeTrue())

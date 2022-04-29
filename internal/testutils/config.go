@@ -1,12 +1,12 @@
 package testutils
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
 
-	Ω "github.com/onsi/gomega"
-
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
+
+	Ω "github.com/onsi/gomega"
 )
 
 // TestConfigGetInvalidQueryValue tests whether the config returns an error when an invalid query value is requested
@@ -23,6 +23,12 @@ func TestConfigSetInvalidQueryValue(config types.ServiceConfig, rawInvalidURL st
 
 	err = config.SetURL(invalidURL)
 	Ω.ExpectWithOffset(1, err).To(Ω.HaveOccurred())
+}
+
+// TestConfigSetDefaultValues tests whether setting the default values can be set for an empty config without any errors
+func TestConfigSetDefaultValues(config types.ServiceConfig) {
+	pkr := format.NewPropKeyResolver(config)
+	Ω.ExpectWithOffset(1, pkr.SetDefaultProps(config)).To(Ω.Succeed())
 }
 
 // TestConfigGetEnumsCount tests whether the config.Enums returns the expected amount of items

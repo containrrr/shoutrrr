@@ -2,10 +2,11 @@ package slack_test
 
 import (
 	"errors"
-	. "github.com/containrrr/shoutrrr/pkg/services/slack"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	"github.com/jarcoal/httpmock"
 	"log"
+
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	. "github.com/containrrr/shoutrrr/pkg/services/slack"
+	"github.com/jarcoal/httpmock"
 
 	"net/url"
 	"os"
@@ -43,7 +44,7 @@ var _ = Describe("the slack service", func() {
 			}
 
 			serviceURL, _ := url.Parse(envSlackURL.String())
-			err := service.Initialize(serviceURL, util.TestLogger())
+			err := service.Initialize(serviceURL, testutils.TestLogger())
 			Expect(err).NotTo(HaveOccurred())
 
 			err = service.Send("This is an integration test message", nil)
@@ -83,7 +84,7 @@ var _ = Describe("the slack service", func() {
 					newURL := "slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?botname=testbot&color=3f00fe&title=Test+title"
 
 					config := &Config{}
-					err := config.SetURL(urlMust(oldURL))
+					err := config.SetURL(testutils.URLMust(oldURL))
 					Expect(err).NotTo(HaveOccurred(), "verifying")
 
 					Expect(config.GetURL().String()).To(Equal(newURL))
@@ -92,7 +93,7 @@ var _ = Describe("the slack service", func() {
 			})
 		})
 		When("the URL contains an invalid property", func() {
-			testURL := urlMust("slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?bass=dirty")
+			testURL := testutils.URLMust("slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?bass=dirty")
 			err := (&Config{}).SetURL(testURL)
 			Expect(err).To(HaveOccurred())
 		})
@@ -100,7 +101,7 @@ var _ = Describe("the slack service", func() {
 			testURL := "slack://hook:AAAAAAAAA-BBBBBBBBB-123456789123456789123456@webhook?botname=testbot&color=3f00fe&title=Test+title"
 
 			config := &Config{}
-			err := config.SetURL(urlMust(testURL))
+			err := config.SetURL(testutils.URLMust(testURL))
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
@@ -208,12 +209,12 @@ var _ = Describe("the slack service", func() {
 			})
 
 			It("should not report an error if the server accepts the payload", func() {
-				serviceURL := urlMust("slack://xoxb:123456789012-1234567890123-4mt0t4l1YL3g1T5L4cK70k3N@C0123456789")
+				serviceURL := testutils.URLMust("slack://xoxb:123456789012-1234567890123-4mt0t4l1YL3g1T5L4cK70k3N@C0123456789")
 				err = service.Initialize(serviceURL, logger)
 				Expect(err).NotTo(HaveOccurred())
 
 				targetURL := "https://slack.com/api/chat.postMessage"
-				httpmock.RegisterResponder("POST", targetURL, jsonRespondMust(200, APIResponse{
+				httpmock.RegisterResponder("POST", targetURL, testutils.JSONRespondMust(200, APIResponse{
 					Ok: true,
 				}))
 
@@ -221,12 +222,12 @@ var _ = Describe("the slack service", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 			It("should not panic if an error occurs when sending the payload", func() {
-				serviceURL := urlMust("slack://xoxb:123456789012-1234567890123-4mt0t4l1YL3g1T5L4cK70k3N@C0123456789")
+				serviceURL := testutils.URLMust("slack://xoxb:123456789012-1234567890123-4mt0t4l1YL3g1T5L4cK70k3N@C0123456789")
 				err = service.Initialize(serviceURL, logger)
 				Expect(err).NotTo(HaveOccurred())
 
 				targetURL := "https://slack.com/api/chat.postMessage"
-				httpmock.RegisterResponder("POST", targetURL, jsonRespondMust(200, APIResponse{
+				httpmock.RegisterResponder("POST", targetURL, testutils.JSONRespondMust(200, APIResponse{
 					Error: "someone turned off the internet",
 				}))
 
@@ -237,18 +238,6 @@ var _ = Describe("the slack service", func() {
 	})
 })
 
-func jsonRespondMust(code int, response APIResponse) httpmock.Responder {
-	responder, err := httpmock.NewJsonResponder(code, response)
-	ExpectWithOffset(1, err).NotTo(HaveOccurred(), "invalid test response struct")
-	return responder
-}
-
-func urlMust(rawURL string) *url.URL {
-	parsed, err := url.Parse(rawURL)
-	ExpectWithOffset(1, err).NotTo(HaveOccurred(), "invalid test URL string")
-	return parsed
-}
-
 func tokenMust(rawToken string) *Token {
 	token, err := ParseToken(rawToken)
 	ExpectWithOffset(1, err).NotTo(HaveOccurred())
@@ -256,7 +245,7 @@ func tokenMust(rawToken string) *Token {
 }
 
 func expectErrorMessageGivenURL(expected error, rawURL string) {
-	err := service.Initialize(urlMust(rawURL), util.TestLogger())
+	err := service.Initialize(testutils.URLMust(rawURL), testutils.TestLogger())
 	ExpectWithOffset(1, err).To(HaveOccurred())
 	ExpectWithOffset(1, err).To(Equal(expected))
 }
