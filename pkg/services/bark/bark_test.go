@@ -138,7 +138,6 @@ var _ = Describe("the bark service", func() {
 				testutils.TestConfigGetInvalidQueryValue(&Config{})
 				testutils.TestConfigSetInvalidQueryValue(&Config{}, "bark://:mock-device@host/?foo=bar")
 
-				testutils.TestConfigSetInvalidParamValue(&Config{}, "foo", "bar")
 				testutils.TestConfigSetDefaultValues(&Config{})
 
 				testutils.TestConfigGetEnumsCount(&Config{}, 0)
