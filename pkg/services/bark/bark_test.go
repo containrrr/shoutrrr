@@ -132,14 +132,32 @@ var _ = Describe("the bark service", func() {
 		})
 	})
 
-	It("should implement basic service API methods correctly", func() {
-		testutils.TestConfigGetInvalidQueryValue(&Config{})
-		testutils.TestConfigSetInvalidQueryValue(&Config{}, "bark://:mock-device@host/?foo=bar")
+	Describe("the basic service API", func() {
+		Describe("the service config", func() {
+			It("should implement basic service config API methods correctly", func() {
+				testutils.TestConfigGetInvalidQueryValue(&Config{})
+				testutils.TestConfigSetInvalidQueryValue(&Config{}, "bark://:mock-device@host/?foo=bar")
 
-		testutils.TestConfigSetInvalidParamValue(&Config{}, "foo", "bar")
+				testutils.TestConfigSetInvalidParamValue(&Config{}, "foo", "bar")
+				testutils.TestConfigSetDefaultValues(&Config{})
 
-		testutils.TestConfigGetEnumsCount(&Config{}, 0)
-		testutils.TestConfigGetFieldsCount(&Config{}, 9)
+				testutils.TestConfigGetEnumsCount(&Config{}, 0)
+				testutils.TestConfigGetFieldsCount(&Config{}, 9)
+			})
+		})
+		Describe("the service instance", func() {
+			BeforeEach(func() {
+				httpmock.Activate()
+			})
+			AfterEach(func() {
+				httpmock.DeactivateAndReset()
+			})
+			It("should implement basic service API methods correctly", func() {
+				serviceURL := testutils.URLMust("bark://:devicekey@hostname")
+				Expect(service.Initialize(serviceURL, logger)).To(Succeed())
+				testutils.TestServiceSetInvalidParamValue(service, "foo", "bar")
+			})
+		})
 	})
 })
 

@@ -40,9 +40,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
 
-	if err := service.pkr.SetDefaultProps(service.config); err != nil {
-		return err
-	}
+	_ = service.pkr.SetDefaultProps(service.config)
 
 	return service.config.setURL(&service.pkr, configURL)
 
