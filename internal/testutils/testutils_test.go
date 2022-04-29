@@ -59,6 +59,15 @@ var _ = Describe("the testutils package", func() {
 			})
 		})
 
+		Describe("TestConfigGetInvalidQueryValue", func() {
+			It("should fail when not correctly implemented", func() {
+				failures := InterceptGomegaFailures(func() {
+					TestConfigGetInvalidQueryValue(&config)
+				})
+				Expect(failures).To(HaveLen(1))
+			})
+		})
+
 		Describe("TestConfigSetDefaultValues", func() {
 			It("should fail when not correctly implemented", func() {
 				failures := InterceptGomegaFailures(func() {
@@ -108,23 +117,16 @@ type dummyConfig struct {
 	Foo uint64 `key:"foo" default:"-1"`
 }
 
-func (dc *dummyConfig) GetURL() *url.URL {
-	return &url.URL{}
-}
-
-func (dc *dummyConfig) SetURL(u *url.URL) error {
-	return nil
-}
+func (dc *dummyConfig) GetURL() *url.URL           { return &url.URL{} }
+func (dc *dummyConfig) SetURL(u *url.URL) error    { return nil }
+func (dc *dummyConfig) Get(string) (string, error) { return "", nil }
+func (dc *dummyConfig) Set(string, string) error   { return nil }
+func (dc *dummyConfig) QueryFields() []string      { return []string{} }
 
 type dummyService struct {
 	standard.Standard
 	Config dummyConfig
 }
 
-func (s *dummyService) Initialize(_ *url.URL, _ types.StdLogger) error {
-	return nil
-}
-
-func (s *dummyService) Send(_ string, _ *types.Params) error {
-	return nil
-}
+func (s *dummyService) Initialize(_ *url.URL, _ types.StdLogger) error { return nil }
+func (s *dummyService) Send(_ string, _ *types.Params) error           { return nil }
