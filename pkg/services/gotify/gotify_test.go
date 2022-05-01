@@ -2,11 +2,13 @@ package gotify
 
 import (
 	"errors"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"testing"
 
+	"github.com/containrrr/shoutrrr/internal/testutils"
+
+	"github.com/jarcoal/httpmock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -81,31 +83,36 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 			It("should be identical after de-/serialization (with path)", func() {
 				testURL := "gotify://my.gotify.tld/gotify/Aaa.bbb.ccc.ddd?title=Test+title"
 
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
-
 				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).NotTo(HaveOccurred(), "verifying")
-
-				outputURL := config.GetURL()
-				Expect(outputURL.String()).To(Equal(testURL))
-
+				Expect(config.SetURL(testutils.URLMust(testURL))).To(Succeed())
+				Expect(config.GetURL().String()).To(Equal(testURL))
 			})
 			It("should be identical after de-/serialization (without path)", func() {
 				testURL := "gotify://my.gotify.tld/Aaa.bbb.ccc.ddd?disabletls=Yes&priority=1&title=Test+title"
 
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
+				config := &Config{}
+				Expect(config.SetURL(testutils.URLMust(testURL))).To(Succeed())
+				Expect(config.GetURL().String()).To(Equal(testURL))
+
+			})
+			It("should allow slash at the end of the token", func() {
+				url := testutils.URLMust("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd/")
 
 				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).NotTo(HaveOccurred(), "verifying")
+				Expect(config.SetURL(url)).To(Succeed())
+				Expect(config.Token).To(Equal("Aaa.bbb.ccc.ddd"))
+			})
+			It("should allow slash at the end of the token, with additional path", func() {
+				url := testutils.URLMust("gotify://my.gotify.tld/path/to/gotify/Aaa.bbb.ccc.ddd/")
 
-				outputURL := config.GetURL()
-
-				Expect(outputURL.String()).To(Equal(testURL))
-
+				config := &Config{}
+				Expect(config.SetURL(url)).To(Succeed())
+				Expect(config.Token).To(Equal("Aaa.bbb.ccc.ddd"))
+			})
+			It("should not crash on empty token or path slash at the end of the token", func() {
+				config := &Config{}
+				Expect(config.SetURL(testutils.URLMust("gotify://my.gotify.tld//"))).To(Succeed())
+				Expect(config.SetURL(testutils.URLMust("gotify://my.gotify.tld/"))).To(Succeed())
 			})
 		})
 	})
@@ -119,11 +126,11 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.httpClient)
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
-			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
+			httpmock.RegisterResponder("POST", targetURL, testutils.JSONRespondMust(200, messageResponse{}))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -131,7 +138,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not panic if an error occurs when sending the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.Client)
+			httpmock.ActivateNonDefault(service.httpClient)
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
