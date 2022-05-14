@@ -26,7 +26,7 @@ var limits = types.MessageLimit{
 }
 
 const (
-	hookURL = "https://discordapp.com/api/webhooks"
+	hookURL = "https://discord.com/api/webhooks"
 	// Only search this many runes for a good split position
 	maxSearchRunes = 100
 )
