@@ -15,6 +15,7 @@ type Config struct {
 	standard.EnumlessConfig
 	UserName string `url:"user" optional:"" desc:"Override webhook user"`
 	Icon     string `key:"icon,icon_emoji,icon_url" default:"" optional:"" desc:"Use emoji or URL as icon (based on presence of http(s):// prefix)"`
+	Title    string `key:"title" default:"" desc:"Notification title, optionally set by the sender (not used)"`
 	Channel  string `url:"path2" optional:"" desc:"Override webhook channel"`
 	Host     string `url:"host,port" desc:"Mattermost server host"`
 	Token    string `url:"path1" desc:"Webhook token"`
