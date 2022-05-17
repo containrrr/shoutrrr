@@ -111,6 +111,42 @@ var _ = Describe("the mattermost service", func() {
 			})
 		})
 	})
+	When("generating a config object", func() {
+		It("should not set icon", func() {
+			slackURL, _ := url.Parse("mattermost://AAAAAAAAA/BBBBBBBBB")
+			config, configError := CreateConfigFromURL(slackURL)
+
+			Expect(configError).NotTo(HaveOccurred())
+			Expect(config.Icon).To(BeEmpty())
+		})
+		It("should set icon", func() {
+			slackURL, _ := url.Parse("mattermost://AAAAAAAAA/BBBBBBBBB?icon=test")
+			config, configError := CreateConfigFromURL(slackURL)
+
+			Expect(configError).NotTo(HaveOccurred())
+			Expect(config.Icon).To(BeIdenticalTo("test"))
+		})
+	})
+	Describe("creating the payload", func() {
+		Describe("the icon fields", func() {
+			payload := JSON{}
+			It("should set IconURL when the configured icon looks like an URL", func() {
+				payload.SetIcon("https://example.com/logo.png")
+				Expect(payload.IconURL).To(Equal("https://example.com/logo.png"))
+				Expect(payload.IconEmoji).To(BeEmpty())
+			})
+			It("should set IconEmoji when the configured icon does not look like an URL", func() {
+				payload.SetIcon("tanabata_tree")
+				Expect(payload.IconEmoji).To(Equal("tanabata_tree"))
+				Expect(payload.IconURL).To(BeEmpty())
+			})
+			It("should clear both fields when icon is empty", func() {
+				payload.SetIcon("")
+				Expect(payload.IconEmoji).To(BeEmpty())
+				Expect(payload.IconURL).To(BeEmpty())
+			})
+		})
+	})
 	Describe("Sending messages", func() {
 		When("sending a message completely without parameters", func() {
 			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com/thisshouldbeanapitoken")

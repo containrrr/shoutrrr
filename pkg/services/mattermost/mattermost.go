@@ -3,9 +3,11 @@ package mattermost
 import (
 	"bytes"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -14,13 +16,15 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
+	pkr    format.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
+	service.pkr = format.NewPropKeyResolver(service.config)
+	if err := service.config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
@@ -31,6 +35,10 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 func (service *Service) Send(message string, params *types.Params) error {
 	config := service.config
 	apiURL := buildURL(config)
+
+	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+		return err
+	}
 	json, _ := CreateJSONPayload(config, message, params)
 	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 	if err != nil {
