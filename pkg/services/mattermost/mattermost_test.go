@@ -1,6 +1,7 @@
 package mattermost
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"testing"
@@ -195,6 +196,51 @@ var _ = Describe("the mattermost service", func() {
 		})
 	})
 
+	Describe("creating configurations", func() {
+		When("given a url with channel field", func() {
+			It("should not throw an error", func() {
+				serviceURL := testutils.URLMust(`mattermost://user@mockserver/atoken/achannel`)
+				Expect((&Config{}).SetURL(serviceURL)).To(Succeed())
+			})
+		})
+		When("given a url with title prop", func() {
+			It("should not throw an error", func() {
+				serviceURL := testutils.URLMust(`mattermost://user@mockserver/atoken?icon=https%3A%2F%2Fexample%2Fsomething.png`)
+				Expect((&Config{}).SetURL(serviceURL)).To(Succeed())
+			})
+		})
+		When("given a url with all fields and props", func() {
+			It("should not throw an error", func() {
+				serviceURL := testutils.URLMust(`mattermost://user@mockserver/atoken/achannel?icon=https%3A%2F%2Fexample%2Fsomething.png`)
+				Expect((&Config{}).SetURL(serviceURL)).To(Succeed())
+			})
+		})
+		When("given a url with invalid props", func() {
+			It("should return an error", func() {
+				serviceURL := testutils.URLMust(`matrix://user@mockserver/atoken?foo=bar`)
+				Expect((&Config{}).SetURL(serviceURL)).To(HaveOccurred())
+			})
+		})
+		When("parsing the configuration URL", func() {
+			It("should be identical after de-/serialization", func() {
+				testURL := "mattermost://user@mockserver/atoken/achannel?icon=something"
+
+				url, err := url.Parse(testURL)
+				Expect(err).NotTo(HaveOccurred(), "parsing")
+
+				config := &Config{}
+				err = config.SetURL(url)
+				Expect(err).NotTo(HaveOccurred(), "verifying")
+
+				outputURL := config.GetURL()
+				fmt.Println(outputURL.String(), testURL)
+
+				Expect(outputURL.String()).To(Equal(testURL))
+
+			})
+		})
+	})
+
 	Describe("sending the payload", func() {
 		var err error
 		BeforeEach(func() {
@@ -218,19 +264,17 @@ var _ = Describe("the mattermost service", func() {
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
-
 	})
-	
+
 	Describe("the basic service API", func() {
 		Describe("the service config", func() {
 			It("should implement basic service config API methods correctly", func() {
 				testutils.TestConfigGetInvalidQueryValue(&Config{})
-				testutils.TestConfigSetInvalidQueryValue(&Config{}, "bark://:mock-device@host/?foo=bar")
 
 				testutils.TestConfigSetDefaultValues(&Config{})
 
 				testutils.TestConfigGetEnumsCount(&Config{}, 0)
-				testutils.TestConfigGetFieldsCount(&Config{}, 9)
+				testutils.TestConfigGetFieldsCount(&Config{}, 4)
 			})
 		})
 		Describe("the service instance", func() {
@@ -241,8 +285,8 @@ var _ = Describe("the mattermost service", func() {
 				httpmock.DeactivateAndReset()
 			})
 			It("should implement basic service API methods correctly", func() {
-				serviceURL := testutils.URLMust("bark://:devicekey@hostname")
-				Expect(service.Initialize(serviceURL, logger)).To(Succeed())
+				serviceURL := testutils.URLMust("bark://mockhost/mocktoken")
+				Expect(service.Initialize(serviceURL, testutils.TestLogger())).To(Succeed())
 				testutils.TestServiceSetInvalidParamValue(service, "foo", "bar")
 			})
 		})

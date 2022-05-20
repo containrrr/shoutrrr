@@ -31,12 +31,14 @@ func (config *Config) GetURL() *url.URL {
 	if config.UserName != "" {
 		user = url.User(config.UserName)
 	}
+	resolver := format.NewPropKeyResolver(config)
 	return &url.URL{
 		User:       user,
 		Host:       config.Host,
 		Path:       strings.Join(paths, "/"),
 		Scheme:     Scheme,
 		ForceQuery: false,
+		RawQuery:   format.BuildQuery(&resolver),
 	}
 }
 
