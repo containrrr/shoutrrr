@@ -24,11 +24,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
 	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return service.config.setURL(&service.pkr, configURL)
 }
 
 // Send a notification message to Mattermost
