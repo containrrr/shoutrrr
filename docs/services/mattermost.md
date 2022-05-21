@@ -3,7 +3,7 @@
 ## URL Format
 
 !!! info ""
-    mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]
+    mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__][?icon=__`smiley`__]
 
 --8<-- "docs/services/mattermost/config.md"
 
@@ -59,6 +59,7 @@ params := (*types.Params)(
 	&map[string]string{
 		"username": "overwriteUserName",
 		"channel": "overwriteChannel",
+        "icon": "overwriteIcon",
 	},
 )
 
