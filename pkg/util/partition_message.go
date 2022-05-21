@@ -25,10 +25,10 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 	}
 
 	for i := 0; i < maxCount; i++ {
-		// If no suitable split point is found, use the chunkSize
-		chunkEnd := chunkOffset + limits.ChunkSize
-		// ... and start next chunk directly after this one
-		nextChunkStart := chunkEnd
+		// If no suitable split point is found, start next chunk at chunkSize from chunk start
+		nextChunkStart := chunkOffset + limits.ChunkSize
+		// ... and set the chunk end to the rune before the next chunk
+		chunkEnd := nextChunkStart - 1
 		if chunkEnd > maxTotal {
 			// The chunk is smaller than the limit, no need to search
 			chunkEnd = maxTotal
