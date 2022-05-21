@@ -1,6 +1,7 @@
 package discord_test
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -115,12 +116,24 @@ var _ = Describe("the discord service", func() {
 		})
 	})
 	Describe("creating a json payload", func() {
-		//When("given a blank message", func() {
-		//	It("should return an error", func() {
-		//		_, err := CreatePayloadFromItems("", false)
-		//		Expect(err).To(HaveOccurred())
-		//	})
-		//})
+		When("given a blank message", func() {
+			When("split lines is enabled", func() {
+				It("should return an error", func() {
+					items, omitted := CreateItemsFromPlain("", true)
+					Expect(items).To(BeEmpty())
+					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					Expect(err).To(HaveOccurred())
+				})
+			})
+			When("split lines is disabled", func() {
+				It("should return an error", func() {
+					items, omitted := CreateItemsFromPlain("", false)
+					Expect(items).To(BeEmpty())
+					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					Expect(err).To(HaveOccurred())
+				})
+			})
+		})
 		When("given a message that exceeds the max length", func() {
 			It("should return a payload with chunked messages", func() {
 
@@ -204,29 +217,45 @@ var _ = Describe("the discord service", func() {
 	})
 
 	Describe("sending the payload", func() {
-		var err error
+		var dummyConfig = Config{
+			WebhookID: "1",
+			Token:     "dummyToken",
+		}
+		var service Service
 		BeforeEach(func() {
 			httpmock.Activate()
+			service = Service{}
+			if err := service.Initialize(dummyConfig.GetURL(), logger); err != nil {
+				panic(fmt.Errorf("service initialization failed: %v", err))
+			}
 		})
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
 		It("should not report an error if the server accepts the payload", func() {
-			config := Config{
-				WebhookID: "1",
-				Token:     "dummyToken",
-			}
-			serviceURL := config.GetURL()
-			service := Service{}
-			err = service.Initialize(serviceURL, logger)
-			Expect(err).NotTo(HaveOccurred())
+			setupResponder(&dummyConfig, 204, "")
 
-			setupResponder(&config, 204, "")
-
-			err = service.Send("Message", nil)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(service.Send("Message", nil)).To(Succeed())
 		})
-
+		It("should report an error if the server response is not OK", func() {
+			setupResponder(&dummyConfig, 400, "")
+			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
+			Expect(service.Send("Message", nil)).NotTo(Succeed())
+		})
+		It("should report an error if the message is empty", func() {
+			setupResponder(&dummyConfig, 204, "")
+			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
+			Expect(service.Send("", nil)).NotTo(Succeed())
+		})
+		When("using a custom json payload", func() {
+			It("should report an error if the server response is not OK", func() {
+				config := dummyConfig
+				config.JSON = true
+				setupResponder(&config, 400, "")
+				Expect(service.Initialize(config.GetURL(), logger)).To(Succeed())
+				Expect(service.Send("Message", nil)).NotTo(Succeed())
+			})
+		})
 	})
 })
 
