@@ -935,7 +935,19 @@ You're not viewing the latest version.
   URL part: <code class="service-url">mattermost://username@host:port/token/<strong>channel</strong></code>  </li>
 </ul>
 <h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
-<p><em>The services does not support any query/param props</em></p>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Icon</strong> - Use emoji or URL as icon (based on presence of http(s):// prefix)<br />
+  Default: <em>empty</em><br />
+  Aliases: <code>icon_emoji</code>, <code>icon_url</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Notification title, optionally set by the sender (not used)<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 
 
 

@@ -1067,7 +1067,7 @@ You're not viewing the latest version.
 <h1 id="mattermost">MatterMost<a class="headerlink" href="#mattermost" title="Permanent link">&para;</a></h1>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
-<p>mattermost://[<strong><code>username</code></strong>@]<strong><code>mattermost-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code></strong>]</p>
+<p>mattermost://[<strong><code>username</code></strong>@]<strong><code>mattermost-host</code></strong>/<strong><code>token</code></strong>[/<strong><code>channel</code></strong>][?icon=<strong><code>smiley</code></strong>]</p>
 </div>
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1083,7 +1083,19 @@ You're not viewing the latest version.
   URL part: <code class="service-url">mattermost://username@host:port/token/<strong>channel</strong></code>  </li>
 </ul>
 <h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
-<p><em>The services does not support any query/param props</em></p>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Icon</strong> - Use emoji or URL as icon (based on presence of http(s):// prefix)<br />
+  Default: <em>empty</em><br />
+  Aliases: <code>icon_emoji</code>, <code>icon_url</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Notification title, optionally set by the sender (not used)<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
 <h2 id="creating_a_webhook_in_mattermost">Creating a Webhook in MatterMost<a class="headerlink" href="#creating_a_webhook_in_mattermost" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
@@ -1133,6 +1145,7 @@ The following example contains all parameters that are currently supported.</p>
     &amp;map[string]string{
         &quot;username&quot;: &quot;overwriteUserName&quot;,
         &quot;channel&quot;: &quot;overwriteChannel&quot;,
+        &quot;icon&quot;: &quot;overwriteIcon&quot;,
     },
 )
 
