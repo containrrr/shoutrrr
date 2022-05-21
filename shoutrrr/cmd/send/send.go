@@ -51,11 +51,13 @@ func run(cmd *cobra.Command) error {
 
 	if message == "-" {
 		logf("Reading from STDIN...")
-		msgBytes, err := io.ReadAll(os.Stdin)
+		sb := strings.Builder{}
+		count, err := io.Copy(&sb, os.Stdin)
 		if err != nil {
 			return fmt.Errorf("failed to read message from stdin: %v", err)
 		}
-		message = string(msgBytes)
+		logf("Read %d byte(s)", count)
+		message = sb.String()
 	}
 
 	var logger *log.Logger
