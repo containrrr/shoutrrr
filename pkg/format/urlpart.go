@@ -1,5 +1,3 @@
-//go:generate stringer -type=URLPart -trimprefix URL
-
 package format
 
 import (
@@ -8,7 +6,7 @@ import (
 )
 
 // URLPart is an indicator as to what part of an URL a field is serialized to
-type URLPart int
+type URLPart string
 
 // Suffix returns the separator between the URLPart and it's subsequent part
 func (u URLPart) Suffix() rune {
@@ -21,22 +19,49 @@ func (u URLPart) Suffix() rune {
 		return ':'
 	case URLPort:
 		fallthrough
-	case URLPath:
+	case URLPath1:
+		fallthrough
+	case URLPath2:
+		fallthrough
+	case URLPath3:
+		fallthrough
+	case URLPath4:
 		fallthrough
 	default:
 		return '/'
 	}
 }
 
+func (u URLPart) IsPath() bool {
+	return strings.HasPrefix(string(u), "path")
+}
+
 // indicator as to what part of an URL a field is serialized to
 const (
-	URLQuery URLPart = iota
-	URLUser
-	URLPassword
-	URLHost
-	URLPort
-	URLPath
+	URLScheme    URLPart = "scheme"
+	URLQuery     URLPart = "query"
+	URLUser      URLPart = "user"
+	URLPassword  URLPart = "password"
+	URLHost      URLPart = "host"
+	URLPort      URLPart = "port"
+	URLPath1     URLPart = "path1"
+	URLPath2     URLPart = "path2"
+	URLPath3     URLPart = "path3"
+	URLPath4     URLPart = "path4"
+	URLPartCount         = 6
 )
+
+var URLPartOrder [9]URLPart = [9]URLPart{
+	URLScheme,
+	URLUser,
+	URLPassword,
+	URLHost,
+	URLPort,
+	URLPath1,
+	URLPath2,
+	URLPath3,
+	URLPath4,
+}
 
 // ParseURLPart returns the URLPart that matches the supplied string
 func ParseURLPart(s string) URLPart {
@@ -54,13 +79,13 @@ func ParseURLPart(s string) URLPart {
 	case "path":
 		fallthrough
 	case "path1":
-		return URLPath
+		return URLPath1
 	case "path2":
-		return URLPath + 1
+		return URLPath2
 	case "path3":
-		return URLPath + 2
+		return URLPath3
 	case "path4":
-		return URLPath + 3
+		return URLPath4
 	case "query":
 		fallthrough
 	case "":

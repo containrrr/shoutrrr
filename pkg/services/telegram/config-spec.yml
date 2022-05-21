@@ -1,0 +1,33 @@
+version: 1
+props:
+  Chats:
+    type: list
+    description: Chat IDs or Channel names (using @channel-name)
+    required: true
+    keys: [chats, channels]
+  Notification:
+    type: toggle
+    description: If disabled, sends Message silently
+    default: "Yes"
+    keys: [notification]
+  ParseMode:
+    type: option
+    description: How the text Message should be parsed
+    default: None
+    base: 10
+    keys: [parsemode]
+    values: [None, Markdown, HTML, MarkdownV2]
+  Preview:
+    type: toggle
+    description: If disabled, no web page preview will be displayed for URLs
+    default: "Yes"
+    keys: [preview]
+  Title:
+    type: text
+    description: Notification title, optionally set by the sender
+    keys: [title]
+  Token:
+    type: text
+    description: ""
+    required: true
+    urlparts: [user]

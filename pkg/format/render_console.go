@@ -57,9 +57,9 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 				if i > 0 {
 					sb.WriteString(", ")
 				}
-				if part > URLPath {
-					part = URLPath
-				}
+				// if part.IsPath() {
+				// 	part = URLPath1
+				// }
 				sb.WriteString(ColorizeEnum(part))
 			}
 			sb.WriteString(">")

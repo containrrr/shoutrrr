@@ -1,3 +1,4 @@
+//go:generate -command gen-conf go run $GOPACKAGE/shoutrrr-gen --lang go
 package shoutrrr
 
 import (

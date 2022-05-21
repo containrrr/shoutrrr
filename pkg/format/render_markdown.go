@@ -19,15 +19,13 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	sb := strings.Builder{}
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
-	urlFields := make([]*FieldInfo, URLPath+1)
+	urlFields := map[URLPart]*FieldInfo{}
 
 	for _, node := range root.Items {
 		field := node.Field()
 		for _, urlPart := range field.URLParts {
 			if urlPart == URLQuery {
 				queryFields = append(queryFields, field)
-			} else if urlPart > URLPath {
-				urlFields = append(urlFields, field)
 			} else {
 				urlFields[urlPart] = field
 			}
@@ -59,29 +57,12 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	return sb.String()
 }
 
-func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*FieldInfo, scheme string) {
+func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[URLPart]*FieldInfo, scheme string) {
 	fieldsPrinted := make(map[string]bool)
 
-	sort.SliceStable(urlFields, func(i, j int) bool {
-		if urlFields[i] == nil || urlFields[j] == nil {
-			return false
-		}
-
-		urlPartA := URLQuery
-		if len(urlFields[i].URLParts) > 0 {
-			urlPartA = urlFields[i].URLParts[0]
-		}
-
-		urlPartB := URLQuery
-		if len(urlFields[j].URLParts) > 0 {
-			urlPartB = urlFields[j].URLParts[0]
-		}
-
-		return urlPartA < urlPartB
-	})
-
 	r.writeHeader(sb, "URL Fields")
-	for _, field := range urlFields {
+	for _, part := range URLPartOrder {
+		field := urlFields[part]
 		if field == nil || fieldsPrinted[field.Name] {
 			continue
 		}
@@ -89,16 +70,18 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*F
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
 
-		for i, uf := range urlFields {
-			urlPart := URLPart(i)
-			if urlPart == URLQuery {
+		var lastPart URLPart
+		for _, urlPart := range URLPartOrder {
+			// urlPart := URLPart(i)
+			uf := urlFields[urlPart]
+			if urlPart == URLScheme {
 				sb.WriteString(scheme)
 				sb.WriteString("://")
 				continue
 			}
 			if uf == nil {
-				if urlPart == URLPath {
-					sb.WriteRune(urlPart.Suffix())
+				if urlPart.IsPath() {
+					// sb.WriteRune(urlPart.Suffix())
 				} else if urlPart == URLHost {
 					// Host cannot be empty
 					if urlFields[URLPassword] != nil || urlFields[URLUser] != nil {
@@ -108,9 +91,9 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*F
 				}
 				continue
 			} else if urlPart == URLHost && urlFields[URLUser] == nil && urlFields[URLPassword] == nil {
-			} else if urlPart > URLUser {
-				lastPart := urlPart - 1
+			} else if urlPart != URLUser {
 				sb.WriteRune(lastPart.Suffix())
+
 			}
 			if field.IsURLPart(urlPart) {
 				sb.WriteString("<strong>")
@@ -127,7 +110,7 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields []*F
 			if field.IsURLPart(urlPart) {
 				sb.WriteString("</strong>")
 			}
-
+			lastPart = urlPart
 		}
 		sb.WriteString("</code>  \n")
 

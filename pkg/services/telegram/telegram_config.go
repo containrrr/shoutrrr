@@ -11,7 +11,7 @@ import (
 )
 
 // Config for use within the telegram plugin
-type Config struct {
+type Config2 struct {
 	Token        string    `url:"user"`
 	Preview      bool      `key:"preview" default:"Yes" desc:"If disabled, no web page preview will be displayed for URLs"`
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends Message silently"`
@@ -21,25 +21,25 @@ type Config struct {
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config *Config) Enums() map[string]types.EnumFormatter {
+func (config *Config2) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 		"ParseMode": ParseModes.Enum,
 	}
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *Config2) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *Config2) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *Config2) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	tokenParts := strings.Split(config.Token, ":")
 
@@ -53,7 +53,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *Config2) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 

@@ -1,3 +1,5 @@
+//go:generate go run ../../../shoutrrr-gen --lang go config-spec.yml
+
 package bark
 
 import (
@@ -10,7 +12,7 @@ import (
 )
 
 // Config for use within the telegram plugin
-type Config struct {
+type Config2 struct {
 	standard.EnumlessConfig
 	Title     string `key:"title"    default:""      desc:"Notification title, optionally set by the sender"`
 	Host      string `url:"host"                     desc:"Server hostname and port"`
@@ -26,20 +28,8 @@ type Config struct {
 	Copy      string `key:"copy"     default:""      desc:"The value to be copied"`
 }
 
-// GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
-	return config.getURL(&resolver)
-}
-
-// SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
-	return config.setURL(&resolver, url)
-}
-
 // GetAPIURL returns the API URL corresponding to the passed endpoint based on the configuration
-func (config *Config) GetAPIURL(endpoint string) string {
+func (config *Config2) GetAPIURL(endpoint string) string {
 
 	path := strings.Builder{}
 	if !strings.HasPrefix(config.Path, "/") {
@@ -59,7 +49,7 @@ func (config *Config) GetAPIURL(endpoint string) string {
 	return apiURL.String()
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *Config2) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		User:       url.UserPassword("", config.DeviceKey),
 		Host:       config.Host,
@@ -71,7 +61,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *Config2) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 	config.DeviceKey = password
