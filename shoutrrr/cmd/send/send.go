@@ -2,12 +2,14 @@ package send
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
-	u "github.com/containrrr/shoutrrr/internal/util"
+	intutil "github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
@@ -19,8 +21,8 @@ var Cmd = &cobra.Command{
 	Use:    "send",
 	Short:  "Send a notification using a service url",
 	Args:   cobra.MaximumNArgs(2),
-	PreRun: u.LoadFlagsFromAltSources,
-	Run:    Run,
+	PreRun: intutil.LoadFlagsFromAltSources,
+	RunE:   Run,
 }
 
 func init() {
@@ -35,36 +37,50 @@ func init() {
 	Cmd.Flags().StringP("title", "t", "", "The title used for services that support it")
 }
 
-// Run the send command
-func Run(cmd *cobra.Command, _ []string) {
-	verbose, _ := cmd.Flags().GetBool("verbose")
+func logf(format string, a ...interface{}) {
+	fmt.Fprintf(os.Stderr, format+"\n", a...)
+}
 
-	urls, _ := cmd.Flags().GetStringArray("url")
-	message, _ := cmd.Flags().GetString("message")
-	title, _ := cmd.Flags().GetString("title")
+func run(cmd *cobra.Command) error {
+	flags := cmd.Flags()
+	verbose, _ := flags.GetBool("verbose")
+
+	urls, _ := flags.GetStringArray("url")
+	message, _ := flags.GetString("message")
+	title, _ := flags.GetString("title")
+
+	if message == "-" {
+		logf("Reading from STDIN...")
+		msgBytes, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return fmt.Errorf("failed to read message from stdin: %v", err)
+		}
+		message = string(msgBytes)
+	}
 
 	var logger *log.Logger
 
 	if verbose {
-		fmt.Println("URLs:")
-		for _, url := range urls {
-			fmt.Printf("  %s\n", url)
+		urlsPrefix := "URLs:"
+		for i, url := range urls {
+			logf("%s %s", urlsPrefix, url)
+			if i == 0 {
+				// Only display "URLs:" prefix for first line, replace with indentation for the the subsequent
+				urlsPrefix = strings.Repeat(" ", len(urlsPrefix))
+			}
 		}
-		fmt.Printf("Message: %s\n", message)
+		logf("Message: %s", util.Ellipsis(message, 100))
 		if title != "" {
-			fmt.Printf("Title: %v\n", title)
+			logf("Title: %v", title)
 		}
 		logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
 	} else {
 		logger = util.DiscardLogger
 	}
 
-	exitCode := cli.ExSuccess
-
 	sr, err := router.New(logger, urls...)
 	if err != nil {
-		fmt.Printf("error invoking send: %s\n", err)
-		exitCode = cli.ExConfig
+		return cli.ConfigurationError(fmt.Sprintf("error invoking send: %s", err))
 	} else {
 		params := make(types.Params)
 		if title != "" {
@@ -72,14 +88,25 @@ func Run(cmd *cobra.Command, _ []string) {
 		}
 		errs := sr.SendAsync(message, &params)
 		for err := range errs {
-			if err == nil {
-				fmt.Println("Notification sent")
-			} else {
-				fmt.Printf("Error: %v\n", err)
-				exitCode = cli.ExUnavailable
+			if err != nil {
+				return cli.TaskUnavailable(err.Error())
 			}
+			logf("Notification sent")
 		}
 	}
 
-	os.Exit(exitCode)
+	return nil
+}
+
+// Run the send command
+func Run(cmd *cobra.Command, _ []string) error {
+	err := run(cmd)
+	if err != nil {
+		if result, ok := err.(cli.Result); ok && result.ExitCode != cli.ExUsage {
+			// If the error is not related to the CLI usage, report error and exit to not invoke cobra error output
+			_, _ = fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(result.ExitCode)
+		}
+	}
+	return err
 }
