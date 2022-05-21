@@ -59,6 +59,14 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 	return items, len(runes) - chunkOffset
 }
 
+// Ellipsis returns a string that is at most maxLength characters with a ellipsis appended if the input was longer
+func Ellipsis(text string, maxLength int) string {
+	if len(text) > maxLength {
+		text = text[:maxLength-len(ellipsis)] + ellipsis
+	}
+	return text
+}
+
 // MessageItemsFromLines creates a set of MessageItems that is compatible with the supplied limits
 func MessageItemsFromLines(plain string, limits t.MessageLimit) (items []t.MessageItem, omitted int) {
 	omitted = 0
