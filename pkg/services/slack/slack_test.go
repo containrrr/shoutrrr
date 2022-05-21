@@ -2,7 +2,9 @@ package slack_test
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/slack"
@@ -163,7 +165,29 @@ var _ = Describe("the slack service", func() {
 				Expect(payload.IconURL).To(BeEmpty())
 			})
 		})
+		When("when more than 99 lines are being sent", func() {
+			It("should append the exceeding lines to the last attachment", func() {
+				config := Config{}
+				sb := strings.Builder{}
+				for i := 1; i <= 110; i++ {
+					sb.WriteString(fmt.Sprintf("Line %d\n", i))
+				}
+				payload := CreateJSONPayload(&config, sb.String()).(MessagePayload)
+				atts := payload.Attachments
 
+				fmt.Printf("\nLines: %d, Last: %#v\n", len(atts), atts[len(atts)-1])
+
+				Expect(atts).To(HaveLen(100))
+				Expect(atts[len(atts)-1].Text).To(ContainSubstring("Line 110"))
+			})
+		})
+		When("when the last message line ends with a newline", func() {
+			It("should not send an empty attachment", func() {
+				payload := CreateJSONPayload(&Config{}, "One\nTwo\nThree\n").(MessagePayload)
+				atts := payload.Attachments
+				Expect(atts[len(atts)-1].Text).NotTo(BeEmpty())
+			})
+		})
 	})
 
 	Describe("sending the payload", func() {
