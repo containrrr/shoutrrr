@@ -1,6 +1,7 @@
 package discord_test
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -216,29 +217,36 @@ var _ = Describe("the discord service", func() {
 	})
 
 	Describe("sending the payload", func() {
-		var err error
+		var dummyConfig = Config{
+			WebhookID: "1",
+			Token:     "dummyToken",
+		}
+		var service Service
 		BeforeEach(func() {
 			httpmock.Activate()
+			service = Service{}
+			if err := service.Initialize(dummyConfig.GetURL(), logger); err != nil {
+				panic(fmt.Errorf("service initialization failed: %v", err))
+			}
 		})
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
 		It("should not report an error if the server accepts the payload", func() {
-			config := Config{
-				WebhookID: "1",
-				Token:     "dummyToken",
-			}
-			serviceURL := config.GetURL()
-			service := Service{}
-			err = service.Initialize(serviceURL, logger)
-			Expect(err).NotTo(HaveOccurred())
+			setupResponder(&dummyConfig, 204, "")
 
-			setupResponder(&config, 204, "")
-
-			err = service.Send("Message", nil)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(service.Send("Message", nil)).To(Succeed())
 		})
-
+		It("should report an error if the server response is not OK", func() {
+			setupResponder(&dummyConfig, 400, "")
+			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
+			Expect(service.Send("Message", nil)).NotTo(Succeed())
+		})
+		It("should report an error if the message is empty", func() {
+			setupResponder(&dummyConfig, 204, "")
+			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
+			Expect(service.Send("", nil)).NotTo(Succeed())
+		})
 	})
 })
 
