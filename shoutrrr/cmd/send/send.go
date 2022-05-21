@@ -31,7 +31,7 @@ func init() {
 	Cmd.Flags().StringArrayP("url", "u", []string{}, "The notification url")
 	_ = Cmd.MarkFlagRequired("url")
 
-	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url")
+	Cmd.Flags().StringP("message", "m", "", "The message to send to the notification url, or - to read message from stdin")
 	_ = Cmd.MarkFlagRequired("message")
 
 	Cmd.Flags().StringP("title", "t", "", "The title used for services that support it")
