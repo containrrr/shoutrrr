@@ -115,12 +115,24 @@ var _ = Describe("the discord service", func() {
 		})
 	})
 	Describe("creating a json payload", func() {
-		//When("given a blank message", func() {
-		//	It("should return an error", func() {
-		//		_, err := CreatePayloadFromItems("", false)
-		//		Expect(err).To(HaveOccurred())
-		//	})
-		//})
+		When("given a blank message", func() {
+			When("split lines is enabled", func() {
+				It("should return an error", func() {
+					items, omitted := CreateItemsFromPlain("", true)
+					Expect(items).To(BeEmpty())
+					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					Expect(err).To(HaveOccurred())
+				})
+			})
+			When("split lines is disabled", func() {
+				It("should return an error", func() {
+					items, omitted := CreateItemsFromPlain("", false)
+					Expect(items).To(BeEmpty())
+					_, err := CreatePayloadFromItems(items, "title", dummyColors, omitted)
+					Expect(err).To(HaveOccurred())
+				})
+			})
+		})
 		When("given a message that exceeds the max length", func() {
 			It("should return a payload with chunked messages", func() {
 

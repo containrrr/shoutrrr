@@ -18,6 +18,12 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 	maxTotal := Min(len(runes), limits.TotalChunkSize)
 	maxCount := limits.ChunkCount - 1
 
+	if len(input) == 0 {
+		// If the message is empty, return an empty array
+		omitted = 0
+		return
+	}
+
 	for i := 0; i < maxCount; i++ {
 		// If no suitable split point is found, use the chunkSize
 		chunkEnd := chunkOffset + limits.ChunkSize

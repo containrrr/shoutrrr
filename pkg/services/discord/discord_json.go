@@ -2,16 +2,17 @@ package discord
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"time"
 )
 
 // WebhookPayload is the webhook endpoint payload
 type WebhookPayload struct {
-	Embeds   []embedItem `json:"embeds"`
-	Username string      `json:"username,omitempty"`
-	AvatarURL string     `json:"avatar_url,omitempty"`
+	Embeds    []embedItem `json:"embeds"`
+	Username  string      `json:"username,omitempty"`
+	AvatarURL string      `json:"avatar_url,omitempty"`
 }
 
 // JSON is the actual notification payload
@@ -31,6 +32,10 @@ type embedFooter struct {
 
 // CreatePayloadFromItems creates a JSON payload to be sent to the discord webhook API
 func CreatePayloadFromItems(items []types.MessageItem, title string, colors [types.MessageLevelCount]uint, omitted int) (WebhookPayload, error) {
+
+	if len(items) < 1 {
+		return WebhookPayload{}, fmt.Errorf("message is empty")
+	}
 
 	metaCount := 1
 	if omitted < 1 && len(title) < 1 {
@@ -65,10 +70,14 @@ func CreatePayloadFromItems(items []types.MessageItem, title string, colors [typ
 		embeds = append(embeds, ei)
 	}
 
-	embeds[0].Title = title
-	if omitted > 0 {
-		embeds[0].Footer = &embedFooter{
-			Text: fmt.Sprintf("... (%v character(s) where omitted)", omitted),
+	// This should not happen, but it's better to leave the index check before dereferencing the array
+	if len(embeds) > 0 {
+		embeds[0].Title = title
+
+		if omitted > 0 {
+			embeds[0].Footer = &embedFooter{
+				Text: fmt.Sprintf("... (%v character(s) where omitted)", omitted),
+			}
 		}
 	}
 

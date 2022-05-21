@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"net/http"
-	"net/url"
 )
 
 // Service providing Discord as a notification service
@@ -32,15 +33,20 @@ const (
 )
 
 // Send a notification message to discord
-func (service *Service) Send(message string, params *types.Params) error {
-
+func (service *Service) Send(message string, params *types.Params) (err error) {
 	if service.config.JSON {
 		postURL := CreateAPIURLFromConfig(service.config)
-		return doSend([]byte(message), postURL)
+		err = doSend([]byte(message), postURL)
+	} else {
+		items, omitted := CreateItemsFromPlain(message, service.config.SplitLines)
+		err = service.sendItems(items, params, omitted)
 	}
 
-	items, omitted := CreateItemsFromPlain(message, service.config.SplitLines)
-	return service.sendItems(items, params, omitted)
+	if err != nil {
+		err = fmt.Errorf("failed to send discord notification: %v", err)
+	}
+
+	return
 }
 
 // SendItems sends items with additional meta data and richer appearance
@@ -121,9 +127,5 @@ func doSend(payload []byte, postURL string) error {
 		err = fmt.Errorf("response status code %s", res.Status)
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to send discord notification: %v", err)
-	}
-
-	return nil
+	return err
 }
