@@ -285,7 +285,7 @@ var _ = Describe("the mattermost service", func() {
 				httpmock.DeactivateAndReset()
 			})
 			It("should implement basic service API methods correctly", func() {
-				serviceURL := testutils.URLMust("bark://mockhost/mocktoken")
+				serviceURL := testutils.URLMust("mattermost://mockhost/mocktoken")
 				Expect(service.Initialize(serviceURL, testutils.TestLogger())).To(Succeed())
 				testutils.TestServiceSetInvalidParamValue(service, "foo", "bar")
 			})
