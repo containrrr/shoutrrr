@@ -42,6 +42,13 @@ var _ = Describe("Partition Message", func() {
 				Expect(len(items[1].Text)).To(Equal(1999))
 				Expect(len(items[2].Text)).To(Equal(5))
 			})
+			When("the message is empty", func() {
+				It("should return no items", func() {
+					items, _ := testPartitionMessage(0, limits, 100)
+					Expect(items).To(BeEmpty())
+				})
+			})
+
 		})
 		When("splitting by lines", func() {
 			It("should return a payload with chunked messages", func() {

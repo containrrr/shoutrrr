@@ -247,6 +247,15 @@ var _ = Describe("the discord service", func() {
 			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
 			Expect(service.Send("", nil)).NotTo(Succeed())
 		})
+		When("using a custom json payload", func() {
+			It("should report an error if the server response is not OK", func() {
+				config := dummyConfig
+				config.JSON = true
+				setupResponder(&config, 400, "")
+				Expect(service.Initialize(config.GetURL(), logger)).To(Succeed())
+				Expect(service.Send("Message", nil)).NotTo(Succeed())
+			})
+		})
 	})
 })
 
