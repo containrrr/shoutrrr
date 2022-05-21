@@ -76,7 +76,7 @@ func CreatePayloadFromItems(items []types.MessageItem, title string, colors [typ
 
 		if omitted > 0 {
 			embeds[0].Footer = &embedFooter{
-				Text: fmt.Sprintf("... (%v character(s) where omitted)", omitted),
+				Text: fmt.Sprintf("... (%v character(s) were omitted)", omitted),
 			}
 		}
 	}
