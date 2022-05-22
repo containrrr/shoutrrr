@@ -53,31 +53,43 @@ var _ = Describe("Partition Message", func() {
 			})
 			When("given an input without whitespace", func() {
 				It("should not crash, regardless of length", func() {
+					unalignedLimits := types.MessageLimit{
+						ChunkSize:      1997,
+						ChunkCount:     11,
+						TotalChunkSize: 5631,
+					}
+
 					testString := ""
 					for inputLen := 1; inputLen < 8000; inputLen++ {
 						// add a rune to the string using a repeatable pattern (single digit hex of position)
 						testString += strconv.FormatInt(int64(inputLen%16), 16)
-						items, omitted := PartitionMessage(testString, limits, 7)
+						items, omitted := PartitionMessage(testString, unalignedLimits, 7)
 						included := 0
 						for ii, item := range items {
-							expectedSize := limits.ChunkSize
-							// If this is the last chunk, and we haven't reached the total maximum
-							if inputLen < limits.TotalChunkSize && ii == len(items)-1 {
-								// ...and the chunk wouldn't be empty
-								chunkOffset := inputLen % limits.ChunkSize
-								if chunkOffset > 0 {
+							expectedSize := unalignedLimits.ChunkSize
+
+							// The last chunk might be smaller than the preceeding chunks
+							if ii == len(items)-1 {
+								// the chunk size is the remainder of, the total size,
+								// or the max size, whatever is smallest,
+								// and the previous chunk sizes
+								chunkSize := Min(inputLen, unalignedLimits.TotalChunkSize) % unalignedLimits.ChunkSize
+								// if the "rest" of the runes needs another chunk
+								if chunkSize > 0 {
 									// expect the chunk to contain the "rest" of the runes
-									expectedSize = chunkOffset
+									expectedSize = chunkSize
 								}
 								// the last chunk should never be empty, so treat it as one of the full ones
 							}
 
-							// Verify the data, but only on the last chunk to reduce test time
+							// verify the data, but only on the last chunk to reduce test time
 							if ii == len(items)-1 {
 								for ri, r := range item.Text {
 									runeOffset := (len(item.Text) - ri) - 1
 									runeVal, err := strconv.ParseInt(string(r), 16, 64)
-									expectedVal := (expectedSize - runeOffset) % 16
+									expectedLen := Min(inputLen, unalignedLimits.TotalChunkSize)
+									expectedVal := (expectedLen - runeOffset) % 16
+
 									Expect(err).ToNot(HaveOccurred())
 									Expect(runeVal).To(Equal(int64(expectedVal)))
 								}
@@ -87,6 +99,7 @@ var _ = Describe("Partition Message", func() {
 							Expect(item.Text).To(HaveLen(expectedSize))
 						}
 						Expect(omitted + included).To(Equal(inputLen))
+
 					}
 				})
 			})
