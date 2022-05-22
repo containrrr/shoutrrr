@@ -1,7 +1,6 @@
 package gotify
 
 import (
-	"errors"
 	"log"
 	"net/url"
 	"testing"
@@ -78,6 +77,17 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 			Expect(isTokenValid(token)).To(BeFalse())
 		})
 	})
+	Describe("creating the API URL", func() {
+		When("the token is invalid", func() {
+			It("should return an error", func() {
+				config := Config{
+					Token: "invalid",
+				}
+				_, err := buildURL(&config)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 	Describe("creating a config", func() {
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization (with path)", func() {
@@ -126,7 +136,7 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not report an error if the server accepts the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.httpClient)
+			httpmock.ActivateNonDefault(service.GetHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
@@ -138,11 +148,15 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 		It("should not panic if an error occurs when sending the payload", func() {
 			serviceURL, _ := url.Parse("gotify://my.gotify.tld/Aaa.bbb.ccc.ddd")
 			err = service.Initialize(serviceURL, logger)
-			httpmock.ActivateNonDefault(service.httpClient)
+			httpmock.ActivateNonDefault(service.GetHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 
 			targetURL := "https://my.gotify.tld/message?token=Aaa.bbb.ccc.ddd"
-			httpmock.RegisterResponder("POST", targetURL, httpmock.NewErrorResponder(errors.New("dummy error")))
+			httpmock.RegisterResponder("POST", targetURL, testutils.JSONRespondMust(401, errorResponse{
+				Name:        "Unauthorized",
+				Code:        401,
+				Description: "you need to provide a valid access token or user credentials to access this api",
+			}))
 
 			err = service.Send("Message", nil)
 			Expect(err).To(HaveOccurred())
