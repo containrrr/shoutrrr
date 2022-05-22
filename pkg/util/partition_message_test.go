@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -34,10 +35,12 @@ var _ = Describe("Partition Message", func() {
 			})
 			It("should handle messages with a size modulus of chunksize", func() {
 				items, _ := testPartitionMessage(20, limits, 100)
-				Expect(len(items[0].Text)).To(Equal(1994))
-				Expect(len(items[1].Text)).To(Equal(5))
+				// Last word fits in the chunk size
+				Expect(len(items[0].Text)).To(Equal(2000))
 
 				items, _ = testPartitionMessage(40, limits, 100)
+				// Now the last word of the first chunk will be concatenated with
+				// the first word of the second chunk, and so it does not fit in the chunk anymore
 				Expect(len(items[0].Text)).To(Equal(1994))
 				Expect(len(items[1].Text)).To(Equal(1999))
 				Expect(len(items[2].Text)).To(Equal(5))
@@ -48,7 +51,58 @@ var _ = Describe("Partition Message", func() {
 					Expect(items).To(BeEmpty())
 				})
 			})
+			When("given an input without whitespace", func() {
+				It("should not crash, regardless of length", func() {
+					unalignedLimits := types.MessageLimit{
+						ChunkSize:      1997,
+						ChunkCount:     11,
+						TotalChunkSize: 5631,
+					}
 
+					testString := ""
+					for inputLen := 1; inputLen < 8000; inputLen++ {
+						// add a rune to the string using a repeatable pattern (single digit hex of position)
+						testString += strconv.FormatInt(int64(inputLen%16), 16)
+						items, omitted := PartitionMessage(testString, unalignedLimits, 7)
+						included := 0
+						for ii, item := range items {
+							expectedSize := unalignedLimits.ChunkSize
+
+							// The last chunk might be smaller than the preceeding chunks
+							if ii == len(items)-1 {
+								// the chunk size is the remainder of, the total size,
+								// or the max size, whatever is smallest,
+								// and the previous chunk sizes
+								chunkSize := Min(inputLen, unalignedLimits.TotalChunkSize) % unalignedLimits.ChunkSize
+								// if the "rest" of the runes needs another chunk
+								if chunkSize > 0 {
+									// expect the chunk to contain the "rest" of the runes
+									expectedSize = chunkSize
+								}
+								// the last chunk should never be empty, so treat it as one of the full ones
+							}
+
+							// verify the data, but only on the last chunk to reduce test time
+							if ii == len(items)-1 {
+								for ri, r := range item.Text {
+									runeOffset := (len(item.Text) - ri) - 1
+									runeVal, err := strconv.ParseInt(string(r), 16, 64)
+									expectedLen := Min(inputLen, unalignedLimits.TotalChunkSize)
+									expectedVal := (expectedLen - runeOffset) % 16
+
+									Expect(err).ToNot(HaveOccurred())
+									Expect(runeVal).To(Equal(int64(expectedVal)))
+								}
+							}
+
+							included += len(item.Text)
+							Expect(item.Text).To(HaveLen(expectedSize))
+						}
+						Expect(omitted + included).To(Equal(inputLen))
+
+					}
+				})
+			})
 		})
 		When("splitting by lines", func() {
 			It("should return a payload with chunked messages", func() {
@@ -135,11 +189,9 @@ func testPartitionMessage(hundreds int, limits types.MessageLimit, distance int)
 	items, omitted = PartitionMessage(builder.String(), limits, distance)
 
 	contentSize := Min(hundreds*100, limits.TotalChunkSize)
-	expectedChunkCount := CeilDiv(contentSize, limits.ChunkSize-1)
 	expectedOmitted := Max(0, (hundreds*100)-contentSize)
 
-	Expect(omitted).To(Equal(expectedOmitted))
-	Expect(len(items)).To(Equal(expectedChunkCount))
+	ExpectWithOffset(0, omitted).To(Equal(expectedOmitted))
 
 	return
 }
