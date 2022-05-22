@@ -34,10 +34,12 @@ var _ = Describe("Partition Message", func() {
 			})
 			It("should handle messages with a size modulus of chunksize", func() {
 				items, _ := testPartitionMessage(20, limits, 100)
-				Expect(len(items[0].Text)).To(Equal(1994))
-				Expect(len(items[1].Text)).To(Equal(5))
+				// Last word fits in the chunk size
+				Expect(len(items[0].Text)).To(Equal(2000))
 
 				items, _ = testPartitionMessage(40, limits, 100)
+				// Now the last word of the first chunk will be concatenated with
+				// the first word of the second chunk, and so it does not fit in the chunk anymore
 				Expect(len(items[0].Text)).To(Equal(1994))
 				Expect(len(items[1].Text)).To(Equal(1999))
 				Expect(len(items[2].Text)).To(Equal(5))
@@ -48,7 +50,32 @@ var _ = Describe("Partition Message", func() {
 					Expect(items).To(BeEmpty())
 				})
 			})
-
+			When("given an input without whitespace", func() {
+				It("should not crash, regardless of length", func() {
+					testString := ""
+					for inputLen := 1; inputLen < 8000; inputLen++ {
+						testString += "z"
+						items, omitted := PartitionMessage(testString, limits, 7)
+						included := 0
+						for ii, item := range items {
+							expectedSize := limits.ChunkSize
+							// If this is the last chunk, and we haven't reached the total maximum
+							if inputLen < limits.TotalChunkSize && ii == len(items)-1 {
+								// ...and the chunk wouldn't be empty
+								chunkOffset := inputLen % limits.ChunkSize
+								if chunkOffset > 0 {
+									// expect the chunk to contain the "rest" of the runes
+									expectedSize = chunkOffset
+								}
+								// the last chunk should never be empty, so treat it as one of the full ones
+							}
+							included += len(item.Text)
+							Expect(item.Text).To(HaveLen(expectedSize))
+						}
+						Expect(omitted + included).To(Equal(inputLen))
+					}
+				})
+			})
 		})
 		When("splitting by lines", func() {
 			It("should return a payload with chunked messages", func() {
@@ -135,11 +162,11 @@ func testPartitionMessage(hundreds int, limits types.MessageLimit, distance int)
 	items, omitted = PartitionMessage(builder.String(), limits, distance)
 
 	contentSize := Min(hundreds*100, limits.TotalChunkSize)
-	expectedChunkCount := CeilDiv(contentSize, limits.ChunkSize-1)
+	// expectedChunkCount := CeilDiv(contentSize, limits.ChunkSize-1)
 	expectedOmitted := Max(0, (hundreds*100)-contentSize)
 
-	Expect(omitted).To(Equal(expectedOmitted))
-	Expect(len(items)).To(Equal(expectedChunkCount))
+	ExpectWithOffset(1, omitted).To(Equal(expectedOmitted))
+	// ExpectWithOffset(1, len(items)).To(Equal(expectedChunkCount))
 
 	return
 }
