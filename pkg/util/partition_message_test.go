@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -54,7 +55,8 @@ var _ = Describe("Partition Message", func() {
 				It("should not crash, regardless of length", func() {
 					testString := ""
 					for inputLen := 1; inputLen < 8000; inputLen++ {
-						testString += "z"
+						// add a rune to the string using a repeatable pattern (single digit hex of position)
+						testString += strconv.FormatInt(int64(inputLen%16), 16)
 						items, omitted := PartitionMessage(testString, limits, 7)
 						included := 0
 						for ii, item := range items {
@@ -69,6 +71,18 @@ var _ = Describe("Partition Message", func() {
 								}
 								// the last chunk should never be empty, so treat it as one of the full ones
 							}
+
+							// Verify the data, but only on the last chunk to reduce test time
+							if ii == len(items)-1 {
+								for ri, r := range item.Text {
+									runeOffset := (len(item.Text) - ri) - 1
+									runeVal, err := strconv.ParseInt(string(r), 16, 64)
+									expectedVal := (expectedSize - runeOffset) % 16
+									Expect(err).ToNot(HaveOccurred())
+									Expect(runeVal).To(Equal(int64(expectedVal)))
+								}
+							}
+
 							included += len(item.Text)
 							Expect(item.Text).To(HaveLen(expectedSize))
 						}
