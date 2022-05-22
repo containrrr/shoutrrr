@@ -1,9 +1,7 @@
 package gotify
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -13,14 +11,16 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
 // Service providing Gotify as a notification service
 type Service struct {
 	standard.Standard
-	config *Config
-	pkr    format.PropKeyResolver
-	Client *http.Client
+	config     *Config
+	pkr        format.PropKeyResolver
+	httpClient *http.Client
+	client     jsonclient.Client
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -32,7 +32,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.pkr = format.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 
-	service.Client = &http.Client{
+	service.httpClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				// If DisableTLS is specified, we might still need to disable TLS verification
@@ -44,6 +44,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		// Set a reasonable timeout to prevent one bad transfer from block all subsequent ones
 		Timeout: 10 * time.Second,
 	}
+	service.client = jsonclient.NewWithHTTPClient(service.httpClient)
 
 	return err
 }
@@ -69,11 +70,8 @@ func isTokenValid(token string) bool {
 
 func buildURL(config *Config) (string, error) {
 	token := config.Token
-	if len(token) > 0 && token[0] == '/' {
-		token = token[1:]
-	}
 	if !isTokenValid(token) {
-		return "", fmt.Errorf("invalid gotify token \"%s\"", token)
+		return "", fmt.Errorf("invalid gotify token %q", token)
 	}
 	scheme := "https"
 	if config.DisableTLS {
@@ -96,24 +94,26 @@ func (service *Service) Send(message string, params *types.Params) error {
 	if err != nil {
 		return err
 	}
-	jsonBody, err := json.Marshal(JSON{
+
+	request := &messageRequest{
 		Message:  message,
 		Title:    config.Title,
 		Priority: config.Priority,
-	})
-	if err != nil {
-		return err
 	}
-	jsonBuffer := bytes.NewBuffer(jsonBody)
-	resp, err := service.Client.Post(postURL, "application/json", jsonBuffer)
+	response := &messageResponse{}
+	err = service.client.Post(postURL, request, response)
 	if err != nil {
+		errorRes := &errorResponse{}
+		if service.client.ErrorResponse(err, errorRes) {
+			return errorRes
+		}
 		return fmt.Errorf("failed to send notification to Gotify: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Gotify notification returned %d HTTP status code", resp.StatusCode)
 	}
 
 	return nil
+}
+
+// GetHTTPClient is only supposed to be used for mocking the httpclient when testing
+func (service *Service) GetHTTPClient() *http.Client {
+	return service.httpClient
 }

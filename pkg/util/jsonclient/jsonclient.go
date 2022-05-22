@@ -31,9 +31,15 @@ type client struct {
 	indent     string
 }
 
+// NewClient returns a new JSON Client using the default http.Client
 func NewClient() Client {
+	return NewWithHTTPClient(http.DefaultClient)
+}
+
+// NewWithHTTPClient returns a new JSON Client using the specified http.Client
+func NewWithHTTPClient(httpClient *http.Client) Client {
 	return &client{
-		httpClient: http.DefaultClient,
+		httpClient: httpClient,
 		headers: http.Header{
 			"Content-Type": []string{ContentType},
 		},
