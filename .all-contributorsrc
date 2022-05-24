@@ -119,6 +119,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "JosephKav",
+      "name": "Joseph Kavanagh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4267227?v=4",
+      "profile": "https://josephkav.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
