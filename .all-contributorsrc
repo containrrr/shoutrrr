@@ -110,6 +110,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "darktohka",
+      "name": "Derzsi Dániel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16326697?v=4",
+      "profile": "http://ko-fi.com/disyer",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
