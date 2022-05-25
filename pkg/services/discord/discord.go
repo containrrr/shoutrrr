@@ -33,28 +33,36 @@ const (
 )
 
 // Send a notification message to discord
-func (service *Service) Send(message string, params *types.Params) (err error) {
+func (service *Service) Send(message string, params *types.Params) error {
+	var firstErr error
+
 	if service.config.JSON {
 		postURL := CreateAPIURLFromConfig(service.config)
-		err = doSend([]byte(message), postURL)
+		firstErr = doSend([]byte(message), postURL)
 	} else {
-		items, omitted := CreateItemsFromPlain(message, service.config.SplitLines)
-		err = service.sendItems(items, params, omitted)
+		batches := CreateItemsFromPlain(message, service.config.SplitLines)
+		for _, items := range batches {
+			if err := service.sendItems(items, params); err != nil {
+				service.Log(err)
+				if firstErr == nil {
+					firstErr = err
+				}
+			}
+		}
 	}
 
-	if err != nil {
-		err = fmt.Errorf("failed to send discord notification: %v", err)
+	if firstErr != nil {
+		return fmt.Errorf("failed to send discord notification: %v", firstErr)
 	}
-
-	return
+	return nil
 }
 
 // SendItems sends items with additional meta data and richer appearance
 func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
-	return service.sendItems(items, params, 0)
+	return service.sendItems(items, params)
 }
 
-func (service *Service) sendItems(items []types.MessageItem, params *types.Params, omitted int) error {
+func (service *Service) sendItems(items []types.MessageItem, params *types.Params) error {
 	var err error
 
 	config := *service.config
@@ -63,7 +71,7 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 	}
 
 	var payload WebhookPayload
-	payload, err = CreatePayloadFromItems(items, config.Title, config.LevelColors(), omitted)
+	payload, err = CreatePayloadFromItems(items, config.Title, config.LevelColors())
 	if err != nil {
 		return err
 	}
@@ -82,12 +90,21 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 }
 
 // CreateItemsFromPlain creates a set of MessageItems that is compatible with Discords webhook payload
-func CreateItemsFromPlain(plain string, splitLines bool) (items []types.MessageItem, omitted int) {
+func CreateItemsFromPlain(plain string, splitLines bool) (batches [][]types.MessageItem) {
 	if splitLines {
 		return util.MessageItemsFromLines(plain, limits)
 	}
 
-	return util.PartitionMessage(plain, limits, maxSearchRunes)
+	for {
+		items, omitted := util.PartitionMessage(plain, limits, maxSearchRunes)
+		batches = append(batches, items)
+		if omitted == 0 {
+			break
+		}
+		plain = plain[len(plain)-omitted:]
+	}
+
+	return
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service

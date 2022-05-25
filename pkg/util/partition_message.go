@@ -68,41 +68,44 @@ func Ellipsis(text string, maxLength int) string {
 }
 
 // MessageItemsFromLines creates a set of MessageItems that is compatible with the supplied limits
-func MessageItemsFromLines(plain string, limits t.MessageLimit) (items []t.MessageItem, omitted int) {
-	omitted = 0
-	maxCount := limits.ChunkCount - 1
+func MessageItemsFromLines(plain string, limits t.MessageLimit) (batches [][]t.MessageItem) {
+	maxCount := limits.ChunkCount
 
 	lines := strings.Split(plain, "\n")
-	items = make([]t.MessageItem, 0, Min(maxCount, len(lines)))
+	batches = make([][]t.MessageItem, 0)
+	items := make([]t.MessageItem, 0, Min(maxCount, len(lines)))
 
 	totalLength := 0
-	for l, line := range lines {
-		if l < maxCount && totalLength < limits.TotalChunkSize {
-			runes := []rune(line)
-			maxLen := limits.ChunkSize
-			if totalLength+maxLen > limits.TotalChunkSize {
-				maxLen = limits.TotalChunkSize - totalLength
-			}
-			if len(runes) > maxLen {
-				// Trim and add ellipsis
-				runes = runes[:maxLen-len(ellipsis)]
-				line = string(runes) + ellipsis
-			}
+	for _, line := range lines {
 
-			if len(runes) < 1 {
-				continue
-			}
+		maxLen := limits.ChunkSize
 
-			items = append(items, t.MessageItem{
-				Text: line,
-			})
-
-			totalLength += len(runes)
-
-		} else {
-			omitted += len(line)
+		if len(items) == maxCount || totalLength+maxLen > limits.TotalChunkSize {
+			batches = append(batches, items)
+			items = items[:0]
 		}
+
+		runes := []rune(line)
+		if len(runes) > maxLen {
+			// Trim and add ellipsis
+			runes = runes[:maxLen-len(ellipsis)]
+			line = string(runes) + ellipsis
+		}
+
+		if len(runes) < 1 {
+			continue
+		}
+
+		items = append(items, t.MessageItem{
+			Text: line,
+		})
+
+		totalLength += len(runes)
 	}
 
-	return items, omitted
+	if len(items) > 0 {
+		batches = append(batches, items)
+	}
+
+	return batches
 }
