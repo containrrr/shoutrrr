@@ -138,17 +138,19 @@ type Update struct {
 	ChosenInlineResult *chosenInlineResult `json:"chosen_inline_result"`
 	//// 	Optional. New incoming callback query
 	CallbackQuery *callbackQuery `json:"callback_query"`
+
+	// API fields that are not used by the client has been commented out
+
 	//// 	Optional. New incoming shipping query. Only for invoices with flexible price
 	//ShippingQuery	ShippingQuery `json:"shipping_query"`
 	//// 	Optional. New incoming pre-checkout query. Contains full information about checkout
 	//PreCheckoutQuery	PreCheckoutQuery `json:"pre_checkout_query"`
-	/*
-		// 	Optional. New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot
-		Poll	Poll `json:"poll"`
-		// 	Optional. A User changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
-		Poll_answer	PollAnswer `json:"poll_answer"`
-	*/
-	ChatMemberUpdate *chatMemberUpdate `json:"my_chat_member"`
+	//// 	Optional. New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot
+	//Poll	Poll `json:"poll"`
+	//// 	Optional. A User changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
+	//Poll_answer	PollAnswer `json:"poll_answer"`
+
+	ChatMemberUpdate *ChatMemberUpdate `json:"my_chat_member"`
 }
 
 // Chat represents a telegram conversation
@@ -193,7 +195,8 @@ type callbackQuery struct {
 	Data    string   `json:"data"`
 }
 
-type chatMemberUpdate struct {
+// ChatMemberUpdate represents a member update in a telegram chat
+type ChatMemberUpdate struct {
 	// Chat the user belongs to
 	Chat *Chat `json:"chat"`
 	// Performer of the action, which resulted in the change
@@ -201,14 +204,15 @@ type chatMemberUpdate struct {
 	// Date the change was done in Unix time
 	Date int `json:"date"`
 	// Previous information about the chat member
-	OldChatMember *chatMember `json:"old_chat_member"`
+	OldChatMember *ChatMember `json:"old_chat_member"`
 	// New information about the chat member
-	NewChatMember *chatMember `json:"new_chat_member"`
+	NewChatMember *ChatMember `json:"new_chat_member"`
 	// Optional. Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
 	// invite_link ChatInviteLink
 }
 
-type chatMember struct {
+// ChatMember represents the membership state for a user in a telegram chat
+type ChatMember struct {
 	//	The member's status in the chat
 	Status string `json:"status"`
 	// Information about the user
