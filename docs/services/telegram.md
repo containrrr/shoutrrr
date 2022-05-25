@@ -15,15 +15,18 @@ Talk to [the botfather](https://core.telegram.org/bots#6-botfather).
 
 The `chats` param consists of one or more `Chat ID`s or `channel name`s. 
 
-### Channels
-The channel names can be retrieved in the telegram client in the `Channel info` section. 
+### Public Channels
+The channel names can be retrieved in the telegram client in the `Channel info` section for public channels. 
 Replace the `t.me/` prefix from the link with a `@`.
 
 !!! note
     Channels names need to be prefixed by `@` to identify them as such.
 
+!!! note
+    If your channel only has an invite link (starting with `t.me/+`), you have to use it's Chat ID (see below)
+
 ### Chats
-Group chats and private chats are identifieds by `Chat ID`s. Unfortunatly, they are generally not visible in the
+Private channels, Group chats and private chats are identified by `Chat ID`s. Unfortunatly, they are generally not visible in the
 telegram clients.
 The easiest way to retrieve them is by using the `shoutrrr generate telegram` command which will guide you through
 creating a URL with your target chats.

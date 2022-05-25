@@ -148,6 +148,7 @@ type Update struct {
 		// 	Optional. A User changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
 		Poll_answer	PollAnswer `json:"poll_answer"`
 	*/
+	ChatMemberUpdate *chatMemberUpdate `json:"my_chat_member"`
 }
 
 // Chat represents a telegram conversation
@@ -160,7 +161,7 @@ type Chat struct {
 
 // Name returns the name of the channel based on its type
 func (c *Chat) Name() string {
-	if c.Type == "private" || c.Type == "channel" {
+	if c.Type == "private" || c.Type == "channel" && c.Username != "" {
 		return "@" + c.Username
 	}
 	return c.Title
@@ -190,4 +191,26 @@ type callbackQuery struct {
 	From    *User    `json:"from"`
 	Message *Message `json:"Message"`
 	Data    string   `json:"data"`
+}
+
+type chatMemberUpdate struct {
+	// Chat the user belongs to
+	Chat *Chat `json:"chat"`
+	// Performer of the action, which resulted in the change
+	From *User `json:"from"`
+	// Date the change was done in Unix time
+	Date int `json:"date"`
+	// Previous information about the chat member
+	OldChatMember *chatMember `json:"old_chat_member"`
+	// New information about the chat member
+	NewChatMember *chatMember `json:"new_chat_member"`
+	// Optional. Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
+	// invite_link ChatInviteLink
+}
+
+type chatMember struct {
+	//	The member's status in the chat
+	Status string `json:"status"`
+	// Information about the user
+	User *User `json:"user"`
 }

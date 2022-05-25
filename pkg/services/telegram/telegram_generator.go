@@ -77,6 +77,9 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 			panic(err)
 		}
 
+		// If no updates were retrieved, prompt user to continue
+		prompt_done := len(updates) == 0
+
 		for _, update := range updates {
 			lastUpdate = update.UpdateID + 1
 
@@ -88,25 +91,37 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 			if message != nil {
 				chat := message.Chat
 
-				source := message.Chat.Username
+				source := message.Chat.Name()
 				if message.From != nil {
-					source = message.From.Username
+					source = "@" + message.From.Username
 				}
-				ud.Writeln("Got Message '%v' from @%v in %v chat %v",
+
+				ud.Writeln("Got Message '%v' from %v in %v chat %v",
 					f.ColorizeString(message.Text),
 					f.ColorizeProp(source),
 					f.ColorizeEnum(chat.Type),
 					f.ColorizeNumber(chat.ID))
 				ud.Writeln(g.addChat(chat))
+				// Another chat was added, prompt user to continue
+				prompt_done = true
+			} else if update.ChatMemberUpdate != nil {
+				cmu := update.ChatMemberUpdate
+				oldStatus := cmu.OldChatMember.Status
+				newStatus := cmu.NewChatMember.Status
+				ud.Writeln("Got a bot chat member update for %v, status was changed from %v to %v",
+					f.ColorizeProp(cmu.Chat.Name()),
+					f.ColorizeEnum(oldStatus),
+					f.ColorizeEnum(newStatus))
 			} else {
 				ud.Writeln("Got unknown Update. Ignored!")
 			}
 		}
+		if prompt_done {
+			ud.Writeln("")
 
-		ud.Writeln("")
-
-		g.done = !ud.QueryBool(fmt.Sprintf("Got %v chat ID(s) so far. Want to add some more?",
-			f.ColorizeNumber(len(g.chats))), "")
+			g.done = !ud.QueryBool(fmt.Sprintf("Got %v chat ID(s) so far. Want to add some more?",
+				f.ColorizeNumber(len(g.chats))), "")
+		}
 	}
 
 	ud.Writeln("")
