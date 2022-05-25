@@ -2,12 +2,13 @@ package telegram_test
 
 import (
 	"fmt"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/telegram"
@@ -52,7 +53,7 @@ var _ = Describe("the telegram service", func() {
 					return
 				}
 				hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
-				serviceURL, _ := url.Parse("telegram://12345:mock-token/?chats=channel-1")
+				serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1")
 				builder := strings.Builder{}
 				for i := 0; i < 42; i++ {
 					builder.WriteString(hundredChars)
@@ -150,7 +151,8 @@ var _ = Describe("the telegram service", func() {
 		testutils.TestConfigSetInvalidQueryValue(&Config{}, "telegram://12345:mock-token@telegram/?chats=channel-1&foo=bar")
 
 		testutils.TestConfigGetEnumsCount(&Config{}, 1)
-		testutils.TestConfigGetFieldsCount(&Config{}, 6)
+		testutils.TestConfigGetFieldsCount(&Config{}, 7)
+		testutils.TestConfigSetDefaultValues(&Config{})
 	})
 })
 
@@ -159,6 +161,7 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	err := telegram.Initialize(serviceURL, logger)
 	Expect(err).To(HaveOccurred())
 	config := telegram.GetConfig()
+	fmt.Printf("%#v", config)
 	Expect(config.Token).To(BeEmpty())
 	Expect(len(config.Chats)).To(BeZero())
 }

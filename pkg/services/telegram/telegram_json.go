@@ -1,8 +1,8 @@
 package telegram
 
 import (
-	"fmt"
 	"html"
+	"strings"
 )
 
 // SendMessagePayload is the notification payload for the telegram notification service
@@ -39,23 +39,26 @@ func createSendMessagePayload(message string, channel string, config *Config) Se
 		DisablePreview:      !config.Preview,
 	}
 
-	parseMode := config.ParseMode
-	if config.ParseMode == ParseModes.None && config.Title != "" {
-		parseMode = ParseModes.HTML
-		// no parse mode has been provided, treat message as unescaped HTML
-		message = html.EscapeString(message)
-	}
-
-	if parseMode != ParseModes.None {
-		payload.ParseMode = parseMode.String()
-	}
-
-	// only HTML parse mode is supported for titles
-	if parseMode == ParseModes.HTML {
-		payload.Text = fmt.Sprintf("<b>%v</b>\n%v", html.EscapeString(config.Title), message)
+	if config.ParseMode != ParseModes.None {
+		payload.ParseMode = config.ParseMode.String()
 	}
 
 	return payload
+}
+
+const HTMLOverhead = 19
+
+func formatHTMLMessage(title string, message string) string {
+	sb := strings.Builder{}
+	if title != "" {
+		sb.WriteString("<b>")
+		sb.WriteString(html.EscapeString(title))
+		sb.WriteString("</b>\n")
+	}
+	sb.WriteString("<pre>")
+	sb.WriteString(message)
+	sb.WriteString("</pre>")
+	return sb.String()
 }
 
 type errorResponse struct {

@@ -29,8 +29,8 @@ type Generator struct {
 }
 
 // Generate a telegram Shoutrrr configuration from a user dialog
-func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
-	var config Config
+func (g *Generator) Generate(service types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
+	config := Config{}
 	if g.Reader == nil {
 		g.Reader = os.Stdin
 	}
@@ -131,11 +131,12 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 
 	ud.Writeln("")
 
-	config = Config{
-		Notification: true,
-		Token:        token,
-		Chats:        g.chats,
-	}
+	pkr := f.NewPropKeyResolver(&config)
+	_ = pkr.SetDefaultProps(&config)
+
+	config.Notification = true
+	config.Token = token
+	config.Chats = g.chats
 
 	return &config, nil
 }

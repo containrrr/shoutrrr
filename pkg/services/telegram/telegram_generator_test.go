@@ -2,13 +2,14 @@ package telegram_test
 
 import (
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/jarcoal/httpmock"
 	"github.com/mattn/go-colorable"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"io"
-	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 )
@@ -53,7 +54,7 @@ var _ = Describe("TelegramGenerator", func() {
 	AfterEach(func() {
 		httpmock.DeactivateAndReset()
 	})
-	It("should return the ", func() {
+	It("should return the expected URL from a session", func() {
 		gen := telegram.Generator{
 			Reader: userOut,
 			Writer: userInMono,
@@ -106,7 +107,7 @@ var _ = Describe("TelegramGenerator", func() {
 		Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
 		Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))
 
-		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667&preview=No`)))
+		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667`)))
 	})
 
 })

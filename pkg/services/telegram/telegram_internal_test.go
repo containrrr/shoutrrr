@@ -3,10 +3,11 @@ package telegram
 import (
 	"encoding/json"
 	"errors"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"log"
 	"net/url"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("the telegram service", func() {
@@ -18,15 +19,6 @@ var _ = Describe("the telegram service", func() {
 
 	Describe("creating configurations", func() {
 		When("given an url", func() {
-
-			When("a parse mode is not supplied", func() {
-				It("no parse_mode should be present in payload", func() {
-					payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1", "Message", logger)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(payload).NotTo(ContainSubstring("parse_mode"))
-				})
-			})
-
 			When("a parse mode is supplied", func() {
 				When("it's set to a valid mode and not None", func() {
 					It("parse_mode should be present in payload", func() {
@@ -36,27 +28,18 @@ var _ = Describe("the telegram service", func() {
 					})
 				})
 				When("it's set to None", func() {
-					When("no title has been provided", func() {
-						It("no parse_mode should be present in payload", func() {
-							payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&parsemode=None", "Message", logger)
-							Expect(err).NotTo(HaveOccurred())
-							Expect(payload).NotTo(ContainSubstring("parse_mode"))
-						})
+					payload, err := getSinglePayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
+					Expect(err).NotTo(HaveOccurred())
+					It("should have parse_mode set to HTML", func() {
+						Expect(payload.ParseMode).To(Equal("HTML"))
 					})
-					When("a title has been provided", func() {
-						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
-						Expect(err).NotTo(HaveOccurred())
-						It("should have parse_mode set to HTML", func() {
-							Expect(payload.ParseMode).To(Equal("HTML"))
-						})
-						It("should contain the title prepended in the message", func() {
-							Expect(payload.Text).To(ContainSubstring("MessageTitle"))
-						})
-						It("should escape the message HTML tags", func() {
-							Expect(payload.Text).To(ContainSubstring("&lt;3"))
-							Expect(payload.Text).To(ContainSubstring("Cool &amp; stuff"))
-							Expect(payload.Text).To(ContainSubstring("-&gt;"))
-						})
+					It("should contain the title prepended in the message", func() {
+						Expect(payload.Text).To(ContainSubstring("MessageTitle"))
+					})
+					It("should escape the message HTML tags", func() {
+						Expect(payload.Text).To(ContainSubstring("&lt;3"))
+						Expect(payload.Text).To(ContainSubstring("Cool &amp; stuff"))
+						Expect(payload.Text).To(ContainSubstring("-&gt;"))
 					})
 				})
 			})
@@ -65,28 +48,40 @@ var _ = Describe("the telegram service", func() {
 	})
 })
 
-func getPayloadFromURL(testURL string, message string, logger *log.Logger) (SendMessagePayload, error) {
+func getPayloadsFromURL(testURL string, message string, logger *log.Logger) ([]SendMessagePayload, int, error) {
+	var payloads []SendMessagePayload
 	telegram := &Service{}
 
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
-		return SendMessagePayload{}, err
+		return payloads, 0, err
 	}
 
 	if err = telegram.Initialize(serviceURL, logger); err != nil {
-		return SendMessagePayload{}, err
+		return payloads, 0, err
 	}
 
 	if len(telegram.config.Chats) < 1 {
-		return SendMessagePayload{}, errors.New("no channels were supplied")
+		return payloads, 0, errors.New("no channels were supplied")
 	}
 
-	return createSendMessagePayload(message, telegram.config.Chats[0], telegram.config), nil
+	messages, omitted := splitMessages(telegram.config, message)
+
+	payloads = make([]SendMessagePayload, len(messages))
+	for i, msg := range messages {
+		payloads[i] = createSendMessagePayload(msg, telegram.config.Chats[0], telegram.config)
+	}
+	return payloads, omitted, nil
 
 }
 
+func getSinglePayloadFromURL(testURL string, message string, logger *log.Logger) (SendMessagePayload, error) {
+	payloads, _, err := getPayloadsFromURL(testURL, message, logger)
+	return payloads[0], err
+}
+
 func getPayloadStringFromURL(testURL string, message string, logger *log.Logger) ([]byte, error) {
-	payload, err := getPayloadFromURL(testURL, message, logger)
+	payload, err := getSinglePayloadFromURL(testURL, message, logger)
 	if err != nil {
 		return nil, err
 	}
