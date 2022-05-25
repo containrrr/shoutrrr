@@ -88,6 +88,14 @@ var _ = Describe("SetConfigField", func() {
 					Expect(ts.StrSlice).To(HaveLen(2))
 				})
 			})
+			When("the value is empty", func() {
+				It("should be set to an empty slice ", func() {
+					valid, err := SetConfigField(tv, *nodeMap["StrSlice"].Field(), "")
+					Expect(valid).To(BeTrue())
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ts.StrSlice).To(HaveLen(0))
+				})
+			})
 		})
 
 		When("setting a string array value", func() {
