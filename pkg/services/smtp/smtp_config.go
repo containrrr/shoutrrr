@@ -3,9 +3,10 @@ package smtp
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"net/url"
 	"strconv"
+
+	"github.com/containrrr/shoutrrr/pkg/util"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -23,7 +24,7 @@ type Config struct {
 	Subject     string    `desc:"The subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
 	Auth        authType  `desc:"SMTP authentication method" key:"auth" default:"Unknown"`
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
-	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"starttls"`
+	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"usestarttls"`
 	UseHTML     bool      `desc:"Whether the message being sent is in HTML" default:"No" key:"usehtml"`
 }
 
