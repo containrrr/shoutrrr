@@ -98,9 +98,9 @@ var _ = Describe("the SMTP service", func() {
 			testutils.TestConfigSetInvalidQueryValue(config, "smtp://example.com/?fromAddress=s@example.com&toAddresses=r@example.com&foo=bar")
 		})
 
-		It("should have the exped number of fields and enums", func() {
+		It("should have the expected number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
-			testutils.TestConfigGetFieldsCount(config, 11)
+			testutils.TestConfigGetFieldsCount(config, 12)
 		})
 	})
 

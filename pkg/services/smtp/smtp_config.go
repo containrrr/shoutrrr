@@ -6,10 +6,9 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/containrrr/shoutrrr/pkg/util"
-
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // Config is the configuration needed to send e-mail notifications over SMTP
@@ -24,7 +23,7 @@ type Config struct {
 	Subject     string    `desc:"The subject of the sent mail" key:"subject,title" default:"Shoutrrr Notification"`
 	Auth        authType  `desc:"SMTP authentication method" key:"auth" default:"Unknown"`
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
-	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"usestarttls"`
+	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"usestarttls,starttls"`
 	UseHTML     bool      `desc:"Whether the message being sent is in HTML" default:"No" key:"usehtml"`
 }
 
