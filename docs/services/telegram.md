@@ -15,15 +15,18 @@ Talk to [the botfather](https://core.telegram.org/bots#6-botfather).
 
 The `chats` param consists of one or more `Chat ID`s or `channel name`s. 
 
-### Channels
-The channel names can be retrieved in the telegram client in the `Channel info` section. 
+### Public Channels
+The channel names can be retrieved in the telegram client in the `Channel info` section for public channels. 
 Replace the `t.me/` prefix from the link with a `@`.
 
 !!! note
     Channels names need to be prefixed by `@` to identify them as such.
 
+!!! note
+    If your channel only has an invite link (starting with `t.me/+`), you have to use it's Chat ID (see below)
+
 ### Chats
-Group chats and private chats are identifieds by `Chat ID`s. Unfortunatly, they are generally not visible in the
+Private channels, Group chats and private chats are identified by `Chat ID`s. Unfortunatly, they are generally not visible in the
 telegram clients.
 The easiest way to retrieve them is by using the `shoutrrr generate telegram` command which will guide you through
 creating a URL with your target chats.
@@ -33,6 +36,16 @@ creating a URL with your target chats.
     ```
     docker run --rm -it containrrr/shoutrrr generate telegram
     ```
+
+### Asking @shoutrrrbot
+Another way of retrieving the Chat IDs, is by forwarding a message from the target chat to the [@shoutrrrbot](https://t.me/shoutrrrbot).
+It will reply with the Chat ID for the chat where the forwarded message was originally posted.
+Note that it will not work correctly for Group chats, as those messages are just seen as being posted by a user, not in a specific chat.
+Instead you can use the second method, which is to invite the @shoutrrrbot into your group chat and address a message to it (start the message with @shoutrrrbot). You can then safely kick the bot from the group. 
+
+The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at [github.com/containrrr/shoutrrrbot](https://github.com/containrrr/shoutrrrbot).
+
+
 
 ## Optional parameters
 
