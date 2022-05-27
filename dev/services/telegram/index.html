@@ -787,9 +787,9 @@ You're not viewing the latest version.
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#channels" class="md-nav__link">
+  <a href="#public_channels" class="md-nav__link">
     <span class="md-ellipsis">
-      Channels
+      Public Channels
     </span>
   </a>
   
@@ -799,6 +799,15 @@ You're not viewing the latest version.
   <a href="#chats" class="md-nav__link">
     <span class="md-ellipsis">
       Chats
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking_shoutrrrbot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Asking @shoutrrrbot
     </span>
   </a>
   
@@ -1090,9 +1099,9 @@ You're not viewing the latest version.
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#channels" class="md-nav__link">
+  <a href="#public_channels" class="md-nav__link">
     <span class="md-ellipsis">
-      Channels
+      Public Channels
     </span>
   </a>
   
@@ -1102,6 +1111,15 @@ You're not viewing the latest version.
   <a href="#chats" class="md-nav__link">
     <span class="md-ellipsis">
       Chats
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking_shoutrrrbot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Asking @shoutrrrbot
     </span>
   </a>
   
@@ -1194,15 +1212,19 @@ You're not viewing the latest version.
 <p>Talk to <a href="https://core.telegram.org/bots#6-botfather">the botfather</a>.</p>
 <h2 id="identifying_the_target_chatschannels">Identifying the target chats/channels<a class="headerlink" href="#identifying_the_target_chatschannels" title="Permanent link">&para;</a></h2>
 <p>The <code>chats</code> param consists of one or more <code>Chat ID</code>s or <code>channel name</code>s. </p>
-<h3 id="channels">Channels<a class="headerlink" href="#channels" title="Permanent link">&para;</a></h3>
-<p>The channel names can be retrieved in the telegram client in the <code>Channel info</code> section. 
+<h3 id="public_channels">Public Channels<a class="headerlink" href="#public_channels" title="Permanent link">&para;</a></h3>
+<p>The channel names can be retrieved in the telegram client in the <code>Channel info</code> section for public channels. 
 Replace the <code>t.me/</code> prefix from the link with a <code>@</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Channels names need to be prefixed by <code>@</code> to identify them as such.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your channel only has an invite link (starting with <code>t.me/+</code>), you have to use it's Chat ID (see below)</p>
+</div>
 <h3 id="chats">Chats<a class="headerlink" href="#chats" title="Permanent link">&para;</a></h3>
-<p>Group chats and private chats are identifieds by <code>Chat ID</code>s. Unfortunatly, they are generally not visible in the
+<p>Private channels, Group chats and private chats are identified by <code>Chat ID</code>s. Unfortunatly, they are generally not visible in the
 telegram clients.
 The easiest way to retrieve them is by using the <code>shoutrrr generate telegram</code> command which will guide you through
 creating a URL with your target chats.</p>
@@ -1212,6 +1234,12 @@ creating a URL with your target chats.</p>
 <div class="highlight"><pre><span></span><code>docker run --rm -it containrrr/shoutrrr generate telegram
 </code></pre></div></p>
 </div>
+<h3 id="asking_shoutrrrbot">Asking @shoutrrrbot<a class="headerlink" href="#asking_shoutrrrbot" title="Permanent link">&para;</a></h3>
+<p>Another way of retrieving the Chat IDs, is by forwarding a message from the target chat to the <a href="https://t.me/shoutrrrbot">@shoutrrrbot</a>.
+It will reply with the Chat ID for the chat where the forwarded message was originally posted.
+Note that it will not work correctly for Group chats, as those messages are just seen as being posted by a user, not in a specific chat.
+Instead you can use the second method, which is to invite the @shoutrrrbot into your group chat and address a message to it (start the message with @shoutrrrbot). You can then safely kick the bot from the group. </p>
+<p>The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at <a href="https://github.com/containrrr/shoutrrrbot">github.com/containrrr/shoutrrrbot</a>.</p>
 <h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
 <p>You can optionally specify the <strong><code>notification</code></strong>, <strong><code>parseMode</code></strong> and <strong><code>preview</code></strong> parameters in the URL:  </p>
 <div class="admonition info">
