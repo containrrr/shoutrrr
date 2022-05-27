@@ -17,7 +17,7 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 [![github code size in bytes](https://img.shields.io/github/languages/code-size/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr)
 [![license](https://img.shields.io/github/license/containrrr/shoutrrr.svg?style=flat-square)](https://github.com/containrrr/shoutrrr/blob/main/LICENSE)
 [![godoc](https://godoc.org/github.com/containrrr/shoutrrr?status.svg)](https://godoc.org/github.com/containrrr/shoutrrr) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 </div>
@@ -119,7 +119,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/JonasPf"><img src="https://avatars.githubusercontent.com/u/2216775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>JonasPf</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=JonasPf" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/claycooper"><img src="https://avatars.githubusercontent.com/u/3612906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>claycooper</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=claycooper" title="Documentation">📖</a></td>
     <td align="center"><a href="http://ko-fi.com/disyer"><img src="https://avatars.githubusercontent.com/u/16326697?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Derzsi Dániel</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=darktohka" title="Code">💻</a></td>
-    <td align="center"><a href="https://josephkav.io"><img src="https://avatars.githubusercontent.com/u/4267227?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joseph Kavanagh</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=JosephKav" title="Code">💻</a></td>
+    <td align="center"><a href="https://josephkav.io"><img src="https://avatars.githubusercontent.com/u/4267227?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joseph Kavanagh</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/commits?author=JosephKav" title="Code">💻</a> <a href="https://github.com/containrrr/shoutrrr/issues?q=author%3AJosephKav" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://ring0.lol"><img src="https://avatars.githubusercontent.com/u/1893909?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Justin Steven</b></sub></a><br /><a href="https://github.com/containrrr/shoutrrr/issues?q=author%3Ajustinsteven" title="Bug reports">🐛</a></td>
   </tr>
 </table>
