@@ -15,17 +15,15 @@ import (
 
 // Generator is the telegram-specific URL generator
 type Generator struct {
-	ud            *generator.UserDialog
-	client        *Client
-	chats         []string
-	chatNames     []string
-	chatTypes     []string
-	done          bool
-	owner         *User
-	statusMessage int64
-	botName       string
-	Reader        io.Reader
-	Writer        io.Writer
+	ud        *generator.UserDialog
+	client    *Client
+	chats     []string
+	chatNames []string
+	chatTypes []string
+	done      bool
+	botName   string
+	Reader    io.Reader
+	Writer    io.Writer
 }
 
 // Generate a telegram Shoutrrr configuration from a user dialog
@@ -47,7 +45,6 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	token := ud.QueryString("Enter your bot token:", generator.ValidateFormat(IsTokenValid), "token")
 
 	ud.Writeln("Fetching bot info...")
-	// ud.Writeln("Session token: %v", g.sessionToken)
 
 	g.client = &Client{token: token}
 	botInfo, err := g.client.GetBotInfo()
@@ -78,7 +75,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 		}
 
 		// If no updates were retrieved, prompt user to continue
-		prompt_done := len(updates) == 0
+		promptDone := len(updates) == 0
 
 		for _, update := range updates {
 			lastUpdate = update.UpdateID + 1
@@ -103,7 +100,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 					f.ColorizeNumber(chat.ID))
 				ud.Writeln(g.addChat(chat))
 				// Another chat was added, prompt user to continue
-				prompt_done = true
+				promptDone = true
 			} else if update.ChatMemberUpdate != nil {
 				cmu := update.ChatMemberUpdate
 				oldStatus := cmu.OldChatMember.Status
@@ -116,7 +113,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 				ud.Writeln("Got unknown Update. Ignored!")
 			}
 		}
-		if prompt_done {
+		if promptDone {
 			ud.Writeln("")
 
 			g.done = !ud.QueryBool(fmt.Sprintf("Got %v chat ID(s) so far. Want to add some more?",

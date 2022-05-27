@@ -37,11 +37,13 @@ creating a URL with your target chats.
     docker run --rm -it containrrr/shoutrrr generate telegram
     ```
 
-### UserInfoBot
-Another way of retrieving the Chat IDs, is by forwarding a message from the target chat to the [@UserInfoBot](https://t.me/userinfobot).
-It will reply with both your user ID (which can be used to send private messages) and the ID for the chat where the forwarded message was originally posted.
+### Asking @shoutrrrbot
+Another way of retrieving the Chat IDs, is by forwarding a message from the target chat to the [@shoutrrrbot](https://t.me/shoutrrrbot).
+It will reply with the Chat ID for the chat where the forwarded message was originally posted.
+Note that it will not work correctly for Group chats, as those messages are just seen as being posted by a user, not in a specific chat.
+Instead you can use the second method, which is to invite the @shoutrrrbot into your group chat and address a message to it (start the message with @shoutrrrbot). You can then safely kick the bot from the group. 
 
-The bot is created and hosted by [@nadam](https://github.com/nadam), and it's source is available at [github.com/nadam/userinfobot](https://github.com/nadam/userinfobot).
+The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at [github.com/containrrr/shoutrrrbot](https://github.com/containrrr/shoutrrrbot).
 
 
 
