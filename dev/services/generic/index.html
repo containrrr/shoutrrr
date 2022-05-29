@@ -14,7 +14,7 @@
         
       
       <link rel="icon" href="../../favicon.ico">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.15+insiders-4.16.0">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.16+insiders-4.16.2">
     
     
       
@@ -22,10 +22,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.bec4e691.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ca782038.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.96b5c56e.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
         
       
       
@@ -773,6 +773,24 @@ You're not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#shortcut_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shortcut URL
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forwarded_query_variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Forwarded query variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#url_format" class="md-nav__link">
     <span class="md-ellipsis">
       URL Format
@@ -972,6 +990,24 @@ You're not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#shortcut_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shortcut URL
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forwarded_query_variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Forwarded query variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#url_format" class="md-nav__link">
     <span class="md-ellipsis">
       URL Format
@@ -1023,6 +1059,28 @@ You're not viewing the latest version.
 
 
 <h1 id="generic">Generic<a class="headerlink" href="#generic" title="Permanent link">&para;</a></h1>
+<p>The Generic service can be used for any target that is not explicitly supported by Shoutrrr, as long as it
+supports recieving the message via a POST request.
+Usually, this requires customization on the recieving end to interpret the payload that it recives, and might
+not be a viable approach.</p>
+<h2 id="shortcut_url">Shortcut URL<a class="headerlink" href="#shortcut_url" title="Permanent link">&para;</a></h2>
+<p>You can just add <code>generic+</code> as a prefix to your target URL to use it with the generic service, so
+<div class="highlight"><pre><span></span><code>https://example.com/api/v1/postStuff
+</code></pre></div>
+would become
+<div class="highlight"><pre><span></span><code>generic+https://example.com/api/v1/postStuff
+</code></pre></div></p>
+<h2 id="forwarded_query_variables">Forwarded query variables<a class="headerlink" href="#forwarded_query_variables" title="Permanent link">&para;</a></h2>
+<p>All query variables that are not listed in the <a href="#queryparam_props">Query/Param Props</a> section will be
+forwarded to the target endpoint.
+If you need to pass a query variable that <em>is</em> reserved, you can prefix it with an underscore (<code>_</code>).</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>The URL <code>generic+https://example.com/api/v1/postStuff?contenttype=text/plain</code> would send a POST message
+to <code>https://example.com/api/v1/postStuff</code> using the <code>Content-Type: text/plain</code> header.</p>
+<p>If instead escaped, <code>generic+https://example.com/api/v1/postStuff?_contenttype=text/plain</code> would send a POST message
+to <code>https://example.com/api/v1/postStuff?contenttype=text/plain</code> using the <code>Content-Type: application/json</code> header (as it's the default).</p>
+</div>
 <h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
 <h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
 <h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
@@ -1114,7 +1172,7 @@ You're not viewing the latest version.
     <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.4bc08946.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.560c3827.min.js"></script>
+      <script src="../../assets/javascripts/bundle.1a3bf749.min.js"></script>
       
     
   </body>
