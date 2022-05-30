@@ -2,13 +2,14 @@ package telegram_test
 
 import (
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/jarcoal/httpmock"
 	"github.com/mattn/go-colorable"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"io"
-	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/services/telegram"
 )
@@ -79,6 +80,13 @@ var _ = Describe("TelegramGenerator", func() {
 			true,
 			[]telegram.Update{
 				{
+					ChatMemberUpdate: &telegram.ChatMemberUpdate{
+						Chat:          &telegram.Chat{Type: `channel`, Title: `mockChannel`},
+						OldChatMember: &telegram.ChatMember{Status: `kicked`},
+						NewChatMember: &telegram.ChatMember{Status: `administrator`},
+					},
+				},
+				{
 					Message: &telegram.Message{
 						Text: "hi!",
 						From: &telegram.User{Username: `mockUser`},
@@ -102,6 +110,7 @@ var _ = Describe("TelegramGenerator", func() {
 		mockTyped(mockToken)
 		mockTyped(`no`)
 
+		Eventually(userIn).Should(gbytes.Say(`Got a bot chat member update for mockChannel, status was changed from kicked to administrator`))
 		Eventually(userIn).Should(gbytes.Say(`Got 1 chat ID\(s\) so far\. Want to add some more\?`))
 		Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
 		Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))

@@ -1,13 +1,14 @@
 package rocketchat
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/url"
 	"os"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var (
@@ -31,7 +32,7 @@ var _ = Describe("the rocketchat service", func() {
 				return
 			}
 			serviceURL, _ := url.Parse(envRocketchatURL.String())
-			service.Initialize(serviceURL, util.TestLogger())
+			service.Initialize(serviceURL, testutils.TestLogger())
 			err := service.Send(
 				"this is an integration test",
 				nil,
@@ -173,15 +174,15 @@ var _ = Describe("the rocketchat service", func() {
 		})
 		When("sending to an URL with badly syntaxed #channel name", func() {
 			It("should properly parse the Channel", func() {
-                rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
-			    config := &Config{}
-  			    config.SetURL(rocketchatURL)
+				rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/###########################testChannel")
+				config := &Config{}
+				config.SetURL(rocketchatURL)
 				Expect(config.Channel).To(ContainSubstring("###########################testChannel"))
 			})
 			It("should properly parse the Channel", func() {
-			    rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
-			    config := &Config{}
-  			    config.SetURL(rocketchatURL)
+				rocketchatURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com:5055/tokenA/tokenB/#testChannel")
+				config := &Config{}
+				config.SetURL(rocketchatURL)
 				Expect(config.Channel).To(ContainSubstring("#testChannel"))
 			})
 		})

@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"net/http"
-	"net/url"
 )
 
 // Service providing Discord as a notification service
@@ -26,29 +27,42 @@ var limits = types.MessageLimit{
 }
 
 const (
-	hookURL = "https://discordapp.com/api/webhooks"
+	hookURL = "https://discord.com/api/webhooks"
 	// Only search this many runes for a good split position
 	maxSearchRunes = 100
 )
 
 // Send a notification message to discord
 func (service *Service) Send(message string, params *types.Params) error {
+	var firstErr error
 
 	if service.config.JSON {
 		postURL := CreateAPIURLFromConfig(service.config)
-		return doSend([]byte(message), postURL)
+		firstErr = doSend([]byte(message), postURL)
+	} else {
+		batches := CreateItemsFromPlain(message, service.config.SplitLines)
+		for _, items := range batches {
+			if err := service.sendItems(items, params); err != nil {
+				service.Log(err)
+				if firstErr == nil {
+					firstErr = err
+				}
+			}
+		}
 	}
 
-	items, omitted := CreateItemsFromPlain(message, service.config.SplitLines)
-	return service.sendItems(items, params, omitted)
+	if firstErr != nil {
+		return fmt.Errorf("failed to send discord notification: %v", firstErr)
+	}
+	return nil
 }
 
 // SendItems sends items with additional meta data and richer appearance
 func (service *Service) SendItems(items []types.MessageItem, params *types.Params) error {
-	return service.sendItems(items, params, 0)
+	return service.sendItems(items, params)
 }
 
-func (service *Service) sendItems(items []types.MessageItem, params *types.Params, omitted int) error {
+func (service *Service) sendItems(items []types.MessageItem, params *types.Params) error {
 	var err error
 
 	config := *service.config
@@ -57,7 +71,7 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 	}
 
 	var payload WebhookPayload
-	payload, err = CreatePayloadFromItems(items, config.Title, config.LevelColors(), omitted)
+	payload, err = CreatePayloadFromItems(items, config.Title, config.LevelColors())
 	if err != nil {
 		return err
 	}
@@ -76,12 +90,21 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 }
 
 // CreateItemsFromPlain creates a set of MessageItems that is compatible with Discords webhook payload
-func CreateItemsFromPlain(plain string, splitLines bool) (items []types.MessageItem, omitted int) {
+func CreateItemsFromPlain(plain string, splitLines bool) (batches [][]types.MessageItem) {
 	if splitLines {
 		return util.MessageItemsFromLines(plain, limits)
 	}
 
-	return util.PartitionMessage(plain, limits, maxSearchRunes)
+	for {
+		items, omitted := util.PartitionMessage(plain, limits, maxSearchRunes)
+		batches = append(batches, items)
+		if omitted == 0 {
+			break
+		}
+		plain = plain[len(plain)-omitted:]
+	}
+
+	return
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -121,9 +144,5 @@ func doSend(payload []byte, postURL string) error {
 		err = fmt.Errorf("response status code %s", res.Status)
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to send discord notification: %v", err)
-	}
-
-	return nil
+	return err
 }
