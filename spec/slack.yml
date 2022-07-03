@@ -1,0 +1,40 @@
+version: 1
+scheme: slack
+props:
+  BotName:
+    type: text
+    description: Bot name
+    keys: [botname, username]
+    credential: false
+  Channel:
+    type: text
+    description: Channel to send messages to in Cxxxxxxxxxx format
+    required: true
+    urlparts: [host]
+    credential: false
+  Color:
+    type: text
+    description: Message left-hand border color
+    keys: [color]
+    credential: false
+  Icon:
+    type: text
+    description: Use emoji or URL as icon (based on presence of http(s):// prefix)
+    keys: [icon, icon_emoji, icon_url]
+    credential: false
+  ThreadTS:
+    type: text
+    description: ts value of the parent message (to send message as reply in thread)
+    keys: [thread_ts]
+    credential: false
+  Title:
+    type: text
+    description: Prepended text above the message
+    keys: [title]
+    credential: false
+  Token:
+    type: custom
+    description: API Bot token
+    required: true
+    urlparts: [user, password]
+    credential: false

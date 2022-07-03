@@ -1,0 +1,31 @@
+version: 1
+scheme: zulip
+props:
+  BotKey:
+    type: text
+    description: API Key
+    required: true
+    urlparts: [password]
+    credential: false
+  BotMail:
+    type: text
+    description: Bot e-mail address
+    required: true
+    urlparts: [user]
+    credential: false
+  Host:
+    type: text
+    description: API server hostname
+    required: true
+    urlparts: [host, port]
+    credential: false
+  Stream:
+    type: text
+    description: ""
+    keys: [stream]
+    credential: false
+  Topic:
+    type: text
+    description: ""
+    keys: [topic, title]
+    credential: false

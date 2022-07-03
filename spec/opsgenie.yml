@@ -1,0 +1,91 @@
+version: 1
+scheme: opsgenie
+props:
+  APIKey:
+    type: text
+    description: The OpsGenie API key
+    required: true
+    urlparts: [path1]
+    credential: false
+  Actions:
+    type: list
+    description: Custom actions that will be available for the alert
+    keys: [actions]
+    credential: false
+  Alias:
+    type: text
+    description: Client-defined identifier of the alert
+    keys: [alias]
+    credential: false
+  Description:
+    type: text
+    description: Description field of the alert
+    keys: [description]
+    credential: false
+  Details:
+    type: map
+    description: Map of key-value pairs to use as custom properties of the alert
+    keys: [details]
+    credential: false
+  Entity:
+    type: text
+    description: Entity field of the alert that is generally used to specify which
+      domain the Source field of the alert
+    keys: [entity]
+    credential: false
+  Host:
+    type: text
+    description: The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances
+    default: api.opsgenie.com
+    urlparts: [host]
+    credential: false
+  Note:
+    type: text
+    description: Additional note that will be added while creating the alert
+    keys: [note]
+    credential: false
+  Port:
+    type: number
+    description: The OpsGenie API port.
+    default: "443"
+    urlparts: [port]
+    base: 10
+    credential: false
+  Priority:
+    type: text
+    description: Priority level of the alert. Possible values are P1, P2, P3, P4 and
+      P5
+    keys: [priority]
+    credential: false
+  Responders:
+    type: list
+    description: Teams, users, escalations and schedules that the alert will be routed
+      to send notifications
+    keys: [responders]
+    credential: false
+  Source:
+    type: text
+    description: Source field of the alert
+    keys: [source]
+    credential: false
+  Tags:
+    type: list
+    description: Tags of the alert
+    keys: [tags]
+    credential: false
+  Title:
+    type: text
+    description: notification title, optionally set by the sender
+    keys: [title]
+    credential: false
+  User:
+    type: text
+    description: Display name of the request owner
+    keys: [user]
+    credential: false
+  VisibleTo:
+    type: list
+    description: Teams and users that the alert will become visible to without sending
+      any notification
+    keys: [visibleto]
+    credential: false

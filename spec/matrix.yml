@@ -1,0 +1,36 @@
+version: 1
+scheme: matrix
+props:
+  DisableTLS:
+    type: toggle
+    description: ""
+    default: "No"
+    keys: [disabletls]
+    credential: false
+  Host:
+    type: text
+    description: ""
+    required: true
+    urlparts: [host]
+    credential: false
+  Password:
+    type: text
+    description: Password or access token
+    required: true
+    urlparts: [password]
+    credential: false
+  Rooms:
+    type: list
+    description: Room aliases, or with ! prefix, room IDs
+    keys: [rooms, room]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    keys: [title]
+    credential: false
+  User:
+    type: text
+    description: Username or empty when using access token
+    urlparts: [user]
+    credential: false

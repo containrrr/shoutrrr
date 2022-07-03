@@ -1,0 +1,32 @@
+version: 1
+scheme: pushover
+props:
+  Devices:
+    type: list
+    description: ""
+    keys: [devices]
+    credential: false
+  Priority:
+    type: number
+    description: ""
+    default: "0"
+    base: 10
+    keys: [priority]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    keys: [title]
+    credential: false
+  Token:
+    type: text
+    description: API Token/Key
+    required: true
+    urlparts: [password]
+    credential: false
+  User:
+    type: text
+    description: User Key
+    required: true
+    urlparts: [host]
+    credential: false

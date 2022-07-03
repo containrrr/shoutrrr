@@ -1,0 +1,39 @@
+version: 1
+scheme: gotify
+props:
+  DisableTLS:
+    type: toggle
+    description: ""
+    default: "No"
+    keys: [disabletls]
+    credential: false
+  Host:
+    type: text
+    description: Server hostname (and optionally port)
+    required: true
+    urlparts: [host, port]
+    credential: false
+  Path:
+    type: text
+    description: Server subpath
+    urlparts: [path1]
+    credential: false
+  Priority:
+    type: number
+    description: ""
+    default: "0"
+    base: 10
+    keys: [priority]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    default: Shoutrrr notification
+    keys: [title]
+    credential: false
+  Token:
+    type: text
+    description: Application token
+    required: true
+    urlparts: [path2]
+    credential: false

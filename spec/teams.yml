@@ -1,0 +1,39 @@
+version: 1
+scheme: teams
+props:
+  AltID:
+    type: text
+    description: ""
+    urlparts: [path1]
+    credential: false
+  Color:
+    type: text
+    description: ""
+    keys: [color]
+    credential: false
+  Group:
+    type: text
+    description: ""
+    urlparts: [user]
+    credential: false
+  GroupOwner:
+    type: text
+    description: ""
+    urlparts: [path2]
+    credential: false
+  Host:
+    type: text
+    description: ""
+    default: outlook.office.com
+    keys: [host]
+    credential: false
+  Tenant:
+    type: text
+    description: ""
+    urlparts: [host]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    keys: [title]
+    credential: false

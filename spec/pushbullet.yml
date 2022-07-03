@@ -1,0 +1,21 @@
+version: 1
+scheme: pushbullet
+props:
+  Targets:
+    type: list
+    description: ""
+    required: true
+    urlparts: [path1]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    default: Shoutrrr notification
+    keys: [title]
+    credential: false
+  Token:
+    type: text
+    description: ""
+    required: true
+    urlparts: [host]
+    credential: false

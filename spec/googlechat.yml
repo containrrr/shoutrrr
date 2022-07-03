@@ -1,0 +1,23 @@
+version: 1
+scheme: googlechat
+props:
+  Host:
+    type: text
+    description: ""
+    default: chat.googleapis.com
+    credential: false
+  Key:
+    type: text
+    description: ""
+    required: true
+    credential: false
+  Path:
+    type: text
+    description: ""
+    required: true
+    credential: false
+  Token:
+    type: text
+    description: ""
+    required: true
+    credential: false

@@ -1,0 +1,25 @@
+version: 1
+scheme: mattermost
+props:
+  Channel:
+    type: text
+    description: Override webhook channel
+    urlparts: [path2]
+    credential: false
+  Host:
+    type: text
+    description: Mattermost server host
+    required: true
+    urlparts: [host, port]
+    credential: false
+  Token:
+    type: text
+    description: Webhook token
+    required: true
+    urlparts: [path1]
+    credential: false
+  UserName:
+    type: text
+    description: Override webhook user
+    urlparts: [user]
+    credential: false

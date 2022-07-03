@@ -1,0 +1,78 @@
+version: 1
+scheme: discord
+props:
+  Avatar:
+    type: text
+    description: Override the webhook default avatar with specified URL
+    keys: [avatar, avatarurl]
+    credential: false
+  Color:
+    type: number
+    description: The color of the left border for plain messages
+    default: "0x50D9ff"
+    base: 16
+    keys: [color]
+    credential: false
+  ColorDebug:
+    type: number
+    description: The color of the left border for debug messages
+    default: "0x7b00ab"
+    base: 16
+    keys: [colordebug]
+    credential: false
+  ColorError:
+    type: number
+    description: The color of the left border for error messages
+    default: "0xd60510"
+    base: 16
+    keys: [colorerror]
+    credential: false
+  ColorInfo:
+    type: number
+    description: The color of the left border for info messages
+    default: "0x2488ff"
+    base: 16
+    keys: [colorinfo]
+    credential: false
+  ColorWarn:
+    type: number
+    description: The color of the left border for warning messages
+    default: "0xffc441"
+    base: 16
+    keys: [colorwarn]
+    credential: false
+  JSON:
+    type: toggle
+    description: Whether to send the whole message as the JSON payload instead of
+      using it as the 'content' field
+    default: "No"
+    keys: [json]
+    credential: false
+  SplitLines:
+    type: toggle
+    description: Whether to send each line as a separate embedded item
+    default: "Yes"
+    keys: [splitlines]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    keys: [title]
+    credential: false
+  Token:
+    type: text
+    description: ""
+    required: true
+    urlparts: [user]
+    credential: false
+  Username:
+    type: text
+    description: Override the webhook default username
+    keys: [username]
+    credential: false
+  WebhookID:
+    type: text
+    description: ""
+    required: true
+    urlparts: [host]
+    credential: false

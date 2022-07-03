@@ -1,0 +1,69 @@
+version: 1
+scheme: bark
+props:
+  Badge:
+    type: number
+    description: The number displayed next to App icon
+    default: "0"
+    base: 10
+    keys: [badge]
+    credential: false
+  Category:
+    type: text
+    description: Reserved field, no use yet
+    keys: [category]
+    credential: false
+  Copy:
+    type: text
+    description: The value to be copied
+    keys: [copy]
+    credential: false
+  DeviceKey:
+    type: text
+    description: The key for each device
+    required: true
+    urlparts: [password]
+    credential: false
+  Group:
+    type: text
+    description: The group of the notification
+    keys: [group]
+    credential: false
+  Host:
+    type: text
+    description: Server hostname and port
+    required: true
+    urlparts: [host]
+    credential: false
+  Icon:
+    type: text
+    description: An url to the icon, available only on iOS 15 or later
+    keys: [icon]
+    credential: false
+  Path:
+    type: text
+    description: Server path
+    default: /
+    urlparts: [path1]
+    credential: false
+  Scheme:
+    type: text
+    description: Server protocol, http or https
+    default: https
+    keys: [scheme]
+    credential: false
+  Sound:
+    type: text
+    description: Value from https://github.com/Finb/Bark/tree/master/Sounds
+    keys: [sound]
+    credential: false
+  Title:
+    type: text
+    description: Notification title, optionally set by the sender
+    keys: [title]
+    credential: false
+  URL:
+    type: text
+    description: Url that will jump when click notification
+    keys: [url]
+    credential: false

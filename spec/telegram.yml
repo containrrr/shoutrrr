@@ -1,0 +1,40 @@
+version: 1
+scheme: telegram
+props:
+  Chats:
+    type: list
+    description: Chat IDs or Channel names (using @channel-name)
+    required: true
+    keys: [chats, channels]
+    credential: false
+  Notification:
+    type: toggle
+    description: If disabled, sends Message silently
+    default: "Yes"
+    keys: [notification]
+    credential: false
+  ParseMode:
+    type: number
+    description: How the text Message should be parsed
+    default: None
+    base: 10
+    keys: [parsemode]
+    values: [None, Markdown, HTML, MarkdownV2]
+    credential: false
+  Preview:
+    type: toggle
+    description: If disabled, no web page preview will be displayed for URLs
+    default: "Yes"
+    keys: [preview]
+    credential: false
+  Title:
+    type: text
+    description: Notification title, optionally set by the sender
+    keys: [title]
+    credential: false
+  Token:
+    type: text
+    description: ""
+    required: true
+    urlparts: [user]
+    credential: false

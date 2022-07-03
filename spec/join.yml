@@ -1,0 +1,25 @@
+version: 1
+scheme: join
+props:
+  APIKey:
+    type: text
+    description: ""
+    required: true
+    urlparts: [password]
+    credential: false
+  Devices:
+    type: list
+    description: Comma separated list of device IDs
+    required: true
+    keys: [devices]
+    credential: false
+  Icon:
+    type: text
+    description: Icon URL
+    keys: [icon]
+    credential: false
+  Title:
+    type: text
+    description: If set creates a notification
+    keys: [title]
+    credential: false

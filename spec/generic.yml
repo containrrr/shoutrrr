@@ -1,0 +1,25 @@
+version: 1
+scheme: generic
+props:
+  ContentType:
+    type: text
+    description: The value of the Content-Type header
+    default: application/json
+    keys: [contenttype]
+    credential: false
+  DisableTLS:
+    type: toggle
+    description: ""
+    default: "No"
+    keys: [disabletls]
+    credential: false
+  Template:
+    type: text
+    description: ""
+    keys: [template]
+    credential: false
+  Title:
+    type: text
+    description: ""
+    keys: [title]
+    credential: false

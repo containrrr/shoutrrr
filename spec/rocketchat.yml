@@ -1,0 +1,38 @@
+version: 1
+scheme: rocketchat
+props:
+  Channel:
+    type: text
+    description: ""
+    required: true
+    urlparts: [path3]
+    credential: false
+  Host:
+    type: text
+    description: ""
+    required: true
+    urlparts: [host]
+    credential: false
+  Port:
+    type: text
+    description: ""
+    required: true
+    urlparts: [port]
+    credential: false
+  TokenA:
+    type: text
+    description: ""
+    required: true
+    urlparts: [path1]
+    credential: false
+  TokenB:
+    type: text
+    description: ""
+    required: true
+    urlparts: [path2]
+    credential: false
+  UserName:
+    type: text
+    description: ""
+    urlparts: [user]
+    credential: false

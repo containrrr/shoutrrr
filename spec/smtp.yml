@@ -1,0 +1,77 @@
+version: 1
+scheme: smtp
+props:
+  Auth:
+    type: option
+    description: SMTP authentication method
+    default: Unknown
+    base: 10
+    keys: [auth]
+    values: [None, Plain, CRAMMD5, Unknown, OAuth2]
+    credential: false
+  Encryption:
+    type: option
+    description: Encryption method
+    default: Auto
+    base: 10
+    keys: [encryption]
+    values: [None, ExplicitTLS, ImplicitTLS, Auto]
+    credential: false
+  FromAddress:
+    type: text
+    description: E-mail address that the mail are sent from
+    required: true
+    keys: [fromaddress, from]
+    credential: false
+  FromName:
+    type: text
+    description: Name of the sender
+    keys: [fromname]
+    credential: false
+  Host:
+    type: text
+    description: SMTP server hostname or IP address
+    required: true
+    urlparts: [host]
+    credential: false
+  Password:
+    type: text
+    description: SMTP server password or hash (for OAuth2)
+    urlparts: [password]
+    credential: false
+  Port:
+    type: number
+    description: SMTP server port, common ones are 25, 465, 587 or 2525
+    default: "25"
+    urlparts: [port]
+    base: 10
+    credential: false
+  Subject:
+    type: text
+    description: The subject of the sent mail
+    default: Shoutrrr Notification
+    keys: [subject, title]
+    credential: false
+  ToAddresses:
+    type: list
+    description: List of recipient e-mails separated by "," (comma)
+    required: true
+    keys: [toaddresses, to]
+    credential: false
+  UseHTML:
+    type: toggle
+    description: Whether the message being sent is in HTML
+    default: "No"
+    keys: [usehtml]
+    credential: false
+  UseStartTLS:
+    type: toggle
+    description: Whether to use StartTLS encryption
+    default: "Yes"
+    keys: [starttls]
+    credential: false
+  Username:
+    type: text
+    description: SMTP server username
+    urlparts: [user]
+    credential: false

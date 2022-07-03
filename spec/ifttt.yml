@@ -1,0 +1,49 @@
+version: 1
+scheme: ifttt
+props:
+  Events:
+    type: list
+    description: ""
+    required: true
+    keys: [events]
+    credential: false
+  Title:
+    type: text
+    description: Notification title, optionally set by the sender
+    keys: [title]
+    credential: false
+  UseMessageAsValue:
+    type: number
+    description: Sets the corresponding value field to the notification message
+    default: "2"
+    base: 10
+    keys: [messagevalue]
+    credential: false
+  UseTitleAsValue:
+    type: number
+    description: Sets the corresponding value field to the notification title
+    default: "0"
+    base: 10
+    keys: [titlevalue]
+    credential: false
+  Value1:
+    type: text
+    description: ""
+    keys: [value1]
+    credential: false
+  Value2:
+    type: text
+    description: ""
+    keys: [value2]
+    credential: false
+  Value3:
+    type: text
+    description: ""
+    keys: [value3]
+    credential: false
+  WebHookID:
+    type: text
+    description: ""
+    required: true
+    urlparts: [host]
+    credential: false
