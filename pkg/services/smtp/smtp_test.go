@@ -11,7 +11,6 @@ import (
 
 	"github.com/containrrr/shoutrrr/internal/failures"
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 
 	. "github.com/onsi/ginkgo"
@@ -48,8 +47,7 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err).NotTo(HaveOccurred(), "parsing")
 
 			config := &Config{}
-			pkr := format.NewPropKeyResolver(config)
-			err = config.setURL(&pkr, url)
+			err = config.SetURL(url)
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
@@ -95,7 +93,7 @@ var _ = Describe("the SMTP service", func() {
 			testutils.TestConfigSetInvalidQueryValue(config, "smtp://example.com/?fromAddress=s@example.com&toAddresses=r@example.com&foo=bar")
 		})
 
-		It("should have the exped number of fields and enums", func() {
+		It("should have the expected number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
 			testutils.TestConfigGetFieldsCount(config, 11)
 		})
@@ -191,7 +189,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should send notifications without any errors", func() {
 				testURL := "smtp://user:password@example.com:2225/?startTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com,rec2@example.com&useHTML=yes"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
@@ -219,7 +217,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should send notifications without any errors", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
@@ -242,7 +240,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should send notifications without any errors", func() {
 				testURL := "smtp://example.com:2225/?startTLS=yes&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
@@ -265,7 +263,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when not being able to enable StartTLS", func() {
 				testURL := "smtp://example.com:2225/?startTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-STARTTLS",
 					"250-AUTH LOGIN PLAIN",
@@ -294,7 +292,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when not being able to use authentication type", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=crammd5&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
@@ -311,7 +309,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when not being able to send to recipient", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",
@@ -328,7 +326,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when the recipient is not accepted", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testSendRecipient(testURL, []string{
-					"250 mx.google.com at your service",
+					"250 example.com at your service",
 					"250 Sender OK",
 					"553 She doesn't want to be disturbed",
 				})
@@ -343,7 +341,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when the server does not accept the data stream", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testSendRecipient(testURL, []string{
-					"250 mx.google.com at your service",
+					"250 example.com at your service",
 					"250 Sender OK",
 					"250 Receiver OK",
 					"554 Nah I'm fine thanks",
@@ -359,7 +357,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when the server does not accept the data stream content", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testSendRecipient(testURL, []string{
-					"250 mx.google.com at your service",
+					"250 example.com at your service",
 					"250 Sender OK",
 					"250 Receiver OK",
 					"354 Go ahead",
@@ -376,7 +374,7 @@ var _ = Describe("the SMTP service", func() {
 			It("should fail when the server does not close the connection gracefully", func() {
 				testURL := "smtp://example.com:2225/?startTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
-					"250-mx.google.com at your service",
+					"250-example.com at your service",
 					"250-SIZE 35651584",
 					"250-AUTH LOGIN PLAIN",
 					"250 8BITMIME",

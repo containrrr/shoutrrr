@@ -39,8 +39,8 @@ func createSendMessagePayload(message string, channel string, config *Config) Se
 		DisablePreview:      !config.Preview,
 	}
 
-	parseMode := config.ParseMode
-	if config.ParseMode == ParseModes.None && config.Title != "" {
+	parseMode := parseMode(config.ParseMode)
+	if parseMode == ParseModes.None && config.Title != "" {
 		parseMode = ParseModes.HTML
 		// no parse mode has been provided, treat message as unescaped HTML
 		message = html.EscapeString(message)

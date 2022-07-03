@@ -2,8 +2,9 @@ package telegram
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -43,7 +44,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		Notification: true,
 	}
 	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+	if err := service.config.SetURL(configURL); err != nil {
 		return err
 	}
 
@@ -62,6 +63,10 @@ func (service *Service) sendMessageForChatIDs(message string, config *Config) er
 // GetConfig returns the Config for the service
 func (service *Service) GetConfig() *Config {
 	return service.config
+}
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
 }
 
 func sendMessageToAPI(message string, chat string, config *Config) error {

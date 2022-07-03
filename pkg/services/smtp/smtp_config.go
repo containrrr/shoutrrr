@@ -1,18 +1,20 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go ../../../spec/smtp.yml
 package smtp
 
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	"net/url"
 	"strconv"
+
+	"github.com/containrrr/shoutrrr/pkg/util"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config is the configuration needed to send e-mail notifications over SMTP
-type Config struct {
+type LegacyConfig struct {
 	Host        string    `desc:"SMTP server hostname or IP address" url:"Host"`
 	Username    string    `desc:"SMTP server username" default:"" url:"User"`
 	Password    string    `desc:"SMTP server password or hash (for OAuth2)" default:"" url:"Pass"`
@@ -28,18 +30,18 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *LegacyConfig) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
 		User:       util.URLUserPassword(config.Username, config.Password),
@@ -52,7 +54,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	password, _ := url.User.Password()
 
@@ -82,7 +84,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 }
 
 // Clone returns a copy of the config
-func (config *Config) Clone() Config {
+func (config *LegacyConfig) Clone() LegacyConfig {
 	clone := *config
 	clone.ToAddresses = make([]string, len(config.ToAddresses))
 	copy(clone.ToAddresses, config.ToAddresses)
@@ -90,12 +92,20 @@ func (config *Config) Clone() Config {
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config Config) Enums() map[string]types.EnumFormatter {
+func (config LegacyConfig) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 		"Auth":       AuthTypes.Enum,
 		"Encryption": EncMethods.Enum,
 	}
 }
 
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}
+
 // Scheme is the identifying part of this service's configuration URL
 const Scheme = "smtp"
+
+func (config *Config) Hostname() string {
+	return (&url.URL{Host: config.Host}).Hostname()
+}

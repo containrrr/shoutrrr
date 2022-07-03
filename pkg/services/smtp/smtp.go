@@ -3,7 +3,6 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
 	"math/rand"
 	"net"
@@ -21,7 +20,6 @@ type Service struct {
 	standard.Templater
 	config            *Config
 	multipartBoundary string
-	propKeyResolver   format.PropKeyResolver
 }
 
 const (
@@ -33,31 +31,29 @@ const (
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{
-		Port:        25,
-		ToAddresses: nil,
-		Subject:     "",
-		Auth:        AuthTypes.Unknown,
-		UseStartTLS: true,
-		UseHTML:     false,
-		Encryption:  EncMethods.Auto,
-	}
+	service.config = &Config{}
+	service.config.Init()
+	// service.config = &Config{
+	// 	Port:        25,
+	// 	ToAddresses: nil,
+	// 	Subject:     "",
+	// 	Auth:        AuthOptions.Unknown,
+	// 	UseStartTLS: true,
+	// 	UseHTML:     false,
+	// 	Encryption:  EncryptionOptions.Auto,
+	// }
 
-	pkr := format.NewPropKeyResolver(service.config)
-
-	if err := service.config.setURL(&pkr, configURL); err != nil {
+	if err := service.config.SetURL(configURL); err != nil {
 		return err
 	}
 
-	if service.config.Auth == AuthTypes.Unknown {
+	if service.config.Auth == AuthOptions.Unknown {
 		if service.config.Username != "" {
-			service.config.Auth = AuthTypes.Plain
+			service.config.Auth = AuthOptions.Plain
 		} else {
-			service.config.Auth = AuthTypes.None
+			service.config.Auth = AuthOptions.None
 		}
 	}
-
-	service.propKeyResolver = pkr
 
 	return nil
 }
@@ -69,8 +65,8 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return fail(FailGetSMTPClient, err)
 	}
 
-	config := service.config.Clone()
-	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
+	config := *service.config
+	if err := config.UpdateFromParams(params); err != nil {
 		return fail(FailApplySendParams, err)
 	}
 
@@ -84,7 +80,7 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
-	if useImplicitTLS(config.Encryption, config.Port) {
+	if useImplicitTLS(encMethod(config.Encryption), uint16(config.Port)) {
 		conn, err = tls.Dial("tcp", addr, &tls.Config{
 			ServerName: config.Host,
 		})
@@ -110,7 +106,7 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
 	}
 
-	if config.UseStartTLS && !useImplicitTLS(config.Encryption, config.Port) {
+	if config.UseStartTLS && !useImplicitTLS(encMethod(config.Encryption), uint16(config.Port)) {
 		if supported, _ := client.Extension("StartTLS"); !supported {
 			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
 		} else {
@@ -151,17 +147,17 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
-	switch config.Auth {
+	switch authType(config.Auth) {
 	case AuthTypes.None:
 		return nil, nil
 	case AuthTypes.Plain:
-		return smtp.PlainAuth("", config.Username, config.Password, config.Host), nil
+		return smtp.PlainAuth("", config.Username, config.Password, config.Hostname()), nil
 	case AuthTypes.CRAMMD5:
 		return smtp.CRAMMD5Auth(config.Username, config.Password), nil
 	case AuthTypes.OAuth2:
 		return OAuth2Auth(config.Username, config.Password), nil
 	default:
-		return nil, fail(FailAuthType, nil, config.Auth.String())
+		return nil, fail(FailAuthType, nil, authType(config.Auth).String())
 	}
 
 }

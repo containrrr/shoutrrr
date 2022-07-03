@@ -42,7 +42,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 	_ = service.pkr.SetDefaultProps(service.config)
 
-	return service.config.setURL(&service.pkr, configURL)
+	return service.config.SetURL(configURL)
 
 }
 

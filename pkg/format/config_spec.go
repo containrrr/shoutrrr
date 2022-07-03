@@ -13,6 +13,7 @@ import (
 
 type ConfigSpec struct {
 	Version uint32
+	Scheme  string
 	Props   map[string]*ConfigSpecProp
 }
 
@@ -29,6 +30,7 @@ type ConfigSpecProp struct {
 	Keys         []string  `yaml:",omitempty,flow"`
 	Values       []string  `yaml:",omitempty,flow"`
 	CustomType   string    `yaml:"customType,omitempty"`
+	Credential   bool      `yaml:"credential"`
 }
 
 type ConfigPropType string
@@ -45,6 +47,20 @@ const (
 	CustomPropType   ConfigPropType = "custom"
 )
 
+func (pt ConfigPropType) FormatCall(sp *ConfigSpecProp, valueVar string) string {
+	nm := string(pt)
+	args := []string{valueVar}
+	switch pt {
+	case NumberPropType:
+		args = append(args, fmt.Sprintf("%d", sp.Base))
+	case OptionPropType:
+		return fmt.Sprintf(`%vOptions.Formatter.Print(int(%v))`, sp.Name, args[0])
+		// args = append(args, fmt.Sprintf("%vOptions.Formatter", sp.Name))
+	}
+
+	return fmt.Sprintf("format.Format%v%vValue(%v)", strings.ToUpper(nm[:1]), nm[1:], strings.Join(args, ", "))
+}
+
 func (pt ConfigPropType) ParserCall(sp *ConfigSpecProp, valueVar string) string {
 	nm := string(pt)
 	args := []string{valueVar}
@@ -52,13 +68,33 @@ func (pt ConfigPropType) ParserCall(sp *ConfigSpecProp, valueVar string) string 
 	case NumberPropType:
 		args = append(args, fmt.Sprintf("%d", sp.Base))
 	case OptionPropType:
-		args = append(args, fmt.Sprintf("%vFormatter", sp.Name))
+		return fmt.Sprintf(`%vOptions.Parse(%v)`, sp.Name, args[0])
+		// args = append(args, fmt.Sprintf("%vOptions.Formatter", sp.Name))
 	}
 
-	return fmt.Sprintf("Parse%v%vValue(%v)", strings.ToUpper(nm[:1]), nm[1:], strings.Join(args, ", "))
+	return fmt.Sprintf("format.Parse%v%vValue(%v)", strings.ToUpper(nm[:1]), nm[1:], strings.Join(args, ", "))
+}
+
+func (pt ConfigPropType) EmptyCall(sp *ConfigSpecProp, valueVar string) string {
+	switch pt {
+	case NumberPropType:
+		return fmt.Sprintf(`%v == 0`, valueVar)
+	case TextPropType:
+		return fmt.Sprintf(`%v == ""`, valueVar)
+	case ListPropType:
+		return fmt.Sprintf(`len(%v) == 0`, valueVar)
+	case OptionPropType:
+		return fmt.Sprintf(`int(%v) == 0`, valueVar)
+	// args = append(args, fmt.Sprintf("%vOptions.Formatter", sp.Name))
+	default:
+		panic(fmt.Sprintf("EmptyCall not implemented for %v", pt))
+	}
 }
 
 func ConfigPropTypeFromType(rtype reflect.Type, ttype NodeTokenType) ConfigPropType {
+	if ttype == EnumToken {
+		return OptionPropType
+	}
 	kind := rtype.Kind()
 	if util.IsNumeric(kind) {
 		return NumberPropType
@@ -121,4 +157,36 @@ func ParseToggleValue(v string) (bool, error) {
 
 func ParseMapValue(v string) (map[string]string, error) {
 	return nil, fmt.Errorf("map value parser is not implemented")
+}
+
+func FormatNumberValue(v int64, base int) string {
+	return strconv.FormatInt(v, base)
+}
+
+func FormatTextValue(v string) string {
+	return v
+}
+
+func FormatListValue(v []string) string {
+	return strings.Join(v, ",")
+}
+
+func FormatColorValue(v int64) string {
+	panic("color value formatter is not implemented")
+}
+
+func FormatDurationValue(v time.Duration) string {
+	return v.String()
+}
+
+func FormatOptionValue(v Option, ef types.EnumFormatter) string {
+	return ef.Print(int(v))
+}
+
+func FormatToggleValue(v bool) string {
+	return PrintBool(v)
+}
+
+func FormatMapValue(v map[string]string) string {
+	panic("map value parser is not implemented")
 }
