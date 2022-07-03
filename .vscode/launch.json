@@ -13,6 +13,16 @@
             "args": ["pkg/services/telegram/config-spec.yml"],
             "env": { "GOPACKAGE": "telegram", "GOFILE": "pkg/services/telegram/telegram_config.go" },
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run mkspec",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "./cmd/mkspec",
+            "args": [""],
+            // "env": { "GOPACKAGE": "telegram", "GOFILE": "pkg/services/telegram/telegram_config.go" },
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
