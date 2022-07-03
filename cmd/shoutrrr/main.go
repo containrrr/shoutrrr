@@ -3,13 +3,12 @@ package main
 import (
 	"os"
 
+	"github.com/containrrr/shoutrrr/cmd/shoutrrr/docs"
+	"github.com/containrrr/shoutrrr/cmd/shoutrrr/generate"
+	"github.com/containrrr/shoutrrr/cmd/shoutrrr/send"
+	"github.com/containrrr/shoutrrr/cmd/shoutrrr/verify"
 	"github.com/containrrr/shoutrrr/internal/meta"
-	cli "github.com/containrrr/shoutrrr/shoutrrr/cmd"
-	"github.com/containrrr/shoutrrr/shoutrrr/cmd/docs"
-	"github.com/containrrr/shoutrrr/shoutrrr/cmd/generate"
-	"github.com/containrrr/shoutrrr/shoutrrr/cmd/migrate"
-	"github.com/containrrr/shoutrrr/shoutrrr/cmd/send"
-	"github.com/containrrr/shoutrrr/shoutrrr/cmd/verify"
+	"github.com/containrrr/shoutrrr/pkg/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,7 +25,6 @@ func init() {
 	cmd.AddCommand(generate.Cmd)
 	cmd.AddCommand(send.Cmd)
 	cmd.AddCommand(docs.Cmd)
-	cmd.AddCommand(migrate.Cmd)
 }
 
 func main() {

@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 // Result contains the final exit message and code for a CLI session
 type Result struct {

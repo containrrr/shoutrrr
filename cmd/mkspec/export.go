@@ -1,4 +1,4 @@
-package migrate
+package main
 
 import (
 	"io"
@@ -9,12 +9,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Export(service types.Service, w io.Writer) error {
-	configNode := format.GetServiceConfigFormat(service)
+type MigratedService interface {
+	GetLegacyConfig() types.ServiceConfig
+}
+
+func Export(service types.Service, scheme string, w io.Writer) error {
+	var configNode *format.ContainerNode
+	if migratedService, ok := service.(MigratedService); ok {
+		println("Service config is migrated, using legacy config")
+		configNode = format.GetConfigFormat(migratedService.GetLegacyConfig())
+	} else {
+		configNode = format.GetServiceConfigFormat(service)
+	}
 
 	configDef := format.ConfigSpec{
 		Version: 1,
-		Props:   map[string]format.ConfigSpecProp{},
+		Scheme:  scheme,
+		Props:   map[string]*format.ConfigSpecProp{},
 	}
 
 	for _, item := range configNode.Items {
@@ -23,7 +34,7 @@ func Export(service types.Service, w io.Writer) error {
 		if ef := field.EnumFormatter; ef != nil {
 			values = ef.Names()
 		}
-		configDef.Props[field.Name] = format.ConfigSpecProp{
+		configDef.Props[field.Name] = &format.ConfigSpecProp{
 			Type:         format.ConfigPropTypeFromType(field.Type, item.TokenType()),
 			Description:  field.Description,
 			DefaultValue: field.DefaultValue,
