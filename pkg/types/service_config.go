@@ -20,3 +20,10 @@ type ConfigQueryResolver interface {
 	Set(string, string) error
 	QueryFields() []string
 }
+
+// GeneratedConfig is the interface for service configs created using shoutrr-gen
+type GeneratedConfig interface {
+	ServiceConfig
+	Init() error
+	UpdateFromParams(*Params) error
+}

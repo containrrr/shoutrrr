@@ -128,6 +128,10 @@ func ParseTextValue(v string) (string, error) {
 }
 
 func ParseListValue(v string) ([]string, error) {
+	if v == "" {
+		// If the source string is empty, the list contains no items
+		return []string{}, nil
+	}
 	return strings.Split(v, ","), nil
 }
 

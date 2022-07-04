@@ -86,6 +86,9 @@ func (pkr *PropKeyResolver) set(target reflect.Value, key string, value string) 
 // If the provided config is nil, the internal config will be updated instead.
 // The error returned is the first error that occurred, subsequent errors are just discarded.
 func (pkr *PropKeyResolver) UpdateConfigFromParams(config t.ServiceConfig, params *t.Params) (firstError error) {
+	if genConf, ok := config.(t.GeneratedConfig); ok {
+		return genConf.UpdateFromParams(params)
+	}
 	confValue := pkr.configValueOrInternal(config)
 	if params != nil {
 		for key, val := range *params {
@@ -101,6 +104,9 @@ func (pkr *PropKeyResolver) UpdateConfigFromParams(config t.ServiceConfig, param
 // If the provided config is nil, the internal config will be updated instead.
 // The error returned is the first error that occurred, subsequent errors are just discarded.
 func (pkr *PropKeyResolver) SetDefaultProps(config t.ServiceConfig) (firstError error) {
+	if genConf, ok := config.(t.GeneratedConfig); ok {
+		return genConf.Init()
+	}
 	confValue := pkr.configValueOrInternal(config)
 	for key, info := range pkr.keyFields {
 		if err := pkr.set(confValue, key, info.DefaultValue); err != nil && firstError == nil {
