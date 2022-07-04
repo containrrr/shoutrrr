@@ -38,9 +38,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-
-	_ = service.pkr.SetDefaultProps(service.config)
+	service.config.Init()
 
 	return service.config.SetURL(configURL)
 

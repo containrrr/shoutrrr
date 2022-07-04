@@ -4,24 +4,29 @@ package bark
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/format"
 )
 
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Props                          ( 
+// (___________________________________)
+
 type Config struct {
-	Badge     int64
-	Category  string
-	Copy      string
-	DeviceKey string
-	Group     string
-	Host      string
-	Icon      string
-	Path      string
-	Scheme    string
-	Sound     string
-	Title     string
-	URL       string
+	Badge     int64 `key:"badge" `
+	Category  string `key:"category" `
+	Copy      string `key:"copy" `
+	DeviceKey string `url:"password" `
+	Group     string `key:"group" `
+	Host      string `url:"host" `
+	Icon      string `key:"icon" `
+	Path      string `url:"path1" `
+	Scheme    string `key:"scheme" `
+	Sound     string `key:"sound" `
+	Title     string `key:"title" `
+	URL       string `key:"url" `
 }
 
 type configProp int
@@ -68,6 +73,18 @@ var propKeys = []string{
 	"url",
 }
 
+var keyProp = []configProp{
+	propBadge,
+	propCategory,
+	propCopy,
+	propGroup,
+	propIcon,
+	propScheme,
+	propSound,
+	propTitle,
+	propURL,
+}
+
 var defaultValues = []string{
 	"0",
 	"",
@@ -83,13 +100,41 @@ var defaultValues = []string{
 	"",
 }
 
+var primaryKeys = []int{
+	0,
+	1,
+	2,
+	-1,
+	3,
+	-1,
+	4,
+	-1,
+	5,
+	6,
+	7,
+	8,
+}
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  GetURL                         ( 
+// (___________________________________)
+
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
 		User: url.UserPassword("", config.DeviceKey),
 		Host: config.Host,
+		Path: config.Path,
+		RawQuery: config.QueryValues().Encode(),
+		Scheme: Scheme,
 	}
 }
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  SetURL                         ( 
+// (___________________________________)
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
@@ -98,45 +143,42 @@ func (config *Config) SetURL(url *url.URL) error {
 	if pwd, found := url.User.Password(); found {
 		updates["DeviceKey"] = pwd
 	}
+	updates["Path"] = url.Path
 
-	if qv := url.Query()["badge"]; len(qv) == 1 {
-        updates["Badge"] = qv[0]
+	for key, value := range url.Query() {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value[0]
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
 	}
-	if qv := url.Query()["category"]; len(qv) == 1 {
-        updates["Category"] = qv[0]
+
+	err := config.Update(updates); if err != nil {
+		return err
 	}
-	if qv := url.Query()["copy"]; len(qv) == 1 {
-        updates["Copy"] = qv[0]
+
+	if config.DeviceKey == "" {
+		return fmt.Errorf("DeviceKey missing from config URL")
 	}
-	if qv := url.Query()["group"]; len(qv) == 1 {
-        updates["Group"] = qv[0]
-	}
-	if qv := url.Query()["icon"]; len(qv) == 1 {
-        updates["Icon"] = qv[0]
-	}
-	if qv := url.Query()["scheme"]; len(qv) == 1 {
-        updates["Scheme"] = qv[0]
-	}
-	if qv := url.Query()["sound"]; len(qv) == 1 {
-        updates["Sound"] = qv[0]
-	}
-	if qv := url.Query()["title"]; len(qv) == 1 {
-        updates["Title"] = qv[0]
-	}
-	if qv := url.Query()["url"]; len(qv) == 1 {
-        updates["URL"] = qv[0]
+
+	if config.Host == "" {
+		return fmt.Errorf("Host missing from config URL")
 	}
 
 	return nil
 }
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Enums / Options                ( 
+// (___________________________________)
 
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 	}
 }
 
-var (
-)
 // Update updates the Config from a map of it's properties
 func (config *Config) Update(updates map[string]string) error {
 	var last_err error
@@ -224,12 +266,108 @@ func (config *Config) Update(updates map[string]string) error {
 	return nil
 }
 
+// Update updates the Config from a map of it's properties
+func (config *Config) propValue(prop configProp) string {
+	switch prop {
+	case propBadge:
+		return format.FormatNumberValue(config.Badge, 10)
+	case propCategory:
+		return format.FormatTextValue(config.Category)
+	case propCopy:
+		return format.FormatTextValue(config.Copy)
+	case propDeviceKey:
+		return format.FormatTextValue(config.DeviceKey)
+	case propGroup:
+		return format.FormatTextValue(config.Group)
+	case propHost:
+		return format.FormatTextValue(config.Host)
+	case propIcon:
+		return format.FormatTextValue(config.Icon)
+	case propPath:
+		return format.FormatTextValue(config.Path)
+	case propScheme:
+		return format.FormatTextValue(config.Scheme)
+	case propSound:
+		return format.FormatTextValue(config.Sound)
+	case propTitle:
+		return format.FormatTextValue(config.Title)
+	case propURL:
+		return format.FormatTextValue(config.URL)
+	default:
+		return ""
+	}
+}
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Helpers                        ( 
+// (___________________________________)
+
+
+func propNameFromKey(key string) (string, error) {
+	key = strings.ToLower(key)
+	for i, pk := range propKeys {
+		if key == pk {
+			return propNames[keyProp[i]], nil
+		}
+	}
+	return "", fmt.Errorf("invalid key %q", key)
+}
+
+// UpdateFromParams updates the configuration from the supplied params
+func (config *Config) UpdateFromParams(params *types.Params) error {
+	if params == nil {
+		return nil
+	}
+	updates := make(map[string]string, len(*params))
+	for key, value := range *params {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
+	}
+	return config.Update(updates)
+}
+
+
+// UpdateFromQuery updates the configuration from the supplied query values
+func (config *Config) UpdateFromQuery(values url.Values) error {
+	updates := make(map[string]string, len(values))
+	for key, value := range values {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value[0]
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
+	}
+	return config.Update(updates)
+}
+
 // Init sets all the Config properties to their default values
-func (config *Config) Init() {
+func (config *Config) Init() error {
 	updates := make(map[string]string, propCount)
 	for i, name := range propNames {
 		updates[name] = defaultValues[i]
 	}
-	config.Update(updates)
+	return config.Update(updates)
 }
 
+// QueryValues returns a url.Values populated from the configuration
+func (config *Config) QueryValues() url.Values {
+	values := make(url.Values, propCount)
+	for i := range propNames {
+		if primaryKeys[i] < 0 {
+			continue
+		}
+		value := config.propValue(configProp(i))
+		if value == defaultValues[i] {
+			continue
+		}
+		values.Set(propKeys[primaryKeys[i]], config.propValue(configProp(i)))
+	}
+	return values
+}
+	

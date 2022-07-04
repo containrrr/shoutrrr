@@ -2,7 +2,6 @@ package bark
 
 import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
 
 	"log"
 	"net/http"
@@ -76,8 +75,7 @@ var _ = Describe("the bark service", func() {
 			It("should be identical after de-/serialization", func() {
 				testURL := "bark://:device-key@example.com:2225/?badge=5&category=CAT&group=GROUP&scheme=http&title=TITLE&url=URL"
 				config := &Config{}
-				pkr := format.NewPropKeyResolver(config)
-				Expect(config.setURL(&pkr, testutils.URLMust(testURL))).To(Succeed(), "verifying")
+				Expect(config.SetURL(testutils.URLMust(testURL))).To(Succeed(), "verifying")
 				Expect(config.GetURL().String()).To(Equal(testURL))
 			})
 		})
