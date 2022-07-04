@@ -142,6 +142,10 @@ func goType(ps *format.ConfigSpecProp) string {
 		// return "format.Option"
 	case format.ListPropType:
 		return "[]string"
+	case format.ColorPropType:
+		return "uint32"
+	case format.CustomPropType:
+		return ps.Name + "Type"
 	default:
 		return "interface{}"
 	}
@@ -149,6 +153,49 @@ func goType(ps *format.ConfigSpecProp) string {
 
 func optionTypeName(name string) string {
 	return strings.ToLower(name[:1]) + name[1:] + `Option`
+}
+
+func getPathSetter(urlProps map[format.URLPart]string) string {
+	pathVal := `"/",`
+	if prop, found := urlProps[format.URLPath]; found {
+		pathVal = fmt.Sprintf(`string(config.%v),`, prop)
+	} else {
+		pathParts := []string{}
+		for _, pp := range format.URLPathParts {
+			if prop, found := urlProps[pp]; found {
+				pathParts = append(pathParts, fmt.Sprintf(`string(config.%v)`, prop))
+			} else {
+				break
+			}
+		}
+		if len(pathParts) > 0 {
+			pathVal = fmt.Sprintf(`strings.Join([]string{%v}, "/"),`, strings.Join(pathParts, ", "))
+		}
+	}
+	return `		Path: ` + pathVal
+}
+
+func writePathGetters(urlProps map[format.URLPart]string) {
+	if prop, found := urlProps[format.URLPath]; found {
+		wf(`	updates[%q] = url.Path`, prop)
+		return
+	} else {
+		for i, pp := range format.URLPathParts {
+			if prop, found := urlProps[pp]; found {
+				if i == 0 {
+					wl(`	pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")`)
+				}
+				wf(`	updates[%q] = pathParts[%v]`, prop, i)
+			} else {
+				if i > 0 {
+					wf(`	if len(pathParts) > %v {`, i)
+					wf(`		return fmt.Errorf("too many path items: %%v, expected %v", len(pathParts))`, i)
+					wl(`	}`)
+				}
+				break
+			}
+		}
+	}
 }
 
 func getUserInfoSetter(urlProps map[format.URLPart]string) string {

@@ -53,6 +53,8 @@ func (pt ConfigPropType) FormatCall(sp *ConfigSpecProp, valueVar string) string 
 	switch pt {
 	case NumberPropType:
 		args = append(args, fmt.Sprintf("%d", sp.Base))
+	case CustomPropType:
+		return fmt.Sprintf("config.get%v()", sp.Name)
 	case OptionPropType:
 		return fmt.Sprintf(`%vOptions.Formatter.Print(int(%v))`, sp.Name, args[0])
 		// args = append(args, fmt.Sprintf("%vOptions.Formatter", sp.Name))
@@ -67,8 +69,10 @@ func (pt ConfigPropType) ParserCall(sp *ConfigSpecProp, valueVar string) string 
 	switch pt {
 	case NumberPropType:
 		args = append(args, fmt.Sprintf("%d", sp.Base))
+	case CustomPropType:
+		return fmt.Sprintf("config.set%v(%v)", sp.Name, valueVar)
 	case OptionPropType:
-		return fmt.Sprintf(`%vOptions.Parse(%v)`, sp.Name, args[0])
+		return fmt.Sprintf(`%vOptions.Parse(%v)`, sp.Name, valueVar)
 		// args = append(args, fmt.Sprintf("%vOptions.Formatter", sp.Name))
 	}
 
@@ -135,8 +139,15 @@ func ParseListValue(v string) ([]string, error) {
 	return strings.Split(v, ","), nil
 }
 
-func ParseColorValue(v string) (int, error) {
-	return 0, fmt.Errorf("color value parser is not implemented")
+func ParseColorValue(v string) (uint32, error) {
+	if len(v) > 0 && v[0] == '#' {
+		v = v[1:]
+	}
+	if len(v) > 1 && v[:2] == "0x" {
+		v = v[2:]
+	}
+	color, err := strconv.ParseUint(v, 16, 32)
+	return uint32(color), err
 }
 
 func ParseDurationValue(v string) (time.Duration, error) {
@@ -175,8 +186,8 @@ func FormatListValue(v []string) string {
 	return strings.Join(v, ",")
 }
 
-func FormatColorValue(v int64) string {
-	panic("color value formatter is not implemented")
+func FormatColorValue(v uint32) string {
+	return fmt.Sprintf("0x%06x", v)
 }
 
 func FormatDurationValue(v time.Duration) string {

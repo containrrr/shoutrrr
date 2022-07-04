@@ -1,6 +1,8 @@
 package confwriter
 
-import "github.com/containrrr/shoutrrr/pkg/format"
+import (
+	"github.com/containrrr/shoutrrr/pkg/format"
+)
 
 func (cw *ConfWriter) WriteGetURL() {
 	cw.writeSection("GetURL")
@@ -13,11 +15,7 @@ func (cw *ConfWriter) WriteGetURL() {
 	if p, found := cw.urlProps[format.URLHost]; found {
 		wf(`		Host: config.%v,`, p)
 	}
-	if p, found := cw.urlProps[format.URLPath1]; found {
-		wf(`		Path: config.%v,`, p)
-	} else {
-		wl(`		Path: "/",`)
-	}
+	wl(getPathSetter(cw.urlProps))
 	wf(`		RawQuery: config.QueryValues().Encode(),`)
 	wf(`		Scheme: Scheme,`)
 	wl(`	}`)
@@ -43,9 +41,7 @@ func (cw *ConfWriter) WriteSetURL() {
 		wf(`		updates[%q] = pwd`, p)
 		wl(`	}`)
 	}
-	if p, found := cw.urlProps[format.URLPath1]; found {
-		wf(`	updates[%q] = url.Path`, p)
-	}
+	writePathGetters(cw.urlProps)
 	wl()
 	wl(`	for key, value := range url.Query() {`)
 	wl(`		propName, err := propNameFromKey(key)`)

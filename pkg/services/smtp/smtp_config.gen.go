@@ -184,8 +184,8 @@ func (config *Config) SetURL(url *url.URL) error {
 
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth": AuthOptions.Formatter,
 		"Encryption": EncryptionOptions.Formatter,
+		"Auth": AuthOptions.Formatter,
 	}
 }
 

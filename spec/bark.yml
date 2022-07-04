@@ -44,7 +44,7 @@ props:
     type: text
     description: Server path
     default: /
-    urlparts: [path1]
+    urlparts: [path]
     credential: false
   Scheme:
     type: text

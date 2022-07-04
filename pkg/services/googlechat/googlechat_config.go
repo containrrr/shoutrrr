@@ -1,3 +1,4 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go ../../../spec/googlechat.yml
 package googlechat
 
 import (
@@ -10,7 +11,7 @@ import (
 )
 
 // Config for use within the Google Chat plugin.
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	Host  string `default:"chat.googleapis.com"`
 	Path  string
@@ -19,19 +20,19 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *LegacyConfig) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values.
-func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
+func (config *LegacyConfig) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
 	config.Host = serviceURL.Host
 	config.Path = serviceURL.Path
 
@@ -50,7 +51,7 @@ func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) e
 	return nil
 }
 
-func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(_ types.ConfigQueryResolver) *url.URL {
 	query := url.Values{}
 	query.Set("key", config.Key)
 	query.Set("token", config.Token)

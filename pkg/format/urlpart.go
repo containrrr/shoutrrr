@@ -48,6 +48,7 @@ const (
 	URLPath2     URLPart = "path2"
 	URLPath3     URLPart = "path3"
 	URLPath4     URLPart = "path4"
+	URLPath      URLPart = "path"
 	URLPartCount         = 6
 )
 
@@ -57,6 +58,13 @@ var URLPartOrder [9]URLPart = [9]URLPart{
 	URLPassword,
 	URLHost,
 	URLPort,
+	URLPath1,
+	URLPath2,
+	URLPath3,
+	URLPath4,
+}
+
+var URLPathParts [4]URLPart = [4]URLPart{
 	URLPath1,
 	URLPath2,
 	URLPath3,
@@ -77,7 +85,7 @@ func ParseURLPart(s string) URLPart {
 	case "port":
 		return URLPort
 	case "path":
-		fallthrough
+		return URLPath
 	case "path1":
 		return URLPath1
 	case "path2":

@@ -6,17 +6,21 @@ props:
     description: ""
     default: chat.googleapis.com
     credential: false
+    urlparts: [host]
   Key:
+    keys: [key]
     type: text
     description: ""
     required: true
-    credential: false
+    credential: true
   Path:
     type: text
     description: ""
     required: true
     credential: false
+    urlparts: [path]
   Token:
+    keys: [token]
     type: text
     description: ""
     required: true

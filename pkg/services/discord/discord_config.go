@@ -1,15 +1,18 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go ../../../spec/discord.yml
 package discord
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Config is the configuration needed to send discord notifications
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	WebhookID  string `url:"host"`
 	Token      string `url:"user"`
@@ -27,28 +30,28 @@ type Config struct {
 
 // LevelColors returns an array of colors with a MessageLevel index
 func (config *Config) LevelColors() (colors [types.MessageLevelCount]uint) {
-	colors[types.Unknown] = config.Color
-	colors[types.Error] = config.ColorError
-	colors[types.Warning] = config.ColorWarn
-	colors[types.Info] = config.ColorInfo
-	colors[types.Debug] = config.ColorDebug
+	colors[types.Unknown] = uint(config.Color)
+	colors[types.Error] = uint(config.ColorError)
+	colors[types.Warning] = uint(config.ColorWarn)
+	colors[types.Info] = uint(config.ColorInfo)
+	colors[types.Debug] = uint(config.ColorDebug)
 
 	return colors
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
+func (config *LegacyConfig) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 	u = &url.URL{
 		User:       url.User(config.Token),
 		Host:       config.WebhookID,
@@ -65,7 +68,7 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) (u *url.URL) {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	config.WebhookID = url.Host
 	config.Token = url.User.Username()
@@ -95,6 +98,31 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 	}
 
 	return nil
+}
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}
+
+type RawModeType string
+
+func (config *Config) getRawMode() string {
+	if config.JSON {
+		return "raw"
+	} else {
+		return ""
+	}
+}
+
+func (config *Config) setRawMode(v string) (RawModeType, error) {
+	if v == "raw" {
+		config.JSON = true
+		return RawModeType(v), nil
+	} else if v == "" {
+		return RawModeType(""), nil
+	}
+
+	return "", fmt.Errorf("invalid value raw mode value %q", v)
 }
 
 // Scheme is the identifying part of this service's configuration URL
