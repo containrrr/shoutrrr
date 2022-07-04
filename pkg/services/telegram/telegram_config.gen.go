@@ -4,31 +4,42 @@ package telegram
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/format"
 )
 
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Props                          ( 
+// (___________________________________)
+
 type Config struct {
-	Chats        []string
-	Notification bool
-	ParseMode    int64
-	Preview      bool
-	Title        string
-	Token        string
+	APIHost      string `url:"host" `
+	BotID        string `url:"user" `
+	Chats        []string `key:"chats,channels" `
+	Notification bool `key:"notification" `
+	ParseMode    parseModeOption `key:"parsemode" `
+	Preview      bool `key:"preview" `
+	Title        string `key:"title" `
+	Token        string `url:"password" `
 }
 
 type configProp int
 const (
-	propChats        configProp = 0
-	propNotification configProp = 1
-	propParseMode    configProp = 2
-	propPreview      configProp = 3
-	propTitle        configProp = 4
-	propToken        configProp = 5
-	propCount = 6
+	propAPIHost      configProp = 0
+	propBotID        configProp = 1
+	propChats        configProp = 2
+	propNotification configProp = 3
+	propParseMode    configProp = 4
+	propPreview      configProp = 5
+	propTitle        configProp = 6
+	propToken        configProp = 7
+	propCount = 8
 )
 var propNames = []string{
+	"APIHost",
+	"BotID",
 	"Chats",
 	"Notification",
 	"ParseMode",
@@ -47,7 +58,18 @@ var propKeys = []string{
 	"title",
 }
 
+var keyProp = []configProp{
+	propChats,
+	propChats,
+	propNotification,
+	propParseMode,
+	propPreview,
+	propTitle,
+}
+
 var defaultValues = []string{
+	"telegram",
+	"",
 	"",
 	"Yes",
 	"None",
@@ -56,59 +78,137 @@ var defaultValues = []string{
 	"",
 }
 
+var primaryKeys = []int{
+	-1,
+	-1,
+	1,
+	2,
+	3,
+	4,
+	5,
+	-1,
+}
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  GetURL                         ( 
+// (___________________________________)
+
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
-		User: url.User(config.Token),
+		User: url.UserPassword(config.BotID, config.Token),
+		Host: config.APIHost,
+		Path: "/",
+		RawQuery: config.QueryValues().Encode(),
+		Scheme: Scheme,
 	}
 }
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  SetURL                         ( 
+// (___________________________________)
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
 	updates := make(map[string]string, propCount)
-	updates["Token"] = url.User.Username()
+	updates["APIHost"] = url.Host
+	updates["BotID"] = url.User.Username()
+	if pwd, found := url.User.Password(); found {
+		updates["Token"] = pwd
+	}
 
-	if qv := url.Query()["channels"]; len(qv) == 1 {
-        updates["Chats"] = qv[0]
+	for key, value := range url.Query() {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value[0]
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
 	}
-	if qv := url.Query()["chats"]; len(qv) == 1 {
-        updates["Chats"] = qv[0]
+
+	err := config.Update(updates); if err != nil {
+		return err
 	}
-	if qv := url.Query()["notification"]; len(qv) == 1 {
-        updates["Notification"] = qv[0]
+
+	if config.BotID == "" {
+		return fmt.Errorf("BotID missing from config URL")
 	}
-	if qv := url.Query()["parsemode"]; len(qv) == 1 {
-        updates["ParseMode"] = qv[0]
+
+	if len(config.Chats) == 0 {
+		return fmt.Errorf("Chats missing from config URL")
 	}
-	if qv := url.Query()["preview"]; len(qv) == 1 {
-        updates["Preview"] = qv[0]
-	}
-	if qv := url.Query()["title"]; len(qv) == 1 {
-        updates["Title"] = qv[0]
+
+	if config.Token == "" {
+		return fmt.Errorf("Token missing from config URL")
 	}
 
 	return nil
 }
 
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Enums / Options                ( 
+// (___________________________________)
+
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"ParseMode": ParseModeFormatter,
+		"ParseMode": ParseModeOptions.Formatter,
 	}
 }
 
-var (
-	ParseModeFormatter = format.CreateEnumFormatter([]string{
+
+/* == ParseMode Option ======================== */
+
+type parseModeOption int
+
+type parseModeOptionVals struct {
+	None	parseModeOption
+	Markdown	parseModeOption
+	HTML	parseModeOption
+	MarkdownV2	parseModeOption
+	Formatter types.EnumFormatter
+}
+
+var ParseModeOptions = &parseModeOptionVals {
+	None:	0,
+	Markdown:	1,
+	HTML:	2,
+	MarkdownV2:	3,
+	Formatter: format.CreateEnumFormatter([]string{
 		"None",
 		"Markdown",
 		"HTML",
 		"MarkdownV2",
-	})
-)
+	}),
+}
+
+func (ov *parseModeOptionVals) Parse(v string) (parseModeOption, error) {
+	if val := ov.Formatter.Parse(v); val != format.EnumInvalid {
+		return parseModeOption(val), nil
+	} else {
+		return parseModeOption(val), fmt.Errorf("invalid option %q for ParseMode", v)
+	}
+}
+
 // Update updates the Config from a map of it's properties
 func (config *Config) Update(updates map[string]string) error {
 	var last_err error
 	for key, value := range updates {
 		switch key {
+		case "APIHost":
+			if val, err := format.ParseTextValue(value); err != nil {
+				last_err = err
+			} else {
+				config.APIHost = val
+			}
+		case "BotID":
+			if val, err := format.ParseTextValue(value); err != nil {
+				last_err = err
+			} else {
+				config.BotID = val
+			}
 		case "Chats":
 			if val, err := format.ParseListValue(value); err != nil {
 				last_err = err
@@ -122,7 +222,7 @@ func (config *Config) Update(updates map[string]string) error {
 				config.Notification = val
 			}
 		case "ParseMode":
-			if val, err := format.ParseNumberValue(value, 10); err != nil {
+			if val, err := ParseModeOptions.Parse(value); err != nil {
 				last_err = err
 			} else {
 				config.ParseMode = val
@@ -155,12 +255,100 @@ func (config *Config) Update(updates map[string]string) error {
 	return nil
 }
 
+// Update updates the Config from a map of it's properties
+func (config *Config) propValue(prop configProp) string {
+	switch prop {
+	case propAPIHost:
+		return format.FormatTextValue(config.APIHost)
+	case propBotID:
+		return format.FormatTextValue(config.BotID)
+	case propChats:
+		return format.FormatListValue(config.Chats)
+	case propNotification:
+		return format.FormatToggleValue(config.Notification)
+	case propParseMode:
+		return ParseModeOptions.Formatter.Print(int(config.ParseMode))
+	case propPreview:
+		return format.FormatToggleValue(config.Preview)
+	case propTitle:
+		return format.FormatTextValue(config.Title)
+	case propToken:
+		return format.FormatTextValue(config.Token)
+	default:
+		return ""
+	}
+}
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Helpers                        ( 
+// (___________________________________)
+
+
+func propNameFromKey(key string) (string, error) {
+	key = strings.ToLower(key)
+	for i, pk := range propKeys {
+		if key == pk {
+			return propNames[keyProp[i]], nil
+		}
+	}
+	return "", fmt.Errorf("invalid key %q", key)
+}
+
+// UpdateFromParams updates the configuration from the supplied params
+func (config *Config) UpdateFromParams(params *types.Params) error {
+	if params == nil {
+		return nil
+	}
+	updates := make(map[string]string, len(*params))
+	for key, value := range *params {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
+	}
+	return config.Update(updates)
+}
+
+
+// UpdateFromQuery updates the configuration from the supplied query values
+func (config *Config) UpdateFromQuery(values url.Values) error {
+	updates := make(map[string]string, len(values))
+	for key, value := range values {
+		propName, err := propNameFromKey(key)
+		if err == nil {
+			updates[propName] = value[0]
+		} else if key != "title" {
+			return fmt.Errorf("invalid key %q", key)
+		}
+	}
+	return config.Update(updates)
+}
+
 // Init sets all the Config properties to their default values
-func (config *Config) Init() {
+func (config *Config) Init() error {
 	updates := make(map[string]string, propCount)
 	for i, name := range propNames {
 		updates[name] = defaultValues[i]
 	}
-	config.Update(updates)
+	return config.Update(updates)
 }
 
+// QueryValues returns a url.Values populated from the configuration
+func (config *Config) QueryValues() url.Values {
+	values := make(url.Values, propCount)
+	for i := range propNames {
+		if primaryKeys[i] < 0 {
+			continue
+		}
+		value := config.propValue(configProp(i))
+		if value == defaultValues[i] {
+			continue
+		}
+		values.Set(propKeys[primaryKeys[i]], config.propValue(configProp(i)))
+	}
+	return values
+}
+	

@@ -14,7 +14,7 @@ props:
     keys: [notification]
     credential: false
   ParseMode:
-    type: number
+    type: option
     description: How the text Message should be parsed
     default: None
     base: 10
@@ -36,5 +36,17 @@ props:
     type: text
     description: ""
     required: true
+    urlparts: [password]
+    credential: false
+  BotID:
+    type: text
+    description: ""
+    required: true
     urlparts: [user]
+    credential: true
+  APIHost:
+    type: text
+    description: ""
+    urlparts: [host]
+    default: telegram
     credential: false

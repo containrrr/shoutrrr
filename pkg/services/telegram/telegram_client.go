@@ -3,16 +3,20 @@ package telegram
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 )
 
+const DEFAULT_API_HOST string = "api.telegram.org"
+
 // Client for Telegram API
 type Client struct {
-	token string
+	token   string
+	apiHost string
 }
 
 func (c *Client) apiURL(endpoint string) string {
-	return fmt.Sprintf(apiFormat, c.token, endpoint)
+	return fmt.Sprintf(apiFormat, c.apiHost, c.token, endpoint)
 }
 
 // GetBotInfo returns the bot User info

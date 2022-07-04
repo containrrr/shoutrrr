@@ -1,6 +1,8 @@
 package telegram
 
 import (
+	"strings"
+
 	f "github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
@@ -30,7 +32,9 @@ type Generator struct {
 
 // Generate a telegram Shoutrrr configuration from a user dialog
 func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
-	var config Config
+	config := &Config{}
+	config.Init()
+
 	if g.Reader == nil {
 		g.Reader = os.Stdin
 	}
@@ -49,7 +53,7 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	ud.Writeln("Fetching bot info...")
 	// ud.Writeln("Session token: %v", g.sessionToken)
 
-	g.client = &Client{token: token}
+	g.client = &Client{token: token, apiHost: config.apiHost()}
 	botInfo, err := g.client.GetBotInfo()
 	if err != nil {
 		return &Config{}, err
@@ -131,13 +135,13 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 
 	ud.Writeln("")
 
-	config = Config{
-		Notification: true,
-		Token:        token,
-		Chats:        g.chats,
-	}
+	tokenParts := strings.SplitN(token, ":", 2)
 
-	return &config, nil
+	config.BotID = tokenParts[0]
+	config.Token = tokenParts[1]
+	config.Chats = g.chats
+
+	return config, nil
 }
 
 func (g *Generator) addChat(chat *Chat) (result string) {

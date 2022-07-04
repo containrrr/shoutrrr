@@ -2,12 +2,13 @@ package telegram_test
 
 import (
 	"fmt"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/telegram"
@@ -110,7 +111,8 @@ var _ = Describe("the telegram service", func() {
 				It("should create a config object containing the API Token", func() {
 
 					Expect(err).NotTo(HaveOccurred())
-					Expect(config.Token).To(Equal("12345:mock-token"))
+					Expect(config.BotID).To(Equal("12345"))
+					Expect(config.Token).To(Equal("mock-token"))
 				})
 				It("should add every chats query field as a chat ID", func() {
 					Expect(err).NotTo(HaveOccurred())
@@ -158,9 +160,6 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 	serviceURL, _ := url.Parse(rawURL)
 	err := telegram.Initialize(serviceURL, logger)
 	Expect(err).To(HaveOccurred())
-	config := telegram.GetConfig()
-	Expect(config.Token).To(BeEmpty())
-	Expect(len(config.Chats)).To(BeZero())
 }
 
 func setupResponder(endpoint string, token string, code int, body string) {

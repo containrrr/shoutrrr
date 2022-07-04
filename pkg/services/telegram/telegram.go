@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	apiFormat = "https://api.telegram.org/bot%s/%s"
+	apiFormat = "https://%s/bot%s/%s"
 	maxlength = 4096
 )
 
@@ -39,11 +39,8 @@ func (service *Service) Send(message string, params *types.Params) error {
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{
-		Preview:      true,
-		Notification: true,
-	}
-	service.pkr = format.NewPropKeyResolver(service.config)
+	service.config = &Config{}
+	service.config.Init()
 	if err := service.config.SetURL(configURL); err != nil {
 		return err
 	}
@@ -70,7 +67,7 @@ func (service *Service) GetLegacyConfig() types.ServiceConfig {
 }
 
 func sendMessageToAPI(message string, chat string, config *Config) error {
-	client := &Client{token: config.Token}
+	client := &Client{token: config.token(), apiHost: config.apiHost()}
 	payload := createSendMessagePayload(message, chat, config)
 	_, err := client.SendMessage(&payload)
 	return err
