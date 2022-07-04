@@ -10,6 +10,10 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 )
 
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Props                          ( 
+// (___________________________________)
+
 type Config struct {
 	Auth        authOption `key:"auth" `
 	Encryption  encryptionOption `key:"encryption" `
@@ -115,6 +119,11 @@ var primaryKeys = []int{
 	-1,
 }
 
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  GetURL                         ( 
+// (___________________________________)
+
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
 	return &url.URL{
@@ -125,6 +134,11 @@ func (config *Config) GetURL() *url.URL {
 		Scheme: Scheme,
 	}
 }
+
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  SetURL                         ( 
+// (___________________________________)
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) SetURL(url *url.URL) error {
@@ -163,6 +177,11 @@ func (config *Config) SetURL(url *url.URL) error {
 	return nil
 }
 
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Enums / Options                ( 
+// (___________________________________)
+
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 		"Auth": AuthOptions.Formatter,
@@ -170,7 +189,9 @@ func (config *Config) Enums() map[string]types.EnumFormatter {
 	}
 }
 
-// Auth Option
+
+/* == Auth Option ============================= */
+
 type authOption int
 
 type authOptionVals struct {
@@ -205,7 +226,9 @@ func (ov *authOptionVals) Parse(v string) (authOption, error) {
 	}
 }
 
-// Encryption Option
+
+/* == Encryption Option ======================= */
+
 type encryptionOption int
 
 type encryptionOptionVals struct {
@@ -356,6 +379,12 @@ func (config *Config) propValue(prop configProp) string {
 	}
 }
 
+
+// (‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾)
+//  )  Helpers                        ( 
+// (___________________________________)
+
+
 func propNameFromKey(key string) (string, error) {
 	key = strings.ToLower(key)
 	for i, pk := range propKeys {
@@ -366,7 +395,7 @@ func propNameFromKey(key string) (string, error) {
 	return "", fmt.Errorf("invalid key %q", key)
 }
 
-// UpdateFromParams
+// UpdateFromParams updates the configuration from the supplied params
 func (config *Config) UpdateFromParams(params *types.Params) error {
 	if params == nil {
 		return nil
@@ -383,7 +412,8 @@ func (config *Config) UpdateFromParams(params *types.Params) error {
 	return config.Update(updates)
 }
 
-// UpdateFromParams
+
+// UpdateFromQuery updates the configuration from the supplied query values
 func (config *Config) UpdateFromQuery(values url.Values) error {
 	updates := make(map[string]string, len(values))
 	for key, value := range values {
@@ -398,23 +428,27 @@ func (config *Config) UpdateFromQuery(values url.Values) error {
 }
 
 // Init sets all the Config properties to their default values
-func (config *Config) Init() {
+func (config *Config) Init() error {
 	updates := make(map[string]string, propCount)
 	for i, name := range propNames {
 		updates[name] = defaultValues[i]
 	}
-	config.Update(updates)
+	return config.Update(updates)
 }
 
-// Init sets all the Config properties to their default values
+// QueryValues returns a url.Values populated from the configuration
 func (config *Config) QueryValues() url.Values {
 	values := make(url.Values, propCount)
 	for i := range propNames {
 		if primaryKeys[i] < 0 {
 			continue
 		}
+		value := config.propValue(configProp(i))
+		if value == defaultValues[i] {
+			continue
+		}
 		values.Set(propKeys[primaryKeys[i]], config.propValue(configProp(i)))
 	}
 	return values
 }
-
+	
