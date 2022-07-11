@@ -1,14 +1,16 @@
-package format
+package ref
 
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // GetServiceConfig returns the inner config of a service
@@ -58,7 +60,7 @@ func SetConfigField(config r.Value, field FieldInfo, inputValue string) (valid b
 		return true, nil
 	} else if field.EnumFormatter != nil {
 		value := field.EnumFormatter.Parse(inputValue)
-		if value == EnumInvalid {
+		if value == format.EnumInvalid {
 			enumNames := strings.Join(field.EnumFormatter.Names(), ", ")
 			return false, fmt.Errorf("not a one of %v", enumNames)
 		}
@@ -83,7 +85,7 @@ func SetConfigField(config r.Value, field FieldInfo, inputValue string) (valid b
 			return true, nil
 		}
 	} else if fieldKind == r.Bool {
-		value, ok := ParseBool(inputValue, false)
+		value, ok := format.ParseBool(inputValue, false)
 		if !ok {
 			return false, errors.New("accepted values are 1, true, yes or 0, false, no")
 		}

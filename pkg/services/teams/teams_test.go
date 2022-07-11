@@ -2,10 +2,11 @@ package teams
 
 import (
 	"errors"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +24,7 @@ var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 
 func TestTeams(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Teams Suite")
+	RunSpecs(t, "Teams Service Suite")
 }
 
 var _ = Describe("the teams service", func() {

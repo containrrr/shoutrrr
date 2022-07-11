@@ -2,13 +2,14 @@ package generic
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/jarcoal/httpmock"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,7 +17,7 @@ import (
 
 func TestGeneric(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Generic Webhook Suite")
+	RunSpecs(t, "Generic Webhook Service Suite")
 }
 
 var (
@@ -77,9 +78,7 @@ var _ = Describe("the Generic service", func() {
 		When("TLS is disabled", func() {
 			It("should use http schema", func() {
 				config := Config{
-					webhookURL: &url.URL{
-						Host: "test.tld",
-					},
+					Host:       "test.tld",
 					DisableTLS: true,
 				}
 				Expect(config.WebhookURL().Scheme).To(Equal("http"))
@@ -88,9 +87,7 @@ var _ = Describe("the Generic service", func() {
 		When("TLS is not disabled", func() {
 			It("should use https schema", func() {
 				config := Config{
-					webhookURL: &url.URL{
-						Host: "test.tld",
-					},
+					Host:       "test.tld",
 					DisableTLS: false,
 				}
 				Expect(config.WebhookURL().Scheme).To(Equal("https"))
@@ -102,7 +99,7 @@ var _ = Describe("the Generic service", func() {
 		When("creating a default config", func() {
 			It("should not return an error", func() {
 				config := &Config{}
-				pkr := format.NewPropKeyResolver(config)
+				pkr := pkr.NewPropKeyResolver(config)
 				err := pkr.SetDefaultProps(config)
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -220,16 +217,16 @@ var _ = Describe("the Generic service", func() {
 func testCustomURL(testURL string) (*Config, *url.URL) {
 	customURL, err := url.Parse(testURL)
 	Expect(err).NotTo(HaveOccurred())
-	config, pkr, err := ConfigFromWebhookURL(*customURL)
+	config, err := ConfigFromWebhookURL(*customURL)
 	Expect(err).NotTo(HaveOccurred())
-	return config, config.getURL(&pkr)
+	return config, config.GetURL()
 }
 
 func testServiceURL(testURL string) (*Config, *url.URL) {
 	serviceURL, err := url.Parse(testURL)
 	Expect(err).NotTo(HaveOccurred())
-	config, pkr := DefaultConfig()
-	err = config.setURL(&pkr, serviceURL)
+	config := DefaultConfig()
+	err = config.SetURL(serviceURL)
 	Expect(err).NotTo(HaveOccurred())
-	return config, config.getURL(&pkr)
+	return config, config.GetURL()
 }

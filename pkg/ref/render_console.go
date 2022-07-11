@@ -1,4 +1,4 @@
-package format
+package ref
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 
 	"github.com/fatih/color"
 
+	f "github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/urlpart"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
@@ -48,10 +50,10 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 		}
 
 		sb.WriteString(strings.Repeat(" ", util.Max(preLen-valueLen, 1)))
-		sb.WriteString(ColorizeDesc(field.Description))
+		sb.WriteString(f.ColorizeDesc(field.Description))
 		sb.WriteString(strings.Repeat(" ", util.Max(60-len(field.Description), 1)))
 
-		if len(field.URLParts) > 0 && field.URLParts[0] != URLQuery {
+		if len(field.URLParts) > 0 && field.URLParts[0] != urlpart.Query {
 			sb.WriteString(" <URL: ")
 			for i, part := range field.URLParts {
 				if i > 0 {
@@ -60,21 +62,21 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 				// if part.IsPath() {
 				// 	part = URLPath1
 				// }
-				sb.WriteString(ColorizeEnum(part))
+				sb.WriteString(f.ColorizeEnum(part))
 			}
 			sb.WriteString(">")
 		}
 
 		if len(field.Template) > 0 {
-			sb.WriteString(fmt.Sprintf(" <Template: %s>", ColorizeString(field.Template)))
+			sb.WriteString(fmt.Sprintf(" <Template: %s>", f.ColorizeString(field.Template)))
 		}
 
 		if len(field.DefaultValue) > 0 {
-			sb.WriteString(fmt.Sprintf(" <Default: %s>", ColorizeValue(field.DefaultValue, field.EnumFormatter != nil)))
+			sb.WriteString(fmt.Sprintf(" <Default: %s>", f.ColorizeValue(field.DefaultValue, field.EnumFormatter != nil)))
 		}
 
 		if field.Required {
-			sb.WriteString(fmt.Sprintf(" <%s>", ColorizeFalse("Required")))
+			sb.WriteString(fmt.Sprintf(" <%s>", f.ColorizeFalse("Required")))
 		}
 
 		if len(field.Keys) > 1 {
@@ -87,21 +89,21 @@ func (r ConsoleTreeRenderer) RenderTree(root *ContainerNode, _ string) string {
 				if i > 1 {
 					sb.WriteString(", ")
 				}
-				sb.WriteString(ColorizeString(key))
+				sb.WriteString(f.ColorizeString(key))
 			}
 			sb.WriteString(">")
 		}
 
 		if field.EnumFormatter != nil {
-			sb.WriteString(ColorizeContainer(" ["))
+			sb.WriteString(f.ColorizeContainer(" ["))
 			for i, name := range field.EnumFormatter.Names() {
 				if i != 0 {
 					sb.WriteString(", ")
 				}
-				sb.WriteString(ColorizeEnum(name))
+				sb.WriteString(f.ColorizeEnum(name))
 			}
 
-			sb.WriteString(ColorizeContainer("]"))
+			sb.WriteString(f.ColorizeContainer("]"))
 		}
 
 		sb.WriteRune('\n')

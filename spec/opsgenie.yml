@@ -6,7 +6,7 @@ props:
     description: The OpsGenie API key
     required: true
     urlparts: [path1]
-    credential: false
+    credential: true
   Actions:
     type: list
     description: Custom actions that will be available for the alert
@@ -50,18 +50,24 @@ props:
     default: "443"
     urlparts: [port]
     base: 10
+    validation:
+      known: TCPPort
     credential: false
   Priority:
     type: text
     description: Priority level of the alert. Possible values are P1, P2, P3, P4 and
       P5
     keys: [priority]
+    validation:
+      regex:
+        matches: (P[1-5])?
     credential: false
   Responders:
     type: list
     description: Teams, users, escalations and schedules that the alert will be routed
       to send notifications
     keys: [responders]
+    customType: Entity
     credential: false
   Source:
     type: text
@@ -88,4 +94,5 @@ props:
     description: Teams and users that the alert will become visible to without sending
       any notification
     keys: [visibleto]
+    customType: Entity
     credential: false

@@ -2,10 +2,11 @@ package gotify
 
 import (
 	"errors"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,7 +14,7 @@ import (
 
 func TestGotify(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Gotify Suite")
+	RunSpecs(t, "Gotify Service Suite")
 }
 
 var logger *log.Logger

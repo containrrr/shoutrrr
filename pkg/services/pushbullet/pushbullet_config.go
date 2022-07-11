@@ -1,18 +1,21 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package pushbullet
 
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config ...
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	Targets []string `url:"path"`
 	Token   string   `url:"host"`
@@ -20,28 +23,28 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		Host:       config.Token,
 		Path:       "/" + strings.Join(config.Targets, "/"),
 		Scheme:     Scheme,
 		ForceQuery: false,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	path := url.Path
 
 	if len(path) > 0 && path[0] == '/' {
@@ -86,3 +89,14 @@ const (
 
 // ErrorTokenIncorrectSize is the error returned when the token size is incorrect
 var ErrorTokenIncorrectSize = errors.New("token has incorrect size")
+
+func (config *Config) UpdateLegacyURL(legacyURL *url.URL) *url.URL {
+	if len(legacyURL.Fragment) > 0 {
+		updatedURL := *legacyURL
+		updatedURL.Fragment = ""
+		paths := append(conf.SplitPath(legacyURL.Path), "#"+legacyURL.Fragment)
+		updatedURL.Path = conf.JoinPath(paths...)
+		return &updatedURL
+	}
+	return legacyURL
+}

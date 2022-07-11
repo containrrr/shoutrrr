@@ -4,7 +4,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/ref"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"gopkg.in/yaml.v2"
 )
@@ -14,18 +15,18 @@ type MigratedService interface {
 }
 
 func Export(service types.Service, scheme string, w io.Writer) error {
-	var configNode *format.ContainerNode
+	var configNode *ref.ContainerNode
 	if migratedService, ok := service.(MigratedService); ok {
 		println("Service config is migrated, using legacy config")
-		configNode = format.GetConfigFormat(migratedService.GetLegacyConfig())
+		configNode = ref.GetConfigFormat(migratedService.GetLegacyConfig())
 	} else {
-		configNode = format.GetServiceConfigFormat(service)
+		configNode = ref.GetServiceConfigFormat(service)
 	}
 
-	configDef := format.ConfigSpec{
+	configDef := conf.Spec{
 		Version: 1,
 		Scheme:  scheme,
-		Props:   map[string]*format.ConfigSpecProp{},
+		Props:   map[string]*conf.SpecProp{},
 	}
 
 	for _, item := range configNode.Items {
@@ -34,8 +35,8 @@ func Export(service types.Service, scheme string, w io.Writer) error {
 		if ef := field.EnumFormatter; ef != nil {
 			values = ef.Names()
 		}
-		configDef.Props[field.Name] = &format.ConfigSpecProp{
-			Type:         format.ConfigPropTypeFromType(field.Type, item.TokenType()),
+		configDef.Props[field.Name] = &conf.SpecProp{
+			Type:         conf.ConfigPropTypeFromType(field.Type, item.TokenType()),
 			Description:  field.Description,
 			DefaultValue: field.DefaultValue,
 			Template:     field.Template,

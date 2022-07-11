@@ -12,13 +12,14 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
 )
 
 func TestIFTTT(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr IFTTT Suite")
+	RunSpecs(t, "IFTTT Service Suite")
 }
 
 var (
@@ -90,7 +91,7 @@ var _ = Describe("the ifttt package", func() {
 			It("should set value1, value2 and value3", func() {
 				serviceURL, _ := url.Parse("ifttt://dummyID/?events=dummyevent&value3=three&value2=two&value1=one")
 				config := Config{}
-				err := config.SetURL(serviceURL)
+				err := conf.Init(&config, serviceURL)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(config.Value1).To(Equal("one"))
@@ -102,7 +103,7 @@ var _ = Describe("the ifttt package", func() {
 	When("serializing a config to URL", func() {
 		When("given multiple events", func() {
 			It("should return an URL with all the events comma-separated", func() {
-				expectedURL := "ifttt://dummyID/?events=foo%2Cbar%2Cbaz&messagevalue=0"
+				expectedURL := "ifttt://dummyID?events=foo%2Cbar%2Cbaz&messagevalue=0"
 				config := Config{
 					Events:            []string{"foo", "bar", "baz"},
 					WebHookID:         "dummyID",
@@ -115,13 +116,14 @@ var _ = Describe("the ifttt package", func() {
 
 		When("given values", func() {
 			It("should return an URL with all the values", func() {
-				expectedURL := "ifttt://dummyID/?messagevalue=0&value1=v1&value2=v2&value3=v3"
-				config := Config{
-					WebHookID: "dummyID",
-					Value1:    "v1",
-					Value2:    "v2",
-					Value3:    "v3",
-				}
+				expectedURL := "ifttt://dummyID?value1=v1&value2=v2&value3=v3"
+				config := &Config{}
+				conf.SetDefaults(config)
+				config.WebHookID = "dummyID"
+				config.Value1 = "v1"
+				config.Value2 = "v2"
+				config.Value3 = "v3"
+
 				resultURL := config.GetURL().String()
 				Expect(resultURL).To(Equal(expectedURL))
 			})
@@ -186,7 +188,7 @@ var _ = Describe("the ifttt package", func() {
 				}
 
 				for i := 1; i <= 3; i++ {
-					config.UseMessageAsValue = uint8(i)
+					config.UseMessageAsValue = int64(i)
 					bytes, err := createJSONToSend(config, "d", nil)
 					Expect(err).ToNot(HaveOccurred())
 

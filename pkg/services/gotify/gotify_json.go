@@ -4,5 +4,5 @@ package gotify
 type JSON struct {
 	Message  string `json:"message"`
 	Title    string `json:"title"`
-	Priority int    `json:"priority"`
+	Priority int64  `json:"priority"`
 }

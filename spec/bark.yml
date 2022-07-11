@@ -33,7 +33,7 @@ props:
     type: text
     description: Server hostname and port
     required: true
-    urlparts: [host]
+    urlparts: [host,port]
     credential: false
   Icon:
     type: text

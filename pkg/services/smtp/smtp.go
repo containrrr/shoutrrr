@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -32,7 +33,6 @@ const (
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.config.Init()
 	// service.config = &Config{
 	// 	Port:        25,
 	// 	ToAddresses: nil,
@@ -43,7 +43,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	// 	Encryption:  EncryptionOptions.Auto,
 	// }
 
-	if err := service.config.SetURL(configURL); err != nil {
+	if err := conf.Init(service.config, configURL); err != nil {
 		return err
 	}
 
@@ -66,7 +66,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	config := *service.config
-	if err := config.UpdateFromParams(params); err != nil {
+	if err := conf.UpdateFromParams(&config, params); err != nil {
 		return fail(FailApplySendParams, err)
 	}
 

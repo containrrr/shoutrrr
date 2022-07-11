@@ -18,7 +18,7 @@ import (
 func TestBark(t *testing.T) {
 	gomegaformat.CharactersAroundMismatchToInclude = 20
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Bark Suite")
+	RunSpecs(t, "Bark Service Suite")
 }
 
 var (

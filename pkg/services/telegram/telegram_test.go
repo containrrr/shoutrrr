@@ -19,7 +19,7 @@ import (
 
 func TestTelegram(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Telegram Suite")
+	RunSpecs(t, "Telegram Service Suite")
 }
 
 var _ = Describe("the telegram service", func() {

@@ -1,4 +1,4 @@
-package format
+package pkr
 
 import (
 	"net/url"

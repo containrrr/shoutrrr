@@ -1,15 +1,17 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package zulip
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Config for the zulip service
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	BotMail string `url:"user" desc:"Bot e-mail address"`
 	BotKey  string `url:"pass" desc:"API Key"`
@@ -19,18 +21,18 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(_ types.ConfigQueryResolver) *url.URL {
 	query := &url.Values{}
 
 	if config.Stream != "" {
@@ -50,7 +52,7 @@ func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
+func (config *LegacyConfig) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
 	var ok bool
 
 	config.BotMail = serviceURL.User.Username()
@@ -78,8 +80,8 @@ func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) e
 }
 
 // Clone the config to a new Config struct
-func (config *Config) Clone() *Config {
-	return &Config{
+func (config *LegacyConfig) Clone() *LegacyConfig {
+	return &LegacyConfig{
 		BotMail: config.BotMail,
 		BotKey:  config.BotKey,
 		Host:    config.Host,
@@ -96,7 +98,11 @@ const (
 // CreateConfigFromURL to use within the zulip service
 func CreateConfigFromURL(serviceURL *url.URL) (*Config, error) {
 	config := Config{}
-	err := config.setURL(nil, serviceURL)
+	err := config.SetURL(serviceURL)
 
 	return &config, err
+}
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
 }

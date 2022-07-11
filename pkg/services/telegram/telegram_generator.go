@@ -3,6 +3,7 @@ package telegram
 import (
 	"strings"
 
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	f "github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
@@ -33,7 +34,7 @@ type Generator struct {
 // Generate a telegram Shoutrrr configuration from a user dialog
 func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	config := &Config{}
-	config.Init()
+	conf.SetDefaults(config)
 
 	if g.Reader == nil {
 		g.Reader = os.Stdin

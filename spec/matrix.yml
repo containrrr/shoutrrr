@@ -18,7 +18,7 @@ props:
     description: Password or access token
     required: true
     urlparts: [password]
-    credential: false
+    credential: true
   Rooms:
     type: list
     description: Room aliases, or with ! prefix, room IDs

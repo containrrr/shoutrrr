@@ -2,11 +2,13 @@ package pushbullet
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
-	"net/url"
 )
 
 const (
@@ -18,7 +20,7 @@ type Service struct {
 	standard.Standard
 	client jsonclient.Client
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
@@ -26,8 +28,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.Logger.SetLogger(logger)
 
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+	if err := conf.Init(service.config, configURL); err != nil {
 		return err
 	}
 
@@ -40,7 +41,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 // Send a push notification via Pushbullet
 func (service *Service) Send(message string, params *types.Params) error {
 	config := *service.config
-	if err := service.pkr.UpdateConfigFromParams(&config, params); err != nil {
+	if err := conf.UpdateFromParams(&config, params); err != nil {
 		return err
 	}
 

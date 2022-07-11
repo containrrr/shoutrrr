@@ -1,9 +1,10 @@
 package googlechat
 
 import (
-	"github.com/jarcoal/httpmock"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,7 +12,7 @@ import (
 
 func TestGooglechat(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Google Chat Suite")
+	RunSpecs(t, "Google Chat Service Suite")
 }
 
 var _ = Describe("Google Chat Service", func() {

@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -16,7 +17,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 // Send a notification message to Bark
@@ -38,10 +39,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.config.Init()
-
-	return service.config.SetURL(configURL)
-
+	return conf.Init(service.config, configURL)
 }
 
 func (service *Service) sendAPI(config *Config, message string) error {

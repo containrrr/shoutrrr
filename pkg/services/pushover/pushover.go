@@ -2,11 +2,13 @@ package pushover
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -21,7 +23,7 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 // Send a notification message to Pushover
@@ -75,10 +77,5 @@ func (service *Service) sendToDevice(device string, message string, config *Conf
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return conf.Init(service.config, configURL)
 }

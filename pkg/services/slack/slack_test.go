@@ -20,7 +20,7 @@ import (
 func TestSlack(t *testing.T) {
 	gomegaformat.CharactersAroundMismatchToInclude = 20
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Slack Suite")
+	RunSpecs(t, "Slack Service Suite")
 }
 
 var (
@@ -247,5 +247,5 @@ func tokenMust(rawToken string) *Token {
 func expectErrorMessageGivenURL(expected error, rawURL string) {
 	err := service.Initialize(testutils.URLMust(rawURL), testutils.TestLogger())
 	ExpectWithOffset(1, err).To(HaveOccurred())
-	ExpectWithOffset(1, err).To(Equal(expected))
+	ExpectWithOffset(1, err.Error()).To(HaveSuffix(expected.Error()))
 }

@@ -1,13 +1,15 @@
-package format
+package ref
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // NodeTokenType is used to represent the type of value that a node has for syntax highlighting
@@ -251,9 +253,9 @@ func getValueNodeValue(fieldValue r.Value, fieldInfo *FieldInfo) (string, NodeTo
 	case r.Bool:
 		val := fieldValue.Bool()
 		if val {
-			return PrintBool(val), TrueToken
+			return format.PrintBool(val), TrueToken
 		}
-		return PrintBool(val), FalseToken
+		return format.PrintBool(val), FalseToken
 	case r.Array, r.Slice, r.Map:
 		return getContainerValueString(fieldValue, fieldInfo), UnknownToken
 	case r.Ptr, r.Struct:

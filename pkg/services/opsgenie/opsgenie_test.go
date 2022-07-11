@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"testing"
 
+	tu "github.com/containrrr/shoutrrr/internal/testutils"
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
 
 	. "github.com/onsi/ginkgo"
@@ -24,7 +26,7 @@ const (
 
 func TestOpsGenie(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr OpsGenie Suite")
+	RunSpecs(t, "OpsGenie Service Suite")
 }
 
 var _ = Describe("the OpsGenie service", func() {
@@ -285,29 +287,23 @@ var _ = Describe("the OpsGenie service", func() {
 var _ = Describe("the OpsGenie Config struct", func() {
 	When("generating a config from a simple URL", func() {
 		It("should populate the config with host and apikey", func() {
-			url, err := url.Parse(fmt.Sprintf("opsgenie://%s/%s", mockHost, mockAPIKey))
-			Expect(err).To(BeNil())
-
+			url := tu.URLMust(fmt.Sprintf("opsgenie://%s/%s", mockHost, mockAPIKey))
 			config := Config{}
-			err = config.SetURL(url)
-			Expect(err).To(BeNil())
+			Expect(conf.Init(&config, url)).To(Succeed())
 
 			Expect(config.APIKey).To(Equal(mockAPIKey))
 			Expect(config.Host).To(Equal(mockHost))
-			Expect(config.Port).To(Equal(uint16(443)))
+			Expect(config.Port).To(BeEquivalentTo(443))
 		})
 	})
 
 	When("generating a config from a url with port", func() {
 		It("should populate the port field", func() {
-			url, err := url.Parse(fmt.Sprintf("opsgenie://%s:12345/%s", mockHost, mockAPIKey))
-			Expect(err).To(BeNil())
-
+			url := tu.URLMust(fmt.Sprintf("opsgenie://%s:12345/%s", mockHost, mockAPIKey))
 			config := Config{}
-			err = config.SetURL(url)
-			Expect(err).To(BeNil())
+			Expect(conf.Init(&config, url)).To(Succeed())
 
-			Expect(config.Port).To(Equal(uint16(12345)))
+			Expect(config.Port).To(BeEquivalentTo(12345))
 		})
 	})
 
@@ -318,8 +314,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			Expect(err).To(BeNil())
 
 			config := Config{}
-			err = config.SetURL(url)
-			Expect(err).To(BeNil())
+			Expect(conf.Init(&config, url)).To(Succeed())
 
 			Expect(config.Alias).To(Equal("Life is too short for no alias"))
 			Expect(config.Description).To(Equal("Every alert needs a description"))
@@ -350,8 +345,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 			Expect(err).To(BeNil())
 
 			config := Config{}
-			err = config.SetURL(url)
-			Expect(err).To(BeNil())
+			Expect(conf.Init(&config, url)).To(Succeed())
 
 			Expect(config.Alias).To(Equal("Life is too short for no alias"))
 
@@ -360,14 +354,15 @@ var _ = Describe("the OpsGenie Config struct", func() {
 
 	When("generating a url from a simple config", func() {
 		It("should generate a url", func() {
+
 			config := Config{
 				Host:   "api.opsgenie.com",
 				APIKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
 			}
-
+			conf.SetPartialDefaults(&config)
 			url := config.GetURL()
 
-			Expect(url.String()).To(Equal("opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889"))
+			Expect(url.String()).To(Equal("opsgenie://api.opsgenie.com:443/eb243592-faa2-4ba2-a551q-1afdf565c889"))
 		})
 	})
 
@@ -378,7 +373,7 @@ var _ = Describe("the OpsGenie Config struct", func() {
 				APIKey: "eb243592-faa2-4ba2-a551q-1afdf565c889",
 				Port:   12345,
 			}
-
+			conf.SetPartialDefaults(&config)
 			url := config.GetURL()
 
 			Expect(url.String()).To(Equal("opsgenie://api.opsgenie.com:12345/eb243592-faa2-4ba2-a551q-1afdf565c889"))
@@ -410,8 +405,10 @@ var _ = Describe("the OpsGenie Config struct", func() {
 				Note:     "Here is a note",
 			}
 
+			conf.SetPartialDefaults(&config)
+
 			url := config.GetURL()
-			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1%2Caction2&alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&details=key%3Avalue&entity=An+example+entity&note=Here+is+a+note&priority=P1&responders=user%3ATest%2Cteam%3ANOC%2Cteam%3A4513b7ea-3b91-438f-b7e4-e3e54af9147c&source=The+source&tags=tag1%2Ctag2&user=Dracula&visibleto=user%3AA+User`))
+			Expect(url.String()).To(Equal(`opsgenie://api.opsgenie.com:443/eb243592-faa2-4ba2-a551q-1afdf565c889?actions=action1%2Caction2&alias=Life+is+too+short+for+no+alias&description=Every+alert+needs+a+description&details=key%3Avalue&entity=An+example+entity&note=Here+is+a+note&priority=P1&responders=user%3ATest%2Cteam%3ANOC%2Cteam%3A4513b7ea-3b91-438f-b7e4-e3e54af9147c&source=The+source&tags=tag1%2Ctag2&user=Dracula&visibleto=user%3AA+User`))
 		})
 	})
 })

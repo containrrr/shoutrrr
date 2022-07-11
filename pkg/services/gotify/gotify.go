@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -19,7 +19,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 	Client *http.Client
 }
 
@@ -29,7 +29,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	service.config = &Config{
 		Title: "Shoutrrr notification",
 	}
-	service.pkr = format.NewPropKeyResolver(service.config)
+	service.pkr = pkr.NewPropKeyResolver(service.config)
 	err := service.config.SetURL(configURL)
 
 	service.Client = &http.Client{

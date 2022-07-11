@@ -3,13 +3,14 @@ package xouath2
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strings"
+
 	"github.com/containrrr/shoutrrr/pkg/services/smtp"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"io/ioutil"
-	"strings"
 )
 
 // Generator is the XOAuth2 Generator implementation
@@ -180,7 +181,7 @@ func generateOauth2Config(conf *oauth2.Config, host string) (*smtp.Config, error
 		FromAddress: sender,
 		FromName:    "Shoutrrr",
 		ToAddresses: []string{sender},
-		Auth:        smtp.AuthTypes.OAuth2,
+		Auth:        smtp.AuthOptions.OAuth2,
 		UseStartTLS: true,
 		UseHTML:     true,
 	}

@@ -1,11 +1,13 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package ifttt
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 const (
@@ -14,7 +16,7 @@ const (
 )
 
 // Config is the configuration needed to send IFTTT notifications
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	WebHookID         string   `url:"host" required:"true"`
 	Events            []string `key:"events" required:"true"`
@@ -27,28 +29,28 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 
 	return &url.URL{
 		Host:     config.WebHookID,
 		Path:     "/",
 		Scheme:   Scheme,
-		RawQuery: format.BuildQuery(resolver),
+		RawQuery: pkr.BuildQuery(resolver),
 	}
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	if config.UseMessageAsValue == 0 {
 		config.UseMessageAsValue = 2
 	}

@@ -16,7 +16,7 @@ import (
 
 func TestLogger(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Logger Suite")
+	RunSpecs(t, "Logger Service Suite")
 }
 
 var _ = Describe("the logger service", func() {

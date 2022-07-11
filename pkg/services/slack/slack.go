@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -18,7 +20,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 const (
@@ -27,19 +29,19 @@ const (
 
 // Send a notification message to Slack
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
+	config := *service.config
 
-	if err := service.pkr.UpdateConfigFromParams(config, params); err != nil {
+	if err := conf.UpdateFromParams(&config, params); err != nil {
 		return err
 	}
 
-	payload := CreateJSONPayload(config, message)
+	payload := CreateJSONPayload(&config, message)
 
 	var err error
 	if config.Token.IsAPIToken() {
-		err = service.sendAPI(config, payload)
+		err = service.sendAPI(&config, payload)
 	} else {
-		err = service.sendWebhook(config, payload)
+		err = service.sendWebhook(&config, payload)
 	}
 
 	if err != nil {
@@ -53,9 +55,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-
-	return service.config.setURL(&service.pkr, configURL)
+	return conf.Init(service.config, configURL)
 
 }
 

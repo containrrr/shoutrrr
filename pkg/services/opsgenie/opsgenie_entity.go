@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
 )
 
 // Entity represents either a user or a team
@@ -68,4 +70,24 @@ func (e *Entity) GetPropValue() (string, error) {
 // Detects OpsGenie IDs in the form 4513b7ea-3b91-438f-b7e4-e3e54af9147c
 func isOpsGenieID(str string) (bool, error) {
 	return regexp.MatchString(`^[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}$`, str)
+}
+
+func parseEntityItems(value string) ([]Entity, error) {
+	items, err := conf.ParseListValue(value, ",")
+	if err != nil {
+		return []Entity{}, nil
+	}
+	entities := make([]Entity, len(items))
+	for i, item := range items {
+		entities[i].SetFromProp(item)
+	}
+	return entities, nil
+}
+
+func formatEntityItems(entities []Entity) []string {
+	items := make([]string, len(entities))
+	for i, entity := range entities {
+		items[i], _ = entity.GetPropValue()
+	}
+	return items
 }

@@ -1,13 +1,14 @@
 package services_test
 
 import (
+	"log"
+	"net/http"
+	"testing"
+
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
-	"log"
-	"net/http"
-	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +21,7 @@ func TestServices(t *testing.T) {
 
 var serviceURLs = map[string]string{
 	"discord":    "discord://token@id",
-	"gotify":     "gotify://example.com/Aaa.bbb.ccc.ddd",
+	"gotify":     "gotify://example.com//Aaa.bbb.ccc.ddd",
 	"googlechat": "googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"hangouts":   "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz",
 	"ifttt":      "ifttt://key?events=event",
@@ -28,7 +29,7 @@ var serviceURLs = map[string]string{
 	"logger":     "logger://",
 	"mattermost": "mattermost://user@example.com/token",
 	"opsgenie":   "opsgenie://example.com/token?responders=user:dummy",
-	"pushbullet": "pushbullet://tokentokentokentokentokentokentoke",
+	"pushbullet": "pushbullet://tokentokentokentokentokentokentoke/target",
 	"pushover":   "pushover://:token@user/?devices=device",
 	"rocketchat": "rocketchat://example.com/token/channel",
 	"slack":      "slack://AAAAAAAAA/BBBBBBBBB/123456789123456789123456",

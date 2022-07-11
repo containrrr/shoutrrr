@@ -1,4 +1,4 @@
-//go:generate go run ../../../cmd/shoutrrr-gen --lang go ../../../spec/discord.yml
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go
 package discord
 
 import (
@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Config is the configuration needed to send discord notifications
+// LegacyConfig is the configuration needed to send discord notifications
 type LegacyConfig struct {
 	standard.EnumlessConfig
 	WebhookID  string `url:"host"`
@@ -41,13 +41,13 @@ func (config *Config) LevelColors() (colors [types.MessageLevelCount]uint) {
 
 // GetURL returns a URL representation of it's current field values
 func (config *LegacyConfig) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *LegacyConfig) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
@@ -56,7 +56,7 @@ func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) (u *url.U
 		User:       url.User(config.Token),
 		Host:       config.WebhookID,
 		Scheme:     Scheme,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 		ForceQuery: false,
 	}
 
@@ -104,7 +104,7 @@ func (service *Service) GetLegacyConfig() types.ServiceConfig {
 	return &LegacyConfig{}
 }
 
-type RawModeType string
+type rawModeType string
 
 func (config *Config) getRawMode() string {
 	if config.JSON {
@@ -114,12 +114,12 @@ func (config *Config) getRawMode() string {
 	}
 }
 
-func (config *Config) setRawMode(v string) (RawModeType, error) {
+func (config *Config) setRawMode(v string) (rawModeType, error) {
 	if v == "raw" {
 		config.JSON = true
-		return RawModeType(v), nil
+		return rawModeType(v), nil
 	} else if v == "" {
-		return RawModeType(""), nil
+		return rawModeType(""), nil
 	}
 
 	return "", fmt.Errorf("invalid value raw mode value %q", v)

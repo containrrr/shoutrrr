@@ -1,3 +1,4 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package opsgenie
 
 import (
@@ -5,14 +6,15 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 const defaultPort = 443
 
 // Config for use within the opsgenie service
-type Config struct {
+type LegacyConfig struct {
 	APIKey      string            `url:"path" desc:"The OpsGenie API key"`
 	Host        string            `url:"host" desc:"The OpsGenie API host. Use 'api.eu.opsgenie.com' for EU instances" default:"api.opsgenie.com"`
 	Port        uint16            `url:"port" desc:"The OpsGenie API port." default:"443"`
@@ -32,18 +34,18 @@ type Config struct {
 }
 
 // Enums returns an empty map because the OpsGenie service doesn't use Enums
-func (config Config) Enums() map[string]types.EnumFormatter {
+func (config LegacyConfig) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{}
 }
 
 // GetURL is the public version of getURL that creates a new PropKeyResolver when accessed from outside the package
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // Private version of GetURL that can use an instance of PropKeyResolver instead of rebuilding it's model from reflection
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	host := ""
 	if config.Port > 0 {
 		host = fmt.Sprintf("%s:%d", config.Host, config.Port)
@@ -55,20 +57,20 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 		Host:     host,
 		Path:     fmt.Sprintf("/%s", config.APIKey),
 		Scheme:   Scheme,
-		RawQuery: format.BuildQuery(resolver),
+		RawQuery: pkr.BuildQuery(resolver),
 	}
 
 	return result
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
 // Private version of SetURL that can use an instance of PropKeyResolver instead of rebuilding it's model from reflection
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	config.Host = url.Hostname()
 	config.APIKey = url.Path[1:]
 
@@ -95,3 +97,10 @@ const (
 	// Scheme is the identifying part of this service's configuration URL
 	Scheme = "opsgenie"
 )
+
+func NewConfig(init func(c *Config)) *Config {
+	config := Config{}
+	conf.SetDefaults(&config)
+	init(&config)
+	return &config
+}

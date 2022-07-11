@@ -1,18 +1,20 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go
 package teams
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for use within the teams plugin
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	Group      string `url:"user" optional:""`
 	Tenant     string `url:"host" optional:""`
@@ -53,29 +55,29 @@ func ConfigFromWebhookURL(webhookURL url.URL) (*Config, error) {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		User:       url.User(config.Group),
 		Host:       config.Tenant,
 		Path:       "/" + config.AltID + "/" + config.GroupOwner,
 		Scheme:     Scheme,
 		ForceQuery: false,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	var webhookParts [4]string
 
 	if pass, legacyFormat := url.User.Password(); legacyFormat {
@@ -96,7 +98,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 		return fmt.Errorf("invalid URL format: %v", err)
 	}
 
-	config.setFromWebhookParts(webhookParts)
+	//config.setFromWebhookParts(webhookParts)
 
 	for key, vals := range url.Query() {
 		if err := resolver.Set(key, vals[0]); err != nil {
@@ -158,3 +160,7 @@ const (
 	// ProviderName is the name of the Teams integration provider
 	ProviderName = "IncomingWebhook"
 )
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}

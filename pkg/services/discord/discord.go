@@ -4,19 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"net/http"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
-	"net/http"
-	"net/url"
 )
 
 // Service providing Discord as a notification service
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
 }
 
 var limits = types.MessageLimit{
@@ -52,9 +52,7 @@ func (service *Service) sendItems(items []types.MessageItem, params *types.Param
 	var err error
 
 	config := *service.config
-	if err = service.pkr.UpdateConfigFromParams(&config, params); err != nil {
-		return err
-	}
+	conf.UpdateFromParams(&config, params)
 
 	var payload WebhookPayload
 	payload, err = CreatePayloadFromItems(items, config.Title, config.LevelColors(), omitted)
@@ -88,17 +86,7 @@ func CreateItemsFromPlain(plain string, splitLines bool) (items []types.MessageI
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-
-	if err := service.pkr.SetDefaultProps(service.config); err != nil {
-		return err
-	}
-
-	if err := service.config.SetURL(configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return conf.Init(service.config, configURL)
 }
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url

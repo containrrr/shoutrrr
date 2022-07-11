@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containrrr/shoutrrr/pkg/cli"
-	f "github.com/containrrr/shoutrrr/pkg/format"
+	f "github.com/containrrr/shoutrrr/pkg/ref"
 	"github.com/containrrr/shoutrrr/pkg/router"
 )
 

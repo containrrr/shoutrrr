@@ -8,7 +8,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
@@ -18,7 +19,7 @@ import (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 // Send a notification message to Microsoft Teams
@@ -35,13 +36,8 @@ func (service *Service) Send(message string, params *types.Params) error {
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{
-		Host: LegacyHost,
-	}
-
-	service.pkr = format.NewPropKeyResolver(service.config)
-
-	return service.config.setURL(&service.pkr, configURL)
+	service.config = &Config{}
+	return conf.Init(service.config, configURL)
 }
 
 // GetConfigURLFromCustom creates a regular service URL from one with a custom host
@@ -51,14 +47,9 @@ func (*Service) GetConfigURLFromCustom(customURL *url.URL) (serviceURL *url.URL,
 		return nil, err
 	}
 
-	resolver := format.NewPropKeyResolver(config)
-	for key, vals := range customURL.Query() {
-		if err := resolver.Set(key, vals[0]); err != nil {
-			return nil, err
-		}
-	}
+	conf.UpdateFromQuery(config, customURL.Query())
 
-	return config.getURL(&resolver), nil
+	return config.GetURL(), nil
 }
 
 func (service *Service) doSend(config *Config, message string) error {

@@ -1,6 +1,9 @@
 package types
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
 // Enummer contains fields that have associated EnumFormatter instances
 type Enummer interface {
@@ -24,6 +27,28 @@ type ConfigQueryResolver interface {
 // GeneratedConfig is the interface for service configs created using shoutrr-gen
 type GeneratedConfig interface {
 	ServiceConfig
-	Init() error
-	UpdateFromParams(*Params) error
+	PropInfo() *ConfigPropInfo
+	Update(map[int]string) error
+	PropValue(int) string
+}
+
+type ConfigWithLegacyURLSupport interface {
+	UpdateLegacyURL(*url.URL) *url.URL
+}
+
+type CustomQueryConfig interface {
+	CustomQueryVars() url.Values
+}
+
+type ConfigPropInfo struct {
+	PropNames      []string
+	DefaultValues  []string
+	Keys           []string
+	PrimaryKeys    []int
+	KeyPropIndexes map[string]int
+}
+
+func (cpr *ConfigPropInfo) PropIndexFor(key string) (int, bool) {
+	val, found := cpr.KeyPropIndexes[strings.ToLower(key)]
+	return val, found
 }

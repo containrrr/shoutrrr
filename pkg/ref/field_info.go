@@ -1,4 +1,4 @@
-package format
+package ref
 
 import (
 	r "reflect"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
+	up "github.com/containrrr/shoutrrr/pkg/urlpart"
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
@@ -18,7 +19,7 @@ type FieldInfo struct {
 	DefaultValue  string
 	Template      string
 	Required      bool
-	URLParts      []URLPart
+	URLParts      []up.URLPart
 	Title         bool
 	Base          int
 	Keys          []string
@@ -30,7 +31,7 @@ func (fi *FieldInfo) IsEnum() bool {
 }
 
 // IsURLPart returns whether the field is serialized as the specified part of an URL
-func (fi *FieldInfo) IsURLPart(part URLPart) bool {
+func (fi *FieldInfo) IsURLPart(part up.URLPart) bool {
 	for _, up := range fi.URLParts {
 		if up == part {
 			return true
@@ -86,7 +87,7 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("url"); ok {
-			info.URLParts = ParseURLParts(tag)
+			info.URLParts = up.ParseAll(tag)
 		}
 
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {

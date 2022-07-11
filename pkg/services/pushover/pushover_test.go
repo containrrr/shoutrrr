@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/jarcoal/httpmock"
 
@@ -20,13 +20,13 @@ const hookURL = "https://api.pushover.net/1/messages.json"
 
 func TestPushover(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Pushover Suite")
+	RunSpecs(t, "Pushover Service Suite")
 }
 
 var (
 	service        *pushover.Service
 	config         *pushover.Config
-	keyResolver    format.PropKeyResolver
+	keyResolver    pkr.PropKeyResolver
 	envPushoverURL *url.URL
 	logger         *log.Logger
 )
@@ -53,7 +53,7 @@ var _ = Describe("the pushover service", func() {
 var _ = Describe("the pushover config", func() {
 	BeforeEach(func() {
 		config = &pushover.Config{}
-		keyResolver = format.NewPropKeyResolver(config)
+		keyResolver = pkr.NewPropKeyResolver(config)
 	})
 	When("updating it using an url", func() {
 		It("should update the username using the host part of the url", func() {
@@ -98,7 +98,7 @@ var _ = Describe("the pushover config", func() {
 		It("should update priority when a valid number is supplied", func() {
 			err := keyResolver.Set("priority", "1")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(config.Priority).To(Equal(int8(1)))
+			Expect(config.Priority).To(BeEquivalentTo(1))
 		})
 		It("should update priority when a negative number is supplied", func() {
 			Expect(keyResolver.Set("priority", "-1")).To(Succeed())

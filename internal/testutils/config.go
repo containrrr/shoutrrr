@@ -3,7 +3,7 @@ package testutils
 import (
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/types"
 
 	Ω "github.com/onsi/gomega"
@@ -11,7 +11,7 @@ import (
 
 // TestConfigGetInvalidQueryValue tests whether the config returns an error when an invalid query value is requested
 func TestConfigGetInvalidQueryValue(config types.ServiceConfig) {
-	value, err := format.GetConfigQueryResolver(config).Get("invalid query var")
+	value, err := pkr.GetConfigQueryResolver(config).Get("invalid query var")
 	Ω.ExpectWithOffset(1, value).To(Ω.BeEmpty())
 	Ω.ExpectWithOffset(1, err).To(Ω.HaveOccurred())
 }
@@ -27,7 +27,7 @@ func TestConfigSetInvalidQueryValue(config types.ServiceConfig, rawInvalidURL st
 
 // TestConfigSetDefaultValues tests whether setting the default values can be set for an empty config without any errors
 func TestConfigSetDefaultValues(config types.ServiceConfig) {
-	pkr := format.NewPropKeyResolver(config)
+	pkr := pkr.NewPropKeyResolver(config)
 	Ω.ExpectWithOffset(1, pkr.SetDefaultProps(config)).To(Ω.Succeed())
 }
 
@@ -39,6 +39,6 @@ func TestConfigGetEnumsCount(config types.ServiceConfig, expectedCount int) {
 
 // TestConfigGetFieldsCount tests whether the config.QueryFields return the expected amount of fields
 func TestConfigGetFieldsCount(config types.ServiceConfig, expectedCount int) {
-	fields := format.GetConfigQueryResolver(config).QueryFields()
+	fields := pkr.GetConfigQueryResolver(config).QueryFields()
 	Ω.ExpectWithOffset(1, fields).To(Ω.HaveLen(expectedCount))
 }

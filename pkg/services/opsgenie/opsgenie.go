@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -21,7 +22,7 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 func (service *Service) sendAlert(url string, apiKey string, payload AlertPayload) error {
@@ -59,14 +60,16 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-	return service.config.setURL(&service.pkr, configURL)
+	return conf.Init(service.config, configURL)
 }
 
 // Send a notification message to OpsGenie
 // See: https://docs.opsgenie.com/docs/alert-api#create-alert
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
+	config := *service.config
+	if err := conf.UpdateFromParams(&config, params); err != nil {
+		return err
+	}
 	endpointURL := fmt.Sprintf(alertEndpointTemplate, config.Host, config.Port)
 	payload, err := service.newAlertPayload(message, params)
 	if err != nil {

@@ -1,16 +1,18 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package gotify
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for use within the gotify plugin
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	Token      string `url:"path2" desc:"Application token" required:""`
 	Host       string `url:"host,port" desc:"Server hostname (and optionally port)" required:""`
@@ -21,28 +23,28 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		Host:       config.Host,
 		Scheme:     Scheme,
 		ForceQuery: false,
 		Path:       config.Path + config.Token,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 
 	tokenIndex := strings.LastIndex(url.Path, "/")
 	config.Path = url.Path[:tokenIndex]

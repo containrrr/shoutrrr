@@ -5,11 +5,11 @@ type ErrorMessage string
 
 const (
 	// MissingAPIKey from the service URL
-	MissingAPIKey ErrorMessage = "missing API key"
+	MissingAPIKey ErrorMessage = "botKey missing from config URL"
 	// MissingHost from the service URL
-	MissingHost ErrorMessage = "missing Zulip host"
+	MissingHost ErrorMessage = "host missing from config URL"
 	// MissingBotMail from the service URL
-	MissingBotMail ErrorMessage = "missing Bot mail address"
+	MissingBotMail ErrorMessage = "botMail missing from config URL"
 	// TopicTooLong if topic is more than 60 characters
 	TopicTooLong ErrorMessage = "topic exceeds max length (%d characters): was %d characters"
 )

@@ -1,4 +1,4 @@
-package format
+package pkr
 
 import (
 	t "github.com/containrrr/shoutrrr/pkg/types"

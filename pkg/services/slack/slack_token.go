@@ -2,10 +2,11 @@ package slack
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 var _ types.ConfigProp = &Token{}
@@ -24,12 +25,17 @@ type Token struct {
 // SetFromProp updates it's state according to the passed string
 // (implementation of the types.ConfigProp interface)
 func (token *Token) SetFromProp(propValue string) error {
+	if propValue == "" {
+		// Allow empty value to be set here, since it should be marked as required if empty is not valid
+		return nil
+	}
 	if len(propValue) < 3 {
 		return ErrorInvalidToken
 	}
 
 	match := tokenPattern.FindStringSubmatch(propValue)
 	if match == nil || len(match) != tokenMatchCount {
+
 		return ErrorInvalidToken
 	}
 
@@ -60,6 +66,9 @@ func (token *Token) GetPropValue() (string, error) {
 
 // TypeIdentifier returns the type identifier of the token
 func (token Token) TypeIdentifier() string {
+	if token.IsEmpty() {
+		return ""
+	}
 	return token.raw[:4]
 }
 
@@ -92,6 +101,9 @@ func (token *Token) String() string {
 
 // UserInfo returns a url.Userinfo struct populated from the token
 func (token *Token) UserInfo() *url.Userinfo {
+	if token.IsEmpty() {
+		return nil
+	}
 	return url.UserPassword(token.raw[:4], token.raw[5:])
 }
 
@@ -104,6 +116,9 @@ const webhookBase = "https://hooks.slack.com/services/"
 
 // WebhookURL returns the corresponding Webhook URL for the Token
 func (token Token) WebhookURL() string {
+	if token.IsEmpty() {
+		return ""
+	}
 	sb := strings.Builder{}
 	sb.WriteString(webhookBase)
 	sb.Grow(len(token.raw) - 5)
@@ -119,6 +134,9 @@ func (token Token) WebhookURL() string {
 
 // Authorization returns the corresponding `Authorization` HTTP header value for the Token
 func (token *Token) Authorization() string {
+	if token.IsEmpty() {
+		return ""
+	}
 	sb := strings.Builder{}
 	sb.WriteString("Bearer ")
 	sb.Grow(len(token.raw))
@@ -126,4 +144,8 @@ func (token *Token) Authorization() string {
 	sb.WriteRune('-')
 	sb.WriteString(token.raw[5:])
 	return sb.String()
+}
+
+func (token *Token) IsEmpty() bool {
+	return len(token.raw) == 0
 }

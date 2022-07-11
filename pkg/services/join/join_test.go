@@ -2,7 +2,7 @@ package join_test
 
 import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	pkr_ "github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/join"
 	"github.com/jarcoal/httpmock"
 
@@ -16,13 +16,13 @@ import (
 
 func TestJoin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Join Suite")
+	RunSpecs(t, "Join Service Suite")
 }
 
 var (
 	service    *join.Service
 	config     *join.Config
-	pkr        format.PropKeyResolver
+	pkr        pkr_.PropKeyResolver
 	envJoinURL *url.URL
 )
 var _ = Describe("the join service", func() {
@@ -47,7 +47,7 @@ var _ = Describe("the join service", func() {
 var _ = Describe("the join config", func() {
 	BeforeEach(func() {
 		config = &join.Config{}
-		pkr = format.NewPropKeyResolver(config)
+		pkr = pkr_.NewPropKeyResolver(config)
 	})
 	When("updating it using an url", func() {
 		It("should update the API key using the password part of the url", func() {
@@ -114,7 +114,7 @@ var _ = Describe("the join config", func() {
 
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			input := "join://Token:apikey@join?devices=dev1%2Cdev2&icon=warning&title=hey"
+			input := "join://:apikey@join?devices=dev1%2Cdev2&icon=warning&title=hey"
 			config := &join.Config{}
 			Expect(config.SetURL(testutils.URLMust(input))).To(Succeed())
 			Expect(config.GetURL().String()).To(Equal(input))

@@ -19,7 +19,7 @@ var (
 
 func TestMattermost(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Mattermost Suite")
+	RunSpecs(t, "Mattermost Service Suite")
 }
 
 var _ = Describe("the mattermost service", func() {

@@ -17,7 +17,7 @@ import (
 
 func TestMatrix(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Matrix Suite")
+	RunSpecs(t, "Matrix Service Suite")
 }
 
 var _ = Describe("the matrix service", func() {

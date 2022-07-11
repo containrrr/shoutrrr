@@ -1,3 +1,4 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package logger
 
 import (
@@ -7,19 +8,19 @@ import (
 )
 
 // Config is the configuration object for the Logger Service
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 	return &url.URL{
 		Scheme: Scheme,
 	}
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(_ *url.URL) error {
+func (config *LegacyConfig) SetURL(_ *url.URL) error {
 	return nil
 }
 

@@ -1,14 +1,16 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go
 package pushover
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/pkr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // Config for the Pushover notification service service
-type Config struct {
+type LegacyConfig struct {
 	Token    string   `url:"pass" desc:"API Token/Key"`
 	User     string   `url:"host" desc:"User Key"`
 	Devices  []string `key:"devices" optional:""`
@@ -17,29 +19,29 @@ type Config struct {
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config *Config) Enums() map[string]types.EnumFormatter {
+func (config *LegacyConfig) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{}
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return &url.URL{
 		User:       url.UserPassword("Token", config.Token),
 		Host:       config.User,
 		Scheme:     Scheme,
 		ForceQuery: true,
-		RawQuery:   format.BuildQuery(&resolver),
+		RawQuery:   pkr.BuildQuery(&resolver),
 	}
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
 	password, _ := url.User.Password()
 
 	config.User = url.Host
@@ -64,3 +66,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 
 // Scheme is the identifying part of this service's configuration URL
 const Scheme = "pushover"
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}

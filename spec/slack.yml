@@ -37,4 +37,5 @@ props:
     description: API Bot token
     required: true
     urlparts: [user, password]
-    credential: false
+    credential: true
+    customType: Token

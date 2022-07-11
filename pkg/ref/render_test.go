@@ -1,6 +1,9 @@
-package format
+package ref
 
-import t "github.com/containrrr/shoutrrr/pkg/types"
+import (
+	"github.com/containrrr/shoutrrr/pkg/format"
+	t "github.com/containrrr/shoutrrr/pkg/types"
+)
 
 type testEnummer struct {
 	Choice int `key:"choice" default:"Maybe"`
@@ -8,7 +11,7 @@ type testEnummer struct {
 
 func (testEnummer) Enums() map[string]t.EnumFormatter {
 	return map[string]t.EnumFormatter{
-		"Choice": CreateEnumFormatter([]string{"Yes", "No", "Maybe"}),
+		"Choice": format.CreateEnumFormatter([]string{"Yes", "No", "Maybe"}),
 	}
 }
 

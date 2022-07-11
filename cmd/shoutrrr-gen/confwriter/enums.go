@@ -1,9 +1,12 @@
 package confwriter
 
-func (cw *ConfWriter) WriteEnums() {
+import "github.com/containrrr/shoutrrr/pkg/conf"
+
+func (cw *ConfWriter) writeEnums() {
 
 	cw.writeSection("Enums / Options")
 
+	// Enums() impl for types.ServiceConfig
 	wl(`func (config *Config) Enums() map[string]types.EnumFormatter {`)
 	wl(`	return map[string]types.EnumFormatter{`)
 	for p := range cw.enumProps {
@@ -12,15 +15,17 @@ func (cw *ConfWriter) WriteEnums() {
 	wl(`	}`)
 	wl(`}`)
 	wl()
-	// wl(`var (`)
+
 	for p, vals := range cw.enumProps {
 
 		cw.writeSubSection(p + " Option")
 
-		typeName := optionTypeName(p)
+		typeName := conf.OptionTypeName(p)
 		structName := typeName + "Vals"
 		wf(`type %v int`, typeName)
 		wl()
+
+		// Values struct
 		wf(`type %v struct {`, structName)
 		for _, val := range vals {
 			wf(`	%s	%s`, val, typeName)
@@ -28,6 +33,8 @@ func (cw *ConfWriter) WriteEnums() {
 		wl(`	Formatter types.EnumFormatter`)
 		wl(`}`)
 		wl()
+
+		// Values singleton
 		wf(`var %vOptions = &%v {`, p, structName)
 		for i, val := range vals {
 			wf(`	%s:	%v,`, val, i)
@@ -39,6 +46,8 @@ func (cw *ConfWriter) WriteEnums() {
 		wl(`	}),`)
 		wl(`}`)
 		wl()
+
+		// Parse helper function
 		wf(`func (ov *%v) Parse(v string) (%v, error) {`, structName, typeName)
 		wf(`	if val := ov.Formatter.Parse(v); val != format.EnumInvalid {`)
 		wf(`		return %v(val), nil`, typeName)

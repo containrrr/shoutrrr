@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/conf"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -19,7 +19,6 @@ const (
 type Service struct {
 	standard.Standard
 	config *Config
-	pkr    format.PropKeyResolver
 }
 
 // Send notification to Telegram
@@ -29,7 +28,8 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	config := *service.config
-	if err := service.pkr.UpdateConfigFromParams(&config, params); err != nil {
+
+	if err := conf.UpdateFromParams(&config, params); err != nil {
 		return err
 	}
 
@@ -40,12 +40,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	service.config.Init()
-	if err := service.config.SetURL(configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return conf.Init(service.config, configURL)
 }
 
 func (service *Service) sendMessageForChatIDs(message string, config *Config) error {

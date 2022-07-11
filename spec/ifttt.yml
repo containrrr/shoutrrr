@@ -17,6 +17,10 @@ props:
     description: Sets the corresponding value field to the notification message
     default: "2"
     base: 10
+    validation:
+      range:
+        minimum: 1
+        maximum: 3
     keys: [messagevalue]
     credential: false
   UseTitleAsValue:

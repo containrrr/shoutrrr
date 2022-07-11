@@ -1,4 +1,4 @@
-package format
+package pkr
 
 import (
 	"errors"
@@ -7,23 +7,25 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/ref"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 )
 
 // PropKeyResolver implements the ConfigQueryResolver interface for services that uses key tags for query props
 type PropKeyResolver struct {
 	confValue reflect.Value
-	keyFields map[string]FieldInfo
+	keyFields map[string]ref.FieldInfo
 	keys      []string
 }
 
 // NewPropKeyResolver creates a new PropKeyResolver and initializes it using the provided config
 func NewPropKeyResolver(config t.ServiceConfig) PropKeyResolver {
 
-	configNode := GetConfigFormat(config)
+	configNode := ref.GetConfigFormat(config)
 	items := configNode.Items
 
-	keyFields := make(map[string]FieldInfo, len(items))
+	keyFields := make(map[string]ref.FieldInfo, len(items))
 	keys := make([]string, 0, len(items))
 	for _, item := range items {
 		field := *item.Field()
@@ -58,7 +60,7 @@ func (pkr *PropKeyResolver) QueryFields() []string {
 // Get returns the value of a config property tagged with the corresponding key
 func (pkr *PropKeyResolver) Get(key string) (string, error) {
 	if field, found := pkr.keyFields[strings.ToLower(key)]; found {
-		return GetConfigFieldString(pkr.confValue, field)
+		return ref.GetConfigFieldString(pkr.confValue, field)
 	}
 
 	return "", fmt.Errorf("%v is not a valid config key", key)
@@ -72,7 +74,7 @@ func (pkr *PropKeyResolver) Set(key string, value string) error {
 // set sets the value of a target struct tagged with the corresponding key
 func (pkr *PropKeyResolver) set(target reflect.Value, key string, value string) error {
 	if field, found := pkr.keyFields[strings.ToLower(key)]; found {
-		valid, err := SetConfigField(target, field, value)
+		valid, err := ref.SetConfigField(target, field, value)
 		if !valid && err == nil {
 			return errors.New("invalid value for type")
 		}
@@ -87,7 +89,7 @@ func (pkr *PropKeyResolver) set(target reflect.Value, key string, value string) 
 // The error returned is the first error that occurred, subsequent errors are just discarded.
 func (pkr *PropKeyResolver) UpdateConfigFromParams(config t.ServiceConfig, params *t.Params) (firstError error) {
 	if genConf, ok := config.(t.GeneratedConfig); ok {
-		return genConf.UpdateFromParams(params)
+		return conf.UpdateFromParams(genConf, params)
 	}
 	confValue := pkr.configValueOrInternal(config)
 	if params != nil {
@@ -105,7 +107,7 @@ func (pkr *PropKeyResolver) UpdateConfigFromParams(config t.ServiceConfig, param
 // The error returned is the first error that occurred, subsequent errors are just discarded.
 func (pkr *PropKeyResolver) SetDefaultProps(config t.ServiceConfig) (firstError error) {
 	if genConf, ok := config.(t.GeneratedConfig); ok {
-		return genConf.Init()
+		return conf.SetDefaults(genConf)
 	}
 	confValue := pkr.configValueOrInternal(config)
 	for key, info := range pkr.keyFields {

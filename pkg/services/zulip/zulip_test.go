@@ -15,7 +15,7 @@ import (
 
 func TestZulip(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Zulip Suite")
+	RunSpecs(t, "Zulip Service Suite")
 }
 
 var (
@@ -47,7 +47,7 @@ var _ = Describe("the zulip service", func() {
 
 	When("given a service url with missing parts", func() {
 		It("should return an error if bot mail is missing", func() {
-			zulipURL, err := url.Parse("zulip://example.zulipchat.com?stream=foo&topic=bar")
+			zulipURL, err := url.Parse("zulip://:pwd@example.zulipchat.com?stream=foo&topic=bar")
 			Expect(err).NotTo(HaveOccurred())
 			expectErrorMessageGivenURL(
 				MissingBotMail,
@@ -90,9 +90,9 @@ var _ = Describe("the zulip service", func() {
 					Topic:   "bar",
 				}
 
-				config2 := config1.Clone()
+				config2 := *config1
 
-				Expect(config1).To(Equal(config2))
+				Expect(config1).To(Equal(&config2))
 			})
 			It("the clone should not be the same struct", func() {
 				config1 := &zulip.Config{
@@ -103,9 +103,9 @@ var _ = Describe("the zulip service", func() {
 					Topic:   "bar",
 				}
 
-				config2 := config1.Clone()
+				config2 := *config1
 
-				Expect(config1).NotTo(BeIdenticalTo(config2))
+				Expect(config1).NotTo(BeIdenticalTo(&config2))
 			})
 		})
 		When("generating a config object", func() {

@@ -1,4 +1,4 @@
-package format
+package pkr
 
 import (
 	"net/url"
@@ -8,7 +8,10 @@ import (
 )
 
 var _ = Describe("Query Formatter", func() {
-	var pkr PropKeyResolver
+	var (
+		ts  *testStruct
+		pkr PropKeyResolver
+	)
 	BeforeEach(func() {
 		ts = &testStruct{}
 		pkr = NewPropKeyResolver(ts)

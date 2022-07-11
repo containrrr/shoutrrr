@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
@@ -29,13 +29,13 @@ func (config *LegacyConfig) Enums() map[string]types.EnumFormatter {
 
 // GetURL returns a URL representation of it's current field values
 func (config *LegacyConfig) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *LegacyConfig) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
@@ -48,7 +48,7 @@ func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL 
 		Host:       Scheme,
 		Scheme:     Scheme,
 		ForceQuery: true,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 
 }

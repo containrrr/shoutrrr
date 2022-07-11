@@ -5,7 +5,7 @@ props:
     type: list
     description: ""
     required: true
-    urlparts: [path1]
+    urlparts: [path]
     credential: false
   Title:
     type: text
@@ -18,4 +18,4 @@ props:
     description: ""
     required: true
     urlparts: [host]
-    credential: false
+    credential: true

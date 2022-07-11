@@ -3,12 +3,13 @@ package basic
 import (
 	"bufio"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/fatih/color"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/ref"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/fatih/color"
 )
 
 // Generator is the Basic Generator implementation
@@ -21,7 +22,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 
 	var err error
 
-	configNode := format.GetServiceConfigFormat(service)
+	configNode := ref.GetServiceConfigFormat(service)
 	configPtr := reflect.New(configNode.Type)
 	config := configPtr.Elem()
 
@@ -73,7 +74,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 				}
 			}
 
-			if valueValid, err = format.SetConfigField(config, *field, inputValue); !valueValid && err == nil {
+			if valueValid, err = ref.SetConfigField(config, *field, inputValue); !valueValid && err == nil {
 				_, _ = fmt.Fprint(color.Output, "Invalid type ", color.HiYellowString(field.Type.Kind().String()))
 				_, _ = fmt.Fprint(color.Output, " for field ", color.HiCyanString(field.Name), "\n\n")
 			}

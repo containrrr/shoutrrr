@@ -1,4 +1,4 @@
-//go:generate go run ../../../cmd/shoutrrr-gen --lang go ../../../spec/telegram.yml
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go
 
 package telegram
 

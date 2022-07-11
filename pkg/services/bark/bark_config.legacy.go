@@ -3,7 +3,7 @@ package bark
 import (
 	"net/url"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -27,13 +27,13 @@ type LegacyConfig struct {
 
 // GetURL returns a URL representation of it's current field values
 func (config *LegacyConfig) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *LegacyConfig) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
@@ -44,7 +44,7 @@ func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL 
 		Scheme:     Scheme,
 		ForceQuery: true,
 		Path:       config.Path,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 
 }

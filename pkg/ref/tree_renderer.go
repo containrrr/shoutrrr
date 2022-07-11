@@ -1,4 +1,4 @@
-package format
+package ref
 
 // TreeRenderer renders a ContainerNode tree into a string
 type TreeRenderer interface {

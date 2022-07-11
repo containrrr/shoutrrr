@@ -1,5 +1,7 @@
 version: 1
 scheme: generic
+options:
+  customQueryVars: yes
 props:
   ContentType:
     type: text
@@ -23,3 +25,19 @@ props:
     description: ""
     keys: [title]
     credential: false
+  Path:
+    type: text
+    urlparts: [path]
+  Host:
+    type: text
+    urlparts: [host]
+  User:
+    type: text
+    urlparts: [user]
+  Password:
+    type: text
+    credential: yes
+    urlparts: [password]
+  Query:
+    type: map
+    urlparts: [query]

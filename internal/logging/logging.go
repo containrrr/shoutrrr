@@ -9,7 +9,6 @@ import (
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/multi"
-	"github.com/apex/log/handlers/text"
 )
 
 var logLevel = log.InfoLevel
@@ -65,13 +64,28 @@ type LogHandler struct {
 
 type Fields log.Fields
 
+// Colors mapping.
+var Colors = [...]int{
+	log.DebugLevel: 36,
+	log.InfoLevel:  34,
+	log.WarnLevel:  33,
+	log.ErrorLevel: 31,
+	log.FatalLevel: 31,
+}
+
+// Strings mapping.
+var Strings = [...]string{
+	log.DebugLevel: "DBG",
+	log.InfoLevel:  "INF",
+	log.WarnLevel:  "WRN",
+	log.ErrorLevel: "ERR",
+	log.FatalLevel: "FAT",
+}
+
 // HandleLog implements log.Handler.HandleLog
 func (lh *LogHandler) HandleLog(e *log.Entry) error {
-	color := text.Colors[e.Level]
-	if e.Level == log.DebugLevel {
-		color = 36
-	}
-	level := text.Strings[e.Level][:3]
+	color := Colors[e.Level]
+	level := Strings[e.Level]
 	names := e.Fields.Names()
 
 	lh.mu.Lock()

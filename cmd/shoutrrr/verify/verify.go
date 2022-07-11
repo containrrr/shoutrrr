@@ -2,11 +2,12 @@ package verify
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/containrrr/shoutrrr/internal/util"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/ref"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/fatih/color"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -39,8 +40,8 @@ func Run(cmd *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	config := format.GetServiceConfig(service)
-	configNode := format.GetConfigFormat(config)
+	config := ref.GetServiceConfig(service)
+	configNode := ref.GetConfigFormat(config)
 
-	_, _ = fmt.Fprintf(color.Output, format.ColorFormatTree(configNode, true))
+	_, _ = fmt.Fprintf(color.Output, ref.ColorFormatTree(configNode, true))
 }

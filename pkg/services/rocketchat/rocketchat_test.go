@@ -18,7 +18,7 @@ var (
 
 func TestRocketchat(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Rocketchat Suite")
+	RunSpecs(t, "Rocketchat Service Suite")
 }
 
 var _ = Describe("the rocketchat service", func() {

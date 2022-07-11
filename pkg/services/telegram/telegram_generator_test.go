@@ -3,6 +3,7 @@ package telegram_test
 import (
 	"fmt"
 	"io"
+	"log"
 	"strings"
 
 	"github.com/jarcoal/httpmock"
@@ -31,11 +32,13 @@ func mockTyped(a ...interface{}) {
 }
 
 func dumpBuffers() {
+	logger := log.New(GinkgoWriter, "Test", log.LstdFlags)
 	for _, line := range strings.Split(string(userIn.Contents()), "\n") {
-		println(">", line)
+		logger.Println(">", line)
 	}
+	logger.Println("----")
 	for _, line := range strings.Split(string(userOut.Contents()), "\n") {
-		println("<", line)
+		logger.Println("<", line)
 	}
 }
 
@@ -107,7 +110,7 @@ var _ = Describe("TelegramGenerator", func() {
 		Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
 		Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))
 
-		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram/?chats=667`)))
+		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667`)))
 	})
 
 })

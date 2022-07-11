@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -26,17 +27,20 @@ func (service *Service) Send(message string, params *types.Params) error {
 	// Clone the config because we might modify stream and/or
 	// topic with values from the parameters and they should only
 	// change this Send().
-	config := service.config.Clone()
-
-	if params != nil {
-		if stream, found := (*params)["stream"]; found {
-			config.Stream = stream
-		}
-
-		if topic, found := (*params)["topic"]; found {
-			config.Topic = topic
-		}
+	config := *service.config
+	if err := conf.UpdateFromParams(&config, params); err != nil {
+		return err
 	}
+
+	// if params != nil {
+	// 	if stream, found := (*params)["stream"]; found {
+	// 		config.Stream = stream
+	// 	}
+
+	// 	if topic, found := (*params)["topic"]; found {
+	// 		config.Topic = topic
+	// 	}
+	// }
 
 	topicLength := len([]rune(config.Topic))
 
@@ -50,19 +54,14 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return fmt.Errorf("message exceeds max size (%d bytes): was %d bytes", contentMaxSize, messageSize)
 	}
 
-	return service.doSend(config, message)
+	return service.doSend(&config, message)
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-
-	if err := service.config.setURL(nil, configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return conf.Init(service.config, configURL)
 }
 
 func (service *Service) doSend(config *Config, message string) error {

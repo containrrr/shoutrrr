@@ -1,48 +1,50 @@
+//go:generate go run ../../../cmd/shoutrrr-gen --lang go
 package slack
 
 import (
 	"net/url"
+	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Config for the slack service
-type Config struct {
+// LegacyConfig for the slack service
+type LegacyConfig struct {
 	standard.EnumlessConfig
-	BotName string `optional:"uses bot default" key:"botname,username" desc:"Bot name"`
-	Icon    string `key:"icon,icon_emoji,icon_url" default:"" optional:"" desc:"Use emoji or URL as icon (based on presence of http(s):// prefix)"`
-	Token   Token  `desc:"API Bot token" url:"user,pass"`
-	Color   string `key:"color" optional:"default border color" desc:"Message left-hand border color"`
-	Title   string `key:"title" optional:"omitted" desc:"Prepended text above the message"`
-	Channel string `url:"host" desc:"Channel to send messages to in Cxxxxxxxxxx format"`
-	ThreadTS string   `key:"thread_ts" optional:"" desc:"ts value of the parent message (to send message as reply in thread)"`
+	BotName  string `optional:"uses bot default" key:"botname,username" desc:"Bot name"`
+	Icon     string `key:"icon,icon_emoji,icon_url" default:"" optional:"" desc:"Use emoji or URL as icon (based on presence of http(s):// prefix)"`
+	Token    Token  `desc:"API Bot token" url:"user,pass"`
+	Color    string `key:"color" optional:"default border color" desc:"Message left-hand border color"`
+	Title    string `key:"title" optional:"omitted" desc:"Prepended text above the message"`
+	Channel  string `url:"host" desc:"Channel to send messages to in Cxxxxxxxxxx format"`
+	ThreadTS string `key:"thread_ts" optional:"" desc:"ts value of the parent message (to send message as reply in thread)"`
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) GetURL() *url.URL {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(url *url.URL) error {
-	resolver := format.NewPropKeyResolver(config)
+func (config *LegacyConfig) SetURL(url *url.URL) error {
+	resolver := pkr.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
 }
 
-func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
+func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
 	return &url.URL{
 		User:       config.Token.UserInfo(),
 		Host:       config.Channel,
 		Scheme:     Scheme,
 		ForceQuery: false,
-		RawQuery:   format.BuildQuery(resolver),
+		RawQuery:   pkr.BuildQuery(resolver),
 	}
 }
 
-func (config *Config) setURL(resolver types.ConfigQueryResolver, serviceURL *url.URL) error {
+func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, serviceURL *url.URL) error {
 
 	var token string
 	var err error
@@ -81,4 +83,39 @@ func CreateConfigFromURL(serviceURL *url.URL) (*Config, error) {
 	config := Config{}
 	err := config.SetURL(serviceURL)
 	return &config, err
+}
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}
+
+func (config *Config) setToken(value string) (*Token, error) {
+	return ParseToken(value)
+}
+
+func (config *Config) getToken() string {
+	value, _ := config.Token.GetPropValue()
+	return value
+}
+
+func (config *Config) emptyToken(value *Token) bool {
+	return value.IsEmpty()
+}
+
+func (config *Config) UpdateLegacyURL(serviceURL *url.URL) *url.URL {
+
+	if len(serviceURL.Path) > 1 {
+		// Reading legacy config URL format
+		updatedURL := *serviceURL
+		token := strings.Replace(serviceURL.Hostname()+serviceURL.Path, "/", "-", -1)
+		updatedURL.User = url.UserPassword(hookTokenIdentifier, token)
+		updatedURL.Path = ""
+		updatedURL.Host = "webhook"
+		query := updatedURL.Query()
+		query.Add("botname", serviceURL.User.Username())
+		updatedURL.RawQuery = query.Encode()
+		return &updatedURL
+	}
+
+	return serviceURL
 }

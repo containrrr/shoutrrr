@@ -20,7 +20,7 @@ import (
 
 func TestDiscord(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Discord Suite")
+	RunSpecs(t, "Discord Service Suite")
 }
 
 var (
@@ -239,7 +239,7 @@ func buildPayloadFromHundreds(hundreds int, split bool, title string, colors [ty
 	}
 
 	items, omitted := CreateItemsFromPlain(builder.String(), split)
-	println("Items:", len(items), "Omitted:", omitted)
+	logger.Println("Items:", len(items), "Omitted:", omitted)
 
 	return CreatePayloadFromItems(items, title, colors, omitted)
 }

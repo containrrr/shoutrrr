@@ -1,9 +1,12 @@
-package format
+package ref
 
 import (
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/urlpart"
 )
 
 // MarkdownTreeRenderer renders a ContainerNode tree into a markdown documentation string
@@ -19,12 +22,12 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	sb := strings.Builder{}
 
 	queryFields := make([]*FieldInfo, 0, len(root.Items))
-	urlFields := map[URLPart]*FieldInfo{}
+	urlFields := map[urlpart.URLPart]*FieldInfo{}
 
 	for _, node := range root.Items {
 		field := node.Field()
 		for _, urlPart := range field.URLParts {
-			if urlPart == URLQuery {
+			if urlPart == urlpart.Query {
 				queryFields = append(queryFields, field)
 			} else {
 				urlFields[urlPart] = field
@@ -57,11 +60,11 @@ func (r MarkdownTreeRenderer) RenderTree(root *ContainerNode, scheme string) str
 	return sb.String()
 }
 
-func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[URLPart]*FieldInfo, scheme string) {
+func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[urlpart.URLPart]*FieldInfo, scheme string) {
 	fieldsPrinted := make(map[string]bool)
 
 	r.writeHeader(sb, "URL Fields")
-	for _, part := range URLPartOrder {
+	for _, part := range urlpart.Order {
 		field := urlFields[part]
 		if field == nil || fieldsPrinted[field.Name] {
 			continue
@@ -70,11 +73,11 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[
 
 		sb.WriteString("  URL part: <code class=\"service-url\">")
 
-		var lastPart URLPart
-		for _, urlPart := range URLPartOrder {
+		var lastPart urlpart.URLPart
+		for _, urlPart := range urlpart.Order {
 			// urlPart := URLPart(i)
 			uf := urlFields[urlPart]
-			if urlPart == URLScheme {
+			if urlPart == urlpart.Scheme {
 				sb.WriteString(scheme)
 				sb.WriteString("://")
 				continue
@@ -82,16 +85,16 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[
 			if uf == nil {
 				if urlPart.IsPath() {
 					// sb.WriteRune(urlPart.Suffix())
-				} else if urlPart == URLHost {
+				} else if urlPart == urlpart.Host {
 					// Host cannot be empty
-					if urlFields[URLPassword] != nil || urlFields[URLUser] != nil {
-						sb.WriteRune(URLPassword.Suffix())
+					if urlFields[urlpart.Password] != nil || urlFields[urlpart.User] != nil {
+						sb.WriteRune(urlpart.Password.Suffix())
 					}
 					sb.WriteString(scheme)
 				}
 				continue
-			} else if urlPart == URLHost && urlFields[URLUser] == nil && urlFields[URLPassword] == nil {
-			} else if urlPart != URLUser {
+			} else if urlPart == urlpart.Host && urlFields[urlpart.User] == nil && urlFields[urlpart.Password] == nil {
+			} else if urlPart != urlpart.User {
 				sb.WriteRune(lastPart.Suffix())
 
 			}
@@ -102,7 +105,7 @@ func (r MarkdownTreeRenderer) writeURLFields(sb *strings.Builder, urlFields map[
 			slug := strings.ToLower(uf.Name)
 
 			// Hard coded override for host:port 😓
-			if slug == "host" && urlPart == URLPort {
+			if slug == "host" && urlPart == urlpart.Port {
 				slug = "port"
 			}
 			sb.WriteString(slug)
@@ -167,7 +170,7 @@ func (MarkdownTreeRenderer) writeFieldPrimary(sb *strings.Builder, field *FieldI
 			sb.WriteString("*empty*")
 		} else {
 			if field.Type.Kind() == reflect.Bool {
-				defaultValue, _ := ParseBool(field.DefaultValue, false)
+				defaultValue, _ := format.ParseBool(field.DefaultValue, false)
 				if defaultValue {
 					sb.WriteString("✔ ")
 				} else {

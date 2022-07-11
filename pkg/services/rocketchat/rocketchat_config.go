@@ -1,17 +1,20 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package rocketchat
 
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
 
 // Config for the rocket.chat service
-type Config struct {
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	UserName string `url:"user" optional:""`
 	Host     string `url:"host"`
@@ -22,7 +25,7 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 
 	u := &url.URL{
 		Host:       fmt.Sprintf("%s:%v", config.Host, config.Port),
@@ -34,7 +37,7 @@ func (config *Config) GetURL() *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(serviceURL *url.URL) error {
+func (config *LegacyConfig) SetURL(serviceURL *url.URL) error {
 
 	UserName := serviceURL.User.Username()
 	host := serviceURL.Hostname()
@@ -74,4 +77,28 @@ func CreateConfigFromURL(_ types.ConfigQueryResolver, serviceURL *url.URL) (*Con
 	config := Config{}
 	err := config.SetURL(serviceURL)
 	return &config, err
+}
+
+func (*Config) UpdateLegacyURL(legacyURL *url.URL) *url.URL {
+	updatedURL := *legacyURL
+
+	path := conf.SplitPath(legacyURL.Path)
+	channel := ""
+
+	if legacyURL.Fragment != "" {
+		channel = "#" + legacyURL.Fragment
+		legacyURL.Fragment = ""
+		if len(path) < 3 {
+			path = append(path, channel)
+		} else {
+			path[2] = channel
+		}
+	} else if len(path) > 2 {
+		if !strings.HasPrefix(path[2], "@") {
+			path[2] = "#" + path[2]
+		}
+	}
+
+	updatedURL.Path = conf.JoinPath(path...)
+	return &updatedURL
 }

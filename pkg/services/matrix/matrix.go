@@ -2,10 +2,12 @@ package matrix
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
+	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Scheme is the identifying part of this service's configuration URL
@@ -16,16 +18,14 @@ type Service struct {
 	standard.Standard
 	config *Config
 	client *client
-	pkr    format.PropKeyResolver
+	pkr    pkr.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (s *Service) Initialize(configURL *url.URL, logger t.StdLogger) error {
 	s.SetLogger(logger)
 	s.config = &Config{}
-
-	s.pkr = format.NewPropKeyResolver(s.config)
-	if err := s.config.setURL(&s.pkr, configURL); err != nil {
+	if err := conf.Init(s.config, configURL); err != nil {
 		return err
 	}
 
@@ -41,7 +41,7 @@ func (s *Service) Initialize(configURL *url.URL, logger t.StdLogger) error {
 // Send notification
 func (s *Service) Send(message string, params *t.Params) error {
 	config := *s.config
-	if err := s.pkr.UpdateConfigFromParams(&config, params); err != nil {
+	if err := conf.UpdateFromParams(&config, params); err != nil {
 		return err
 	}
 

@@ -17,7 +17,7 @@ import (
 
 func TestPushbullet(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Pushbullet Suite")
+	RunSpecs(t, "Pushbullet Service Suite")
 }
 
 var (
@@ -50,7 +50,7 @@ var _ = Describe("the pushbullet service", func() {
 	Describe("the pushbullet config", func() {
 		When("generating a config object", func() {
 			It("should set token", func() {
-				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke")
+				pushbulletURL, _ := url.Parse("pushbullet://tokentokentokentokentokentokentoke/test")
 				config := Config{}
 				err := config.SetURL(pushbulletURL)
 
@@ -72,8 +72,8 @@ var _ = Describe("the pushbullet service", func() {
 				err := config.SetURL(pushbulletURL)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(config.Targets).To(HaveLen(2))
 				Expect(config.Targets).To(ContainElements("foo", "#bar"))
+				Expect(config.Targets).To(HaveLen(2))
 			})
 		})
 

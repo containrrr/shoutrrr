@@ -1,14 +1,17 @@
+//go:generate go run ../../../cmd/shoutrrr-gen
 package mattermost
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/url"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-//Config object holding all information
-type Config struct {
+//LegacyConfig object holding all information
+type LegacyConfig struct {
 	standard.EnumlessConfig
 	UserName string `url:"user" optional:"" desc:"Override webhook user"`
 	Channel  string `url:"path2" optional:"" desc:"Override webhook channel"`
@@ -17,7 +20,7 @@ type Config struct {
 }
 
 // GetURL returns a URL representation of it's current field values
-func (config *Config) GetURL() *url.URL {
+func (config *LegacyConfig) GetURL() *url.URL {
 	paths := []string{"", config.Token, config.Channel}
 	if config.Channel == "" {
 		paths = paths[:2]
@@ -36,7 +39,7 @@ func (config *Config) GetURL() *url.URL {
 }
 
 // SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *Config) SetURL(serviceURL *url.URL) error {
+func (config *LegacyConfig) SetURL(serviceURL *url.URL) error {
 
 	config.Host = serviceURL.Hostname()
 	if serviceURL.Path == "" || serviceURL.Path == "/" {
@@ -68,3 +71,7 @@ const (
 	// NotEnoughArguments provided in the service URL
 	NotEnoughArguments ErrorMessage = "the apiURL does not include enough arguments, either provide 1 or 3 arguments (they may be empty)"
 )
+
+func (service *Service) GetLegacyConfig() types.ServiceConfig {
+	return &LegacyConfig{}
+}

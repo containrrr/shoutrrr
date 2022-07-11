@@ -4,7 +4,7 @@ props:
   Channel:
     type: text
     description: ""
-    required: true
+    required: false
     urlparts: [path3]
     credential: false
   Host:
@@ -14,9 +14,9 @@ props:
     urlparts: [host]
     credential: false
   Port:
-    type: text
+    type: number
     description: ""
-    required: true
+    required: false
     urlparts: [port]
     credential: false
   TokenA:
@@ -24,13 +24,13 @@ props:
     description: ""
     required: true
     urlparts: [path1]
-    credential: false
+    credential: true
   TokenB:
     type: text
     description: ""
     required: true
     urlparts: [path2]
-    credential: false
+    credential: true
   UserName:
     type: text
     description: ""
