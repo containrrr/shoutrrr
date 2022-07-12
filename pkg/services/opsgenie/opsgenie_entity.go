@@ -28,7 +28,7 @@ func (e *Entity) SetFromProp(propValue string) error {
 	elements := strings.Split(propValue, ":")
 
 	if len(elements) != 2 {
-		return fmt.Errorf("invalid entity, should have two elments separated by colon: %q", propValue)
+		return fmt.Errorf("invalid entity, should have two elements separated by colon: %q", propValue)
 	}
 	e.Type = elements[0]
 	identifier := elements[1]

@@ -56,5 +56,9 @@ func (cw *ConfWriter) writeEnums() {
 		wf(`	}`)
 		wf(`}`)
 		wl()
+		wf(`func (o %v) String() string {`, typeName)
+		wf(`	return %vOptions.Formatter.Print(int(o))`, p)
+		wf(`}`)
+		wl()
 	}
 }

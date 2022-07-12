@@ -4,7 +4,6 @@ package pushbullet
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -106,6 +105,10 @@ func (config *Config) SetURL(configURL *url.URL) error {
 
 	if len(config.Targets) == 0 {
 		return fmt.Errorf("targets missing from config URL")
+	}
+
+	if len(config.Token) != 34 {
+		return fmt.Errorf("value %q for token is not the correct length (34)", config.Token)
 	}
 
 	if config.Token == "" {

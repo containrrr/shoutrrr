@@ -4,7 +4,7 @@ package teams
 type payload struct {
 	CardType   string    `json:"@type"`
 	Context    string    `json:"@context"`
-	Markdown   bool      `json:"markdown,bool"`
+	Markdown   bool      `json:"markdown"`
 	Text       string    `json:"text,omitempty"`
 	Title      string    `json:"title,omitempty"`
 	Summary    string    `json:"summary,omitempty"`

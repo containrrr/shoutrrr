@@ -18,9 +18,7 @@ props:
     default: "2"
     base: 10
     validation:
-      range:
-        minimum: 1
-        maximum: 3
+      range: { minimum: 1, maximum: 3 }
     keys: [messagevalue]
     credential: false
   UseTitleAsValue:
@@ -28,6 +26,9 @@ props:
     description: Sets the corresponding value field to the notification title
     default: "0"
     base: 10
+    validation:
+      range: { minimum: 0, maximum: 3 }
+      notEqual: UseMessageAsValue
     keys: [titlevalue]
     credential: false
   Value1:

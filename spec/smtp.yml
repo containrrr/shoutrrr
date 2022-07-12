@@ -38,7 +38,7 @@ props:
     type: text
     description: SMTP server password or hash (for OAuth2)
     urlparts: [password]
-    credential: false
+    credential: true
   Port:
     type: number
     description: SMTP server port, common ones are 25, 465, 587 or 2525

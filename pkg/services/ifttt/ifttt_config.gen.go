@@ -4,7 +4,6 @@ package ifttt
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -148,7 +147,15 @@ func (config *Config) SetURL(configURL *url.URL) error {
 	}
 
 	if config.UseMessageAsValue < 1 || config.UseMessageAsValue > 3 {
-		return fmt.Errorf("value %v for useMessageAsValue is not in the range 0xc000016f70-0xc000016f78", config.UseMessageAsValue)
+		return fmt.Errorf("value %v for useMessageAsValue is not in the range 1-1", config.UseMessageAsValue)
+	}
+
+	if config.UseTitleAsValue < 0 || config.UseTitleAsValue > 3 {
+		return fmt.Errorf("value %v for useTitleAsValue is not in the range 0-0", config.UseTitleAsValue)
+	}
+
+	if config.UseTitleAsValue != config.UseMessageAsValue {
+		return fmt.Errorf("value %v for useTitleAsValue is already used for UseMessageAsValue", config.UseTitleAsValue)
 	}
 
 	if config.WebHookID == "" {

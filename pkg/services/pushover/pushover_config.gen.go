@@ -4,7 +4,6 @@ package pushover
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"

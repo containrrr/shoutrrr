@@ -57,10 +57,6 @@ func (service *Service) GetConfig() *Config {
 	return service.config
 }
 
-func (service *Service) GetLegacyConfig() types.ServiceConfig {
-	return &LegacyConfig{}
-}
-
 func sendMessageToAPI(message string, chat string, config *Config) error {
 	client := &Client{token: config.token(), apiHost: config.apiHost()}
 	payload := createSendMessagePayload(message, chat, config)

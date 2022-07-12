@@ -112,7 +112,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Gotify notification returned %d HTTP status code", resp.StatusCode)
+		return fmt.Errorf("gotify notification returned %d HTTP status code", resp.StatusCode)
 	}
 
 	return nil

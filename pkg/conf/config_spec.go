@@ -37,8 +37,10 @@ type SpecProp struct {
 	ItemSeparator  string       `yaml:"itemSeparator,omitempty"`
 	ValueSeparator string       `yaml:"valueSeparator,omitempty"`
 	Validation     struct {
-		ValidRange   *RangeValidator `yaml:"range,omitempty"`
-		MatchesRegex *RegexValidator `yaml:"regex,omitempty"`
+		ValidRange   *RangeValidator          `yaml:"range,omitempty"`
+		ValidLength  *LengthValidator         `yaml:"length,omitempty"`
+		MatchesRegex *RegexValidator          `yaml:"regex,omitempty"`
+		NotEqual     *NotEqualToPropValidator `yaml:"notEqual,omitempty"`
 	} `yaml:"validation"`
 }
 
@@ -55,6 +57,12 @@ func (sp *SpecProp) Validators() []PropValidator {
 	}
 	if sp.Validation.ValidRange != nil {
 		validators = append(validators, sp.Validation.ValidRange)
+	}
+	if sp.Validation.ValidLength != nil {
+		validators = append(validators, sp.Validation.ValidLength)
+	}
+	if sp.Validation.NotEqual != nil {
+		validators = append(validators, sp.Validation.NotEqual)
 	}
 	if sp.Required {
 		validators = append(validators, &NotEmptyValidator{})

@@ -101,7 +101,6 @@ func (cw *ConfWriter) WriteConfig(src io.Writer, args []string) error {
 	}
 	cw.writeEnums()
 	cw.writeUpdate()
-	// cw.writeHelpers()
 
 	return nil
 }
@@ -117,7 +116,6 @@ func (cw *ConfWriter) writeHeader(args []string) {
 	wl(`import (`)
 	wl(`	"fmt"`)
 	wl(`	"net/url"`)
-	wl(`	_ "strings"`)
 	wl()
 	wl(`	"github.com/containrrr/shoutrrr/pkg/types"`)
 	if len(cw.enumProps) > 0 {

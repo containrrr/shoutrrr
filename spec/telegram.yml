@@ -37,13 +37,15 @@ props:
     description: ""
     required: true
     urlparts: [password]
-    credential: false
+    credential: true
+    validation: {regex: {matches: "[a-zA-Z0-9_-]+" } }
   BotID:
     type: text
     description: ""
     required: true
     urlparts: [user]
-    credential: true
+    credential: false
+    validation: {regex: {matches: "[0-9]+" } }
   APIHost:
     type: text
     description: ""

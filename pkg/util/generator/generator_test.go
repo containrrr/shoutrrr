@@ -2,14 +2,16 @@ package generator_test
 
 import (
 	"fmt"
+	"log"
+	re "regexp"
+	"strings"
+	"testing"
+
 	"github.com/containrrr/shoutrrr/pkg/util/generator"
 	"github.com/mattn/go-colorable"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	re "regexp"
-	"strings"
-	"testing"
 )
 
 func TestGenerator(t *testing.T) {
@@ -29,11 +31,12 @@ func mockTyped(a ...interface{}) {
 }
 
 func dumpBuffers() {
+	logger := log.New(GinkgoWriter, "", 0)
 	for _, line := range strings.Split(string(userIn.Contents()), "\n") {
-		println(">", line)
+		logger.Println(">", line)
 	}
 	for _, line := range strings.Split(string(userOut.Contents()), "\n") {
-		println("<", line)
+		logger.Println("<", line)
 	}
 }
 

@@ -3,84 +3,10 @@ package pushbullet
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
-	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
-	"github.com/containrrr/shoutrrr/pkg/pkr"
-	"github.com/containrrr/shoutrrr/pkg/types"
-
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 )
-
-// Config ...
-type LegacyConfig struct {
-	standard.EnumlessConfig
-	Targets []string `url:"path"`
-	Token   string   `url:"host"`
-	Title   string   `key:"title" default:"Shoutrrr notification"`
-}
-
-// GetURL returns a URL representation of it's current field values
-func (config *LegacyConfig) GetURL() *url.URL {
-	resolver := pkr.NewPropKeyResolver(config)
-	return config.getURL(&resolver)
-}
-
-// SetURL updates a ServiceConfig from a URL representation of it's field values
-func (config *LegacyConfig) SetURL(url *url.URL) error {
-	resolver := pkr.NewPropKeyResolver(config)
-	return config.setURL(&resolver, url)
-}
-
-func (config *LegacyConfig) getURL(resolver types.ConfigQueryResolver) *url.URL {
-	return &url.URL{
-		Host:       config.Token,
-		Path:       "/" + strings.Join(config.Targets, "/"),
-		Scheme:     Scheme,
-		ForceQuery: false,
-		RawQuery:   pkr.BuildQuery(resolver),
-	}
-}
-
-func (config *LegacyConfig) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
-	path := url.Path
-
-	if len(path) > 0 && path[0] == '/' {
-		// Remove initial slash to skip empty first target
-		path = path[1:]
-	}
-
-	if url.Fragment != "" {
-		path += fmt.Sprintf("/#%s", url.Fragment)
-	}
-
-	targets := strings.Split(path, "/")
-
-	token := url.Hostname()
-	if err := validateToken(token); err != nil {
-		return err
-	}
-
-	config.Token = token
-	config.Targets = targets
-
-	for key, vals := range url.Query() {
-		if err := resolver.Set(key, vals[0]); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func validateToken(token string) error {
-	if len(token) != 34 {
-		return ErrorTokenIncorrectSize
-	}
-	return nil
-}
 
 const (
 	//Scheme is the scheme part of the service configuration URL

@@ -4,7 +4,6 @@ package teams
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -137,6 +136,22 @@ func (config *Config) SetURL(configURL *url.URL) error {
 	err := config.Update(updates)
 	if err != nil {
 		return err
+	}
+
+	if !conf.ValueMatchesPattern(config.AltID, "[A-Za-z0-9]{32}") {
+		return fmt.Errorf("value %v for altID does not match the expected format", config.AltID)
+	}
+
+	if !conf.ValueMatchesPattern(config.Group, "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}") {
+		return fmt.Errorf("value %v for group does not match the expected format", config.Group)
+	}
+
+	if !conf.ValueMatchesPattern(config.GroupOwner, "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}") {
+		return fmt.Errorf("value %v for groupOwner does not match the expected format", config.GroupOwner)
+	}
+
+	if !conf.ValueMatchesPattern(config.Tenant, "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}") {
+		return fmt.Errorf("value %v for tenant does not match the expected format", config.Tenant)
 	}
 
 	return nil

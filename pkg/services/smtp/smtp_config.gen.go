@@ -4,7 +4,6 @@ package smtp
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/format"
@@ -200,8 +199,8 @@ func (config *Config) SetURL(configURL *url.URL) error {
 
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Auth":       AuthOptions.Formatter,
 		"Encryption": EncryptionOptions.Formatter,
+		"Auth":       AuthOptions.Formatter,
 	}
 }
 
@@ -241,6 +240,10 @@ func (ov *authOptionVals) Parse(v string) (authOption, error) {
 	}
 }
 
+func (o authOption) String() string {
+	return AuthOptions.Formatter.Print(int(o))
+}
+
 /* == Encryption Option ======================= */
 
 type encryptionOption int
@@ -272,6 +275,10 @@ func (ov *encryptionOptionVals) Parse(v string) (encryptionOption, error) {
 	} else {
 		return encryptionOption(val), fmt.Errorf("invalid option %q for Encryption", v)
 	}
+}
+
+func (o encryptionOption) String() string {
+	return EncryptionOptions.Formatter.Print(int(o))
 }
 
 // Update updates the Config from a map of it's properties

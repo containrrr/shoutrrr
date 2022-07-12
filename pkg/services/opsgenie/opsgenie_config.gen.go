@@ -4,7 +4,6 @@ package opsgenie
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -205,6 +204,10 @@ func (config *Config) SetURL(configURL *url.URL) error {
 
 	if config.APIKey == "" {
 		return fmt.Errorf("apiKey missing from config URL")
+	}
+
+	if config.Port < 1 || config.Port > 65535 {
+		return fmt.Errorf("value %v for port is not in the range 1-1", config.Port)
 	}
 
 	if !conf.ValueMatchesPattern(config.Priority, "(P[1-5])?") {

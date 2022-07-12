@@ -53,7 +53,7 @@ var _ = Describe("the telegram service", func() {
 					return
 				}
 				hundredChars := "this string is exactly (to the letter) a hundred characters long which will make the send func error"
-				serviceURL, _ := url.Parse("telegram://12345:mock-token/?chats=channel-1")
+				serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1")
 				builder := strings.Builder{}
 				for i := 0; i < 42; i++ {
 					builder.WriteString(hundredChars)

@@ -33,15 +33,6 @@ const (
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	// service.config = &Config{
-	// 	Port:        25,
-	// 	ToAddresses: nil,
-	// 	Subject:     "",
-	// 	Auth:        AuthOptions.Unknown,
-	// 	UseStartTLS: true,
-	// 	UseHTML:     false,
-	// 	Encryption:  EncryptionOptions.Auto,
-	// }
 
 	if err := conf.Init(service.config, configURL); err != nil {
 		return err
@@ -80,7 +71,7 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
-	if useImplicitTLS(encMethod(config.Encryption), uint16(config.Port)) {
+	if useImplicitTLS(config.Encryption, uint16(config.Port)) {
 		conn, err = tls.Dial("tcp", addr, &tls.Config{
 			ServerName: config.Host,
 		})
@@ -106,7 +97,7 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
 	}
 
-	if config.UseStartTLS && !useImplicitTLS(encMethod(config.Encryption), uint16(config.Port)) {
+	if config.UseStartTLS && !useImplicitTLS(config.Encryption, uint16(config.Port)) {
 		if supported, _ := client.Extension("StartTLS"); !supported {
 			service.Logf("Warning: StartTLS enabled, but server did not report support for it. Connection is NOT encrypted")
 		} else {
@@ -147,17 +138,17 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
-	switch authType(config.Auth) {
-	case AuthTypes.None:
+	switch config.Auth {
+	case AuthOptions.None:
 		return nil, nil
-	case AuthTypes.Plain:
+	case AuthOptions.Plain:
 		return smtp.PlainAuth("", config.Username, config.Password, config.Hostname()), nil
-	case AuthTypes.CRAMMD5:
+	case AuthOptions.CRAMMD5:
 		return smtp.CRAMMD5Auth(config.Username, config.Password), nil
-	case AuthTypes.OAuth2:
+	case AuthOptions.OAuth2:
 		return OAuth2Auth(config.Username, config.Password), nil
 	default:
-		return nil, fail(FailAuthType, nil, authType(config.Auth).String())
+		return nil, fail(FailAuthType, nil, config.Auth.String())
 	}
 
 }
@@ -252,7 +243,7 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 			return fail(FailMessageTemplate, err)
 		}
 	} else {
-		if _, err := fmt.Fprintf(wc, message); err != nil {
+		if _, err := fmt.Fprint(wc, message); err != nil {
 			return fail(FailMessageRaw, err)
 		}
 	}

@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
-	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -18,7 +17,6 @@ type Service struct {
 	standard.Standard
 	config *Config
 	client *client
-	pkr    pkr.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service

@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
-	"github.com/containrrr/shoutrrr/pkg/pkr"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
@@ -20,7 +19,6 @@ type Service struct {
 	standard.Standard
 	client jsonclient.Client
 	config *Config
-	pkr    pkr.PropKeyResolver
 }
 
 // Initialize loads ServiceConfig from configURL and sets logger for this Service

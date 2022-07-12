@@ -49,7 +49,7 @@ func (service *Service) Send(message string, _ *types.Params) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Google Chat API notification returned %d HTTP status code", resp.StatusCode)
+		return fmt.Errorf("google chat API notification returned %d HTTP status code", resp.StatusCode)
 	}
 
 	return nil

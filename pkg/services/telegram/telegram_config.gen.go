@@ -4,7 +4,6 @@ package telegram
 import (
 	"fmt"
 	"net/url"
-	_ "strings"
 
 	"github.com/containrrr/shoutrrr/pkg/conf"
 	"github.com/containrrr/shoutrrr/pkg/format"
@@ -146,12 +145,20 @@ func (config *Config) SetURL(configURL *url.URL) error {
 		return err
 	}
 
+	if !conf.ValueMatchesPattern(config.BotID, "[0-9]+") {
+		return fmt.Errorf("value %v for botID does not match the expected format", config.BotID)
+	}
+
 	if config.BotID == "" {
 		return fmt.Errorf("botID missing from config URL")
 	}
 
 	if len(config.Chats) == 0 {
 		return fmt.Errorf("chats missing from config URL")
+	}
+
+	if !conf.ValueMatchesPattern(config.Token, "[a-zA-Z0-9_-]+") {
+		return fmt.Errorf("value %v for token does not match the expected format", config.Token)
 	}
 
 	if config.Token == "" {
@@ -202,6 +209,10 @@ func (ov *parseModeOptionVals) Parse(v string) (parseModeOption, error) {
 	} else {
 		return parseModeOption(val), fmt.Errorf("invalid option %q for ParseMode", v)
 	}
+}
+
+func (o parseModeOption) String() string {
+	return ParseModeOptions.Formatter.Print(int(o))
 }
 
 // Update updates the Config from a map of it's properties

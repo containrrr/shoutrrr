@@ -51,7 +51,8 @@ props:
     urlparts: [port]
     base: 10
     validation:
-      known: TCPPort
+      range:
+        known: TCPPort
     credential: false
   Priority:
     type: text

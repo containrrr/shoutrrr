@@ -2,7 +2,6 @@ package zulip_test
 
 import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	. "github.com/containrrr/shoutrrr/pkg/services/zulip"
 
 	"net/url"
@@ -82,7 +81,7 @@ var _ = Describe("the zulip service", func() {
 	Describe("the zulip config", func() {
 		When("cloning a config object", func() {
 			It("the clone should have equal values", func() {
-				config1 := &zulip.Config{
+				config1 := &Config{
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
@@ -95,7 +94,7 @@ var _ = Describe("the zulip service", func() {
 				Expect(config1).To(Equal(&config2))
 			})
 			It("the clone should not be the same struct", func() {
-				config1 := &zulip.Config{
+				config1 := &Config{
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
@@ -115,7 +114,7 @@ var _ = Describe("the zulip service", func() {
 				serviceConfig, err := CreateConfigFromURL(zulipURL)
 				Expect(err).NotTo(HaveOccurred())
 
-				config := &zulip.Config{
+				config := &Config{
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
@@ -127,7 +126,7 @@ var _ = Describe("the zulip service", func() {
 		})
 		When("given a config object with stream and topic", func() {
 			It("should build the correct service url", func() {
-				config := zulip.Config{
+				config := Config{
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",
@@ -140,7 +139,7 @@ var _ = Describe("the zulip service", func() {
 		})
 		When("given a config object with stream but without topic", func() {
 			It("should build the correct service url", func() {
-				config := zulip.Config{
+				config := Config{
 					BotMail: "bot-name@zulipchat.com",
 					BotKey:  "correcthorsebatterystable",
 					Host:    "example.zulipchat.com",

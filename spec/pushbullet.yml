@@ -19,3 +19,6 @@ props:
     required: true
     urlparts: [host]
     credential: true
+    validation:
+      length: 
+        equals: 34

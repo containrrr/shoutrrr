@@ -6,6 +6,7 @@ props:
     description: ""
     urlparts: [path1]
     credential: false
+    validation: {regex: {known: hex32 } }
   Color:
     type: text
     description: ""
@@ -16,11 +17,13 @@ props:
     description: ""
     urlparts: [user]
     credential: false
+    validation: {regex: {known: uuid4 } }
   GroupOwner:
     type: text
     description: ""
     urlparts: [path2]
     credential: false
+    validation: {regex: {known: uuid4 } }
   Host:
     type: text
     description: ""
@@ -32,6 +35,7 @@ props:
     description: ""
     urlparts: [host]
     credential: false
+    validation: {regex: {known: uuid4 } }
   Title:
     type: text
     description: ""
