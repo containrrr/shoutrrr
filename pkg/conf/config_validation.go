@@ -61,7 +61,7 @@ func (v *RangeValidator) FailMessage(propName string, variable string) string {
 	}
 	max := "*"
 	if v.Maximum != nil {
-		max = strconv.FormatInt(*v.Minimum, 10)
+		max = strconv.FormatInt(*v.Maximum, 10)
 	}
 	return fmt.Sprintf(`"value %%v for %v is not in the range %v-%v", %v`, propName, min, max, variable)
 }
@@ -165,7 +165,7 @@ func (v NotEqualToPropValidator) Verify() (err error) {
 	return nil
 }
 func (v NotEqualToPropValidator) TestCall(sp *SpecProp, value string) string {
-	return fmt.Sprintf(`%v != config.%v`, value, string(v))
+	return fmt.Sprintf(`%v == config.%v`, value, string(v))
 }
 func (v NotEqualToPropValidator) FailMessage(propName string, variable string) string {
 	return fmt.Sprintf(`"value %%v for %v is already used for %v", %v`, propName, v, variable)

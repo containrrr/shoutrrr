@@ -17,9 +17,15 @@ props:
     description: Webhook token
     required: true
     urlparts: [path1]
-    credential: false
+    credential: true
   UserName:
     type: text
     description: Override webhook user
     urlparts: [user]
+    credential: false
+  Icon:
+    type: text
+    keys: [icon, icon_emoji, icon_url]
+    required: false
+    description: "Use emoji or URL as icon (based on presence of http(s):// prefix)"
     credential: false

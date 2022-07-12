@@ -84,6 +84,7 @@ var _ = Describe("the ifttt package", func() {
 				Expect(err).To(HaveOccurred())
 			})
 			It("should not return an error if webhook ID and at least one event is given", func() {
+				service = &Service{}
 				serviceURL, _ := url.Parse("ifttt://dummyID/?events=event1")
 				err := service.Initialize(serviceURL, logger)
 				Expect(err).NotTo(HaveOccurred())

@@ -33,6 +33,7 @@ nav:
   - 'Getting started': 'getting-started.md'
   - 'Service Overview': 'services/overview.md'
   - Services:
+      - Bark: 'services/bark.md'
       - Discord: 'services/discord.md'
       - Email: 'services/email.md'
       - Gotify: 'services/gotify.md'

@@ -68,7 +68,7 @@ props:
     type: toggle
     description: Whether to use StartTLS encryption
     default: "Yes"
-    keys: [starttls]
+    keys: [usestarttls, starttls]
     credential: false
   Username:
     type: text

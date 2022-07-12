@@ -210,7 +210,7 @@ func QueryValues(config types.GeneratedConfig) url.Values {
 
 // SplitPath splits a url.Path, removing the initial slash if present
 func SplitPath(path string) []string {
-	return strings.Split(strings.TrimPrefix(path, "/"), "/")
+	return strings.Split(strings.Trim(path, "/"), "/")
 }
 
 // JoinPath joins multiple path elements into a URL path

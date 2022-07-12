@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/types"
+
 	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
@@ -42,6 +43,7 @@ var serviceURLs = map[string]string{
 
 var serviceResponses = map[string]string{
 	"pushbullet": `{"created": 0}`,
+	"gotify":     `{"id": 0}`,
 }
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
@@ -89,9 +91,8 @@ var _ = Describe("services", func() {
 				service, err := serviceRouter.Locate(configURL)
 				Expect(err).NotTo(HaveOccurred())
 
-				if key == "gotify" {
-					gotifyService := service.(*gotify.Service)
-					httpmock.ActivateNonDefault(gotifyService.Client)
+				if mockService, ok := service.(testutils.MockClientService); ok {
+					httpmock.ActivateNonDefault(mockService.GetHTTPClient())
 				}
 
 				err = service.Send("test", (*types.Params)(&map[string]string{

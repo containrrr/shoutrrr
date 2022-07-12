@@ -16,6 +16,7 @@ import (
 type Config struct {
 	Channel  string `url:"path2" `
 	Host     string `url:"host,port" `
+	Icon     string `key:"icon,icon_emoji,icon_url" `
 	Token    string `url:"path1" `
 	UserName string `url:"user" `
 }
@@ -25,23 +26,30 @@ type configProp int
 const (
 	propChannel  configProp = 0
 	propHost     configProp = 1
-	propToken    configProp = 2
-	propUserName configProp = 3
-	propCount               = 4
+	propIcon     configProp = 2
+	propToken    configProp = 3
+	propUserName configProp = 4
+	propCount               = 5
 )
 
 var propInfo = types.ConfigPropInfo{
 	PropNames: []string{
 		"Channel",
 		"Host",
+		"Icon",
 		"Token",
 		"UserName",
 	},
 
 	// Note that propKeys may not align with propNames, as a property can have no or multiple keys
-	Keys: []string{},
+	Keys: []string{
+		"icon",
+		"icon_emoji",
+		"icon_url",
+	},
 
 	DefaultValues: []string{
+		"",
 		"",
 		"",
 		"",
@@ -51,11 +59,16 @@ var propInfo = types.ConfigPropInfo{
 	PrimaryKeys: []int{
 		-1,
 		-1,
+		0,
 		-1,
 		-1,
 	},
 
-	KeyPropIndexes: map[string]int{},
+	KeyPropIndexes: map[string]int{
+		"icon":       2,
+		"icon_emoji": 2,
+		"icon_url":   2,
+	},
 }
 
 func (_ *Config) PropInfo() *types.ConfigPropInfo {
@@ -151,6 +164,12 @@ func (config *Config) Update(updates map[int]string) error {
 			} else {
 				config.Host = val
 			}
+		case propIcon:
+			if val, err := conf.ParseTextValue(value); err != nil {
+				last_err = err
+			} else {
+				config.Icon = val
+			}
 		case propToken:
 			if val, err := conf.ParseTextValue(value); err != nil {
 				last_err = err
@@ -180,6 +199,8 @@ func (config *Config) PropValue(prop int) string {
 		return conf.FormatTextValue(config.Channel)
 	case propHost:
 		return conf.FormatTextValue(config.Host)
+	case propIcon:
+		return conf.FormatTextValue(config.Icon)
 	case propToken:
 		return conf.FormatTextValue(config.Token)
 	case propUserName:

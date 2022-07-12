@@ -3,9 +3,11 @@ package mattermost
 import (
 	"bytes"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/conf"
+	"github.com/containrrr/shoutrrr/pkg/services/standard"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -20,18 +22,18 @@ type Service struct {
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
 	service.config = &Config{}
-	if err := service.config.SetURL(configURL); err != nil {
-		return err
-	}
-
-	return nil
+	return conf.Init(service.config, configURL)
 }
 
 // Send a notification message to Mattermost
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
-	apiURL := buildURL(config)
-	json, _ := CreateJSONPayload(config, message, params)
+	config := *service.config
+	apiURL := buildURL(&config)
+
+	if err := conf.UpdateFromParams(&config, params); err != nil {
+		return err
+	}
+	json, _ := CreateJSONPayload(&config, message, params)
 	res, err := http.Post(apiURL, "application/json", bytes.NewReader(json))
 	if err != nil {
 		return err

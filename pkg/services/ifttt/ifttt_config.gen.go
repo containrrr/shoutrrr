@@ -147,14 +147,14 @@ func (config *Config) SetURL(configURL *url.URL) error {
 	}
 
 	if config.UseMessageAsValue < 1 || config.UseMessageAsValue > 3 {
-		return fmt.Errorf("value %v for useMessageAsValue is not in the range 1-1", config.UseMessageAsValue)
+		return fmt.Errorf("value %v for useMessageAsValue is not in the range 1-3", config.UseMessageAsValue)
 	}
 
 	if config.UseTitleAsValue < 0 || config.UseTitleAsValue > 3 {
-		return fmt.Errorf("value %v for useTitleAsValue is not in the range 0-0", config.UseTitleAsValue)
+		return fmt.Errorf("value %v for useTitleAsValue is not in the range 0-3", config.UseTitleAsValue)
 	}
 
-	if config.UseTitleAsValue != config.UseMessageAsValue {
+	if config.UseTitleAsValue == config.UseMessageAsValue {
 		return fmt.Errorf("value %v for useTitleAsValue is already used for UseMessageAsValue", config.UseTitleAsValue)
 	}
 

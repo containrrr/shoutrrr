@@ -25,7 +25,7 @@ type Config struct {
 	Subject     string           `key:"subject,title" `
 	ToAddresses []string         `key:"toaddresses,to" `
 	UseHTML     bool             `key:"usehtml" `
-	UseStartTLS bool             `key:"starttls" `
+	UseStartTLS bool             `key:"usestarttls,starttls" `
 	Username    string           `url:"user" `
 }
 
@@ -76,6 +76,7 @@ var propInfo = types.ConfigPropInfo{
 		"to",
 		"toaddresses",
 		"usehtml",
+		"usestarttls",
 	},
 
 	DefaultValues: []string{
@@ -104,7 +105,7 @@ var propInfo = types.ConfigPropInfo{
 		6,
 		9,
 		10,
-		5,
+		11,
 		-1,
 	},
 
@@ -120,6 +121,7 @@ var propInfo = types.ConfigPropInfo{
 		"to":          8,
 		"toaddresses": 8,
 		"usehtml":     9,
+		"usestarttls": 10,
 	},
 }
 
@@ -199,8 +201,8 @@ func (config *Config) SetURL(configURL *url.URL) error {
 
 func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
-		"Encryption": EncryptionOptions.Formatter,
 		"Auth":       AuthOptions.Formatter,
+		"Encryption": EncryptionOptions.Formatter,
 	}
 }
 

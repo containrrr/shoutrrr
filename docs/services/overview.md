@@ -4,8 +4,9 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 
 | Service                           | URL format                                                                                                                                      |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Bark](./bark.md)                 | *bark://__`devicekey`__@__`host`__*                                                                                                             |
 | [Discord](./discord.md)           | *discord://__`token`__@__`id`__*                                                                                                                |
-| [Email](./email.md)               | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?fromAddress=__`fromAddress`__&toAddresses=__`recipient1`__[,__`recipient2`__,...]* |
+| [Email](./email.md)               | *smtp://__`username`__:__`password`__@__`host`__:__`port`__/?from=__`fromAddress`__&to=__`recipient1`__[,__`recipient2`__,...]*                 |
 | [Gotify](./gotify.md)             | *gotify://__`gotify-host`__/__`token`__*                                                                                                        |
 | [Google Chat](./googlechat.md)    | *googlechat://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz*                                                                     |
 | [IFTTT](./ifttt.md)               | *ifttt://__`key`__/?events=__`event1`__[,__`event2`__,...]&value1=__`value1`__&value2=__`value2`__&value3=__`value3`__*                         |
@@ -17,8 +18,8 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Pushover](./pushover.md)         | *pushover://shoutrrr:__`apiToken`__@__`userKey`__/?devices=__`device1`__[,__`device2`__, ...]*                                                  |
 | [Rocketchat](./rocketchat.md)     | *rocketchat://[__`username`__@]__`rocketchat-host`__/__`token`__[/__`channel`&#124;`@recipient`__]*                                             |
 | [Slack](./slack.md)               | *slack://[__`botname`__@]__`token-a`__/__`token-b`__/__`token-c`__*                                                                             |
-| [Teams](./teams.md)               | *teams://__`token-a`__/__`token-b`__/__`token-c`__*                                                                                             |
-| [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?chats=__`@channel-1`__[,__`chat-id-1`__,...]*                                                                |
+| [Teams](./teams.md)               | *teams://__`group`__@__`tenant`__/__`altId`__/__`groupOwner`__?host=__`organization`__.webhook.office.com*                                      |
+| [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?chats=__`@channel-1`__[,__`chat-id-1`__,...]*                                                                  |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
 
 ## Specialized services
