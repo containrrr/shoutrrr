@@ -7,7 +7,7 @@ props:
     default: Unknown
     base: 10
     keys: [auth]
-    values: [None, Plain, CRAMMD5, Unknown, OAuth2]
+    values: [None, Plain, CRAMMD5, Unknown, OAuth2, Login]
     credential: false
   Encryption:
     type: option

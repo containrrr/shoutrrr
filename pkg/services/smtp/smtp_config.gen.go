@@ -216,6 +216,7 @@ type authOptionVals struct {
 	CRAMMD5   authOption
 	Unknown   authOption
 	OAuth2    authOption
+	Login     authOption
 	Formatter types.EnumFormatter
 }
 
@@ -225,12 +226,14 @@ var AuthOptions = &authOptionVals{
 	CRAMMD5: 2,
 	Unknown: 3,
 	OAuth2:  4,
+	Login:   5,
 	Formatter: format.CreateEnumFormatter([]string{
 		"None",
 		"Plain",
 		"CRAMMD5",
 		"Unknown",
 		"OAuth2",
+		"Login",
 	}),
 }
 

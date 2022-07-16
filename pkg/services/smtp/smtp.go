@@ -40,7 +40,11 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 	if service.config.Auth == AuthOptions.Unknown {
 		if service.config.Username != "" {
-			service.config.Auth = AuthOptions.Plain
+			if auth, found := knownHostAuth(service.config.Hostname()); found {
+				service.config.Auth = auth
+			} else {
+				service.config.Auth = AuthOptions.Plain
+			}
 		} else {
 			service.config.Auth = AuthOptions.None
 		}
@@ -141,6 +145,8 @@ func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 	switch config.Auth {
 	case AuthOptions.None:
 		return nil, nil
+	case AuthOptions.Login:
+		return LoginAuth("", config.Username, config.Password, config.Hostname()), nil
 	case AuthOptions.Plain:
 		return smtp.PlainAuth("", config.Username, config.Password, config.Hostname()), nil
 	case AuthOptions.CRAMMD5:
@@ -278,4 +284,12 @@ func writeHeaders(wc io.WriteCloser, headers map[string]string) error {
 
 	_, err := fmt.Fprintln(wc)
 	return err
+}
+
+func knownHostAuth(host string) (auth authOption, found bool) {
+	switch host {
+	case "smtp.office365.com", "smtp-mail.outlook.com":
+		return AuthOptions.Login, true
+	}
+	return AuthOptions.Plain, false
 }
