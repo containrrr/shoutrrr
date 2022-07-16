@@ -2,6 +2,7 @@ package generic
 
 import (
 	"encoding/json"
+	"io/ioutil"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
@@ -79,8 +80,15 @@ func (service *Service) doSend(config *Config, params types.Params) error {
 	req, err := http.NewRequest(config.RequestMethod, postURL, payload)
 	if err == nil {
 		req.Header.Set("Content-Type", config.ContentType)
+		req.Header.Set("Accept", config.ContentType)
 		var res *http.Response
 		res, err = http.DefaultClient.Do(req)
+		if res != nil && res.Body != nil {
+			defer res.Body.Close()
+			if body, errRead := ioutil.ReadAll(res.Body); errRead == nil {
+				service.Log("Server response: ", string(body))
+			}
+		}
 		if err == nil && res.StatusCode >= http.StatusMultipleChoices {
 			err = fmt.Errorf("server returned response status code %s", res.Status)
 		}
