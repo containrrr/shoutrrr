@@ -2,13 +2,14 @@ package generic
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/jarcoal/httpmock"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -115,6 +116,8 @@ var _ = Describe("the Generic service", func() {
 				Expect(err).NotTo(HaveOccurred(), "parsing")
 
 				config := &Config{}
+				pkr := format.NewPropKeyResolver(config)
+				Expect(pkr.SetDefaultProps(config)).To(Succeed())
 				err = config.SetURL(url)
 				Expect(err).NotTo(HaveOccurred(), "verifying")
 
@@ -127,16 +130,53 @@ var _ = Describe("the Generic service", func() {
 
 	Describe("building the payload", func() {
 		var service Service
+		var config Config
 		BeforeEach(func() {
 			service = Service{}
+			config = Config{
+				MessageKey: "message",
+				TitleKey:   "title",
+			}
 		})
 		When("no template is specified", func() {
 			It("should use the message as payload", func() {
-				payload, err := service.getPayload("", "test message", nil)
+				payload, err := service.getPayload(&config, types.Params{"message": "test message"})
 				Expect(err).NotTo(HaveOccurred())
 				contents, err := ioutil.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(Equal("test message"))
+			})
+		})
+		When("template is specified as `JSON`", func() {
+			It("should create a JSON object as the payload", func() {
+				config.Template = "JSON"
+				params := types.Params{"title": "test title"}
+				updateParams(&config, params, "test message")
+				payload, err := service.getPayload(&config, params)
+				Expect(err).NotTo(HaveOccurred())
+				contents, err := ioutil.ReadAll(payload)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(MatchJSON(`{
+					"title":   "test title",
+					"message": "test message"
+				}`))
+			})
+			When("alternate keys are specified", func() {
+				It("should create a JSON object using the specified keys", func() {
+					config.Template = "JSON"
+					config.MessageKey = "body"
+					config.TitleKey = "header"
+					params := types.Params{"title": "test title"}
+					updateParams(&config, params, "test message")
+					payload, err := service.getPayload(&config, params)
+					Expect(err).NotTo(HaveOccurred())
+					contents, err := ioutil.ReadAll(payload)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(string(contents)).To(MatchJSON(`{
+						"header":   "test title",
+						"body": "test message"
+					}`))
+				})
 			})
 		})
 		When("a valid template is specified", func() {
@@ -145,7 +185,9 @@ var _ = Describe("the Generic service", func() {
 				Expect(err).NotTo(HaveOccurred())
 				params := types.Params{}
 				params.SetTitle("BREAKING NEWS")
-				payload, err := service.getPayload("news", "it's today!", &params)
+				params.SetMessage("it's today!")
+				config.Template = "news"
+				payload, err := service.getPayload(&config, params)
 				Expect(err).NotTo(HaveOccurred())
 				contents, err := ioutil.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
@@ -155,7 +197,8 @@ var _ = Describe("the Generic service", func() {
 				It("should apply template with message data", func() {
 					err := service.SetTemplateString("arrows", `==> {{.message}} <==`)
 					Expect(err).NotTo(HaveOccurred())
-					payload, err := service.getPayload("arrows", "LOOK AT ME", nil)
+					config.Template = "arrows"
+					payload, err := service.getPayload(&config, types.Params{"message": "LOOK AT ME"})
 					Expect(err).NotTo(HaveOccurred())
 					contents, err := ioutil.ReadAll(payload)
 					Expect(err).NotTo(HaveOccurred())
@@ -165,7 +208,7 @@ var _ = Describe("the Generic service", func() {
 		})
 		When("an unknown template is specified", func() {
 			It("should return an error", func() {
-				_, err := service.getPayload("missing", "test message", nil)
+				_, err := service.getPayload(&Config{Template: "missing"}, nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -212,6 +255,17 @@ var _ = Describe("the Generic service", func() {
 			httpmock.RegisterResponder("POST", targetURL, httpmock.NewStringResponder(200, ""))
 
 			err = service.Send("Message", &types.Params{"unknown": "param"})
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should use the configured HTTP method", func() {
+			serviceURL, _ := url.Parse("generic://host.tld/webhook?method=GET")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetURL := "https://host.tld/webhook"
+			httpmock.RegisterResponder("GET", targetURL, httpmock.NewStringResponder(200, ""))
+
+			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

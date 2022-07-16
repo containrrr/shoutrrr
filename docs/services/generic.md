@@ -1,8 +1,20 @@
 # Generic
 The Generic service can be used for any target that is not explicitly supported by Shoutrrr, as long as it
-supports recieving the message via a POST request.
-Usually, this requires customization on the recieving end to interpret the payload that it recives, and might
+supports receiving the message via a POST request.
+Usually, this requires customization on the receiving end to interpret the payload that it receives, and might
 not be a viable approach.
+
+## JSON template
+By using the built in `JSON` template (`template=json`) you can create a generic JSON payload. The keys used for `title` and `message` can be overriden
+by supplying the params/query values `titleKey` and `messageKey`.
+
+!!! example
+    ```json
+    {
+        "title": "Oh no!",
+        "message": "The thing happened and now there is stuff all over the area!"
+    }
+    ```
 
 ## Shortcut URL
 You can just add `generic+` as a prefix to your target URL to use it with the generic service, so
