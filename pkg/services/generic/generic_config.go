@@ -1,20 +1,24 @@
 package generic
 
 import (
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Config for use within the generic service
 type Config struct {
 	standard.EnumlessConfig
-	webhookURL  *url.URL
-	ContentType string `key:"contenttype" default:"application/json" desc:"The value of the Content-Type header"`
-	DisableTLS  bool   `key:"disabletls" default:"No"`
-	Template    string `key:"template" optional:""`
-	Title       string `key:"title" default:""`
+	webhookURL    *url.URL
+	ContentType   string `key:"contenttype" default:"application/json" desc:"The value of the Content-Type header"`
+	DisableTLS    bool   `key:"disabletls"  default:"No"`
+	Template      string `key:"template"    optional:"" desc:"The template used for creating the request payload"`
+	Title         string `key:"title"       default:""`
+	TitleKey      string `key:"titlekey"    default:"title" desc:"The key that will be used for the title value"`
+	MessageKey    string `key:"messagekey"  default:"message" desc:"The key that will be used for the message value"`
+	RequestMethod string `key:"method"      default:"POST"`
 }
 
 // DefaultConfig creates a PropKeyResolver and uses it to populate the default values of a new Config, returning both
