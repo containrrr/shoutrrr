@@ -2,232 +2,232 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/getting-started/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/proxy/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/generators/basic/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/generators/overview/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/guides/slack/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/bark/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/discord/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/email/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/generic/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/googlechat/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/gotify/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/hangouts/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/ifttt/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/join/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/logger/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/matrix/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/mattermost/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/opsgenie/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/overview/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/pushbullet/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/pushover/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/rocketchat/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/slack/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/teams/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/telegram/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/zulip/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/bark/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/discord/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/generic/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/googlechat/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/gotify/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/ifttt/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/join/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/logger/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/matrix/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/mattermost/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/opsgenie/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/pushbullet/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/pushover/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/rocketchat/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/slack/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/smtp/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/teams/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/telegram/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://containrrr.dev/shoutrrr/v0.6/services/zulip/config/</loc>
-         <lastmod>2022-05-30</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
