@@ -61,20 +61,20 @@ var _ = Describe("Partition Message", func() {
 					}
 
 					testString := ""
-					for inputLen := uint(1); inputLen < 8000; inputLen++ {
+					for inputLen := 1; inputLen < 8000; inputLen++ {
 						// add a rune to the string using a repeatable pattern (single digit hex of position)
 						testString += strconv.FormatInt(int64(inputLen%16), 16)
 						items, omitted := PartitionMessage(testString, unalignedLimits, 7)
 						included := 0
 						for ii, item := range items {
-							expectedSize := unalignedLimits.ChunkSize
+							expectedSize := int(unalignedLimits.ChunkSize)
 
 							// The last chunk might be smaller than the preceeding chunks
 							if ii == len(items)-1 {
 								// the chunk size is the remainder of, the total size,
 								// or the max size, whatever is smallest,
 								// and the previous chunk sizes
-								chunkSize := UMin(inputLen, unalignedLimits.TotalChunkSize) % unalignedLimits.ChunkSize
+								chunkSize := Min(inputLen, int(unalignedLimits.TotalChunkSize)) % int(unalignedLimits.ChunkSize)
 								// if the "rest" of the runes needs another chunk
 								if chunkSize > 0 {
 									// expect the chunk to contain the "rest" of the runes
@@ -88,8 +88,8 @@ var _ = Describe("Partition Message", func() {
 								for ri, r := range item.Text {
 									runeOffset := (len(item.Text) - ri) - 1
 									runeVal, err := strconv.ParseUint(string(r), 16, 64)
-									expectedLen := UMin(inputLen, unalignedLimits.TotalChunkSize)
-									expectedVal := (expectedLen - uint(runeOffset)) % 16
+									expectedLen := Min(inputLen, int(unalignedLimits.TotalChunkSize))
+									expectedVal := (expectedLen - runeOffset) % 16
 
 									Expect(err).ToNot(HaveOccurred())
 									Expect(runeVal).To(BeEquivalentTo(expectedVal))
@@ -161,17 +161,17 @@ func testMessageItemsFromLines(hundreds int, limits types.MessageLimit, repeat i
 	return
 }
 
-func testPartitionMessage(hundreds uint, limits types.MessageLimit, distance int) (items []types.MessageItem, omitted int) {
+func testPartitionMessage(hundreds int, limits types.MessageLimit, distance int) (items []types.MessageItem, omitted int) {
 	builder := strings.Builder{}
 
-	for i := uint(0); i < hundreds; i++ {
+	for i := 0; i < hundreds; i++ {
 		builder.WriteString(hundredChars)
 	}
 
 	items, omitted = PartitionMessage(builder.String(), limits, distance)
 
-	contentSize := UMin(hundreds*100, limits.TotalChunkSize)
-	expectedOmitted := UMax(0, (hundreds*100)-contentSize)
+	contentSize := Min(hundreds*100, int(limits.TotalChunkSize))
+	expectedOmitted := Max(0, (hundreds*100)-contentSize)
 
 	ExpectWithOffset(0, omitted).To(BeEquivalentTo(expectedOmitted))
 
