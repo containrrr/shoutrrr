@@ -13,8 +13,24 @@ func Min(a int, b int) int {
 	return b
 }
 
+// UMin returns the smallest of a and b
+func UMin(a uint, b uint) uint {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // Max returns the largest of a and b
 func Max(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// UMax returns the largest of a and b
+func UMax(a uint, b uint) uint {
 	if a > b {
 		return a
 	}
