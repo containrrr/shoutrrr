@@ -1,8 +1,12 @@
-package util
+//go:build gofuzz
+// +build gofuzz
+
+package fuzz
 
 import (
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 	t "github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 func FuzzPartitionMessage(data []byte) int {
@@ -23,6 +27,6 @@ func FuzzPartitionMessage(data []byte) int {
 	if err != nil {
 		return 0
 	}
-	_, _ = PartitionMessage(input, limits, distance)
+	_, _ = util.PartitionMessage(input, limits, distance)
 	return 1
 }
