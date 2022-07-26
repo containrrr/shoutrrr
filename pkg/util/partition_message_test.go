@@ -92,14 +92,14 @@ var _ = Describe("Partition Message", func() {
 									expectedVal := (expectedLen - uint(runeOffset)) % 16
 
 									Expect(err).ToNot(HaveOccurred())
-									Expect(runeVal).To(Equal(uint64(expectedVal)))
+									Expect(runeVal).To(BeEquivalentTo(expectedVal))
 								}
 							}
 
 							included += len(item.Text)
 							Expect(item.Text).To(HaveLen(int(expectedSize)))
 						}
-						Expect(omitted + included).To(Equal(inputLen))
+						Expect(omitted + included).To(BeEquivalentTo(inputLen))
 
 					}
 				})
@@ -133,8 +133,8 @@ var _ = Describe("Partition Message", func() {
 				batches := testMessageItemsFromLines(hundreds, limits, repeat)
 				items := batches[0]
 
-				Expect(len(items[0].Text)).To(Equal(limits.ChunkSize))
-				Expect(len(items[1].Text)).To(Equal(limits.ChunkSize))
+				Expect(len(items[0].Text)).To(BeEquivalentTo(limits.ChunkSize))
+				Expect(len(items[1].Text)).To(BeEquivalentTo(limits.ChunkSize))
 			})
 		})
 	})
@@ -173,7 +173,7 @@ func testPartitionMessage(hundreds uint, limits types.MessageLimit, distance int
 	contentSize := UMin(hundreds*100, limits.TotalChunkSize)
 	expectedOmitted := UMax(0, (hundreds*100)-contentSize)
 
-	ExpectWithOffset(0, omitted).To(Equal(expectedOmitted))
+	ExpectWithOffset(0, omitted).To(BeEquivalentTo(expectedOmitted))
 
 	return
 }
