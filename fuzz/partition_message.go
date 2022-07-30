@@ -1,7 +1,5 @@
-//go:build gofuzz || cgo
-// +build gofuzz cgo
-// Note that the `cgo` above is a hack to prevent the file from being built in releases, but still
-// included when checking for doc comments (lint)
+//go:build gofuzz
+// +build gofuzz
 
 package fuzz
 
