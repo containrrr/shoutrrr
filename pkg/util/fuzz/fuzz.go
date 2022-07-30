@@ -9,6 +9,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
+// FuzzPartitionMessage fuzzes the util.PartitionMessage function
 func FuzzPartitionMessage(data []byte) int {
 	f := fuzz.NewConsumer(data)
 
