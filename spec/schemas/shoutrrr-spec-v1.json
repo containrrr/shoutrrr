@@ -1,0 +1,134 @@
+{ 
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://containrrr.dev/schemas/shoutrrr-spec-v1.json",
+    "type": "object",
+    "properties": {
+        "version": { "type": "integer", "const": 1 },
+        "scheme": { "type": "string" },
+        "options": {
+            "properties": {
+                "customQueryVars": {
+                    "name": "Enable custom query variables",
+                    "description": "Forward any unknown query values to the prop with the urlpart set to query",
+                    "enum": [true, false, "yes", "no"]
+                },
+                "reversePathPrio": {
+                    "name": "Reverse path priority",
+                    "description": "If only two path elements are present, assign those to path2 and path3 instead of the default path1 and path2",
+                    "enum": [true, false, "yes", "no"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "props": { 
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "number", "text", "toggle",
+                            "map", "option", "color",
+                            "custom", "list"
+                        ]
+                    },
+                    "description": { "type": "string" },
+                    "default": { "type": "string" },
+                    "base": { "type": "integer" },
+                    "keys": { 
+                        "type": "array", 
+                        "items": { "type": "string" } 
+                    },
+                    "urlparts": {
+                        "type": "array", 
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "user", "pass", "password", 
+                                "host", "port", "path",
+                                "path1", "path2", "path3",
+                                "query"
+                            ]
+                        }
+                    },
+                    "credential": { "enum": [true, false, "yes", "no"] },
+                    "validation": {
+                        "type": "object",
+                        "properties": {
+                            "range": {
+                                "description": "Require that the property value matches either a `known` range, or a range specified in `minimum` and `maximum`",
+                                "oneOf": [
+                                    { 
+                                        "properties":{
+                                            "minimum": { "type": "integer" },
+                                            "maximum": { "type": "integer" }
+                                        },
+                                        "additionalProperties": false
+                                    },
+                                    { 
+                                        "properties": {
+                                            "known": { 
+                                                "enum": [
+                                                    "TCPPort"
+                                                ] 
+                                            }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            "length": {
+                                "description": "Require that the property value length is either exactly `equals`, or between `maximum` and `minimum`",
+                                "oneOf": [
+                                    {
+                                        "properties":{
+                                            "minimum": { "type": "integer" },
+                                            "maximum": { "type": "integer" }
+                                        },
+                                        "additionalProperties": false
+                                    },                                    {
+                                        "properties":{
+                                            "equals": {"type": "integer"}
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            },
+                            "notEqual": {
+                                "description": "Require that the property value to not be the same as the value of the given property",
+                                "type": "string"
+                            },
+                            "regex": {
+                                "description": "Require that the property value matches either a `known` pattern or a custom regular expression `pattern`",
+                                "oneOf": [
+                                    { 
+                                        "properties":{
+                                            "matches": { "type": "string" }
+                                        },
+                                        "additionalProperties": false
+                                    },
+                                    { 
+                                        "properties": {
+                                            "known": { 
+                                                "enum": [
+                                                    "uuid4", "hex32", "TCPPort"
+                                                ] 
+                                            }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                ]
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+    
+                },
+                "required": ["type", "description"]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": ["version", "scheme", "props"]
+}
