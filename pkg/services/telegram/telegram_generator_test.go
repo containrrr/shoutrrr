@@ -54,7 +54,7 @@ var _ = Describe("TelegramGenerator", func() {
 	AfterEach(func() {
 		httpmock.DeactivateAndReset()
 	})
-	It("should return the ", func() {
+	It("should return the expected URL from a session", func() {
 		gen := telegram.Generator{
 			Reader: userOut,
 			Writer: userInMono,
@@ -115,7 +115,7 @@ var _ = Describe("TelegramGenerator", func() {
 		Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
 		Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))
 
-		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667&preview=No`)))
+		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667`)))
 	})
 
 })
