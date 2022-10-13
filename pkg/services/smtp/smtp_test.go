@@ -15,6 +15,8 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 
+	gt "github.com/onsi/gomega/types"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -43,7 +45,7 @@ var _ = Describe("the SMTP service", func() {
 	})
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
+			testURL := "smtp://user:password@example.com:2225/?auth=None&clienthost=testhost&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
 
 			url, err := url.Parse(testURL)
 			fmt.Println(url)
@@ -100,7 +102,7 @@ var _ = Describe("the SMTP service", func() {
 
 		It("should have the expected number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
-			testutils.TestConfigGetFieldsCount(config, 12)
+			testutils.TestConfigGetFieldsCount(config, 13)
 		})
 	})
 
@@ -265,6 +267,18 @@ var _ = Describe("the SMTP service", func() {
 
 		When("server communication fails", func() {
 
+			It("should fail when initial handshake is not accepted", func() {
+				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no&clienthost=spammer"
+				err := testIntegration(testURL, []string{
+					"421 4.7.0 Try again later, closing connection. (EHLO) r20-20020a50d694000000b004588af8956dsm771862edi.9 - gsmtp",
+				}, "", "")
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).To(MatchError(fail(FailHandshake, nil)))
+			})
+
 			It("should fail when not being able to enable StartTLS", func() {
 				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
@@ -279,8 +293,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailEnableStartTLS))
+				Expect(err).To(matchFailure(FailEnableStartTLS))
 			})
 
 			It("should fail when authentication type is invalid", func() {
@@ -290,8 +303,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(standard.FailServiceInit))
+				Expect(err).To(matchFailure(standard.FailServiceInit))
 			})
 
 			It("should fail when not being able to use authentication type", func() {
@@ -307,8 +319,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailAuthenticating))
+				Expect(err).To(matchFailure(FailAuthenticating))
 			})
 
 			It("should fail when not being able to send to recipient", func() {
@@ -324,8 +335,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailSendRecipient))
+				Expect(err).To(matchFailure(FailSendRecipient))
 			})
 
 			It("should fail when the recipient is not accepted", func() {
@@ -339,8 +349,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailSetRecipient))
+				Expect(err).To(matchFailure(FailSetRecipient))
 			})
 
 			It("should fail when the server does not accept the data stream", func() {
@@ -355,8 +364,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailOpenDataStream))
+				Expect(err).To(matchFailure(FailOpenDataStream))
 			})
 
 			It("should fail when the server does not accept the data stream content", func() {
@@ -372,8 +380,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailCloseDataStream))
+				Expect(err).To(matchFailure(FailCloseDataStream))
 			})
 
 			It("should fail when the server does not close the connection gracefully", func() {
@@ -394,7 +401,7 @@ var _ = Describe("the SMTP service", func() {
 					return
 				}
 				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailClosingSession))
+				Expect(err).To(matchFailure(FailClosingSession))
 			})
 
 		})
@@ -492,4 +499,9 @@ func fakeTLSEnabled(client *smtp.Client, hostname string) {
 	cr = reflect.ValueOf(client).Elem().FieldByName("serverName")
 	cr = reflect.NewAt(cr.Type(), unsafe.Pointer(cr.UnsafeAddr())).Elem()
 	cr.SetString(hostname)
+}
+
+// matchFailure is a simple wrapper around `fail` and `gomega.MatchError`` to make it easier to use in tests
+func matchFailure(id failures.FailureID) gt.GomegaMatcher {
+	return MatchError(fail(id, nil))
 }

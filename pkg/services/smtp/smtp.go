@@ -3,14 +3,15 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
 	"math/rand"
 	"net"
 	"net/smtp"
 	"net/url"
+	"os"
 	"time"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -64,7 +65,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	client, err := getClientConnection(service.config)
+	client, err := service.getClientConnection(service.config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -77,7 +78,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(client, message, &config)
 }
 
-func getClientConnection(config *Config) (*smtp.Client, error) {
+func (service *Service) getClientConnection(config *Config) (*smtp.Client, error) {
 
 	var conn net.Conn
 	var err error
@@ -105,6 +106,20 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 }
 
 func (service *Service) doSend(client *smtp.Client, message string, config *Config) failure {
+
+	clientHost := config.ClientHost
+	if clientHost == "auto" {
+		if hostname, err := os.Hostname(); err == nil {
+			clientHost = hostname
+		} else {
+			service.Logf("Failed to get hostname, falling back to localhost: %v", err)
+			clientHost = "localhost"
+		}
+	}
+
+	if err := client.Hello(clientHost); err != nil {
+		return fail(FailHandshake, err)
+	}
 
 	if config.UseHTML {
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
