@@ -90,8 +90,8 @@ func fail(failureID failures.FailureID, err error, v ...interface{}) failure {
 		msg = "error applying params to send config"
 	case FailHandshake:
 		msg = "server did not accept the handshake"
+	// case FailUnknown:
 	default:
-	case FailUnknown:
 		msg = "an unknown error occurred"
 	}
 

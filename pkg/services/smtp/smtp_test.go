@@ -14,6 +14,7 @@ import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
 	gt "github.com/onsi/gomega/types"
 
@@ -21,8 +22,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var tt *testing.T
+
 func TestSMTP(t *testing.T) {
 	RegisterFailHandler(Fail)
+	tt = t
 	RunSpecs(t, "Shoutrrr SMTP Suite")
 }
 
@@ -61,6 +65,20 @@ var _ = Describe("the SMTP service", func() {
 
 			Expect(outputURL.String()).To(Equal(testURL))
 
+		})
+		When("resolving client host", func() {
+			When("clienthost is set to auto", func() {
+				It("should return the os hostname", func() {
+					hostname, err := os.Hostname()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(service.resolveClientHost(&Config{ClientHost: "auto"})).To(Equal(hostname))
+				})
+			})
+			When("clienthost is set to a custom value", func() {
+				It("should return that value", func() {
+					Expect(service.resolveClientHost(&Config{ClientHost: "computah"})).To(Equal("computah"))
+				})
+			})
 		})
 		When("fromAddress is missing", func() {
 			It("should return an error", func() {
@@ -106,13 +124,21 @@ var _ = Describe("the SMTP service", func() {
 		})
 	})
 
-	When("the service is not configured correctly", func() {
-		It("should fail to send messages", func() {
-			service := Service{
-				config: &Config{},
-			}
-			err := service.Send("test message", nil)
-			Expect(err).To(HaveOccurred())
+	When("sending a message", func() {
+		When("the service is not configured correctly", func() {
+			It("should fail to send messages", func() {
+				service := Service{config: &Config{}}
+				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+
+				service.config.Encryption = EncMethods.ImplicitTLS
+				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+			})
+		})
+		When("the an invalid param is passed", func() {
+			It("should fail to send messages", func() {
+				service := Service{config: &Config{}}
+				Expect(service.Send("test message", &types.Params{"invalid": "value"})).To(matchFailure(FailApplySendParams))
+			})
 		})
 	})
 
@@ -400,10 +426,23 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
 				Expect(err).To(matchFailure(FailClosingSession))
 			})
 
+		})
+	})
+	When("writing headers and the output stream is closed", func() {
+		When("it's closed during header content", func() {
+			It("should fail with correct error", func() {
+				fw := testutils.CreateFailWriter(0)
+				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+			})
+		})
+		When("it's closed after header content", func() {
+			It("should fail with correct error", func() {
+				fw := testutils.CreateFailWriter(1)
+				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+			})
 		})
 	})
 })
