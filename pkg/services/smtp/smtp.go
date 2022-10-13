@@ -65,7 +65,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	client, err := service.getClientConnection(service.config)
+	client, err := getClientConnection(service.config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -78,7 +78,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	return service.doSend(client, message, &config)
 }
 
-func (service *Service) getClientConnection(config *Config) (*smtp.Client, error) {
+func getClientConnection(config *Config) (*smtp.Client, error) {
 
 	var conn net.Conn
 	var err error
@@ -271,7 +271,7 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 			return fail(FailMessageTemplate, err)
 		}
 	} else {
-		if _, err := fmt.Fprintf(wc, message); err != nil {
+		if _, err := fmt.Fprint(wc, message); err != nil {
 			return fail(FailMessageRaw, err)
 		}
 	}
