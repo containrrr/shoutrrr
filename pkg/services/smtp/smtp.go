@@ -161,12 +161,13 @@ func (service *Service) resolveClientHost(config *Config) string {
 		return config.ClientHost
 	}
 
-	if hostname, err := os.Hostname(); err == nil {
-		return hostname
-	} else {
+	hostname, err := os.Hostname()
+	if err != nil {
 		service.Logf("Failed to get hostname, falling back to localhost: %v", err)
 		return "localhost"
 	}
+
+	return hostname
 }
 
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
