@@ -25,6 +25,7 @@ type Config struct {
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
 	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"usestarttls,starttls"`
 	UseHTML     bool      `desc:"Whether the message being sent is in HTML" default:"No" key:"usehtml"`
+	ClientHost  string    `desc:"The client host name sent to the SMTP server during HELLO phase. If set to \"auto\" it will use the OS hostname" key:"clienthost" default:"localhost"`
 }
 
 // GetURL returns a URL representation of it's current field values

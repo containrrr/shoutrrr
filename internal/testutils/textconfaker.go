@@ -41,6 +41,11 @@ func (tcf *textConFaker) GetConversation(includeGreeting bool) string {
 		if len(tcf.responses) > ri && !inSequence {
 			resp = tcf.responses[ri]
 		}
+
+		if query == "" && resp == "" && i == len(input)-1 {
+			break
+		}
+
 		conv += fmt.Sprintf("  #%2d >> %50s << %-50s\n", i, query, resp)
 		for len(resp) > 3 && resp[3] == '-' {
 			ri++
