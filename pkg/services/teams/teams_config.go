@@ -93,7 +93,7 @@ func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) e
 	}
 
 	if err := verifyWebhookParts(webhookParts); err != nil {
-		return fmt.Errorf("invalid URL format: %v", err)
+		return fmt.Errorf("invalid URL format: %w", err)
 	}
 
 	config.setFromWebhookParts(webhookParts)

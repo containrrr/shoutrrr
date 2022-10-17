@@ -49,7 +49,7 @@ func (s *Service) Send(message string, params *t.Params) error {
 
 	if len(errors) > 0 {
 		for _, err := range errors {
-			s.Logf("error sending message: %v", err)
+			s.Logf("error sending message: %w", err)
 		}
 		return fmt.Errorf("%v error(s) sending message, with initial error: %v", len(errors), errors[0])
 	}

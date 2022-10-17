@@ -54,7 +54,7 @@ func run(cmd *cobra.Command) error {
 		sb := strings.Builder{}
 		count, err := io.Copy(&sb, os.Stdin)
 		if err != nil {
-			return fmt.Errorf("failed to read message from stdin: %v", err)
+			return fmt.Errorf("failed to read message from stdin: %w", err)
 		}
 		logf("Read %d byte(s)", count)
 		message = sb.String()

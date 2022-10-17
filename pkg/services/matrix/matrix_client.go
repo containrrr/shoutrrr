@@ -52,7 +52,7 @@ func (c *client) login(user string, password string) error {
 
 	resLogin := apiResLoginFlows{}
 	if err := c.apiGet(apiLogin, &resLogin); err != nil {
-		return fmt.Errorf("failed to get login flows: %v", err)
+		return fmt.Errorf("failed to get login flows: %w", err)
 	}
 
 	var flows []string
@@ -68,14 +68,13 @@ func (c *client) login(user string, password string) error {
 }
 
 func (c *client) loginPassword(user string, password string) error {
-
 	response := apiResLogin{}
 	if err := c.apiPost(apiLogin, apiReqLogin{
 		Type:       flowLoginPassword,
 		Password:   password,
 		Identifier: newUserIdentifier(user),
 	}, &response); err != nil {
-		return fmt.Errorf("failed to log in: %v", err)
+		return fmt.Errorf("failed to log in: %w", err)
 	}
 
 	c.accessToken = response.AccessToken
@@ -106,7 +105,7 @@ func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []e
 
 		var roomID string
 		if roomID, err = c.joinRoom(room); err != nil {
-			errors = append(errors, fmt.Errorf("error joining room %v: %v", roomID, err))
+			errors = append(errors, fmt.Errorf("error joining room %v: %w", roomID, err))
 			continue
 		}
 
@@ -115,7 +114,7 @@ func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []e
 		}
 
 		if err := c.sendMessageToRoom(message, roomID); err != nil {
-			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %v", roomID, err))
+			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %w", roomID, err))
 		}
 	}
 
@@ -125,14 +124,14 @@ func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []e
 func (c *client) sendToJoinedRooms(message string) (errors []error) {
 	joinedRooms, err := c.getJoinedRooms()
 	if err != nil {
-		return append(errors, fmt.Errorf("failed to get joined rooms: %v", err))
+		return append(errors, fmt.Errorf("failed to get joined rooms: %w", err))
 	}
 
 	// Send to all rooms that are joined
 	for _, roomID := range joinedRooms {
 		c.logf("Sending message to '%v'...\n", roomID)
 		if err := c.sendMessageToRoom(message, roomID); err != nil {
-			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %v", roomID, err))
+			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %w", roomID, err))
 		}
 	}
 

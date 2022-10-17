@@ -43,7 +43,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to send slack notification: %v", err)
+		return fmt.Errorf("failed to send slack notification: %w", err)
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (service *Service) sendWebhook(config *Config, payload interface{}) error {
 	res, err = http.Post(config.Token.WebhookURL(), jsonclient.ContentType, bytes.NewBuffer(payloadBytes))
 
 	if err != nil {
-		return fmt.Errorf("failed to invoke webhook: %v", err)
+		return fmt.Errorf("failed to invoke webhook: %w", err)
 	}
 	defer res.Body.Close()
 	resBytes, _ := ioutil.ReadAll(res.Body)
