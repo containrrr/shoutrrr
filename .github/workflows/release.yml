@@ -36,12 +36,13 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Install goreleaser
-        run: |
-          cd .. && \
-          wget https://github.com/goreleaser/goreleaser/releases/download/v0.138.0/goreleaser_Linux_x86_64.tar.gz && \
-          tar -xvf goreleaser_Linux_x86_64.tar.gz && \
-          ./goreleaser -v
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          install-only: true
+
+      - name: Show GoReleaser version
+        run: goreleaser -v
 
       - name: Login to docker hub
         uses: azure/docker-login@v1
@@ -51,7 +52,7 @@ jobs:
 
       - name: Execute goreleaser
         run: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} CGO_ENABLED=0 ../goreleaser --debug --rm-dist
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} CGO_ENABLED=0 goreleaser --debug --rm-dist
 
       - name: Enable experimental docker features
         run: |
