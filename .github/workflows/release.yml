@@ -12,14 +12,18 @@ jobs:
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
-      - name: Set up Go 1.13
-        uses: actions/setup-go@v1
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - uses: arnested/go-version-action@v1
+        id: go-version
+
+      - name: Set up Go ${{ steps.go-version.outputs.latest }}
+        uses: actions/setup-go@v3
         id: go
         with:
-          go-version: 1.13
-
-      - name: Check out code
-        uses: actions/checkout@v1
+          go-version: ${{ steps.go-version.outputs.latest }}
+          check-latest: true
 
       - name: Build
         run: CGO_ENABLED=0 go build -v .
