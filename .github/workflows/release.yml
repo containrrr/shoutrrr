@@ -5,6 +5,9 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build Shoutrrr

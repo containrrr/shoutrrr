@@ -11,6 +11,9 @@ on:
     paths-ignore:
       - 'docs/*'
 
+permissions:
+  contents: read
+
 jobs:
   go-versions:
     name: Lookup go versions
