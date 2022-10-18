@@ -215,7 +215,7 @@ var _ = Describe("the discord service", func() {
 			httpmock.Activate()
 			service = Service{}
 			if err := service.Initialize(dummyConfig.GetURL(), logger); err != nil {
-				panic(fmt.Errorf("service initialization failed: %v", err))
+				panic(fmt.Errorf("service initialization failed: %w", err))
 			}
 		})
 		AfterEach(func() {

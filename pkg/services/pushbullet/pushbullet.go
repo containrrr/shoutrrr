@@ -59,11 +59,11 @@ func doSend(config *Config, target string, message string, client jsonclient.Cli
 
 	response := PushResponse{}
 	if err := client.Post(pushesEndpoint, push, &response); err != nil {
-		errorResponse := ErrorResponse{}
-		if client.ErrorResponse(err, &errorResponse) {
-			return fmt.Errorf("API error: %v", errorResponse.Error.Message)
+		errorResponse := &ErrorResponse{}
+		if client.ErrorResponse(err, errorResponse) {
+			return fmt.Errorf("API error: %w", errorResponse)
 		}
-		return fmt.Errorf("failed to push: %v", err)
+		return fmt.Errorf("failed to push: %w", err)
 	}
 
 	// TODO: Look at response fields?

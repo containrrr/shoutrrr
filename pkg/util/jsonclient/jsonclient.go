@@ -68,12 +68,12 @@ func (c *client) Post(url string, request interface{}, response interface{}) err
 
 	body, err = json.MarshalIndent(request, "", c.indent)
 	if err != nil {
-		return fmt.Errorf("error creating payload: %v", err)
+		return fmt.Errorf("error creating payload: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return fmt.Errorf("error creating request: %v", err)
+		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	for key, val := range c.headers {
@@ -83,7 +83,7 @@ func (c *client) Post(url string, request interface{}, response interface{}) err
 	var res *http.Response
 	res, err = c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("error sending payload: %v", err)
+		return fmt.Errorf("error sending payload: %w", err)
 	}
 
 	return parseResponse(res, response)

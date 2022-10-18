@@ -28,7 +28,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	}
 
 	if err := service.sendAPI(config, message); err != nil {
-		return fmt.Errorf("failed to send bark notification: %v", err)
+		return fmt.Errorf("failed to send bark notification: %w", err)
 	}
 
 	return nil
