@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gomegaformat "github.com/onsi/gomega/format"
 )
@@ -23,18 +23,15 @@ func TestBark(t *testing.T) {
 }
 
 var (
-	service    *Service
+	service    *Service = &Service{}
 	envBarkURL *url.URL
-	logger     *log.Logger
+	logger     *log.Logger = testutils.TestLogger()
+	_                      = BeforeSuite(func() {
+		envBarkURL, _ = url.Parse(os.Getenv("SHOUTRRR_BARK_URL"))
+	})
 )
 
 var _ = Describe("the bark service", func() {
-
-	BeforeSuite(func() {
-		service = &Service{}
-		logger = testutils.TestLogger()
-		envBarkURL, _ = url.Parse(os.Getenv("SHOUTRRR_BARK_URL"))
-	})
 
 	When("running integration tests", func() {
 		It("should not error out", func() {

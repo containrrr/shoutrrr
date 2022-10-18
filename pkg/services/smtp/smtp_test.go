@@ -18,7 +18,7 @@ import (
 
 	gt "github.com/onsi/gomega/types"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -34,15 +34,15 @@ var (
 	service    *Service
 	envSMTPURL string
 	logger     *log.Logger
-)
-
-var _ = Describe("the SMTP service", func() {
-
-	BeforeSuite(func() {
+	_          = BeforeSuite(func() {
 
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 		logger = testutils.TestLogger()
 	})
+)
+
+var _ = Describe("the SMTP service", func() {
+
 	BeforeEach(func() {
 		service = &Service{}
 

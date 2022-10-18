@@ -14,7 +14,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gomegaformat "github.com/onsi/gomega/format"
 )
@@ -29,15 +29,14 @@ var (
 	service     *Service
 	envSlackURL *url.URL
 	logger      *log.Logger
-)
-
-var _ = Describe("the slack service", func() {
-
-	BeforeSuite(func() {
+	_           = BeforeSuite(func() {
 		service = &Service{}
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envSlackURL, _ = url.Parse(os.Getenv("SHOUTRRR_SLACK_URL"))
 	})
+)
+
+var _ = Describe("the slack service", func() {
 
 	When("running integration tests", func() {
 		It("should not error out", func() {
