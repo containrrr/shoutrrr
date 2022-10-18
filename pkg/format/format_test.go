@@ -2,30 +2,29 @@ package format
 
 import (
 	"errors"
-	"github.com/fatih/color"
 	"net/url"
 	"testing"
+
+	"github.com/fatih/color"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 func TestFormat(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Shoutrrr Discord Suite")
+	RunSpecs(t, "Shoutrrr Format Suite")
 }
 
+var _ = BeforeSuite(func() {
+	// Disable color output for tests to have them match the string format rather than the colors
+	color.NoColor = true
+})
+
 var _ = Describe("the format package", func() {
-	BeforeSuite(func() {
-		// logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
-
-		// Disable color output for tests to have them match the string format rather than the colors
-		color.NoColor = true
-	})
-
 	Describe("Generic Format Utils", func() {
 		When("parsing a bool", func() {
 			var testParseValidBool = func(raw string, expected bool) {

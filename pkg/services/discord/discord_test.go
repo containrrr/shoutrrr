@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -29,14 +29,15 @@ var (
 	service       *Service
 	envDiscordURL *url.URL
 	logger        *log.Logger
-)
-
-var _ = Describe("the discord service", func() {
-	BeforeSuite(func() {
+	_             = BeforeSuite(func() {
 		service = &Service{}
 		envDiscordURL, _ = url.Parse(os.Getenv("SHOUTRRR_DISCORD_URL"))
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
+)
+
+var _ = Describe("the discord service", func() {
+
 	When("running integration tests", func() {
 		It("should work without errors", func() {
 			if envDiscordURL.String() == "" {

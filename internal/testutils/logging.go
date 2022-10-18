@@ -3,7 +3,7 @@ package testutils
 import (
 	"log"
 
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 )
 
 // TestLogger returns a log.Logger that writes to ginkgo.GinkgoWriter for use in tests

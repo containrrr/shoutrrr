@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
@@ -25,13 +25,14 @@ var (
 	service    *Service
 	logger     *log.Logger
 	envTestURL string
-)
-
-var _ = Describe("the ifttt package", func() {
-	BeforeSuite(func() {
+	_          = BeforeSuite(func() {
 		envTestURL = os.Getenv("SHOUTRRR_IFTTT_URL")
 		logger = testutils.TestLogger()
 	})
+)
+
+var _ = Describe("the ifttt package", func() {
+
 	BeforeEach(func() {
 		service = &Service{}
 	})

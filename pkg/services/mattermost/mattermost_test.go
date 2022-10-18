@@ -9,13 +9,17 @@ import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var (
 	service          *Service
 	envMattermostURL *url.URL
+	_                = BeforeSuite(func() {
+		service = &Service{}
+		envMattermostURL, _ = url.Parse(os.Getenv("SHOUTRRR_MATTERMOST_URL"))
+	})
 )
 
 func TestMattermost(t *testing.T) {
@@ -24,10 +28,7 @@ func TestMattermost(t *testing.T) {
 }
 
 var _ = Describe("the mattermost service", func() {
-	BeforeSuite(func() {
-		service = &Service{}
-		envMattermostURL, _ = url.Parse(os.Getenv("SHOUTRRR_MATTERMOST_URL"))
-	})
+
 	When("running integration tests", func() {
 		It("should work without errors", func() {
 			if envMattermostURL.String() == "" {
