@@ -15,3 +15,5 @@ require (
 )
 
 require github.com/google/go-cmp v0.5.9 // indirect
+
+exclude golang.org/x/sys v0.1.0
