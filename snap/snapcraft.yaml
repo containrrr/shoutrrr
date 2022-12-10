@@ -12,6 +12,7 @@ icon: docs/shoutrrr-logotype.png
 license: MIT
 source-code: https://github.com/containrrr/shoutrrr
 type: app
+compression: lzo
 
 
 apps:
