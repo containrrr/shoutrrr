@@ -134,3 +134,20 @@ jobs:
         run: |
           docker manifest push containrrr/shoutrrr:${GITHUB_REF/refs\/tags\/v/} && \
           docker manifest push containrrr/shoutrrr:latest
+  snap:
+    name: Build Shoutrrr snap
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout repository
+      - uses: snapcore/action-build@v1
+        name: Build snap
+        id: build
+      - uses: snapcore/action-publish@v1
+        name: Release snap
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
