@@ -8,7 +8,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Config for use within the telegram plugin
+// Config for use within the ntfy service
 type Config struct {
 	Title    string   `key:"title"    default:""        desc:"Message title"`
 	Host     string   `url:"host"     default:"ntfy.sh" desc:"Server hostname and port"`
