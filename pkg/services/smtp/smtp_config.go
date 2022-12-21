@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -88,6 +89,14 @@ func (config *Config) Clone() Config {
 	clone.ToAddresses = make([]string, len(config.ToAddresses))
 	copy(clone.ToAddresses, config.ToAddresses)
 	return clone
+}
+
+// FixEmailTags replaces parsed spaces (+) in e-mail addresses with '+'
+func (config *Config) FixEmailTags() {
+	config.FromAddress = strings.ReplaceAll(config.FromAddress, " ", "+")
+	for i, adr := range config.ToAddresses {
+		config.ToAddresses[i] = strings.ReplaceAll(adr, " ", "+")
+	}
 }
 
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
