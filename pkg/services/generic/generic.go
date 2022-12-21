@@ -38,9 +38,10 @@ func (service *Service) Send(message string, paramsPtr *types.Params) error {
 		service.Logf("Failed to update params: %v", err)
 	}
 
-	updateParams(&config, params, message)
+	// Create a mutable copy of the passed params
+	sendParams := createSendParams(&config, params, message)
 
-	if err := service.doSend(&config, params); err != nil {
+	if err := service.doSend(&config, sendParams); err != nil {
 		return fmt.Errorf("an error occurred while sending notification to generic webhook: %s", err.Error())
 	}
 
@@ -118,12 +119,14 @@ func (service *Service) getPayload(config *Config, params types.Params) (io.Read
 	return bb, err
 }
 
-func updateParams(config *Config, params types.Params, message string) {
-	if title, found := params.Title(); found {
-		if config.TitleKey != "title" {
-			delete(params, "title")
-			params[config.TitleKey] = title
+func createSendParams(config *Config, params types.Params, message string) types.Params {
+	sendParams := types.Params{}
+	for key, val := range params {
+		if key == types.TitleKey {
+			key = config.TitleKey
 		}
+		sendParams[key] = val
 	}
-	params[config.MessageKey] = message
+	sendParams[config.MessageKey] = message
+	return sendParams
 }
