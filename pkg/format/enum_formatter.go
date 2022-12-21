@@ -11,13 +11,14 @@ const EnumInvalid = -1
 
 // EnumFormatter is the helper methods for enum-like types
 type EnumFormatter struct {
-	names   []string
-	aliases map[string]int
+	names       []string
+	firstOffset int
+	aliases     map[string]int
 }
 
 // Names is the list of the valid Enum string values
 func (ef EnumFormatter) Names() []string {
-	return ef.names
+	return ef.names[ef.firstOffset:]
 }
 
 // Print takes a enum mapped int and returns it's string representation or "Invalid"
@@ -25,7 +26,7 @@ func (ef EnumFormatter) Print(e int) string {
 	if e >= len(ef.names) || e < 0 {
 		return "Invalid"
 	}
-	return ef.names[e]
+	return ef.names[ef.firstOffset+e]
 }
 
 // Parse takes an enum mapped string and returns it's int representation or EnumInvalid (-1)
@@ -48,8 +49,16 @@ func CreateEnumFormatter(names []string, optAliases ...map[string]int) types.Enu
 	if len(optAliases) > 0 {
 		aliases = optAliases[0]
 	}
+	firstOffset := 0
+	for i, name := range names {
+		if name != "" {
+			firstOffset = i
+			break
+		}
+	}
 	return &EnumFormatter{
 		names,
+		firstOffset,
 		aliases,
 	}
 }
