@@ -1,7 +1,6 @@
 package smtp
 
 import (
-	"fmt"
 	"log"
 	"net/smtp"
 	"net/url"
@@ -39,6 +38,7 @@ var (
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 		logger = testutils.TestLogger()
 	})
+	urlWithAllProps = "smtp://user:password@example.com:2225/?auth=None&clienthost=testhost&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
 )
 
 var _ = Describe("the SMTP service", func() {
@@ -49,21 +49,16 @@ var _ = Describe("the SMTP service", func() {
 	})
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			testURL := "smtp://user:password@example.com:2225/?auth=None&clienthost=testhost&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
-
-			url, err := url.Parse(testURL)
-			fmt.Println(url)
-			Expect(err).NotTo(HaveOccurred(), "parsing")
-
+			url := testutils.URLMust(urlWithAllProps)
 			config := &Config{}
 			pkr := format.NewPropKeyResolver(config)
-			err = config.setURL(&pkr, url)
+			err := config.setURL(&pkr, url)
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
-			fmt.Printf("\n\n%s\n%s\n\n-", outputURL, testURL)
+			GinkgoT().Logf("\n\n%s\n%s\n\n-", outputURL, urlWithAllProps)
 
-			Expect(outputURL.String()).To(Equal(testURL))
+			Expect(outputURL.String()).To(Equal(urlWithAllProps))
 
 		})
 		When("resolving client host", func() {
@@ -82,26 +77,14 @@ var _ = Describe("the SMTP service", func() {
 		})
 		When("fromAddress is missing", func() {
 			It("should return an error", func() {
-				testURL := "smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com"
-
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
-
-				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).To(HaveOccurred(), "verifying")
+				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com")
+				Expect((&Config{}).SetURL(testURL)).ToNot(Succeed())
 			})
 		})
 		When("toAddresses are missing", func() {
 			It("should return an error", func() {
-				testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com"
-
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
-
-				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).To(HaveOccurred(), "verifying")
+				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?fromAddress=sender@example.com")
+				Expect((&Config{}).SetURL(testURL)).NotTo(Succeed())
 			})
 
 		})
@@ -123,7 +106,15 @@ var _ = Describe("the SMTP service", func() {
 			testutils.TestConfigGetFieldsCount(config, 13)
 		})
 	})
+	When("cloning a config", func() {
+		It("should be identical to the original", func() {
+			config := &Config{}
+			Expect(config.SetURL(testutils.URLMust(urlWithAllProps))).To(Succeed())
 
+			Expect(config.Clone()).To(Equal(*config))
+
+		})
+	})
 	When("sending a message", func() {
 		When("the service is not configured correctly", func() {
 			It("should fail to send messages", func() {
@@ -134,7 +125,7 @@ var _ = Describe("the SMTP service", func() {
 				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
 			})
 		})
-		When("the an invalid param is passed", func() {
+		When("an invalid param is passed", func() {
 			It("should fail to send messages", func() {
 				service := Service{config: &Config{}}
 				Expect(service.Send("test message", &types.Params{"invalid": "value"})).To(matchFailure(FailApplySendParams))
@@ -237,6 +228,42 @@ var _ = Describe("the SMTP service", func() {
 					"250 Data OK",
 					"221 OK",
 				}, "<pre>{{ .message }}</pre>", "{{ .message }}")
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("given e-mail addresses with pluses in the configuration URL", func() {
+
+			It("should send notifications without any errors", func() {
+				testURL := "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender+tag@example.com&toAddresses=rec1+tag@example.com,rec2@example.com&useHTML=yes"
+				err := testIntegration(
+					testURL,
+					[]string{
+						"250-mx.google.com at your service",
+						"250-SIZE 35651584",
+						"250-AUTH LOGIN PLAIN",
+						"250 8BITMIME",
+						"235 Accepted",
+						"250 Sender OK",
+						"250 Receiver OK",
+						"354 Go ahead",
+						"250 Data OK",
+						"250 Sender OK",
+						"250 Receiver OK",
+						"354 Go ahead",
+						"250 Data OK",
+						"221 OK",
+					},
+					// Message templates:
+					"<pre>{{ .message }}</pre>", "{{ .message }}",
+					// Expected to be sent from client
+					"RCPT TO:<rec1+tag@example.com>",
+					"To: rec1+tag@example.com",
+					"From:  <sender+tag@example.com>")
 				if msg, test := standard.IsTestSetupFailure(err); test {
 					Skip(msg)
 					return
@@ -483,7 +510,7 @@ func testSendRecipient(testURL string, responses []string) failures.Failure {
 	return nil
 }
 
-func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string) failures.Failure {
+func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string, expectRec ...string) failures.Failure {
 
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
@@ -515,6 +542,11 @@ func testIntegration(testURL string, responses []string, htmlTemplate string, pl
 	fakeTLSEnabled(client, serviceURL.Hostname())
 
 	ferr := service.doSend(client, "Test message", service.config)
+
+	recieved := tcfaker.GetClientSentences()
+	for _, expected := range expectRec {
+		Expect(recieved).To(ContainElement(expected))
+	}
 
 	logger.Printf("\n%s", tcfaker.GetConversation(false))
 	if ferr != nil {
