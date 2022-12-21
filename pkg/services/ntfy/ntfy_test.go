@@ -132,7 +132,7 @@ var _ = Describe("the ntfy service", func() {
 				testutils.TestConfigSetDefaultValues(&Config{})
 
 				testutils.TestConfigGetEnumsCount(&Config{}, 1)
-				testutils.TestConfigGetFieldsCount(&Config{}, 13)
+				testutils.TestConfigGetFieldsCount(&Config{}, 15)
 			})
 		})
 		Describe("the service instance", func() {
