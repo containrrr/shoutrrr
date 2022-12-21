@@ -66,9 +66,14 @@ func (c *client) Post(url string, request interface{}, response interface{}) err
 	var err error
 	var body []byte
 
-	body, err = json.MarshalIndent(request, "", c.indent)
-	if err != nil {
-		return fmt.Errorf("error creating payload: %w", err)
+	if strReq, ok := request.(string); ok {
+		// If the request is a string, just pass it through without serializing
+		body = []byte(strReq)
+	} else {
+		body, err = json.MarshalIndent(request, "", c.indent)
+		if err != nil {
+			return fmt.Errorf("error creating payload: %w", err)
+		}
 	}
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
