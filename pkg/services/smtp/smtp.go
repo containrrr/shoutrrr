@@ -107,6 +107,8 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 
 func (service *Service) doSend(client *smtp.Client, message string, config *Config) failure {
 
+	config.FixEmailTags()
+
 	clientHost := service.resolveClientHost(config)
 
 	if err := client.Hello(clientHost); err != nil {
