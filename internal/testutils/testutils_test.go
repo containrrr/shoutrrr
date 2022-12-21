@@ -23,8 +23,8 @@ var _ = Describe("the testutils package", func() {
 		It("should not return nil", func() {
 			Expect(TestLogger()).NotTo(Equal(nil))
 		})
-		It("should have the prefix \"Test\"", func() {
-			Expect(TestLogger().Prefix()).To(Equal("Test"))
+		It(`should have the prefix "[Test] "`, func() {
+			Expect(TestLogger().Prefix()).To(Equal("[Test] "))
 		})
 	})
 
