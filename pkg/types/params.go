@@ -4,7 +4,9 @@ package types
 type Params map[string]string
 
 const (
-	TitleKey   = "title"
+	// TitleKey is the common key for the title prop
+	TitleKey = "title"
+	// MessageKey is the common key for the message prop
 	MessageKey = "message"
 )
 
