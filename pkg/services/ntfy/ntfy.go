@@ -3,9 +3,11 @@ package ntfy
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/containrrr/shoutrrr/internal/meta"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
@@ -51,36 +53,29 @@ func (service *Service) sendAPI(config *Config, message string) error {
 	response := apiResponse{}
 	request := message
 	jsonClient := jsonclient.NewClient()
-	jsonClient.Headers().Del("Content-Type")
-	jsonClient.Headers().Add("Title", config.Title)
-	jsonClient.Headers().Add("Priority", config.Priority.String())
 
-	tags := strings.Join(config.Tags, ",")
-	if tags != "" {
-		jsonClient.Headers().Add("Tags", tags)
-	}
-
-	jsonClient.Headers().Add("Delay", config.Delay)
-
-	actions := strings.Join(config.Actions, "; ")
-	if actions != "" {
-		jsonClient.Headers().Add("Actions", actions)
-	}
-
-	jsonClient.Headers().Add("Click", config.Click)
-	jsonClient.Headers().Add("Attach", config.Attach)
-	jsonClient.Headers().Add("Icon", config.Icon)
-	jsonClient.Headers().Add("Filename", config.Filename)
-	jsonClient.Headers().Add("Email", config.Email)
+	headers := jsonClient.Headers()
+	headers.Del("Content-Type")
+	headers.Set("User-Agent", "shoutrrr/"+meta.Version)
+	addHeaderIfNotEmpty(&headers, "Title", config.Title)
+	addHeaderIfNotEmpty(&headers, "Priority", config.Priority.String())
+	addHeaderIfNotEmpty(&headers, "Tags", strings.Join(config.Tags, ","))
+	addHeaderIfNotEmpty(&headers, "Delay", config.Delay)
+	addHeaderIfNotEmpty(&headers, "Actions", strings.Join(config.Actions, ";"))
+	addHeaderIfNotEmpty(&headers, "Click", config.Click)
+	addHeaderIfNotEmpty(&headers, "Attach", config.Attach)
+	addHeaderIfNotEmpty(&headers, "X-Icon", config.Icon)
+	addHeaderIfNotEmpty(&headers, "Filename", config.Filename)
+	addHeaderIfNotEmpty(&headers, "Email", config.Email)
 
 	if !config.Cache {
-		jsonClient.Headers().Add("Cache", "no")
+		headers.Add("Cache", "no")
 	}
 	if !config.Firebase {
-		jsonClient.Headers().Add("Firebase", "no")
+		headers.Add("Firebase", "no")
 	}
 
-	if err := jsonClient.Post(config.GetAPIURL(), &request, &response); err != nil {
+	if err := jsonClient.Post(config.GetAPIURL(), request, &response); err != nil {
 		if jsonClient.ErrorResponse(err, &response) {
 			// apiResponse implements Error
 			return &response
@@ -89,4 +84,10 @@ func (service *Service) sendAPI(config *Config, message string) error {
 	}
 
 	return nil
+}
+
+func addHeaderIfNotEmpty(headers *http.Header, key string, value string) {
+	if value != "" {
+		headers.Add(key, value)
+	}
 }
