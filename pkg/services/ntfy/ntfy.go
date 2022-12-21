@@ -1,3 +1,4 @@
+// package ntfy implements Ntfy as a shoutrrr service
 package ntfy
 
 import (
