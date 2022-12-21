@@ -26,7 +26,7 @@ func (ef EnumFormatter) Print(e int) string {
 	if e >= len(ef.names) || e < 0 {
 		return "Invalid"
 	}
-	return ef.names[ef.firstOffset+e]
+	return ef.names[e]
 }
 
 // Parse takes an enum mapped string and returns it's int representation or EnumInvalid (-1)
