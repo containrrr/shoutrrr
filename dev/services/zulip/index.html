@@ -1197,13 +1197,13 @@ You're not viewing the latest version.
 </div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <p>Stream and topic are both optional and can be given as parameters to the Send method:</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">__</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">CreateSender</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">__</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">shoutrrr</span><span class="p">.</span><span class="nx">CreateSender</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
 
-<span class="w">  </span><span class="nx">params</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="nx">params</span><span class="p">[</span><span class="s">&quot;stream&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;mystream&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nx">params</span><span class="p">[</span><span class="s">&quot;topic&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;This is my topic&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nx">params</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">make</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">params</span><span class="p">[</span><span class="s">&quot;stream&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;mystream&quot;</span>
+<span class="w">  </span><span class="nx">params</span><span class="p">[</span><span class="s">&quot;topic&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;This is my topic&quot;</span>
 
-<span class="w">  </span><span class="nx">sender</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">params</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nx">sender</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">params</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition example">
 <p class="admonition-title">Example service URL</p>

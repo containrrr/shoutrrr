@@ -1306,20 +1306,20 @@ the <a href="https://docs.opsgenie.com/docs/alert-api">OpsGenie documentation</a
 <p>If you want to, you can pass additional parameters to the <code>send</code> function.
 <br/>
 The following example contains all parameters that are currently supported.</p>
-<div class="highlight"><pre><span></span><code><span class="nx">service</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="s">&quot;An example alert message&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;alias&quot;</span><span class="p">:</span><span class="w">       </span><span class="s">&quot;Life is too short for no alias&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Every alert needs a description&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;responders&quot;</span><span class="p">:</span><span class="w">  </span><span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;NOC&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;visibleTo&quot;</span><span class="p">:</span><span class="w">   </span><span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;rocket_team&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;actions&quot;</span><span class="p">:</span><span class="w">     </span><span class="s">&quot;An action&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;tags&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;tag1 tag2&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;details&quot;</span><span class="p">:</span><span class="w">     </span><span class="s">`{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}`</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;entity&quot;</span><span class="p">:</span><span class="w">      </span><span class="s">&quot;An example entity&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;source&quot;</span><span class="p">:</span><span class="w">      </span><span class="s">&quot;The source&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;priority&quot;</span><span class="p">:</span><span class="w">    </span><span class="s">&quot;P1&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;Dracula&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="s">&quot;note&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;Here is a note&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="p">})</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nx">service</span><span class="p">.</span><span class="nx">Send</span><span class="p">(</span><span class="s">&quot;An example alert message&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">types</span><span class="p">.</span><span class="nx">Params</span><span class="p">{</span>
+<span class="w">    </span><span class="s">&quot;alias&quot;</span><span class="p">:</span><span class="w">       </span><span class="s">&quot;Life is too short for no alias&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Every alert needs a description&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;responders&quot;</span><span class="p">:</span><span class="w">  </span><span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;NOC&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;visibleTo&quot;</span><span class="p">:</span><span class="w">   </span><span class="s">`[{&quot;id&quot;:&quot;4513b7ea-3b91-438f-b7e4-e3e54af9147c&quot;,&quot;type&quot;:&quot;team&quot;},{&quot;name&quot;:&quot;rocket_team&quot;,&quot;type&quot;:&quot;team&quot;}]`</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;actions&quot;</span><span class="p">:</span><span class="w">     </span><span class="s">&quot;An action&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;tags&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;tag1 tag2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;details&quot;</span><span class="p">:</span><span class="w">     </span><span class="s">`{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}`</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;entity&quot;</span><span class="p">:</span><span class="w">      </span><span class="s">&quot;An example entity&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;source&quot;</span><span class="p">:</span><span class="w">      </span><span class="s">&quot;The source&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;priority&quot;</span><span class="p">:</span><span class="w">    </span><span class="s">&quot;P1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;Dracula&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;note&quot;</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;Here is a note&quot;</span><span class="p">,</span>
+<span class="p">})</span>
 </code></pre></div>
 <h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
 <p>You can optionally specify the parameters in the URL:</p>
@@ -1327,7 +1327,7 @@ The following example contains all parameters that are currently supported.</p>
 <p>opsgenie://api.opsgenie.com/eb243592-faa2-4ba2-a551q-1afdf565c889?alias=Life+is+too+short+for+no+alias&amp;description=Every+alert+needs+a+description&amp;actions=An+action&amp;tags=["tag1","tag2"]&amp;entity=An+example+entity&amp;source=The+source&amp;priority=P1&amp;user=Dracula&amp;note=Here+is+a+note</p>
 </div>
 <p>Example using the command line:</p>
-<div class="highlight"><pre><span></span><code>shoutrrr send -u <span class="s1">&#39;opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]&#39;</span> -m <span class="s2">&quot;Hello World6&quot;</span>
+<div class="highlight"><pre><span></span><code>shoutrrr<span class="w"> </span>send<span class="w"> </span>-u<span class="w"> </span><span class="s1">&#39;opsgenie://api.eu.opsgenie.com/token?tags=[&quot;tag1&quot;,&quot;tag2&quot;]&amp;description=testing&amp;responders=[{&quot;username&quot;:&quot;superuser&quot;, &quot;type&quot;: &quot;user&quot;}]&amp;entity=Example Entity&amp;source=Example Source&amp;actions=[&quot;asdf&quot;, &quot;bcde&quot;]&#39;</span><span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Hello World6&quot;</span>
 </code></pre></div>
 
 
