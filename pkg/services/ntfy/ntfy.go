@@ -1,4 +1,4 @@
-// package ntfy implements Ntfy as a shoutrrr service
+// Package ntfy implements Ntfy as a shoutrrr service
 package ntfy
 
 import (
