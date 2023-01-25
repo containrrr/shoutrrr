@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   build:
+    permissions: write-all
     name: Build Shoutrrr
     runs-on: ubuntu-latest
     env:
