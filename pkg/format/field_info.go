@@ -22,6 +22,7 @@ type FieldInfo struct {
 	Title         bool
 	Base          int
 	Keys          []string
+	ItemSeparator rune
 }
 
 // IsEnum returns whether a EnumFormatter has been assigned to the field and that it is of a suitable type
@@ -54,10 +55,11 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 		}
 
 		info := FieldInfo{
-			Name:     fieldDef.Name,
-			Type:     fieldDef.Type,
-			Required: true,
-			Title:    false,
+			Name:          fieldDef.Name,
+			Type:          fieldDef.Type,
+			Required:      true,
+			Title:         false,
+			ItemSeparator: ',',
 		}
 
 		if util.IsNumeric(fieldDef.Type.Kind()) {
@@ -92,6 +94,10 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 		if tag, ok := fieldDef.Tag.Lookup("key"); ok {
 			tag := strings.ToLower(tag)
 			info.Keys = strings.Split(tag, ",")
+		}
+
+		if tag, ok := fieldDef.Tag.Lookup("sep"); ok {
+			info.ItemSeparator = rune(tag[0])
 		}
 
 		if ef, isEnum := enums[fieldDef.Name]; isEnum {

@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -23,13 +23,12 @@ var (
 	envZulipURL *url.URL
 )
 
+var _ = BeforeSuite(func() {
+	service = &Service{}
+	envZulipURL, _ = url.Parse(os.Getenv("SHOUTRRR_ZULIP_URL"))
+})
+
 var _ = Describe("the zulip service", func() {
-
-	BeforeSuite(func() {
-		service = &Service{}
-		envZulipURL, _ = url.Parse(os.Getenv("SHOUTRRR_ZULIP_URL"))
-
-	})
 
 	When("running integration tests", func() {
 		It("should not error out", func() {

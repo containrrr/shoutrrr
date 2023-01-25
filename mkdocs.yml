@@ -42,6 +42,7 @@ nav:
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
       - Matrix: 'services/matrix.md'
+      - Ntfy: 'services/ntfy.md'
       - OpsGenie: 'services/opsgenie.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'

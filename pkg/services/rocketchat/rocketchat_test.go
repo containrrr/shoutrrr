@@ -7,13 +7,17 @@ import (
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var (
 	service          *Service
 	envRocketchatURL *url.URL
+	_                = BeforeSuite(func() {
+		service = &Service{}
+		envRocketchatURL, _ = url.Parse(os.Getenv("SHOUTRRR_ROCKETCHAT_URL"))
+	})
 )
 
 func TestRocketchat(t *testing.T) {
@@ -22,10 +26,7 @@ func TestRocketchat(t *testing.T) {
 }
 
 var _ = Describe("the rocketchat service", func() {
-	BeforeSuite(func() {
-		service = &Service{}
-		envRocketchatURL, _ = url.Parse(os.Getenv("SHOUTRRR_ROCKETCHAT_URL"))
-	})
+
 	When("running integration tests", func() {
 		It("should work without errors", func() {
 			if envRocketchatURL.String() == "" {

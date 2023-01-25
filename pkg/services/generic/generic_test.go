@@ -11,7 +11,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -151,8 +151,8 @@ var _ = Describe("the Generic service", func() {
 			It("should create a JSON object as the payload", func() {
 				config.Template = "JSON"
 				params := types.Params{"title": "test title"}
-				updateParams(&config, params, "test message")
-				payload, err := service.getPayload(&config, params)
+				sendParams := createSendParams(&config, params, "test message")
+				payload, err := service.getPayload(&config, sendParams)
 				Expect(err).NotTo(HaveOccurred())
 				contents, err := ioutil.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
@@ -167,8 +167,8 @@ var _ = Describe("the Generic service", func() {
 					config.MessageKey = "body"
 					config.TitleKey = "header"
 					params := types.Params{"title": "test title"}
-					updateParams(&config, params, "test message")
-					payload, err := service.getPayload(&config, params)
+					sendParams := createSendParams(&config, params, "test message")
+					payload, err := service.getPayload(&config, sendParams)
 					Expect(err).NotTo(HaveOccurred())
 					contents, err := ioutil.ReadAll(payload)
 					Expect(err).NotTo(HaveOccurred())
@@ -267,6 +267,21 @@ var _ = Describe("the Generic service", func() {
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should not mutate the given params", func() {
+			serviceURL, _ := url.Parse("generic://host.tld/webhook?method=GET")
+			err = service.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			targetURL := "https://host.tld/webhook"
+			httpmock.RegisterResponder("GET", targetURL, httpmock.NewStringResponder(200, ""))
+
+			params := types.Params{"title": "TITLE"}
+
+			err = service.Send("Message", &params)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(params).To(Equal(types.Params{"title": "TITLE"}))
 		})
 	})
 })

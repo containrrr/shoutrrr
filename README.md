@@ -23,6 +23,26 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 </div>
 <br/><br/>
 
+## Installation
+
+### Using the snap
+
+```bash
+$ sudo snap install shoutrrr
+```
+
+### Using the Go CLI
+
+```bash
+$ go install github.com/containrrr/shoutrrr@latest
+```
+
+### From Source
+
+```bash
+$ go build -o shoutrrr .
+```
+
 ## Quick Start
 
 ### As a package

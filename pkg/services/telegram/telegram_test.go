@@ -2,17 +2,18 @@ package telegram_test
 
 import (
 	"fmt"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/jarcoal/httpmock"
+
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/telegram"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -21,15 +22,18 @@ func TestTelegram(t *testing.T) {
 	RunSpecs(t, "Shoutrrr Telegram Suite")
 }
 
-var _ = Describe("the telegram service", func() {
-	var telegram *Service
-	var envTelegramURL string
-	var logger *log.Logger
+var (
+	envTelegramURL string
+	logger         *log.Logger
 
-	BeforeSuite(func() {
+	_ = BeforeSuite(func() {
 		envTelegramURL = os.Getenv("SHOUTRRR_TELEGRAM_URL")
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
+)
+
+var _ = Describe("the telegram service", func() {
+	var telegram *Service
 
 	BeforeEach(func() {
 		telegram = &Service{}

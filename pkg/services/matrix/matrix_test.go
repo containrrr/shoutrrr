@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -24,10 +24,6 @@ var _ = Describe("the matrix service", func() {
 	var service *Service
 	logger := log.New(GinkgoWriter, "Test", log.LstdFlags)
 	envMatrixURL := os.Getenv("SHOUTRRR_MATRIX_URL")
-
-	BeforeSuite(func() {
-
-	})
 
 	BeforeEach(func() {
 		service = &Service{}
