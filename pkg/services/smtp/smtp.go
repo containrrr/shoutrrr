@@ -42,6 +42,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		UseStartTLS: true,
 		UseHTML:     false,
 		Encryption:  EncMethods.Auto,
+		ClientHost:  "localhost",
 	}
 
 	pkr := format.NewPropKeyResolver(service.config)
