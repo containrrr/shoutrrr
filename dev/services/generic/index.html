@@ -1069,7 +1069,7 @@ You're not viewing the latest version.
   <span class="md-ellipsis">
     
   
-    Advanced usage
+    Examples
   
 
     
@@ -1082,6 +1082,83 @@ You're not viewing the latest version.
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/generic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Generic Webhook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1246,6 +1323,7 @@ You're not viewing the latest version.
 supports receiving the message via a POST request.
 Usually, this requires customization on the receiving end to interpret the payload that it receives, and might
 not be a viable approach.</p>
+<p>Common examples for use with service providers can be found under <a href="../../examples/generic/">examples</a>.</p>
 <h2 id="json_template">JSON template<a class="headerlink" href="#json_template" title="Permanent link">&para;</a></h2>
 <p>By using the built in <code>JSON</code> template (<code>template=json</code>) you can create a generic JSON payload. The keys used for <code>title</code> and <code>message</code> can be overriden
 by supplying the params/query values <code>titleKey</code> and <code>messageKey</code>.</p>
@@ -1264,6 +1342,10 @@ by supplying the params/query values <code>titleKey</code> and <code>messageKey<
 would become
 <div class="highlight"><pre><span></span><code>generic+https://example.com/api/v1/postStuff
 </code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any query variables added to the URL will be escaped so that they can be forwarded to the remote server. That means that you cannot use <code>?template=json</code> with the  <code>generic+https://</code>, just use <code>generic://</code> instead!</p>
+</div>
 <h2 id="forwarded_query_variables">Forwarded query variables<a class="headerlink" href="#forwarded_query_variables" title="Permanent link">&para;</a></h2>
 <p>All query variables that are not listed in the <a href="#queryparam_props">Query/Param Props</a> section will be
 forwarded to the target endpoint.
