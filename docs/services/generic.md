@@ -29,7 +29,7 @@ generic+https://example.com/api/v1/postStuff
 ```
 
 !!! note
-    Any query variables added to the URL will be escaped so that they can be forwarded to the remote server. That means that you cannot use `?format=json` with the  `generic+https://`, just use `generic://` instead!
+    Any query variables added to the URL will be escaped so that they can be forwarded to the remote server. That means that you cannot use `?template=json` with the  `generic+https://`, just use `generic://` instead!
 
 ## Forwarded query variables
 All query variables that are not listed in the [Query/Param Props](#queryparam_props) section will be
