@@ -1,6 +1,6 @@
 # Examples
 
-Examples of service URLs that can be used with [the generic service](../generic) together with common service providers.
+Examples of service URLs that can be used with [the generic service](../../services/generic) together with common service providers.
 
 ## Home Assistant
 
@@ -16,4 +16,4 @@ generic://HAIPAddress:HAPort/api/webhook/WebhookIDFromHA?template=json&disabletl
 
 Then, in HA, use `{{ trigger.json.message }}` to get the message sent from the JSON.
 
-_Credit [@JeffCrum1](https://github.com/JeffCrum1), source: https://github.com/containrrr/shoutrrr/issues/325#issuecomment-1460105065_
+_Credit [@JeffCrum1](https://github.com/JeffCrum1), source: [https://github.com/containrrr/shoutrrr/issues/325#issuecomment-1460105065]_

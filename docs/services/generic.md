@@ -4,7 +4,7 @@ supports receiving the message via a POST request.
 Usually, this requires customization on the receiving end to interpret the payload that it receives, and might
 not be a viable approach.
 
-Common examples for use with service providers can be found under [examples](generic/examples).
+Common examples for use with service providers can be found under [examples](../examples/generic.md).
 
 ## JSON template
 By using the built in `JSON` template (`template=json`) you can create a generic JSON payload. The keys used for `title` and `message` can be overriden
