@@ -63,4 +63,5 @@ jobs:
 
 
       - name: Deploy docs
-        run: mike deploy --push $DOCS_VERSION
+        run: mike deploy --push --update-aliases $DOCS_VERSION latest
+
