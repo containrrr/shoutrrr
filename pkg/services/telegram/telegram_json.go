@@ -38,8 +38,7 @@ func createSendMessagePayload(message string, channel string, config *Config) Se
 	var threadID *int = nil
 	chatID, thread, ok := strings.Cut(channel, ":")
 	if ok {
-		parsed, err := strconv.Atoi(thread)
-		if err == nil {
+		if parsed, err := strconv.Atoi(thread); err == nil {
 			threadID = &parsed
 		}
 	}
