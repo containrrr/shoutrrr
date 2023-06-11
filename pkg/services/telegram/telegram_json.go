@@ -3,12 +3,15 @@ package telegram
 import (
 	"fmt"
 	"html"
+	"strconv"
+	"strings"
 )
 
 // SendMessagePayload is the notification payload for the telegram notification service
 type SendMessagePayload struct {
 	Text                string       `json:"text"`
 	ID                  string       `json:"chat_id"`
+	MessageThreadID     *int         `json:"message_thread_id,omitempty"`
 	ParseMode           string       `json:"parse_mode,omitempty"`
 	DisablePreview      bool         `json:"disable_web_page_preview"`
 	DisableNotification bool         `json:"disable_notification"`
@@ -32,9 +35,19 @@ type messageResponse struct {
 }
 
 func createSendMessagePayload(message string, channel string, config *Config) SendMessagePayload {
+	threadID := new(int)
+	chatID, thread, ok := strings.Cut(channel, ":")
+	if !ok {
+		threadID = nil
+	} else if parsed, err := strconv.Atoi(thread); err != nil {
+		threadID = nil
+	} else {
+		*threadID = parsed
+	}
 	payload := SendMessagePayload{
 		Text:                message,
-		ID:                  channel,
+		ID:                  chatID,
+		MessageThreadID:     threadID,
 		DisableNotification: !config.Notification,
 		DisablePreview:      !config.Preview,
 	}
