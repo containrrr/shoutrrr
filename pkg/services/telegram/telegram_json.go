@@ -35,14 +35,13 @@ type messageResponse struct {
 }
 
 func createSendMessagePayload(message string, channel string, config *Config) SendMessagePayload {
-	threadID := new(int)
+	var threadID *int = nil
 	chatID, thread, ok := strings.Cut(channel, ":")
-	if !ok {
-		threadID = nil
-	} else if parsed, err := strconv.Atoi(thread); err != nil {
-		threadID = nil
-	} else {
-		*threadID = parsed
+	if ok {
+		parsed, err := strconv.Atoi(thread)
+		if err == nil {
+			threadID = &parsed
+		}
 	}
 	payload := SendMessagePayload{
 		Text:                message,
