@@ -1482,6 +1482,10 @@ Replace the <code>t.me/</code> prefix from the link with a <code>@</code>.</p>
 <p class="admonition-title">Note</p>
 <p>If your channel only has an invite link (starting with <code>t.me/+</code>), you have to use it's Chat ID (see below)</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <code>message_thread_id</code> param (<a href="https://core.telegram.org/bots/api#sendmessage">reference</a>) can be added, with the format of <code>$chat_id:$message_thread_id</code>. <a href="https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418">More info</a> on how to obtain the <code>message_thread_id</code>.</p>
+</div>
 <h3 id="chats">Chats<a class="headerlink" href="#chats" title="Permanent link">&para;</a></h3>
 <p>Private channels, Group chats and private chats are identified by <code>Chat ID</code>s. Unfortunatly, they are generally not visible in the
 telegram clients.
