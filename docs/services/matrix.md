@@ -1,8 +1,8 @@
 # Matrix
 
-> ### ⚠️ Usage of the `title` parameter
-> Do note that Matrix will discard any information put in the `title` parameter as the service has no analogue to a
-> a title. Instead, use a custom message format to supply your wanted title as part of the message.
+!!! note Usage of the `title` parameter
+    Do note that Matrix will discard any information put in the `title` parameter as the service has no analogue to a
+    a title. Instead, use a custom message format to supply your wanted title as part of the message.
 
 ## URL Format
 
