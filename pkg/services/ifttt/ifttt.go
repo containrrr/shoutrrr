@@ -72,7 +72,7 @@ func doSend(payload []byte, postURL string) error {
 	if err != nil {
 		return err
 	}
-	if res.StatusCode != http.StatusNoContent {
+	if res.StatusCode != http.StatusNoContent && res.StatusCode != http.StatusOK {
 		return fmt.Errorf("got response status code %s", res.Status)
 	}
 	return nil
