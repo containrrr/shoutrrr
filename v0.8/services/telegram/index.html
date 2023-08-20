@@ -1,0 +1,1563 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://containrrr.dev/shoutrrr/v0.8/services/telegram/">
+      
+      
+        <link rel="prev" href="../teams/">
+      
+      
+        <link rel="next" href="../zulip/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21+insiders-4.39.0">
+    
+    
+      
+        <title>Telegram - Shoutrrr</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7c2e0b1b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc776e4.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/theme.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="shoutrrr" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#telegram" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+You're not viewing the latest version.
+<a href="../../..">
+
+    <strong>Click here to go to latest.</strong>
+</a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Shoutrrr" class="md-header__button md-logo" aria-label="Shoutrrr" data-md-component="logo">
+      
+  <img src="../../shoutrrr-180px.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Shoutrrr
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Telegram
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Shoutrrr" class="md-nav__button md-logo" aria-label="Shoutrrr" data-md-component="logo">
+      
+  <img src="../../shoutrrr-180px.png" alt="logo">
+
+    </a>
+    Shoutrrr
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/containrrr/shoutrrr/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Services
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Bark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../discord/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../email/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Email
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gotify/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Gotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../googlechat/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Google Chat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ifttt/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    IFTTT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../join/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Join
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mattermost/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Mattermost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../matrix/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ntfy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Ntfy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opsgenie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    OpsGenie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pushbullet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Pushbullet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pushover/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Pushover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rocketchat/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Rocketchat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../slack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Slack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Teams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    
+  
+    Telegram
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Telegram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query/Param Props
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting_a_token_for_telegram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting a token for Telegram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifying_the_target_chatschannels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifying the target chats/channels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifying the target chats/channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public_channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public Channels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking_shoutrrrbot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asking @shoutrrrbot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parse_mode_and_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse Mode and Title
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zulip/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Zulip Chat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Generic Webhook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/slack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Slack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/generic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Generic Webhook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Proxy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#url_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="URL Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queryparam_props" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query/Param Props
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting_a_token_for_telegram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting a token for Telegram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifying_the_target_chatschannels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifying the target chats/channels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifying the target chats/channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public_channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public Channels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking_shoutrrrbot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asking @shoutrrrbot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parse_mode_and_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse Mode and Title
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="telegram">Telegram<a class="headerlink" href="#telegram" title="Permanent link">&para;</a></h1>
+<h2 id="url_format">URL Format<a class="headerlink" href="#url_format" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p>telegram://<strong><code>token</code></strong>@telegram?chats=<strong><code>channel-1</code></strong>[,<strong><code>chat-id-1</code></strong>,...]</p>
+</div>
+<h3 id="url_fields">URL Fields<a class="headerlink" href="#url_fields" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Token</strong> (<strong>Required</strong>)<br />
+  URL part: <code class="service-url">telegram://<strong>token</strong>@telegram/</code>  </li>
+</ul>
+<h3 id="queryparam_props">Query/Param Props<a class="headerlink" href="#queryparam_props" title="Permanent link">&para;</a></h3>
+<p>Props can be either supplied using the params argument, or through the URL using<br />
+<code>?key=value&amp;key=value</code> etc.</p>
+<ul>
+<li>
+<p><strong>Chats</strong> - Chat IDs or Channel names (using @channel-name) (<strong>Required</strong>)<br />
+  Aliases: <code>channels</code>  </p>
+</li>
+<li>
+<p><strong>Notification</strong> - If disabled, sends Message silently<br />
+  Default: ✔ <code>Yes</code>  </p>
+</li>
+<li>
+<p><strong>ParseMode</strong> - How the text Message should be parsed<br />
+  Default: <code>None</code><br />
+  Possible values: <code>None</code>, <code>Markdown</code>, <code>HTML</code>, <code>MarkdownV2</code>  </p>
+</li>
+<li>
+<p><strong>Preview</strong> - If disabled, no web page preview will be displayed for URLs<br />
+  Default: ✔ <code>Yes</code>  </p>
+</li>
+<li>
+<p><strong>Title</strong> - Notification title, optionally set by the sender<br />
+  Default: <em>empty</em>  </p>
+</li>
+</ul>
+<h2 id="getting_a_token_for_telegram">Getting a token for Telegram<a class="headerlink" href="#getting_a_token_for_telegram" title="Permanent link">&para;</a></h2>
+<p>Talk to <a href="https://core.telegram.org/bots#6-botfather">the botfather</a>.</p>
+<h2 id="identifying_the_target_chatschannels">Identifying the target chats/channels<a class="headerlink" href="#identifying_the_target_chatschannels" title="Permanent link">&para;</a></h2>
+<p>The <code>chats</code> param consists of one or more <code>Chat ID</code>s or <code>channel name</code>s. </p>
+<h3 id="public_channels">Public Channels<a class="headerlink" href="#public_channels" title="Permanent link">&para;</a></h3>
+<p>The channel names can be retrieved in the telegram client in the <code>Channel info</code> section for public channels. 
+Replace the <code>t.me/</code> prefix from the link with a <code>@</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Channels names need to be prefixed by <code>@</code> to identify them as such.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your channel only has an invite link (starting with <code>t.me/+</code>), you have to use it's Chat ID (see below)</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <code>message_thread_id</code> param (<a href="https://core.telegram.org/bots/api#sendmessage">reference</a>) can be added, with the format of <code>$chat_id:$message_thread_id</code>. <a href="https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418">More info</a> on how to obtain the <code>message_thread_id</code>.</p>
+</div>
+<h3 id="chats">Chats<a class="headerlink" href="#chats" title="Permanent link">&para;</a></h3>
+<p>Private channels, Group chats and private chats are identified by <code>Chat ID</code>s. Unfortunatly, they are generally not visible in the
+telegram clients.
+The easiest way to retrieve them is by using the <code>shoutrrr generate telegram</code> command which will guide you through
+creating a URL with your target chats.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can use the <code>containrrr/shoutrrr</code> image in docker to run it without download/installing the <code>shoutrrr</code> CLI using:
+<div class="highlight"><pre><span></span><code>docker run --rm -it containrrr/shoutrrr generate telegram
+</code></pre></div></p>
+</div>
+<h3 id="asking_shoutrrrbot">Asking @shoutrrrbot<a class="headerlink" href="#asking_shoutrrrbot" title="Permanent link">&para;</a></h3>
+<p>Another way of retrieving the Chat IDs, is by forwarding a message from the target chat to the <a href="https://t.me/shoutrrrbot">@shoutrrrbot</a>.
+It will reply with the Chat ID for the chat where the forwarded message was originally posted.
+Note that it will not work correctly for Group chats, as those messages are just seen as being posted by a user, not in a specific chat.
+Instead you can use the second method, which is to invite the @shoutrrrbot into your group chat and address a message to it (start the message with @shoutrrrbot). You can then safely kick the bot from the group. </p>
+<p>The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at <a href="https://github.com/containrrr/shoutrrrbot">github.com/containrrr/shoutrrrbot</a>.</p>
+<h2 id="optional_parameters">Optional parameters<a class="headerlink" href="#optional_parameters" title="Permanent link">&para;</a></h2>
+<p>You can optionally specify the <strong><code>notification</code></strong>, <strong><code>parseMode</code></strong> and <strong><code>preview</code></strong> parameters in the URL:  </p>
+<div class="admonition info">
+<p><pre>telegram://<strong><code>token</code></strong>@<strong><code>telegram</code></strong>/?channels=<strong><code>channel</code></strong>&amp;notification=no&amp;preview=false&amp;parseMode=html</pre></p>
+</div>
+<p>See <a href="https://core.telegram.org/bots/api#sendmessage">the telegram documentation</a> for more information.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>preview</code> and <code>notification</code> are inverted in regards to their API counterparts (<code>disable_web_page_preview</code> and <code>disable_notification</code>)</p>
+</div>
+<h3 id="parse_mode_and_title">Parse Mode and Title<a class="headerlink" href="#parse_mode_and_title" title="Permanent link">&para;</a></h3>
+<p>If a parse mode is specified, the message needs to be escaped as per the corresponding sections in
+<a href="https://core.telegram.org/bots/api#formatting-options">Formatting options</a>.</p>
+<p>When a title has been specified, it will be prepended to the message, but this is only supported for
+the <code>HTML</code> parse mode. Note that, if no parse mode is specified, the message will be escaped and sent using <code>HTML</code>.</p>
+<p>Since the markdown modes are really hard to escape correctly, it's recommended to stick to <code>HTML</code> parse mode.</p>
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6c7302c4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.7c5c0157.min.js"></script>
+      
+    
+  </body>
+</html>
