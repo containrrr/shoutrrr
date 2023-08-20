@@ -14,7 +14,8 @@ Using
 generic://example.com?@acceptLanguage=tlh-Piqd
 ```
 would result in the additional header being added:
-```http request
+
+```http
 Accept-Language: tlh-Piqd
 ```
 
