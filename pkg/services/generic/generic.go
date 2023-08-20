@@ -2,8 +2,6 @@ package generic
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -82,11 +80,14 @@ func (service *Service) doSend(config *Config, params types.Params) error {
 	if err == nil {
 		req.Header.Set("Content-Type", config.ContentType)
 		req.Header.Set("Accept", config.ContentType)
+		for key, value := range config.headers {
+			req.Header.Set(key, value)
+		}
 		var res *http.Response
 		res, err = http.DefaultClient.Do(req)
 		if res != nil && res.Body != nil {
 			defer res.Body.Close()
-			if body, errRead := ioutil.ReadAll(res.Body); errRead == nil {
+			if body, errRead := io.ReadAll(res.Body); errRead == nil {
 				service.Log("Server response: ", string(body))
 			}
 		}
@@ -103,6 +104,9 @@ func (service *Service) getPayload(config *Config, params types.Params) (io.Read
 	case "":
 		return bytes.NewBufferString(params[config.MessageKey]), nil
 	case "json", "JSON":
+		for key, value := range config.extraData {
+			params[key] = value
+		}
 		jsonBytes, err := json.Marshal(params)
 		if err != nil {
 			return nil, err
