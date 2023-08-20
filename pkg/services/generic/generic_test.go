@@ -2,7 +2,8 @@ package generic
 
 import (
 	"errors"
-	"io/ioutil"
+	"github.com/containrrr/shoutrrr/internal/testutils"
+	"io"
 	"log"
 	"net/url"
 	"testing"
@@ -13,6 +14,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/onsi/gomega/ghttp"
 )
 
 func TestGeneric(t *testing.T) {
@@ -67,6 +70,36 @@ var _ = Describe("the Generic service", func() {
 			whURL := config.WebhookURL().String()
 			Expect(whURL).To(Equal("https://example.com/?template=passed"))
 		})
+
+		When("the URL includes custom headers", func() {
+			It("should strip the headers from the webhook query", func() {
+				config, _ := testServiceURL("generic://example.com/?@authorization=frend")
+				Expect(config.WebhookURL().Query()).NotTo(HaveKey("@authorization"))
+				Expect(config.WebhookURL().Query()).NotTo(HaveKey("authorization"))
+			})
+			It("should add the headers to the config custom header map", func() {
+				config, _ := testServiceURL("generic://example.com/?@authorization=frend")
+				Expect(config.headers).To(HaveKeyWithValue("Authorization", "frend"))
+			})
+			When("header keys are in camelCase", func() {
+				It("should add headers with kebab-case keys", func() {
+					config, _ := testServiceURL("generic://example.com/?@userAgent=gozilla+1.0")
+					Expect(config.headers).To(HaveKeyWithValue("User-Agent", "gozilla 1.0"))
+				})
+			})
+		})
+
+		When("the URL includes extra data", func() {
+			It("should strip the extra data from the webhook query", func() {
+				config, _ := testServiceURL("generic://example.com/?$context=inside+joke")
+				Expect(config.WebhookURL().Query()).NotTo(HaveKey("$context"))
+				Expect(config.WebhookURL().Query()).NotTo(HaveKey("context"))
+			})
+			It("should add the extra data to the config extra data map", func() {
+				config, _ := testServiceURL("generic://example.com/?$context=inside+joke")
+				Expect(config.extraData).To(HaveKeyWithValue("context", "inside joke"))
+			})
+		})
 	})
 	When("retrieving the webhook URL", func() {
 		It("should build a valid webhook URL", func() {
@@ -110,7 +143,7 @@ var _ = Describe("the Generic service", func() {
 		})
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "generic://user:pass@host.tld/api/v1/webhook?__title=w&contenttype=a%2Fb&template=f&title=t"
+				testURL := "generic://user:pass@host.tld/api/v1/webhook?%24context=inside-joke&%40Authorization=frend&__title=w&contenttype=a%2Fb&template=f&title=t"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -142,7 +175,7 @@ var _ = Describe("the Generic service", func() {
 			It("should use the message as payload", func() {
 				payload, err := service.getPayload(&config, types.Params{"message": "test message"})
 				Expect(err).NotTo(HaveOccurred())
-				contents, err := ioutil.ReadAll(payload)
+				contents, err := io.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(Equal("test message"))
 			})
@@ -154,7 +187,7 @@ var _ = Describe("the Generic service", func() {
 				sendParams := createSendParams(&config, params, "test message")
 				payload, err := service.getPayload(&config, sendParams)
 				Expect(err).NotTo(HaveOccurred())
-				contents, err := ioutil.ReadAll(payload)
+				contents, err := io.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(MatchJSON(`{
 					"title":   "test title",
@@ -170,7 +203,7 @@ var _ = Describe("the Generic service", func() {
 					sendParams := createSendParams(&config, params, "test message")
 					payload, err := service.getPayload(&config, sendParams)
 					Expect(err).NotTo(HaveOccurred())
-					contents, err := ioutil.ReadAll(payload)
+					contents, err := io.ReadAll(payload)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(string(contents)).To(MatchJSON(`{
 						"header":   "test title",
@@ -189,7 +222,7 @@ var _ = Describe("the Generic service", func() {
 				config.Template = "news"
 				payload, err := service.getPayload(&config, params)
 				Expect(err).NotTo(HaveOccurred())
-				contents, err := ioutil.ReadAll(payload)
+				contents, err := io.ReadAll(payload)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(Equal("BREAKING NEWS ==> it's today!"))
 			})
@@ -200,7 +233,7 @@ var _ = Describe("the Generic service", func() {
 					config.Template = "arrows"
 					payload, err := service.getPayload(&config, types.Params{"message": "LOOK AT ME"})
 					Expect(err).NotTo(HaveOccurred())
-					contents, err := ioutil.ReadAll(payload)
+					contents, err := io.ReadAll(payload)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(string(contents)).To(Equal("==> LOOK AT ME <=="))
 				})
@@ -282,6 +315,72 @@ var _ = Describe("the Generic service", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(params).To(Equal(types.Params{"title": "TITLE"}))
+		})
+
+	})
+	Describe("the service upstream client", func() {
+		var server *ghttp.Server
+		var serverHost string
+		BeforeEach(func() {
+			server = ghttp.NewServer()
+			serverHost = testutils.URLMust(server.URL()).Host
+		})
+		AfterEach(func() {
+			server.Close()
+		})
+
+		When("custom headers are configured", func() {
+			It("should add those headers to the request", func() {
+				serviceURL := testutils.URLMust("generic://host.tld/webhook?disabletls=yes&@authorization=frend&@userAgent=gozilla+1.0")
+				serviceURL.Host = serverHost
+				Expect(service.Initialize(serviceURL, logger)).NotTo(HaveOccurred())
+
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/webhook"),
+						ghttp.VerifyHeaderKV("authorization", "frend"),
+						ghttp.VerifyHeaderKV("user-agent", "gozilla 1.0"),
+					),
+				)
+
+				Expect(service.Send("Message", nil)).NotTo(HaveOccurred())
+			})
+		})
+
+		When("extra data is configured", func() {
+			When("json template is used", func() {
+				It("should add those extra data fields to the request", func() {
+					serviceURL := testutils.URLMust("generic://host.tld/webhook?disabletls=yes&template=json&$context=inside+joke")
+					serviceURL.Host = serverHost
+					Expect(service.Initialize(serviceURL, logger)).NotTo(HaveOccurred())
+
+					server.AppendHandlers(
+						ghttp.CombineHandlers(
+							ghttp.VerifyRequest("POST", "/webhook"),
+							ghttp.VerifyJSONRepresenting(map[string]string{
+								"message": "Message",
+								"context": "inside joke",
+							}),
+						),
+					)
+
+					Expect(service.Send("Message", nil)).NotTo(HaveOccurred())
+				})
+			})
+		})
+	})
+	Describe("the normalized header key format", func() {
+		It("should match the format", func() {
+			Expect(normalizedHeaderKey("content-type")).To(Equal("Content-Type"))
+		})
+		It("should match the format", func() {
+			Expect(normalizedHeaderKey("contentType")).To(Equal("Content-Type"))
+		})
+		It("should match the format", func() {
+			Expect(normalizedHeaderKey("ContentType")).To(Equal("Content-Type"))
+		})
+		It("should match the format", func() {
+			Expect(normalizedHeaderKey("Content-Type")).To(Equal("Content-Type"))
 		})
 	})
 })
