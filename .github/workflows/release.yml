@@ -23,7 +23,7 @@ jobs:
         id: go-version
 
       - name: Set up Go ${{ steps.go-version.outputs.latest }}
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         id: go
         with:
           go-version: ${{ steps.go-version.outputs.latest }}
@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         name: Checkout repository
       - uses: snapcore/action-build@v1
         name: Build snap

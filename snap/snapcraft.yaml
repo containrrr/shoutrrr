@@ -1,6 +1,6 @@
 name: shoutrrr 
 base: core22 
-version: '0.6.1' 
+version: '0.7.1' 
 summary: Sending notifications made easy. 
 description: |
   Shoutrrr is a way of making the sending of notifications easy by standardizing it.
@@ -14,10 +14,12 @@ source-code: https://github.com/containrrr/shoutrrr
 type: app
 compression: lzo
 
-
 apps:
   shoutrrr:
     command: bin/shoutrrr
+    plugs:
+      - network
+      - network-observe
 
 parts:
   shoutrrr:

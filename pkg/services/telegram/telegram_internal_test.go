@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("the telegram service", func() {
@@ -58,6 +59,30 @@ var _ = Describe("the telegram service", func() {
 							Expect(payload.Text).To(ContainSubstring("Cool &amp; stuff"))
 							Expect(payload.Text).To(ContainSubstring("-&gt;"))
 						})
+					})
+				})
+			})
+
+			When("parsing URL that might have a message thread id", func() {
+				When("no thread id is provided", func() {
+					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
+					Expect(err).NotTo(HaveOccurred())
+					It("should have message_thread_id set to nil", func() {
+						Expect(payload.MessageThreadID).To(BeNil())
+					})
+				})
+				When("a numeric thread id is provided", func() {
+					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:10&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
+					Expect(err).NotTo(HaveOccurred())
+					It("should have message_thread_id set to 10", func() {
+						Expect(payload.MessageThreadID).To(PointTo(Equal(10)))
+					})
+				})
+				When("non-numeric thread id is provided", func() {
+					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:invalid&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
+					Expect(err).NotTo(HaveOccurred())
+					It("should have message_thread_id set to nil", func() {
+						Expect(payload.MessageThreadID).To(BeNil())
 					})
 				})
 			})

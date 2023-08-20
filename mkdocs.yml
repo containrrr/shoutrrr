@@ -54,6 +54,8 @@ nav:
       - Generic Webhook: 'services/generic.md'
   - Guides:
       - Slack: 'guides/slack/index.md'
+  - Examples:
+      - Generic Webhook: 'examples/generic.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
 
