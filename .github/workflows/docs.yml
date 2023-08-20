@@ -28,11 +28,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up Go 1.16
+      - name: Set up Go 1.18
         uses: actions/setup-go@v1
         id: go
         with:
-          go-version: 1.16
+          go-version: 1.18
 
       - name: Install mkdocs
         env:
@@ -67,4 +67,4 @@ jobs:
 
 
       - name: Deploy docs
-        run: mike deploy --push $(go run ./shoutrrr docs -V)
+        run: mike deploy --push --update-aliases $(go run ./shoutrrr docs -V) latest
