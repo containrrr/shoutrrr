@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.02b45acc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7c2e0b1b.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc776e4.min.css">
@@ -884,21 +884,10 @@ You're not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#json_template" class="md-nav__link">
+  <a href="#custom_headers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        JSON template
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shortcut_url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shortcut URL
+        Custom headers
       
     </span>
   </a>
@@ -1229,21 +1218,10 @@ You're not viewing the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#json_template" class="md-nav__link">
+  <a href="#custom_headers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        JSON template
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shortcut_url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shortcut URL
+        Custom headers
       
     </span>
   </a>
@@ -1325,20 +1303,44 @@ supports receiving the message via a POST request.
 Usually, this requires customization on the receiving end to interpret the payload that it receives, and might
 not be a viable approach.</p>
 <p>Common examples for use with service providers can be found under <a href="../../examples/generic/">examples</a>.</p>
-<h2 id="json_template">JSON template<a class="headerlink" href="#json_template" title="Permanent link">&para;</a></h2>
-<p>By using the built in <code>JSON</code> template (<code>template=json</code>) you can create a generic JSON payload. The keys used for <code>title</code> and <code>message</code> can be overriden
-by supplying the params/query values <code>titleKey</code> and <code>messageKey</code>.</p>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Oh no!&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The thing happened and now there is stuff all over the area!&quot;</span>
-<span class="p">}</span>
+<h2 id="custom_headers">Custom headers<a class="headerlink" href="#custom_headers" title="Permanent link">&para;</a></h2>
+<p>You can add additional HTTP headers to your request by adding query variables prefixed with <code>@</code> (<code>@key=value</code>).</p>
+<p>Using 
+<div class="highlight"><pre><span></span><code>generic://example.com?@acceptLanguage=tlh-Piqd
 </code></pre></div>
-</div>
-<h2 id="shortcut_url">Shortcut URL<a class="headerlink" href="#shortcut_url" title="Permanent link">&para;</a></h2>
-<p>You can just add <code>generic+</code> as a prefix to your target URL to use it with the generic service, so
-<div class="highlight"><pre><span></span><code>https://example.com/api/v1/postStuff
+would result in the additional header being added:
+```http request
+Accept-Language: tlh-Piqd
+<div class="highlight"><pre><span></span><code>## JSON template
+By using the built in `JSON` template (`template=json`) you can create a generic JSON payload. The keys used for `title` and `message` can be overriden
+by supplying the params/query values `titleKey` and `messageKey`.
+
+!!! example
+    ```json
+    {
+        &quot;title&quot;: &quot;Oh no!&quot;,
+        &quot;message&quot;: &quot;The thing happened and now there is stuff all over the area!&quot;
+    }
+    ```
+
+### Custom data fields
+When using the JSON template, you can add additional key/value pairs to the JSON object by adding query variables prefixed with `$` (`$key=value`).
+
+!!! example
+    Using `generic://example.com?$projection=retroazimuthal` would yield: 
+
+    ```json
+    {
+        &quot;title&quot;: &quot;Amazing opportunities!&quot;,
+        &quot;message&quot;: &quot;New map book available for purchase.&quot;,
+        &quot;projection&quot;: &quot;retroazimuthal&quot;
+    }
+    ```
+
+## Shortcut URL
+You can just add `generic+` as a prefix to your target URL to use it with the generic service, so
+```url
+https://example.com/api/v1/postStuff
 </code></pre></div>
 would become
 <div class="highlight"><pre><span></span><code>generic+https://example.com/api/v1/postStuff
