@@ -56,7 +56,7 @@ jobs:
 
       - name: Execute goreleaser
         run: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} CGO_ENABLED=0 goreleaser --debug --rm-dist
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} CGO_ENABLED=0 goreleaser --debug --clean
 
       - name: Enable experimental docker features
         run: |

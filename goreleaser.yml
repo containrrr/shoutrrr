@@ -7,22 +7,15 @@ build:
     - windows
   goarch:
     - amd64
-    - 386
+    - "386"
     - arm
     - arm64
   ignore:
     - goos: windows
       goarch: arm
 archives:
-  - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}'
+  - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     format: tar.gz
-    replacements:
-      arm: armhf
-      arm64: arm64v8
-      amd64: amd64
-      386: 386
-      darwin: macOS
-      linux: linux
     format_overrides:
       - goos: windows
         format: zip
@@ -35,7 +28,7 @@ dockers:
       - containrrr/shoutrrr:amd64-{{ .Version }}
       - containrrr/shoutrrr:amd64-latest
   - goos: linux
-    goarch: 386
+    goarch: "386"
     goarm: ''
     dockerfile: shoutrrr/Dockerfile
     image_templates:
