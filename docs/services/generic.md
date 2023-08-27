@@ -6,6 +6,19 @@ not be a viable approach.
 
 Common examples for use with service providers can be found under [examples](../examples/generic.md).
 
+## Custom headers
+You can add additional HTTP headers to your request by adding query variables prefixed with `@` (`@key=value`).
+
+Using 
+```url
+generic://example.com?@acceptLanguage=tlh-Piqd
+```
+would result in the additional header being added:
+
+```http
+Accept-Language: tlh-Piqd
+```
+
 ## JSON template
 By using the built in `JSON` template (`template=json`) you can create a generic JSON payload. The keys used for `title` and `message` can be overriden
 by supplying the params/query values `titleKey` and `messageKey`.
@@ -18,13 +31,27 @@ by supplying the params/query values `titleKey` and `messageKey`.
     }
     ```
 
+### Custom data fields
+When using the JSON template, you can add additional key/value pairs to the JSON object by adding query variables prefixed with `$` (`$key=value`).
+
+!!! example
+    Using `generic://example.com?$projection=retroazimuthal` would yield: 
+
+    ```json
+    {
+        "title": "Amazing opportunities!",
+        "message": "New map book available for purchase.",
+        "projection": "retroazimuthal"
+    }
+    ```
+
 ## Shortcut URL
 You can just add `generic+` as a prefix to your target URL to use it with the generic service, so
-```
+```url
 https://example.com/api/v1/postStuff
 ```
 would become
-```
+```url
 generic+https://example.com/api/v1/postStuff
 ```
 

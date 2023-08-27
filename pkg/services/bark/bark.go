@@ -57,6 +57,7 @@ func (service *Service) sendAPI(config *Config, message string) error {
 		Sound:     config.Sound,
 		Group:     config.Group,
 		Badge:     &config.Badge,
+		Icon:      config.Icon,
 	}
 	jsonClient := jsonclient.NewClient()
 
