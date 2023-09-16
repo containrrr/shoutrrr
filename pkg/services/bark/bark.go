@@ -58,6 +58,7 @@ func (service *Service) sendAPI(config *Config, message string) error {
 		Group:     config.Group,
 		Badge:     &config.Badge,
 		Icon:      config.Icon,
+		URL:       config.URL,
 	}
 	jsonClient := jsonclient.NewClient()
 
