@@ -205,7 +205,7 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 		return fail(FailOpenDataStream, err)
 	}
 
-	if err := writeHeaders(wc, service.getHeaders(toAddress, config.Subject)); err != nil {
+	if err := writeHeaders(wc, service.getHeaders(config, toAddress)); err != nil {
 		return err
 	}
 
@@ -227,21 +227,17 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 	return nil
 }
 
-func (service *Service) getHeaders(toAddress string, subject string) map[string]string {
-	conf := service.config
-
-	var contentType string
-	if conf.UseHTML {
+func (service *Service) getHeaders(config *Config, toAddress string) map[string]string {
+	contentType := contentPlain
+	if config.UseHTML {
 		contentType = fmt.Sprintf(contentMultipart, service.multipartBoundary)
-	} else {
-		contentType = contentPlain
 	}
 
 	return map[string]string{
-		"Subject":      subject,
+		"Subject":      config.Subject,
 		"Date":         time.Now().Format(time.RFC1123Z),
 		"To":           toAddress,
-		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
+		"From":         fmt.Sprintf("%s <%s>", config.FromName, config.FromAddress),
 		"MIME-version": "1.0",
 		"Content-Type": contentType,
 	}
