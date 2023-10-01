@@ -21,7 +21,7 @@ jobs:
     outputs:
       matrix: ${{ steps.versions.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: arnested/go-version-action@v1
         id: versions
   build:
@@ -40,7 +40,7 @@ jobs:
           check-latest: true
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build
         run: CGO_ENABLED=0 go build -v .
