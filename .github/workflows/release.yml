@@ -16,7 +16,7 @@ jobs:
       DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: arnested/go-version-action@v1
         id: go-version
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout repository
       - uses: snapcore/action-build@v1
         name: Build snap
