@@ -34,13 +34,13 @@ $ sudo snap install shoutrrr
 ### Using the Go CLI
 
 ```bash
-$ go install github.com/containrrr/shoutrrr@latest
+$ go install github.com/containrrr/shoutrrr/shoutrrr@latest
 ```
 
 ### From Source
 
 ```bash
-$ go build -o shoutrrr .
+$ go build -o shoutrrr ./shoutrrr
 ```
 
 ## Quick Start
