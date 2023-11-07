@@ -57,28 +57,36 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 }
 
 func doSend(message string, config *Config) error {
-	req, err := BuildRequestFromPayloadAndConfig(message, config)
-	if err != nil {
-		return err
+	var firstErr error
+
+	for _, room := range config.Rooms {
+		req, firstErr := BuildRequestFromPayloadAndConfig(message, room, config)
+		if firstErr != nil {
+			return firstErr
+		}
+
+		res, firstErr := http.DefaultClient.Do(req)
+
+		if res == nil && firstErr == nil {
+			firstErr = fmt.Errorf("unknown error")
+		}
+
+		if firstErr == nil && res.StatusCode != http.StatusOK {
+			firstErr = fmt.Errorf("response status code %s", res.Status)
+		}
+
+		if firstErr != nil {
+			return firstErr
+		}
 	}
 
-	res, err := http.DefaultClient.Do(req)
-
-	if res == nil && err == nil {
-		err = fmt.Errorf("unknown error")
-	}
-
-	if err == nil && res.StatusCode != http.StatusOK {
-		err = fmt.Errorf("response status code %s", res.Status)
-	}
-
-	return err
+	return firstErr
 }
 
-func BuildRequestFromPayloadAndConfig(message string, config *Config) (*http.Request, error) {
+func BuildRequestFromPayloadAndConfig(message string, room string, config *Config) (*http.Request, error) {
 	var err error
 	payload := MessagePayload{
-		RoomID:   config.RoomID,
+		RoomID:   room,
 		Markdown: message,
 	}
 

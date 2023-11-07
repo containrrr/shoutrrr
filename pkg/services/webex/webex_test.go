@@ -78,7 +78,7 @@ var _ = Describe("the webex service", func() {
 		})
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "webex://token@room"
+				testURL := "webex://token@webex?rooms=room"
 
 				url, err := url.Parse(testURL)
 				Expect(err).NotTo(HaveOccurred(), "parsing")
@@ -97,9 +97,10 @@ var _ = Describe("the webex service", func() {
 
 	Describe("sending the payload", func() {
 		var dummyConfig = Config{
-			RoomID:   "1",
 			BotToken: "dummyToken",
+			Rooms:    []string{"1", "2"},
 		}
+
 		var service Service
 		BeforeEach(func() {
 			httpmock.Activate()
@@ -108,32 +109,38 @@ var _ = Describe("the webex service", func() {
 				panic(fmt.Errorf("service initialization failed: %w", err))
 			}
 		})
+
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
+
 		It("should not report an error if the server accepts the payload", func() {
 			setupResponder(&dummyConfig, 200, "")
 
 			Expect(service.Send("Message", nil)).To(Succeed())
 		})
+
 		It("should report an error if the server response is not OK", func() {
 			setupResponder(&dummyConfig, 400, "")
 			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
 			Expect(service.Send("Message", nil)).NotTo(Succeed())
 		})
+
 		It("should report an error if the message is empty", func() {
 			setupResponder(&dummyConfig, 400, "")
 			Expect(service.Initialize(dummyConfig.GetURL(), logger)).To(Succeed())
 			Expect(service.Send("", nil)).NotTo(Succeed())
 		})
 	})
+
 	Describe("doing request", func() {
 		dummyConfig := &Config{
 			BotToken: "dummyToken",
+			Rooms:    []string{"1"},
 		}
 
 		It("should add authorization header", func() {
-			request, err := BuildRequestFromPayloadAndConfig("", dummyConfig)
+			request, err := BuildRequestFromPayloadAndConfig("", dummyConfig.Rooms[0], dummyConfig)
 
 			Expect(err).To(BeNil())
 			Expect(request.Header.Get("Authorization")).To(Equal("Bearer dummyToken"))
@@ -141,7 +148,7 @@ var _ = Describe("the webex service", func() {
 
 		// webex API rejects messages which do not define Content-Type
 		It("should add content type header", func() {
-			request, err := BuildRequestFromPayloadAndConfig("", dummyConfig)
+			request, err := BuildRequestFromPayloadAndConfig("", dummyConfig.Rooms[0], dummyConfig)
 
 			Expect(err).To(BeNil())
 			Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
