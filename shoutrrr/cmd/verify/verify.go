@@ -42,5 +42,5 @@ func Run(cmd *cobra.Command, _ []string) {
 	config := format.GetServiceConfig(service)
 	configNode := format.GetConfigFormat(config)
 
-	_, _ = fmt.Fprintf(color.Output, format.ColorFormatTree(configNode, true))
+	_, _ = fmt.Fprint(color.Output, format.ColorFormatTree(configNode, true))
 }

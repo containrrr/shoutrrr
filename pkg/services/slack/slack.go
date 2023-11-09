@@ -84,9 +84,10 @@ func (service *Service) sendAPI(config *Config, payload interface{}) error {
 
 func (service *Service) sendWebhook(config *Config, payload interface{}) error {
 	payloadBytes, err := json.Marshal(payload)
-	var res *http.Response
-	res, err = http.Post(config.Token.WebhookURL(), jsonclient.ContentType, bytes.NewBuffer(payloadBytes))
-
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload: %w", err)
+	}
+	res, err := http.Post(config.Token.WebhookURL(), jsonclient.ContentType, bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("failed to invoke webhook: %w", err)
 	}
