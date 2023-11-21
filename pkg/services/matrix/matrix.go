@@ -2,10 +2,11 @@ package matrix
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	t "github.com/containrrr/shoutrrr/pkg/types"
-	"net/url"
 )
 
 // Scheme is the identifying part of this service's configuration URL
@@ -49,7 +50,7 @@ func (s *Service) Send(message string, params *t.Params) error {
 
 	if len(errors) > 0 {
 		for _, err := range errors {
-			s.Logf("error sending message: %w", err)
+			s.Logf("error sending message: %v", err)
 		}
 		return fmt.Errorf("%v error(s) sending message, with initial error: %v", len(errors), errors[0])
 	}
