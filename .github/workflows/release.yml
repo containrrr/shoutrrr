@@ -22,7 +22,7 @@ jobs:
         id: go-version
 
       - name: Set up Go ${{ steps.go-version.outputs.latest }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         id: go
         with:
           go-version: ${{ steps.go-version.outputs.latest }}
