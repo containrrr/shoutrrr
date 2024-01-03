@@ -33,7 +33,7 @@ jobs:
         version: ${{ fromJSON(needs.go-versions.outputs.matrix) }}
     steps:
       - name: Set up Go ${{ matrix.version }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         id: go
         with:
           go-version: ${{ matrix.version }}
