@@ -28,5 +28,5 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | Service                           | Description                                                                                                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Logger](./logger.md)             | Writes notification to a configured go `log.Logger`                                                                                             |
-| [Generic Webhook](./generic.md)   | Sends notifications directly to a webhook                                                                                                       |
+| [Generic Webhook](./generic.md)   | *generic+https://`url`* to send notifications directly to a webhook                                                                                                   |
 
