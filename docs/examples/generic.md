@@ -17,3 +17,16 @@ generic://HAIPAddress:HAPort/api/webhook/WebhookIDFromHA?template=json&disabletl
 Then, in HA, use `{{ trigger.json.message }}` to get the message sent from the JSON.
 
 _Credit [@JeffCrum1](https://github.com/JeffCrum1), source: [https://github.com/containrrr/shoutrrr/issues/325#issuecomment-1460105065]_
+
+## Apprise
+
+The service URL needs to be:
+
+```
+generic://apprise-url/notify/devops?template=json&messagekey=body&title=title
+```
+
+And, if you need http://
+```
+generic://apprise-url/notify/devops?template=json&messagekey=body&title=title&disabletls=yes
+```
