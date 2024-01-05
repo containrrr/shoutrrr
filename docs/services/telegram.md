@@ -26,7 +26,7 @@ Replace the `t.me/` prefix from the link with a `@`.
     If your channel only has an invite link (starting with `t.me/+`), you have to use it's Chat ID (see below)
 
 !!! note
-    A `message_thread_id` param ([reference](https://core.telegram.org/bots/api#sendmessage)) can be added, with the format of `$chat_id:$message_thread_id`. [More info](https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418) on how to obtain the `message_thread_id`.
+    A `message_thread_id` param ([reference](https://core.telegram.org/bots/api#sendmessage)) can be added, with the format of `/?channels=$chat_id:$message_thread_id`. [More info](https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418) on how to obtain the `message_thread_id`.
 
 ### Chats
 Private channels, Group chats and private chats are identified by `Chat ID`s. Unfortunatly, they are generally not visible in the
