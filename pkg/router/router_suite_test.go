@@ -57,9 +57,21 @@ var _ = Describe("the router suite", func() {
 
 	When("initializing a service with a custom URL", func() {
 		It("should return an error if the service does not support it", func() {
-			service, err := sr.initService("log+https://hybr.is")
+			service, scheme, err := sr.initService("logger+https://hybr.is")
 			Expect(err).To(HaveOccurred())
+			Expect(scheme).To(Equal("logger"))
 			Expect(service).To(BeNil())
+		})
+	})
+
+	When("listing added services", func() {
+		When("multiple instances of the same service have been added", func() {
+			It("should return a list with unique identifiers for those services", func() {
+				Expect(sr.AddService("logger://")).To(Succeed())
+				Expect(sr.AddService("logger://")).To(Succeed())
+				Expect(sr.AddService("logger://")).To(Succeed())
+				Expect(sr.ListAddedServices()).To(ConsistOf("logger", "logger2", "logger3"))
+			})
 		})
 	})
 
@@ -83,13 +95,15 @@ var _ = Describe("the router suite", func() {
 
 	When("initializing a service with a custom URL", func() {
 		It("should return an error if the service does not support it", func() {
-			service, err := sr.initService("log+https://hybr.is")
+			service, scheme, err := sr.initService("logger+https://hybr.is")
 			Expect(err).To(HaveOccurred())
+			Expect(scheme).To(Equal("logger"))
 			Expect(service).To(BeNil())
 		})
 		It("should successfully init a service that does support it", func() {
-			service, err := sr.initService(mockCustomURL)
+			service, scheme, err := sr.initService(mockCustomURL)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(scheme).To(Equal("teams"))
 			Expect(service).NotTo(BeNil())
 		})
 	})
@@ -120,7 +134,7 @@ var _ = Describe("the router suite", func() {
 	When("router has not been provided a logger", func() {
 		It("should not crash when trying to log", func() {
 			router := ServiceRouter{}
-			_, err := router.initService(mockCustomURL)
+			_, _, err := router.initService(mockCustomURL)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
