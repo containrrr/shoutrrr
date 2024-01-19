@@ -71,7 +71,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return fail(FailApplySendParams, err)
 	}
 
-	client, err := getClientConnection(service.config)
+	client, err := getClientConnection(&config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -206,7 +206,7 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 		return fail(FailOpenDataStream, err)
 	}
 
-	if err := writeHeaders(wc, service.getHeaders(toAddress, config.Subject)); err != nil {
+	if err := writeHeaders(wc, service.getHeaders(toAddress, config)); err != nil {
 		return err
 	}
 
@@ -228,9 +228,7 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 	return nil
 }
 
-func (service *Service) getHeaders(toAddress string, subject string) map[string]string {
-	conf := service.config
-
+func (service *Service) getHeaders(toAddress string, conf *Config) map[string]string {
 	var contentType string
 	if conf.UseHTML {
 		contentType = fmt.Sprintf(contentMultipart, service.multipartBoundary)
@@ -239,7 +237,7 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 	}
 
 	return map[string]string{
-		"Subject":      subject,
+		"Subject":      conf.Subject,
 		"Date":         time.Now().Format(time.RFC1123Z),
 		"To":           toAddress,
 		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
