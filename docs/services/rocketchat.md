@@ -23,8 +23,8 @@
 
 6. Format the service URL
 ```
-rocketchat://your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX
-                             └────────────────────────────────────────────────────────────────┘
+rocketchat://your-domain.com/hooks/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX
+                                   └────────────────────────────────────────────────────────────────┘
                                                            token
 ```
 
@@ -35,12 +35,12 @@ Rocket.chat provides functionality to post as another user or to another channel
 To do this, you can add a *sender* and/or *channel* / *receiver* to the service URL.
 
 ```
-rocketchat://shoutrrrUser@your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/shoutrrrChannel
-             └──────────┘                 └────────────────────────────────────────────────────────────────┘ └─────────────┘
+rocketchat://shoutrrrUser@your-domain.com/hooks/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/shoutrrrChannel
+             └──────────┘                       └────────────────────────────────────────────────────────────────┘ └─────────────┘
                 sender                                                   token                                   channel
 
-rocketchat://shoutrrrUser@your-domain.com/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/@shoutrrrReceiver
-             └──────────┘                 └────────────────────────────────────────────────────────────────┘ └───────────────┘
+rocketchat://shoutrrrUser@your-domain.com/hooks/8eGdRzc9r4YYNyvge/2XYQcX9NBwJBKfQnphpebPcnXZcPEi32Nt4NKJfrnbhsbRfX/@shoutrrrReceiver
+             └──────────┘                       └────────────────────────────────────────────────────────────────┘ └───────────────┘
                 sender                                                   token                                    receiver
 ```
 
