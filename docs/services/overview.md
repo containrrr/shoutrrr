@@ -22,6 +22,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Teams](./teams.md)               | *teams://__`group`__@__`tenant`__/__`altId`__/__`groupOwner`__?host=__`organization`__.webhook.office.com*                                      |
 | [Telegram](./telegram.md)         | *telegram://__`token`__@telegram?chats=__`@channel-1`__[,__`chat-id-1`__,...]*                                                                  |
 | [Zulip Chat](./zulip.md)          | *zulip://__`bot-mail`__:__`bot-key`__@__`zulip-domain`__/?stream=__`name-or-id`__&topic=__`name`__*                                             |
+| [Lark](./lark.md)                 | *lark://__`host`__/__`token`__?secret=__`secret`__*                                                                                             |
 
 ## Specialized services
 
