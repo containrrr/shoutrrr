@@ -13,5 +13,6 @@ func (e *apiResponse) Error() string {
 	if e.Link != "" {
 		return msg + ", see: " + e.Link
 	}
+
 	return msg
 }

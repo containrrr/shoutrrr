@@ -6,87 +6,85 @@ import (
 	"log"
 	"net/url"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gstruct"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("the telegram service", func() {
+var _ = ginkgo.Describe("the telegram service", func() {
 	var logger *log.Logger
 
-	BeforeEach(func() {
-		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
+	ginkgo.BeforeEach(func() {
+		logger = log.New(ginkgo.GinkgoWriter, "Test", log.LstdFlags)
 	})
 
-	Describe("creating configurations", func() {
-		When("given an url", func() {
-
-			When("a parse mode is not supplied", func() {
-				It("no parse_mode should be present in payload", func() {
+	ginkgo.Describe("creating configurations", func() {
+		ginkgo.When("given an url", func() {
+			ginkgo.When("a parse mode is not supplied", func() {
+				ginkgo.It("no parse_mode should be present in payload", func() {
 					payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1", "Message", logger)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(payload).NotTo(ContainSubstring("parse_mode"))
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					gomega.Expect(payload).NotTo(gomega.ContainSubstring("parse_mode"))
 				})
 			})
 
-			When("a parse mode is supplied", func() {
-				When("it's set to a valid mode and not None", func() {
-					It("parse_mode should be present in payload", func() {
+			ginkgo.When("a parse mode is supplied", func() {
+				ginkgo.When("it's set to a valid mode and not None", func() {
+					ginkgo.It("parse_mode should be present in payload", func() {
 						payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&parsemode=Markdown", "Message", logger)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(payload).To(ContainSubstring("parse_mode"))
+						gomega.Expect(err).NotTo(gomega.HaveOccurred())
+						gomega.Expect(payload).To(gomega.ContainSubstring("parse_mode"))
 					})
 				})
-				When("it's set to None", func() {
-					When("no title has been provided", func() {
-						It("no parse_mode should be present in payload", func() {
+				ginkgo.When("it's set to None", func() {
+					ginkgo.When("no title has been provided", func() {
+						ginkgo.It("no parse_mode should be present in payload", func() {
 							payload, err := getPayloadStringFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&parsemode=None", "Message", logger)
-							Expect(err).NotTo(HaveOccurred())
-							Expect(payload).NotTo(ContainSubstring("parse_mode"))
+							gomega.Expect(err).NotTo(gomega.HaveOccurred())
+							gomega.Expect(payload).NotTo(gomega.ContainSubstring("parse_mode"))
 						})
 					})
-					When("a title has been provided", func() {
+					ginkgo.When("a title has been provided", func() {
 						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
-						Expect(err).NotTo(HaveOccurred())
-						It("should have parse_mode set to HTML", func() {
-							Expect(payload.ParseMode).To(Equal("HTML"))
+						gomega.Expect(err).NotTo(gomega.HaveOccurred())
+						ginkgo.It("should have parse_mode set to HTML", func() {
+							gomega.Expect(payload.ParseMode).To(gomega.Equal("HTML"))
 						})
-						It("should contain the title prepended in the message", func() {
-							Expect(payload.Text).To(ContainSubstring("MessageTitle"))
+						ginkgo.It("should contain the title prepended in the message", func() {
+							gomega.Expect(payload.Text).To(gomega.ContainSubstring("MessageTitle"))
 						})
-						It("should escape the message HTML tags", func() {
-							Expect(payload.Text).To(ContainSubstring("&lt;3"))
-							Expect(payload.Text).To(ContainSubstring("Cool &amp; stuff"))
-							Expect(payload.Text).To(ContainSubstring("-&gt;"))
+						ginkgo.It("should escape the message HTML tags", func() {
+							gomega.Expect(payload.Text).To(gomega.ContainSubstring("&lt;3"))
+							gomega.Expect(payload.Text).To(gomega.ContainSubstring("Cool &amp; stuff"))
+							gomega.Expect(payload.Text).To(gomega.ContainSubstring("-&gt;"))
 						})
 					})
 				})
 			})
 
-			When("parsing URL that might have a message thread id", func() {
-				When("no thread id is provided", func() {
+			ginkgo.When("parsing URL that might have a message thread id", func() {
+				ginkgo.When("no thread id is provided", func() {
 					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
-					Expect(err).NotTo(HaveOccurred())
-					It("should have message_thread_id set to nil", func() {
-						Expect(payload.MessageThreadID).To(BeNil())
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					ginkgo.It("should have message_thread_id set to nil", func() {
+						gomega.Expect(payload.MessageThreadID).To(gomega.BeNil())
 					})
 				})
-				When("a numeric thread id is provided", func() {
+				ginkgo.When("a numeric thread id is provided", func() {
 					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:10&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
-					Expect(err).NotTo(HaveOccurred())
-					It("should have message_thread_id set to 10", func() {
-						Expect(payload.MessageThreadID).To(PointTo(Equal(10)))
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					ginkgo.It("should have message_thread_id set to 10", func() {
+						gomega.Expect(payload.MessageThreadID).To(gstruct.PointTo(gomega.Equal(10)))
 					})
 				})
-				When("non-numeric thread id is provided", func() {
+				ginkgo.When("non-numeric thread id is provided", func() {
 					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:invalid&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
-					Expect(err).NotTo(HaveOccurred())
-					It("should have message_thread_id set to nil", func() {
-						Expect(payload.MessageThreadID).To(BeNil())
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					ginkgo.It("should have message_thread_id set to nil", func() {
+						gomega.Expect(payload.MessageThreadID).To(gomega.BeNil())
 					})
 				})
 			})
-
 		})
 	})
 })
@@ -103,12 +101,11 @@ func getPayloadFromURL(testURL string, message string, logger *log.Logger) (Send
 		return SendMessagePayload{}, err
 	}
 
-	if len(telegram.config.Chats) < 1 {
+	if len(telegram.Config.Chats) < 1 {
 		return SendMessagePayload{}, errors.New("no channels were supplied")
 	}
 
-	return createSendMessagePayload(message, telegram.config.Chats[0], telegram.config), nil
-
+	return createSendMessagePayload(message, telegram.Config.Chats[0], telegram.Config), nil
 }
 
 func getPayloadStringFromURL(testURL string, message string, logger *log.Logger) ([]byte, error) {
@@ -118,5 +115,6 @@ func getPayloadStringFromURL(testURL string, message string, logger *log.Logger)
 	}
 
 	raw, err := json.Marshal(payload)
+
 	return raw, err
 }

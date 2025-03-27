@@ -3,18 +3,19 @@ package basic
 import (
 	"bufio"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/fatih/color"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
-// Generator is the Basic Generator implementation
+// Generator is the Basic Generator implementation.
 type Generator struct{}
 
-// Generate generates a service URL from a set of user questions/answers
+// Generate generates a service URL from a set of user questions/answers.
 func (g *Generator) Generate(service types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	fmt.Println("Enter the configuration values as prompted")
 	fmt.Println()
@@ -29,7 +30,9 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 
 	for _, item := range configNode.Items {
 		field := item.Field()
+
 		var inputValue string
+
 		valueValid := false
 
 		for !valueValid {
@@ -61,6 +64,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 			if len(inputValue) == 0 {
 				if field.Required {
 					_, _ = fmt.Fprint(color.Output, "Field ", color.HiCyanString(field.Name), " is required!\n\n")
+
 					continue
 				} else {
 					// Use the default value instead of the user input
@@ -68,6 +72,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 					if len(inputValue) == 0 {
 						// No default value is specified, leave it uninitialized
 						valueValid = true
+
 						continue
 					}
 				}
@@ -81,9 +86,7 @@ func (g *Generator) Generate(service types.Service, props map[string]string, _ [
 			if err != nil {
 				_, _ = fmt.Fprint(color.Output, "Invalid format for field ", color.HiCyanString(field.Name), ": ", err.Error(), "\n\n")
 			}
-
 		}
-
 	}
 
 	return configPtr.Interface().(types.ServiceConfig), nil

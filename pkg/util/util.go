@@ -1,25 +1,27 @@
 package util
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 )
 
-// Min returns the smallest of a and b
+// Min returns the smallest of a and b.
 func Min(a int, b int) int {
 	if a < b {
 		return a
 	}
+
 	return b
 }
 
-// Max returns the largest of a and b
+// Max returns the largest of a and b.
 func Max(a int, b int) int {
 	if a > b {
 		return a
 	}
+
 	return b
 }
 
-// DiscardLogger is a logger that discards any output written to it
-var DiscardLogger = log.New(ioutil.Discard, "", 0)
+// DiscardLogger is a logger that discards any output written to it.
+var DiscardLogger = log.New(io.Discard, "", 0)

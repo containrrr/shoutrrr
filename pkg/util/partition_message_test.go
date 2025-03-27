@@ -5,55 +5,54 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/types"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 )
 
-var _ = Describe("Partition Message", func() {
+var _ = ginkgo.Describe("Partition Message", func() {
 	limits := types.MessageLimit{
 		ChunkSize:      2000,
 		TotalChunkSize: 6000,
 		ChunkCount:     10,
 	}
-	When("given a message that exceeds the max length", func() {
-		When("not splitting by lines", func() {
-			It("should return a payload with chunked messages", func() {
-
+	ginkgo.When("given a message that exceeds the max length", func() {
+		ginkgo.When("not splitting by lines", func() {
+			ginkgo.It("should return a payload with chunked messages", func() {
 				items, _ := testPartitionMessage(42, limits, 100)
 
-				Expect(len(items[0].Text)).To(Equal(1994))
-				Expect(len(items[1].Text)).To(Equal(1999))
-				Expect(len(items[2].Text)).To(Equal(205))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(1994))
+				gomega.Expect(len(items[1].Text)).To(gomega.Equal(1999))
+				gomega.Expect(len(items[2].Text)).To(gomega.Equal(205))
 			})
-			It("omit characters above total max", func() {
+			ginkgo.It("omit characters above total max", func() {
 				items, _ := testPartitionMessage(62, limits, 100)
 
-				Expect(len(items[0].Text)).To(Equal(1994))
-				Expect(len(items[1].Text)).To(Equal(1999))
-				Expect(len(items[2].Text)).To(Equal(1999))
-				Expect(len(items[3].Text)).To(Equal(5))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(1994))
+				gomega.Expect(len(items[1].Text)).To(gomega.Equal(1999))
+				gomega.Expect(len(items[2].Text)).To(gomega.Equal(1999))
+				gomega.Expect(len(items[3].Text)).To(gomega.Equal(5))
 			})
-			It("should handle messages with a size modulus of chunksize", func() {
+			ginkgo.It("should handle messages with a size modulus of chunksize", func() {
 				items, _ := testPartitionMessage(20, limits, 100)
 				// Last word fits in the chunk size
-				Expect(len(items[0].Text)).To(Equal(2000))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(2000))
 
 				items, _ = testPartitionMessage(40, limits, 100)
 				// Now the last word of the first chunk will be concatenated with
 				// the first word of the second chunk, and so it does not fit in the chunk anymore
-				Expect(len(items[0].Text)).To(Equal(1994))
-				Expect(len(items[1].Text)).To(Equal(1999))
-				Expect(len(items[2].Text)).To(Equal(5))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(1994))
+				gomega.Expect(len(items[1].Text)).To(gomega.Equal(1999))
+				gomega.Expect(len(items[2].Text)).To(gomega.Equal(5))
 			})
-			When("the message is empty", func() {
-				It("should return no items", func() {
+			ginkgo.When("the message is empty", func() {
+				ginkgo.It("should return no items", func() {
 					items, _ := testPartitionMessage(0, limits, 100)
-					Expect(items).To(BeEmpty())
+					gomega.Expect(items).To(gomega.BeEmpty())
 				})
 			})
-			When("given an input without whitespace", func() {
-				It("should not crash, regardless of length", func() {
+			ginkgo.When("given an input without whitespace", func() {
+				ginkgo.It("should not crash, regardless of length", func() {
 					unalignedLimits := types.MessageLimit{
 						ChunkSize:      1997,
 						ChunkCount:     11,
@@ -69,7 +68,7 @@ var _ = Describe("Partition Message", func() {
 						for ii, item := range items {
 							expectedSize := unalignedLimits.ChunkSize
 
-							// The last chunk might be smaller than the preceeding chunks
+							// The last chunk might be smaller than the preceding chunks
 							if ii == len(items)-1 {
 								// the chunk size is the remainder of, the total size,
 								// or the max size, whatever is smallest,
@@ -91,50 +90,50 @@ var _ = Describe("Partition Message", func() {
 									expectedLen := Min(inputLen, unalignedLimits.TotalChunkSize)
 									expectedVal := (expectedLen - runeOffset) % 16
 
-									Expect(err).ToNot(HaveOccurred())
-									Expect(runeVal).To(Equal(int64(expectedVal)))
+									gomega.Expect(err).ToNot(gomega.HaveOccurred())
+									gomega.Expect(runeVal).To(gomega.Equal(int64(expectedVal)))
 								}
 							}
 
 							included += len(item.Text)
-							Expect(item.Text).To(HaveLen(expectedSize))
+							gomega.Expect(item.Text).To(gomega.HaveLen(expectedSize))
 						}
-						Expect(omitted + included).To(Equal(inputLen))
+						gomega.Expect(omitted + included).To(gomega.Equal(inputLen))
 
 					}
 				})
 			})
 		})
-		When("splitting by lines", func() {
-			It("should return a payload with chunked messages", func() {
+		ginkgo.When("splitting by lines", func() {
+			ginkgo.It("should return a payload with chunked messages", func() {
 				batches := testMessageItemsFromLines(18, limits, 2)
 				items := batches[0]
 
-				Expect(len(items[0].Text)).To(Equal(200))
-				Expect(len(items[8].Text)).To(Equal(200))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(200))
+				gomega.Expect(len(items[8].Text)).To(gomega.Equal(200))
 			})
-			When("the message items exceed the limits", func() {
-				It("should split items into multiple batches", func() {
+			ginkgo.When("the message items exceed the limits", func() {
+				ginkgo.It("should split items into multiple batches", func() {
 					batches := testMessageItemsFromLines(21, limits, 2)
 
 					for b, chunks := range batches {
-						fmt.Fprintf(GinkgoWriter, "Batch #%v: (%v chunks)\n", b, len(chunks))
+						fmt.Fprintf(ginkgo.GinkgoWriter, "Batch #%v: (%v chunks)\n", b, len(chunks))
 						for c, chunk := range chunks {
-							fmt.Fprintf(GinkgoWriter, " - Chunk #%v: (%v runes)\n", c, len(chunk.Text))
+							fmt.Fprintf(ginkgo.GinkgoWriter, " - Chunk #%v: (%v runes)\n", c, len(chunk.Text))
 						}
 					}
 
-					Expect(len(batches)).To(Equal(2))
+					gomega.Expect(len(batches)).To(gomega.Equal(2))
 				})
 			})
-			It("should trim characters above chunk size", func() {
+			ginkgo.It("should trim characters above chunk size", func() {
 				hundreds := 42
 				repeat := 21
 				batches := testMessageItemsFromLines(hundreds, limits, repeat)
 				items := batches[0]
 
-				Expect(len(items[0].Text)).To(Equal(limits.ChunkSize))
-				Expect(len(items[1].Text)).To(Equal(limits.ChunkSize))
+				gomega.Expect(len(items[0].Text)).To(gomega.Equal(limits.ChunkSize))
+				gomega.Expect(len(items[1].Text)).To(gomega.Equal(limits.ChunkSize))
 			})
 		})
 	})
@@ -143,15 +142,17 @@ var _ = Describe("Partition Message", func() {
 const hundredChars = "this string is exactly (to the letter) a hundred characters long which will make the send func error"
 
 func testMessageItemsFromLines(hundreds int, limits types.MessageLimit, repeat int) (batches [][]types.MessageItem) {
-
 	builder := strings.Builder{}
 
 	ri := 0
+
 	for i := 0; i < hundreds; i++ {
 		builder.WriteString(hundredChars)
+
 		ri++
 		if ri == repeat {
 			builder.WriteRune('\n')
+
 			ri = 0
 		}
 	}
@@ -173,7 +174,7 @@ func testPartitionMessage(hundreds int, limits types.MessageLimit, distance int)
 	contentSize := Min(hundreds*100, limits.TotalChunkSize)
 	expectedOmitted := Max(0, (hundreds*100)-contentSize)
 
-	ExpectWithOffset(0, omitted).To(Equal(expectedOmitted))
+	gomega.ExpectWithOffset(0, omitted).To(gomega.Equal(expectedOmitted))
 
 	return
 }

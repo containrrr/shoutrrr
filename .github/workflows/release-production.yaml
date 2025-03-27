@@ -1,0 +1,37 @@
+name: Release (Production)
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  packages: write
+  attestations: write
+  id-token: write
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yaml
+
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  build:
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    needs:
+      - test
+
+  renew-docs:
+    name: Refresh pkg.go.dev
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull new module version
+        uses: nicholas-fedor/go-proxy-pull-action@96d97dd65179161a3d0a38e65a49ebfd55dcfd69
+        with:
+          goproxy: https://proxy.golang.org
+          import_path: github.com/nicholas-fedor/shoutrrr

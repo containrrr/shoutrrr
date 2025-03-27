@@ -2,13 +2,14 @@ package join
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/standard"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
 const (
@@ -16,16 +17,17 @@ const (
 	contentType = "text/plain"
 )
 
-// Service providing the notification service Pushover
+// Service providing the notification service Pushover.
 type Service struct {
 	standard.Standard
-	config *Config
+	Config *Config
 	pkr    format.PropKeyResolver
 }
 
-// Send a notification message to Pushover
+// Send a notification message to Pushover.
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config
+	config := service.Config
+
 	if params == nil {
 		params = &types.Params{}
 	}
@@ -46,7 +48,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 }
 
 func (service *Service) sendToDevices(devices string, message string, title string, icon string) error {
-	config := service.config
+	config := service.Config
 
 	apiURL, err := url.Parse(hookURL)
 	if err != nil {
@@ -72,7 +74,6 @@ func (service *Service) sendToDevices(devices string, message string, title stri
 		apiURL.String(),
 		contentType,
 		nil)
-
 	if err != nil {
 		return err
 	}
@@ -84,14 +85,20 @@ func (service *Service) sendToDevices(devices string, message string, title stri
 	return nil
 }
 
-// Initialize loads ServiceConfig from configURL and sets logger for this Service
+// Initialize loads ServiceConfig from configURL and sets logger for this Service.
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
-	service.pkr = format.NewPropKeyResolver(service.config)
-	if err := service.config.setURL(&service.pkr, configURL); err != nil {
+	service.Config = &Config{}
+	service.pkr = format.NewPropKeyResolver(service.Config)
+
+	if err := service.Config.setURL(&service.pkr, configURL); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// GetID returns the service identifier.
+func (service *Service) GetID() string {
+	return Scheme
 }

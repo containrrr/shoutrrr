@@ -1,18 +1,21 @@
 package format
 
 import (
-	r "reflect"
+	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util"
 )
 
-// FieldInfo is the meta data about a config field
+// DefaultBase represents the default numeric base (decimal) for fields.
+const DefaultBase = 10
+
+// FieldInfo is the meta data about a config field.
 type FieldInfo struct {
 	Name          string
-	Type          r.Type
+	Type          reflect.Type
 	EnumFormatter types.EnumFormatter
 	Description   string
 	DefaultValue  string
@@ -25,28 +28,28 @@ type FieldInfo struct {
 	ItemSeparator rune
 }
 
-// IsEnum returns whether a EnumFormatter has been assigned to the field and that it is of a suitable type
+// IsEnum returns whether a EnumFormatter has been assigned to the field and that it is of a suitable type.
 func (fi *FieldInfo) IsEnum() bool {
-	return fi.EnumFormatter != nil && fi.Type.Kind() == r.Int
+	return fi.EnumFormatter != nil && fi.Type.Kind() == reflect.Int
 }
 
-// IsURLPart returns whether the field is serialized as the specified part of an URL
+// IsURLPart returns whether the field is serialized as the specified part of an URL.
 func (fi *FieldInfo) IsURLPart(part URLPart) bool {
 	for _, up := range fi.URLParts {
 		if up == part {
 			return true
 		}
 	}
+
 	return false
 }
 
-func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter) []FieldInfo {
-
+func getStructFieldInfo(structType reflect.Type, enums map[string]types.EnumFormatter) []FieldInfo {
 	numFields := structType.NumField()
 	fields := make([]FieldInfo, 0, numFields)
 	maxKeyLen := 0
 
-	for i := 0; i < numFields; i++ {
+	for i := range numFields {
 		fieldDef := structType.Field(i)
 
 		if isHiddenField(fieldDef) {
@@ -105,6 +108,7 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 		}
 
 		fields = append(fields, info)
+
 		keyLen := len(fieldDef.Name)
 		if keyLen > maxKeyLen {
 			maxKeyLen = keyLen
@@ -114,11 +118,11 @@ func getStructFieldInfo(structType r.Type, enums map[string]types.EnumFormatter)
 	return fields
 }
 
-func isHiddenField(field r.StructField) bool {
+func isHiddenField(field reflect.StructField) bool {
 	return field.Anonymous || strings.ToUpper(field.Name[0:1]) != field.Name[0:1]
 }
 
-func getFieldBase(field r.StructField) int {
+func getFieldBase(field reflect.StructField) int {
 	if tag, ok := field.Tag.Lookup("base"); ok {
 		if base, err := strconv.ParseUint(tag, 10, 8); err == nil {
 			return int(base)
@@ -126,5 +130,5 @@ func getFieldBase(field r.StructField) int {
 	}
 
 	// Default to base 10 if not tagged
-	return 10
+	return DefaultBase
 }

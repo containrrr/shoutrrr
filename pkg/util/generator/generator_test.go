@@ -2,20 +2,20 @@ package generator_test
 
 import (
 	"fmt"
-	re "regexp"
+	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/containrrr/shoutrrr/pkg/util/generator"
 	"github.com/mattn/go-colorable"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util/generator"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 )
 
 func TestGenerator(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Generator Suite")
+	gomega.RegisterFailHandler(ginkgo.Fail)
+	ginkgo.RunSpecs(t, "Generator Suite")
 }
 
 var (
@@ -24,7 +24,7 @@ var (
 	userIn  *gbytes.Buffer
 )
 
-func mockTyped(a ...interface{}) {
+func mockTyped(a ...any) {
 	_, _ = fmt.Fprint(userOut, a...)
 	_, _ = fmt.Fprint(userOut, "\n")
 }
@@ -33,20 +33,21 @@ func dumpBuffers() {
 	for _, line := range strings.Split(string(userIn.Contents()), "\n") {
 		println(">", line)
 	}
+
 	for _, line := range strings.Split(string(userOut.Contents()), "\n") {
 		println("<", line)
 	}
 }
 
-var _ = Describe("GeneratorCommon", func() {
-	BeforeEach(func() {
+var _ = ginkgo.Describe("GeneratorCommon", func() {
+	ginkgo.BeforeEach(func() {
 		userOut = gbytes.NewBuffer()
 		userIn = gbytes.NewBuffer()
 		userInMono := colorable.NewNonColorable(userIn)
 		client = generator.NewUserDialog(userOut, userInMono, map[string]string{"propKey": "propVal"})
 	})
 
-	It("reprompt upon invalid answers", func() {
+	ginkgo.It("reprompt upon invalid answers", func() {
 		defer dumpBuffers()
 		answer := make(chan string)
 		go func() {
@@ -56,91 +57,91 @@ var _ = Describe("GeneratorCommon", func() {
 		mockTyped("")
 		mockTyped("Normal Human Name")
 
-		Eventually(userIn).Should(gbytes.Say(`name: `))
+		gomega.Eventually(userIn).Should(gbytes.Say(`name: `))
 
-		Eventually(userIn).Should(gbytes.Say(`field is required`))
-		Eventually(userIn).Should(gbytes.Say(`name: `))
-		Eventually(answer).Should(Receive(Equal("Normal Human Name")))
+		gomega.Eventually(userIn).Should(gbytes.Say(`field is required`))
+		gomega.Eventually(userIn).Should(gbytes.Say(`name: `))
+		gomega.Eventually(answer).Should(gomega.Receive(gomega.Equal("Normal Human Name")))
 	})
 
-	It("should accept any input when validator is nil", func() {
+	ginkgo.It("should accept any input when validator is nil", func() {
 		defer dumpBuffers()
 		answer := make(chan string)
 		go func() {
 			answer <- client.QueryString("name:", nil, "")
 		}()
 		mockTyped("")
-		Eventually(answer).Should(Receive(BeEmpty()))
+		gomega.Eventually(answer).Should(gomega.Receive(gomega.BeEmpty()))
 	})
 
-	It("should use predefined prop value if key is present", func() {
+	ginkgo.It("should use predefined prop value if key is present", func() {
 		defer dumpBuffers()
 		answer := make(chan string)
 		go func() {
 			answer <- client.QueryString("name:", generator.Required, "propKey")
 		}()
-		Eventually(answer).Should(Receive(Equal("propVal")))
+		gomega.Eventually(answer).Should(gomega.Receive(gomega.Equal("propVal")))
 	})
 
-	Describe("Query", func() {
-		It("should prompt until a valid answer is provided", func() {
+	ginkgo.Describe("Query", func() {
+		ginkgo.It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan []string)
 			query := "pick foo or bar:"
 			go func() {
-				answer <- client.Query(query, re.MustCompile("(foo|bar)"), "")
+				answer <- client.Query(query, regexp.MustCompile("(foo|bar)"), "")
 			}()
 
 			mockTyped("")
 			mockTyped("foo")
 
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(userIn).Should(gbytes.Say(`invalid format`))
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(answer).Should(Receive(ContainElement("foo")))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(userIn).Should(gbytes.Say(`invalid format`))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(answer).Should(gomega.Receive(gomega.ContainElement("foo")))
 		})
 	})
 
-	Describe("QueryAll", func() {
-		It("should prompt until a valid answer is provided", func() {
+	ginkgo.Describe("QueryAll", func() {
+		ginkgo.It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan [][]string)
 			query := "pick foo or bar:"
 			go func() {
-				answer <- client.QueryAll(query, re.MustCompile(`foo(ba[rz])`), "", -1)
+				answer <- client.QueryAll(query, regexp.MustCompile(`foo(ba[rz])`), "", -1)
 			}()
 
 			mockTyped("foobar foobaz")
 
-			Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
 			var matches [][]string
-			Eventually(answer).Should(Receive(&matches))
-			Expect(matches).To(ContainElement([]string{"foobar", "bar"}))
-			Expect(matches).To(ContainElement([]string{"foobaz", "baz"}))
+			gomega.Eventually(answer).Should(gomega.Receive(&matches))
+			gomega.Expect(matches).To(gomega.ContainElement([]string{"foobar", "bar"}))
+			gomega.Expect(matches).To(gomega.ContainElement([]string{"foobaz", "baz"}))
 		})
 	})
 
-	Describe("QueryStringPattern", func() {
-		It("should prompt until a valid answer is provided", func() {
+	ginkgo.Describe("QueryStringPattern", func() {
+		ginkgo.It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan string)
 			query := "type of bar:"
 			go func() {
-				answer <- client.QueryStringPattern(query, re.MustCompile(".*bar"), "")
+				answer <- client.QueryStringPattern(query, regexp.MustCompile(".*bar"), "")
 			}()
 
 			mockTyped("foo")
 			mockTyped("foobar")
 
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(userIn).Should(gbytes.Say(`invalid format`))
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(answer).Should(Receive(Equal("foobar")))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(userIn).Should(gbytes.Say(`invalid format`))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(answer).Should(gomega.Receive(gomega.Equal("foobar")))
 		})
 	})
 
-	Describe("QueryInt", func() {
-		It("should prompt until a valid answer is provided", func() {
+	ginkgo.Describe("QueryInt", func() {
+		ginkgo.It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan int64)
 			query := "number:"
@@ -151,15 +152,15 @@ var _ = Describe("GeneratorCommon", func() {
 			mockTyped("x")
 			mockTyped("0x20")
 
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(userIn).Should(gbytes.Say(`not a number`))
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(answer).Should(Receive(Equal(int64(32))))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(userIn).Should(gbytes.Say(`not a number`))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(answer).Should(gomega.Receive(gomega.Equal(int64(32))))
 		})
 	})
 
-	Describe("QueryBool", func() {
-		It("should prompt until a valid answer is provided", func() {
+	ginkgo.Describe("QueryBool", func() {
+		ginkgo.It("should prompt until a valid answer is provided", func() {
 			defer dumpBuffers()
 			answer := make(chan bool)
 			query := "cool?"
@@ -170,10 +171,10 @@ var _ = Describe("GeneratorCommon", func() {
 			mockTyped("maybe")
 			mockTyped("y")
 
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(userIn).Should(gbytes.Say(`answer using yes or no`))
-			Eventually(userIn).Should(gbytes.Say(query))
-			Eventually(answer).Should(Receive(BeTrue()))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(userIn).Should(gbytes.Say(`answer using yes or no`))
+			gomega.Eventually(userIn).Should(gbytes.Say(query))
+			gomega.Eventually(answer).Should(gomega.Receive(gomega.BeTrue()))
 		})
 	})
 })

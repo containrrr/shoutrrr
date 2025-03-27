@@ -2,38 +2,39 @@ package format
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	r "reflect"
+	"reflect"
+
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
-// GetConfigPropFromString deserializes a config property from a string representation using the ConfigProp interface
-func GetConfigPropFromString(structType r.Type, value string) (r.Value, error) {
-	valuePtr := r.New(structType)
+// GetConfigPropFromString deserializes a config property from a string representation using the ConfigProp interface.
+func GetConfigPropFromString(structType reflect.Type, value string) (reflect.Value, error) {
+	valuePtr := reflect.New(structType)
+
 	configProp, ok := valuePtr.Interface().(types.ConfigProp)
 	if !ok {
-		return r.Value{}, errors.New("struct field cannot be used as a prop")
+		return reflect.Value{}, errors.New("struct field cannot be used as a prop")
 	}
 
 	if err := configProp.SetFromProp(value); err != nil {
-		return r.Value{}, err
+		return reflect.Value{}, err
 	}
 
 	return valuePtr, nil
 }
 
-// GetConfigPropString serializes a config property to a string representation using the ConfigProp interface
-func GetConfigPropString(propPtr r.Value) (string, error) {
-
-	if propPtr.Kind() != r.Ptr {
+// GetConfigPropString serializes a config property to a string representation using the ConfigProp interface.
+func GetConfigPropString(propPtr reflect.Value) (string, error) {
+	if propPtr.Kind() != reflect.Ptr {
 		propVal := propPtr
-		propPtr = r.New(propVal.Type())
+		propPtr = reflect.New(propVal.Type())
 		propPtr.Elem().Set(propVal)
 	}
 
 	if propPtr.CanInterface() {
 		if configProp, ok := propPtr.Interface().(types.ConfigProp); ok {
-	return configProp.GetPropValue()
-}
+			return configProp.GetPropValue()
+		}
 	}
 
 	return "", errors.New("struct field cannot be used as a prop")

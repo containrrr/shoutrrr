@@ -9,209 +9,223 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/containrrr/shoutrrr/internal/failures"
-	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/internal/failures"
+	"github.com/nicholas-fedor/shoutrrr/internal/testutils"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/standard"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 
-	gt "github.com/onsi/gomega/types"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	gomegaTypes "github.com/onsi/gomega/types"
 )
 
 var tt *testing.T
 
 func TestSMTP(t *testing.T) {
-	RegisterFailHandler(Fail)
+	gomega.RegisterFailHandler(ginkgo.Fail)
+
 	tt = t
-	RunSpecs(t, "Shoutrrr SMTP Suite")
+	ginkgo.RunSpecs(t, "Shoutrrr SMTP Suite")
 }
 
 var (
 	service    *Service
 	envSMTPURL string
 	logger     *log.Logger
-	_          = BeforeSuite(func() {
-
+	_          = ginkgo.BeforeSuite(func() {
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 		logger = testutils.TestLogger()
 	})
 	urlWithAllProps = "smtp://user:password@example.com:2225/?auth=None&clienthost=testhost&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
+	// BaseNoAuthURL is a minimal SMTP config without authentication.
+	BaseNoAuthURL = "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+	// BaseAuthURL is a typical config with authentication.
+	BaseAuthURL = "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com,rec2@example.com&useHTML=yes"
+	// BasePlusURL is a config with plus signs in email addresses.
+	BasePlusURL = "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender+tag@example.com&toAddresses=rec1+tag@example.com,rec2@example.com&useHTML=yes"
 )
 
-var _ = Describe("the SMTP service", func() {
+// modifyURL modifies a base URL by updating query parameters as specified.
+func modifyURL(base string, params map[string]string) string {
+	u := testutils.URLMust(base)
 
-	BeforeEach(func() {
+	q := u.Query()
+	for k, v := range params {
+		q.Set(k, v)
+	}
+
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+var _ = ginkgo.Describe("the SMTP service", func() {
+	ginkgo.BeforeEach(func() {
 		service = &Service{}
-
 	})
-	When("parsing the configuration URL", func() {
-		It("should be identical after de-/serialization", func() {
+	ginkgo.When("parsing the configuration URL", func() {
+		ginkgo.It("should be identical after de-/serialization", func() {
 			url := testutils.URLMust(urlWithAllProps)
 			config := &Config{}
 			pkr := format.NewPropKeyResolver(config)
 			err := config.setURL(&pkr, url)
-			Expect(err).NotTo(HaveOccurred(), "verifying")
+			gomega.Expect(err).NotTo(gomega.HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
-			GinkgoT().Logf("\n\n%s\n%s\n\n-", outputURL, urlWithAllProps)
+			ginkgo.GinkgoT().Logf("\n\n%s\n%s\n\n-", outputURL, urlWithAllProps)
 
-			Expect(outputURL.String()).To(Equal(urlWithAllProps))
-
+			gomega.Expect(outputURL.String()).To(gomega.Equal(urlWithAllProps))
 		})
-		When("resolving client host", func() {
-			When("clienthost is set to auto", func() {
-				It("should return the os hostname", func() {
+		ginkgo.When("resolving client host", func() {
+			ginkgo.When("clienthost is set to auto", func() {
+				ginkgo.It("should return the os hostname", func() {
 					hostname, err := os.Hostname()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(service.resolveClientHost(&Config{ClientHost: "auto"})).To(Equal(hostname))
+					gomega.Expect(err).ToNot(gomega.HaveOccurred())
+					gomega.Expect(service.resolveClientHost(&Config{ClientHost: "auto"})).To(gomega.Equal(hostname))
 				})
 			})
-			When("clienthost is set to a custom value", func() {
-				It("should return that value", func() {
-					Expect(service.resolveClientHost(&Config{ClientHost: "computah"})).To(Equal("computah"))
+			ginkgo.When("clienthost is set to a custom value", func() {
+				ginkgo.It("should return that value", func() {
+					gomega.Expect(service.resolveClientHost(&Config{ClientHost: "computah"})).To(gomega.Equal("computah"))
 				})
 			})
 		})
-		When("fromAddress is missing", func() {
-			It("should return an error", func() {
+		ginkgo.When("fromAddress is missing", func() {
+			ginkgo.It("should return an error", func() {
 				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com")
-				Expect((&Config{}).SetURL(testURL)).ToNot(Succeed())
+				gomega.Expect((&Config{}).SetURL(testURL)).ToNot(gomega.Succeed())
 			})
 		})
-		When("toAddresses are missing", func() {
-			It("should return an error", func() {
+		ginkgo.When("toAddresses are missing", func() {
+			ginkgo.It("should return an error", func() {
 				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?fromAddress=sender@example.com")
-				Expect((&Config{}).SetURL(testURL)).NotTo(Succeed())
+				gomega.Expect((&Config{}).SetURL(testURL)).NotTo(gomega.Succeed())
 			})
-
 		})
 	})
-	Context("basic service API methods", func() {
+	ginkgo.Context("basic service API methods", func() {
 		var config *Config
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			config = &Config{}
 		})
-		It("should not allow getting invalid query values", func() {
+		ginkgo.It("should not allow getting invalid query values", func() {
 			testutils.TestConfigGetInvalidQueryValue(config)
 		})
-		It("should not allow setting invalid query values", func() {
-			testutils.TestConfigSetInvalidQueryValue(config, "smtp://example.com/?fromAddress=s@example.com&toAddresses=r@example.com&foo=bar")
+		ginkgo.It("should not allow setting invalid query values", func() {
+			testutils.TestConfigSetInvalidQueryValue(
+				config,
+				"smtp://example.com/?fromAddress=s@example.com&toAddresses=r@example.com&foo=bar",
+			)
 		})
 
-		It("should have the expected number of fields and enums", func() {
+		ginkgo.It("should have the expected number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
 			testutils.TestConfigGetFieldsCount(config, 13)
 		})
 	})
-	When("cloning a config", func() {
-		It("should be identical to the original", func() {
+	ginkgo.When("cloning a config", func() {
+		ginkgo.It("should be identical to the original", func() {
 			config := &Config{}
-			Expect(config.SetURL(testutils.URLMust(urlWithAllProps))).To(Succeed())
+			gomega.Expect(config.SetURL(testutils.URLMust(urlWithAllProps))).To(gomega.Succeed())
 
-			Expect(config.Clone()).To(Equal(*config))
-
+			gomega.Expect(config.Clone()).To(gomega.Equal(*config))
 		})
 	})
-	When("sending a message", func() {
-		When("the service is not configured correctly", func() {
-			It("should fail to send messages", func() {
-				service := Service{config: &Config{}}
-				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+	ginkgo.When("sending a message", func() {
+		ginkgo.When("the service is not configured correctly", func() {
+			ginkgo.It("should fail to send messages", func() {
+				service := Service{Config: &Config{}}
+				gomega.Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
 
-				service.config.Encryption = EncMethods.ImplicitTLS
-				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+				service.Config.Encryption = EncMethods.ImplicitTLS
+				gomega.Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
 			})
 		})
-		When("an invalid param is passed", func() {
-			It("should fail to send messages", func() {
-				service := Service{config: &Config{}}
-				Expect(service.Send("test message", &types.Params{"invalid": "value"})).To(matchFailure(FailApplySendParams))
+		ginkgo.When("an invalid param is passed", func() {
+			ginkgo.It("should fail to send messages", func() {
+				service := Service{Config: &Config{}}
+				gomega.Expect(service.Send("test message", &types.Params{"invalid": "value"})).To(matchFailure(FailApplySendParams))
 			})
 		})
 	})
 
-	When("the underlying stream stops working", func() {
+	ginkgo.When("the underlying stream stops working", func() {
 		var service Service
 		var message string
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			service = Service{}
 			message = ""
 		})
-		It("should fail when writing multipart plain header", func() {
+		ginkgo.It("should fail when writing multipart plain header", func() {
 			writer := testutils.CreateFailWriter(1)
 			err := service.writeMultipartMessage(writer, message)
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailPlainHeader))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailPlainHeader))
 		})
 
-		It("should fail when writing multipart plain message", func() {
+		ginkgo.It("should fail when writing multipart plain message", func() {
 			writer := testutils.CreateFailWriter(2)
 			err := service.writeMultipartMessage(writer, message)
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailMessageRaw))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailMessageRaw))
 		})
 
-		It("should fail when writing multipart HTML header", func() {
+		ginkgo.It("should fail when writing multipart HTML header", func() {
 			writer := testutils.CreateFailWriter(4)
 			err := service.writeMultipartMessage(writer, message)
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailHTMLHeader))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailHTMLHeader))
 		})
 
-		It("should fail when writing multipart HTML message", func() {
+		ginkgo.It("should fail when writing multipart HTML message", func() {
 			writer := testutils.CreateFailWriter(5)
 			err := service.writeMultipartMessage(writer, message)
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailMessageRaw))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailMessageRaw))
 		})
 
-		It("should fail when writing multipart end header", func() {
+		ginkgo.It("should fail when writing multipart end header", func() {
 			writer := testutils.CreateFailWriter(6)
 			err := service.writeMultipartMessage(writer, message)
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailMultiEndHeader))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailMultiEndHeader))
 		})
 
-		It("should fail when writing message template", func() {
+		ginkgo.It("should fail when writing message template", func() {
 			writer := testutils.CreateFailWriter(0)
 			e := service.SetTemplateString("dummy", "dummy template content")
-			Expect(e).ToNot(HaveOccurred())
+			gomega.Expect(e).ToNot(gomega.HaveOccurred())
 
 			err := service.writeMessagePart(writer, message, "dummy")
-			Expect(err).To(HaveOccurred())
-			Expect(err.ID()).To(Equal(FailMessageTemplate))
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(err.ID()).To(gomega.Equal(FailMessageTemplate))
 		})
-
 	})
 
-	When("running E2E tests", func() {
-
-		It("should work without errors", func() {
+	ginkgo.When("running E2E tests", func() {
+		ginkgo.It("should work without errors", func() {
 			if envSMTPURL == "" {
-				Skip("environment not set up for E2E testing")
+				ginkgo.Skip("environment not set up for E2E testing")
+
 				return
 			}
 
 			serviceURL, err := url.Parse(envSMTPURL)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			err = service.Initialize(serviceURL, logger)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			err = service.Send("this is an integration test", nil)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 	})
 
-	When("running integration tests", func() {
-
-		When("given a typical usage case configuration URL", func() {
-
-			It("should send notifications without any errors", func() {
-				testURL := "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com,rec2@example.com&useHTML=yes"
+	ginkgo.When("running integration tests", func() {
+		ginkgo.When("given a typical usage case configuration URL", func() {
+			ginkgo.It("should send notifications without any errors", func() {
+				testURL := BaseAuthURL
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -229,17 +243,17 @@ var _ = Describe("the SMTP service", func() {
 					"221 OK",
 				}, "<pre>{{ .message }}</pre>", "{{ .message }}")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			})
 		})
 
-		When("given e-mail addresses with pluses in the configuration URL", func() {
-
-			It("should send notifications without any errors", func() {
-				testURL := "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender+tag@example.com&toAddresses=rec1+tag@example.com,rec2@example.com&useHTML=yes"
+		ginkgo.When("given e-mail addresses with pluses in the configuration URL", func() {
+			ginkgo.It("should send notifications without any errors", func() {
+				testURL := BasePlusURL
 				err := testIntegration(
 					testURL,
 					[]string{
@@ -258,24 +272,22 @@ var _ = Describe("the SMTP service", func() {
 						"250 Data OK",
 						"221 OK",
 					},
-					// Message templates:
 					"<pre>{{ .message }}</pre>", "{{ .message }}",
-					// Expected to be sent from client
 					"RCPT TO:<rec1+tag@example.com>",
 					"To: rec1+tag@example.com",
 					"From:  <sender+tag@example.com>")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			})
 		})
 
-		When("given a configuration URL with authentication disabled", func() {
-
-			It("should send notifications without any errors", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+		ginkgo.When("given a configuration URL with authentication disabled", func() {
+			ginkgo.It("should send notifications without any errors", func() {
+				testURL := BaseNoAuthURL
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -288,17 +300,17 @@ var _ = Describe("the SMTP service", func() {
 					"221 OK",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			})
 		})
 
-		When("given a configuration URL with StartTLS but it is not supported", func() {
-
-			It("should send notifications without any errors", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=yes&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+		ginkgo.When("given a configuration URL with StartTLS but it is not supported", func() {
+			ginkgo.It("should send notifications without any errors", func() {
+				testURL := modifyURL(BaseNoAuthURL, map[string]string{"useStartTLS": "yes"})
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -311,29 +323,30 @@ var _ = Describe("the SMTP service", func() {
 					"221 OK",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			})
 		})
 
-		When("server communication fails", func() {
-
-			It("should fail when initial handshake is not accepted", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no&clienthost=spammer"
+		ginkgo.When("server communication fails", func() {
+			ginkgo.It("should fail when initial handshake is not accepted", func() {
+				testURL := modifyURL(BaseNoAuthURL, map[string]string{"useStartTLS": "yes", "clienthost": "spammer"})
 				err := testIntegration(testURL, []string{
 					"421 4.7.0 Try again later, closing connection. (EHLO) r20-20020a50d694000000b004588af8956dsm771862edi.9 - gsmtp",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(MatchError(fail(FailHandshake, nil)))
+				gomega.Expect(err).To(gomega.MatchError(fail(FailHandshake, nil)))
 			})
 
-			It("should fail when not being able to enable StartTLS", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when not being able to enable StartTLS", func() {
+				testURL := modifyURL(BaseNoAuthURL, map[string]string{"useStartTLS": "yes"})
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -343,24 +356,26 @@ var _ = Describe("the SMTP service", func() {
 					"502 That's too hard",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailEnableStartTLS))
+				gomega.Expect(err).To(matchFailure(FailEnableStartTLS))
 			})
 
-			It("should fail when authentication type is invalid", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=bad&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when authentication type is invalid", func() {
+				testURL := modifyURL(BaseNoAuthURL, map[string]string{"auth": "bad"})
 				err := testIntegration(testURL, []string{}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(standard.FailServiceInit))
+				gomega.Expect(err).To(matchFailure(standard.FailServiceInit))
 			})
 
-			It("should fail when not being able to use authentication type", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=crammd5&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when not being able to use authentication type", func() {
+				testURL := modifyURL(BaseNoAuthURL, map[string]string{"auth": "crammd5"})
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -369,14 +384,15 @@ var _ = Describe("the SMTP service", func() {
 					"504 Liar",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailAuthenticating))
+				gomega.Expect(err).To(matchFailure(FailAuthenticating))
 			})
 
-			It("should fail when not being able to send to recipient", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when not being able to send to recipient", func() {
+				testURL := BaseNoAuthURL
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -385,28 +401,30 @@ var _ = Describe("the SMTP service", func() {
 					"551 I don't know you",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailSendRecipient))
+				gomega.Expect(err).To(matchFailure(FailSendRecipient))
 			})
 
-			It("should fail when the recipient is not accepted", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when the recipient is not accepted", func() {
+				testURL := BaseNoAuthURL
 				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
 					"553 She doesn't want to be disturbed",
 				})
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailSetRecipient))
+				gomega.Expect(err).To(matchFailure(FailSetRecipient))
 			})
 
-			It("should fail when the server does not accept the data stream", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when the server does not accept the data stream", func() {
+				testURL := BaseNoAuthURL
 				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
@@ -414,14 +432,15 @@ var _ = Describe("the SMTP service", func() {
 					"554 Nah I'm fine thanks",
 				})
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailOpenDataStream))
+				gomega.Expect(err).To(matchFailure(FailOpenDataStream))
 			})
 
-			It("should fail when the server does not accept the data stream content", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when the server does not accept the data stream content", func() {
+				testURL := BaseNoAuthURL
 				err := testSendRecipient(testURL, []string{
 					"250 mx.google.com at your service",
 					"250 Sender OK",
@@ -430,14 +449,15 @@ var _ = Describe("the SMTP service", func() {
 					"554 Such garbage!",
 				})
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailCloseDataStream))
+				gomega.Expect(err).To(matchFailure(FailCloseDataStream))
 			})
 
-			It("should fail when the server does not close the connection gracefully", func() {
-				testURL := "smtp://example.com:2225/?useStartTLS=no&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+			ginkgo.It("should fail when the server does not close the connection gracefully", func() {
+				testURL := BaseNoAuthURL
 				err := testIntegration(testURL, []string{
 					"250-mx.google.com at your service",
 					"250-SIZE 35651584",
@@ -450,27 +470,39 @@ var _ = Describe("the SMTP service", func() {
 					"502 You can't quit, you're fired!",
 				}, "", "")
 				if msg, test := standard.IsTestSetupFailure(err); test {
-					Skip(msg)
+					ginkgo.Skip(msg)
+
 					return
 				}
-				Expect(err).To(matchFailure(FailClosingSession))
+				gomega.Expect(err).To(matchFailure(FailClosingSession))
 			})
-
 		})
 	})
-	When("writing headers and the output stream is closed", func() {
-		When("it's closed during header content", func() {
-			It("should fail with correct error", func() {
+	ginkgo.When("writing headers and the output stream is closed", func() {
+		ginkgo.When("it's closed during header content", func() {
+			ginkgo.It("should fail with correct error", func() {
 				fw := testutils.CreateFailWriter(0)
-				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+				gomega.Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
 			})
 		})
-		When("it's closed after header content", func() {
-			It("should fail with correct error", func() {
+		ginkgo.When("it's closed after header content", func() {
+			ginkgo.It("should fail with correct error", func() {
 				fw := testutils.CreateFailWriter(1)
-				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+				gomega.Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
 			})
 		})
+	})
+	ginkgo.When("default port is not specified", func() {
+		ginkgo.It("should use the default SMTP port when not specified", func() {
+			testURL := "smtp://example.com/?fromAddress=sender@example.com&toAddresses=rec1@example.com"
+			serviceURL := testutils.URLMust(testURL)
+			err := service.Initialize(serviceURL, logger)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(service.Config.Port).To(gomega.Equal(uint16(DefaultSMTPPort)))
+		})
+	})
+	ginkgo.It("returns the correct service identifier", func() {
+		gomega.Expect(service.GetID()).To(gomega.Equal("smtp"))
 	})
 })
 
@@ -503,6 +535,7 @@ func testSendRecipient(testURL string, responses []string) failures.Failure {
 	ferr := service.sendToRecipient(client, "r@example.com", config, message)
 
 	logger.Printf("\n%s", tcfaker.GetConversation(false))
+
 	if ferr != nil {
 		return ferr
 	}
@@ -511,7 +544,6 @@ func testSendRecipient(testURL string, responses []string) failures.Failure {
 }
 
 func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string, expectRec ...string) failures.Failure {
-
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
 		return standard.Failure(standard.FailParseURL, err)
@@ -541,14 +573,15 @@ func testIntegration(testURL string, responses []string, htmlTemplate string, pl
 
 	fakeTLSEnabled(client, serviceURL.Hostname())
 
-	ferr := service.doSend(client, "Test message", service.config)
+	ferr := service.doSend(client, "Test message", service.Config)
 
-	recieved := tcfaker.GetClientSentences()
+	received := tcfaker.GetClientSentences()
 	for _, expected := range expectRec {
-		Expect(recieved).To(ContainElement(expected))
+		gomega.Expect(received).To(gomega.ContainElement(expected))
 	}
 
 	logger.Printf("\n%s", tcfaker.GetConversation(false))
+
 	if ferr != nil {
 		return ferr
 	}
@@ -560,7 +593,6 @@ func testIntegration(testURL string, responses []string, htmlTemplate string, pl
 // this is needed because the SMTP library won't allow plain authentication without TLS being turned on.
 // having it turned on would of course mean that we cannot test the communication since it will be encrypted.
 func fakeTLSEnabled(client *smtp.Client, hostname string) {
-
 	// set the "tls" flag on the client which indicates that TLS encryption is enabled (even though it's not)
 	cr := reflect.ValueOf(client).Elem().FieldByName("tls")
 	cr = reflect.NewAt(cr.Type(), unsafe.Pointer(cr.UnsafeAddr())).Elem()
@@ -572,7 +604,7 @@ func fakeTLSEnabled(client *smtp.Client, hostname string) {
 	cr.SetString(hostname)
 }
 
-// matchFailure is a simple wrapper around `fail` and `gomega.MatchError`` to make it easier to use in tests
-func matchFailure(id failures.FailureID) gt.GomegaMatcher {
-	return MatchError(fail(id, nil))
+// matchFailure is a simple wrapper around `fail` and `gomega.MatchError` to make it easier to use in tests.
+func matchFailure(id failures.FailureID) gomegaTypes.GomegaMatcher {
+	return gomega.MatchError(fail(id, nil))
 }

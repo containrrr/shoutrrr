@@ -9,20 +9,25 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/containrrr/shoutrrr/internal/dedupe"
-	intutil "github.com/containrrr/shoutrrr/internal/util"
-	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
-	cli "github.com/containrrr/shoutrrr/shoutrrr/cmd"
+	"github.com/nicholas-fedor/shoutrrr/internal/dedupe"
+	internalUtil "github.com/nicholas-fedor/shoutrrr/internal/util"
+	"github.com/nicholas-fedor/shoutrrr/pkg/router"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util"
+	cli "github.com/nicholas-fedor/shoutrrr/shoutrrr/cmd"
 )
 
-// Cmd sends a notification using a service url
+const (
+	MaximumNArgs     = 2
+	MaxMessageLength = 100
+)
+
+// Cmd sends a notification using a service url.
 var Cmd = &cobra.Command{
 	Use:    "send",
 	Short:  "Send a notification using a service url",
-	Args:   cobra.MaximumNArgs(2),
-	PreRun: intutil.LoadFlagsFromAltSources,
+	Args:   cobra.MaximumNArgs(MaximumNArgs),
+	PreRun: internalUtil.LoadFlagsFromAltSources,
 	RunE:   Run,
 }
 
@@ -38,7 +43,7 @@ func init() {
 	Cmd.Flags().StringP("title", "t", "", "The title used for services that support it")
 }
 
-func logf(format string, a ...interface{}) {
+func logf(format string, a ...any) {
 	fmt.Fprintf(os.Stderr, format+"\n", a...)
 }
 
@@ -53,12 +58,16 @@ func run(cmd *cobra.Command) error {
 
 	if message == "-" {
 		logf("Reading from STDIN...")
+
 		sb := strings.Builder{}
+
 		count, err := io.Copy(&sb, os.Stdin)
 		if err != nil {
 			return fmt.Errorf("failed to read message from stdin: %w", err)
 		}
+
 		logf("Read %d byte(s)", count)
+
 		message = sb.String()
 	}
 
@@ -68,15 +77,19 @@ func run(cmd *cobra.Command) error {
 		urlsPrefix := "URLs:"
 		for i, url := range urls {
 			logf("%s %s", urlsPrefix, url)
+
 			if i == 0 {
-				// Only display "URLs:" prefix for first line, replace with indentation for the the subsequent
+				// Only display "URLs:" prefix for first line, replace with indentation for the subsequent
 				urlsPrefix = strings.Repeat(" ", len(urlsPrefix))
 			}
 		}
-		logf("Message: %s", util.Ellipsis(message, 100))
+
+		logf("Message: %s", util.Ellipsis(message, MaxMessageLength))
+
 		if title != "" {
 			logf("Title: %v", title)
 		}
+
 		logger = log.New(os.Stderr, "SHOUTRRR ", log.LstdFlags)
 	} else {
 		logger = util.DiscardLogger
@@ -90,11 +103,13 @@ func run(cmd *cobra.Command) error {
 		if title != "" {
 			params["title"] = title
 		}
+
 		errs := sr.SendAsync(message, &params)
 		for err := range errs {
 			if err != nil {
 				return cli.TaskUnavailable(err.Error())
 			}
+
 			logf("Notification sent")
 		}
 	}
@@ -102,7 +117,7 @@ func run(cmd *cobra.Command) error {
 	return nil
 }
 
-// Run the send command
+// Run the send command.
 func Run(cmd *cobra.Command, _ []string) error {
 	err := run(cmd)
 	if err != nil {
@@ -112,5 +127,6 @@ func Run(cmd *cobra.Command, _ []string) error {
 			os.Exit(result.ExitCode)
 		}
 	}
+
 	return err
 }

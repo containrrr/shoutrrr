@@ -1,8 +1,17 @@
 package ntfy
 
 import (
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+)
+
+// Priority levels as constants.
+const (
+	PriorityMin     priority = 1
+	PriorityLow     priority = 2
+	PriorityDefault priority = 3
+	PriorityHigh    priority = 4
+	PriorityMax     priority = 5
 )
 
 type priority int
@@ -16,13 +25,13 @@ type priorityVals struct {
 	Enum    types.EnumFormatter
 }
 
-// Priority ...
+// Priority defines the notification priority levels.
 var Priority = &priorityVals{
-	Min:     1,
-	Low:     2,
-	Default: 3,
-	High:    4,
-	Max:     5,
+	Min:     PriorityMin,
+	Low:     PriorityLow,
+	Default: PriorityDefault,
+	High:    PriorityHigh,
+	Max:     PriorityMax,
 	Enum: format.CreateEnumFormatter(
 		[]string{
 			"",
@@ -32,12 +41,12 @@ var Priority = &priorityVals{
 			"High",
 			"Max",
 		}, map[string]int{
-			"1":      1,
-			"2":      2,
-			"3":      3,
-			"4":      4,
-			"5":      5,
-			"urgent": 5,
+			"1":      int(PriorityMin),
+			"2":      int(PriorityLow),
+			"3":      int(PriorityDefault),
+			"4":      int(PriorityHigh),
+			"5":      int(PriorityMax),
+			"urgent": int(PriorityMax),
 		}),
 }
 

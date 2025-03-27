@@ -2,104 +2,110 @@ package format
 
 import (
 	"fmt"
-	r "reflect"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util"
 )
 
-// NodeTokenType is used to represent the type of value that a node has for syntax highlighting
+// NodeTokenType is used to represent the type of value that a node has for syntax highlighting.
 type NodeTokenType int
 
 const (
-	// UnknownToken represents all unknown/unspecified tokens
+	// UnknownToken represents all unknown/unspecified tokens.
 	UnknownToken NodeTokenType = iota
-	// NumberToken represents all numbers
+	// NumberToken represents all numbers.
 	NumberToken
-	// StringToken represents strings and keys
+	// StringToken represents strings and keys.
 	StringToken
-	// EnumToken represents enum values
+	// EnumToken represents enum values.
 	EnumToken
-	// TrueToken represent boolean true
+	// TrueToken represent boolean true.
 	TrueToken
-	// FalseToken represent boolean false
+	// FalseToken represent boolean false.
 	FalseToken
-	// PropToken represent a serializable struct prop
+	// PropToken represent a serializable struct prop.
 	PropToken
-	// ErrorToken represent a value that was not serializable or otherwise invalid
+	// ErrorToken represent a value that was not serializable or otherwise invalid.
 	ErrorToken
-	// ContainerToken is used for Array/Slice and Map tokens
+	// ContainerToken is used for Array/Slice and Map tokens.
 	ContainerToken
 )
 
-// Node is the generic config tree item
+// Constants for number bases.
+const (
+	BaseDecimalLen = 10
+	BaseHexLen     = 16
+)
+
+// Node is the generic config tree item.
 type Node interface {
 	Field() *FieldInfo
 	TokenType() NodeTokenType
-	Update(tv r.Value)
+	Update(tv reflect.Value)
 }
 
-// ValueNode is a Node without any child items
+// ValueNode is a Node without any child items.
 type ValueNode struct {
 	*FieldInfo
 	Value     string
 	tokenType NodeTokenType
 }
 
-// Field returns the inner FieldInfo
+// Field returns the inner FieldInfo.
 func (n *ValueNode) Field() *FieldInfo {
 	return n.FieldInfo
 }
 
-// TokenType returns a NodeTokenType that matches the value
+// TokenType returns a NodeTokenType that matches the value.
 func (n *ValueNode) TokenType() NodeTokenType {
 	return n.tokenType
-
 }
 
-// Update updates the value string from the provided value
-func (n *ValueNode) Update(tv r.Value) {
+// Update updates the value string from the provided value.
+func (n *ValueNode) Update(tv reflect.Value) {
 	value, token := getValueNodeValue(tv, n.FieldInfo)
 	n.Value = value
 	n.tokenType = token
 }
 
-// ContainerNode is a Node with child items
+// ContainerNode is a Node with child items.
 type ContainerNode struct {
 	*FieldInfo
 	Items        []Node
 	MaxKeyLength int
 }
 
-// Field returns the inner FieldInfo
+// Field returns the inner FieldInfo.
 func (n *ContainerNode) Field() *FieldInfo {
 	return n.FieldInfo
 }
 
-// TokenType always returns ContainerToken for ContainerNode
+// TokenType always returns ContainerToken for ContainerNode.
 func (n *ContainerNode) TokenType() NodeTokenType {
 	return ContainerToken
 }
 
-// Update updates the items to match the provided value
-func (n *ContainerNode) Update(tv r.Value) {
+// Update updates the items to match the provided value.
+func (n *ContainerNode) Update(tv reflect.Value) {
 	switch n.FieldInfo.Type.Kind() {
-	case r.Array, r.Slice:
+	case reflect.Array, reflect.Slice:
 		n.updateArrayNode(tv)
-	case r.Map:
+	case reflect.Map:
 		n.updateMapNode(tv)
 	}
 }
 
-func (n *ContainerNode) updateArrayNode(arrayValue r.Value) {
+func (n *ContainerNode) updateArrayNode(arrayValue reflect.Value) {
 	itemCount := arrayValue.Len()
 	n.Items = make([]Node, 0, itemCount)
 
 	elemType := arrayValue.Type().Elem()
-	for i := 0; i < itemCount; i++ {
+
+	for i := range itemCount {
 		key := strconv.Itoa(i)
 		val := arrayValue.Index(i)
 		n.Items = append(n.Items, getValueNode(val, &FieldInfo{
@@ -109,7 +115,7 @@ func (n *ContainerNode) updateArrayNode(arrayValue r.Value) {
 	}
 }
 
-func getArrayNode(arrayValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
+func getArrayNode(arrayValue reflect.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
 	node = &ContainerNode{
 		FieldInfo:    fieldInfo,
 		MaxKeyLength: 0,
@@ -126,15 +132,17 @@ func sortNodeItems(nodeItems []Node) {
 	})
 }
 
-func (n *ContainerNode) updateMapNode(mapValue r.Value) {
+func (n *ContainerNode) updateMapNode(mapValue reflect.Value) {
 	base := n.FieldInfo.Base
 	if base == 0 {
-		base = 10
+		base = BaseDecimalLen
 	}
+
 	elemType := mapValue.Type().Elem()
 	mapKeys := mapValue.MapKeys()
 	nodeItems := make([]Node, len(mapKeys))
 	maxKeyLength := 0
+
 	for i, keyVal := range mapKeys {
 		// The keys will always be strings
 		key := keyVal.String()
@@ -146,14 +154,15 @@ func (n *ContainerNode) updateMapNode(mapValue r.Value) {
 		})
 		maxKeyLength = util.Max(len(key), maxKeyLength)
 	}
+
 	sortNodeItems(nodeItems)
 
 	n.Items = nodeItems
 	n.MaxKeyLength = maxKeyLength
 }
 
-func getMapNode(mapValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
-	if mapValue.Kind() == r.Ptr {
+func getMapNode(mapValue reflect.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
+	if mapValue.Kind() == reflect.Ptr {
 		mapValue = mapValue.Elem()
 	}
 
@@ -166,11 +175,11 @@ func getMapNode(mapValue r.Value, fieldInfo *FieldInfo) (node *ContainerNode) {
 	return
 }
 
-func getNode(fieldVal r.Value, fieldInfo *FieldInfo) Node {
+func getNode(fieldVal reflect.Value, fieldInfo *FieldInfo) Node {
 	switch fieldInfo.Type.Kind() {
-	case r.Array, r.Slice:
+	case reflect.Array, reflect.Slice:
 		return getArrayNode(fieldVal, fieldInfo)
-	case r.Map:
+	case reflect.Map:
 		return getMapNode(fieldVal, fieldInfo)
 	default:
 		return getValueNode(fieldVal, fieldInfo)
@@ -178,8 +187,8 @@ func getNode(fieldVal r.Value, fieldInfo *FieldInfo) Node {
 }
 
 func getRootNode(v interface{}) *ContainerNode {
-	structValue := r.ValueOf(v)
-	if structValue.Kind() == r.Ptr {
+	structValue := reflect.ValueOf(v)
+	if structValue.Kind() == reflect.Ptr {
 		structValue = structValue.Elem()
 	}
 
@@ -198,12 +207,15 @@ func getRootNode(v interface{}) *ContainerNode {
 	nodeItems := make([]Node, numFields)
 	maxKeyLength := 0
 	fieldOffset := 0
+
 	for i := range infoFields {
 		field := infoFields[i]
+
 		for isHiddenField(fieldInfo.Type.Field(fieldOffset + i)) {
 			// The current field is Anonymous and not present in the FieldInfo slice
 			fieldOffset++
 		}
+
 		fieldValue := structValue.Field(fieldOffset + i)
 
 		nodeItems[i] = getNode(fieldValue, &field)
@@ -219,8 +231,9 @@ func getRootNode(v interface{}) *ContainerNode {
 	}
 }
 
-func getValueNode(fieldVal r.Value, fieldInfo *FieldInfo) (node *ValueNode) {
+func getValueNode(fieldVal reflect.Value, fieldInfo *FieldInfo) (node *ValueNode) {
 	value, tokenType := getValueNodeValue(fieldVal, fieldInfo)
+
 	return &ValueNode{
 		FieldInfo: fieldInfo,
 		Value:     value,
@@ -228,39 +241,44 @@ func getValueNode(fieldVal r.Value, fieldInfo *FieldInfo) (node *ValueNode) {
 	}
 }
 
-func getValueNodeValue(fieldValue r.Value, fieldInfo *FieldInfo) (string, NodeTokenType) {
+func getValueNodeValue(fieldValue reflect.Value, fieldInfo *FieldInfo) (string, NodeTokenType) {
 	kind := fieldValue.Kind()
+
 	base := fieldInfo.Base
 	if base == 0 {
-		base = 10
+		base = BaseDecimalLen
 	}
 
 	if fieldInfo.IsEnum() {
 		return fieldInfo.EnumFormatter.Print(int(fieldValue.Int())), EnumToken
 	}
+
 	switch kind {
-	case r.Uint, r.Uint8, r.Uint16, r.Uint32, r.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		val := strconv.FormatUint(fieldValue.Uint(), base)
-		if base == 16 {
+		if base == BaseHexLen {
 			val = "0x" + val
 		}
+
 		return val, NumberToken
-	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return strconv.FormatInt(fieldValue.Int(), base), NumberToken
-	case r.String:
+	case reflect.String:
 		return fieldValue.String(), StringToken
-	case r.Bool:
+	case reflect.Bool:
 		val := fieldValue.Bool()
 		if val {
 			return PrintBool(val), TrueToken
 		}
+
 		return PrintBool(val), FalseToken
-	case r.Array, r.Slice, r.Map:
+	case reflect.Array, reflect.Slice, reflect.Map:
 		return getContainerValueString(fieldValue, fieldInfo), UnknownToken
-	case r.Ptr, r.Struct:
+	case reflect.Ptr, reflect.Struct:
 		if val, err := GetConfigPropString(fieldValue); err == nil {
 			return val, PropToken
 		}
+
 		return "<ERR>", ErrorToken
 	}
 
@@ -268,11 +286,12 @@ func getValueNodeValue(fieldValue r.Value, fieldInfo *FieldInfo) (string, NodeTo
 	return fmt.Sprintf("<?%s>", kind.String()), UnknownToken
 }
 
-func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
+func getContainerValueString(fieldValue reflect.Value, fieldInfo *FieldInfo) string {
 	itemSep := fieldInfo.ItemSeparator
 	sliceLen := fieldValue.Len()
-	var mapKeys []r.Value
-	if fieldInfo.Type.Kind() == r.Map {
+
+	var mapKeys []reflect.Value
+	if fieldInfo.Type.Kind() == reflect.Map {
 		mapKeys = fieldValue.MapKeys()
 		sort.Slice(mapKeys, func(a, b int) bool {
 			return mapKeys[a].String() < mapKeys[b].String()
@@ -280,9 +299,12 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 	}
 
 	sb := strings.Builder{}
+
 	var itemFieldInfo *FieldInfo
-	for i := 0; i < sliceLen; i++ {
-		var itemValue r.Value
+
+	for i := range sliceLen {
+		var itemValue reflect.Value
+
 		if i > 0 {
 			sb.WriteRune(itemSep)
 		}
@@ -291,6 +313,7 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 			mapKey := mapKeys[i]
 			sb.WriteString(mapKey.String())
 			sb.WriteRune(':')
+
 			itemValue = fieldValue.MapIndex(mapKey)
 		} else {
 			itemValue = fieldValue.Index(i)
@@ -304,11 +327,13 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 			}
 
 			if itemFieldInfo.Base == 0 {
-				itemFieldInfo.Base = 10
+				itemFieldInfo.Base = BaseDecimalLen
 			}
 		}
+
 		strVal, _ := getValueNodeValue(itemValue, itemFieldInfo)
 		sb.WriteString(strVal)
 	}
+
 	return sb.String()
 }

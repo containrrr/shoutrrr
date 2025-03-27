@@ -1,6 +1,6 @@
 site_name: Shoutrrr
-site_url: https://containrrr.dev/shoutrrr/
-repo_url: https://github.com/containrrr/shoutrrr/
+site_url: https://nicholas-fedor.github.io/shoutrrr/
+repo_url: https://github.com/nicholas-fedor/shoutrrr/
 edit_uri: edit/main/docs/
 theme:
   name: 'material'

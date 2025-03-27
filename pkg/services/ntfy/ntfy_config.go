@@ -1,56 +1,58 @@
 package ntfy
 
 import (
+	"errors"
 	"net/url"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
-// Config for use within the ntfy service
+// Config for use within the ntfy service.
 type Config struct {
-	Title    string   `key:"title"       default:""          desc:"Message title"`
-	Host     string   `url:"host"        default:"ntfy.sh"   desc:"Server hostname and port"`
-	Topic    string   `url:"path"        required:""         desc:"Target topic name"`
-	Password string   `url:"password"    optional:""         desc:"Auth password"`
-	Username string   `url:"user"        optional:""         desc:"Auth username"`
-	Scheme   string   `key:"scheme"      default:"https"     desc:"Server protocol, http or https"`
-	Tags     []string `key:"tags"        optional:""         desc:"List of tags that may or not map to emojis"`
-	Priority priority `key:"priority"    default:"default"   desc:"Message priority with 1=min, 3=default and 5=max"`
-	Actions  []string `key:"actions"     optional:"" sep:";" desc:"Custom user action buttons for notifications, see https://docs.ntfy.sh/publish/#action-buttons"`
-	Click    string   `key:"click"       optional:""         desc:"Website opened when notification is clicked"`
-	Attach   string   `key:"attach"      optional:""         desc:"URL of an attachment, see attach via URL"`
-	Filename string   `key:"filename"    optional:""         desc:"File name of the attachment"`
-	Delay    string   `key:"delay,at,in" optional:""         desc:"Timestamp or duration for delayed delivery, see https://docs.ntfy.sh/publish/#scheduled-delivery"`
-	Email    string   `key:"email"       optional:""         desc:"E-mail address for e-mail notifications"`
-	Icon     string   `key:"icon"        optional:""         desc:"URL to use as notification icon"`
-	Cache    bool     `key:"cache"       default:"yes"       desc:"Cache messages"`
-	Firebase bool     `key:"firebase"    default:"yes"       desc:"Send to firebase"`
+	Title    string   `default:""                                                                                              desc:"Message title"                                    key:"title"`
+	Host     string   `default:"ntfy.sh"                                                                                       desc:"Server hostname and port"                         url:"host"`
+	Topic    string   `desc:"Target topic name"                                                                                required:""                                             url:"path"`
+	Password string   `desc:"Auth password"                                                                                    optional:""                                             url:"password"`
+	Username string   `desc:"Auth username"                                                                                    optional:""                                             url:"user"`
+	Scheme   string   `default:"https"                                                                                         desc:"Server protocol, http or https"                   key:"scheme"`
+	Tags     []string `desc:"List of tags that may or not map to emojis"                                                       key:"tags"                                              optional:""`
+	Priority priority `default:"default"                                                                                       desc:"Message priority with 1=min, 3=default and 5=max" key:"priority"`
+	Actions  []string `desc:"Custom user action buttons for notifications, see https://docs.ntfy.sh/publish/#action-buttons"   key:"actions"                                           optional:""    sep:";"`
+	Click    string   `desc:"Website opened when notification is clicked"                                                      key:"click"                                             optional:""`
+	Attach   string   `desc:"URL of an attachment, see attach via URL"                                                         key:"attach"                                            optional:""`
+	Filename string   `desc:"File name of the attachment"                                                                      key:"filename"                                          optional:""`
+	Delay    string   `desc:"Timestamp or duration for delayed delivery, see https://docs.ntfy.sh/publish/#scheduled-delivery" key:"delay,at,in"                                       optional:""`
+	Email    string   `desc:"E-mail address for e-mail notifications"                                                          key:"email"                                             optional:""`
+	Icon     string   `desc:"URL to use as notification icon"                                                                  key:"icon"                                              optional:""`
+	Cache    bool     `default:"yes"                                                                                           desc:"Cache messages"                                   key:"cache"`
+	Firebase bool     `default:"yes"                                                                                           desc:"Send to firebase"                                 key:"firebase"`
 }
 
-// Enums implements types.ServiceConfig
+// Enums implements types.ServiceConfig.
 func (*Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 		"Priority": Priority.Enum,
 	}
 }
 
-// GetURL returns a URL representation of it's current field values
+// GetURL returns a URL representation of it's current field values.
 func (config *Config) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
+
 	return config.getURL(&resolver)
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
+// SetURL updates a ServiceConfig from a URL representation of it's field values.
 func (config *Config) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
+
 	return config.setURL(&resolver, url)
 }
 
-// GetAPIURL returns the API URL corresponding to the passed endpoint based on the configuration
+// GetAPIURL returns the API URL corresponding to the passed endpoint based on the configuration.
 func (config *Config) GetAPIURL() string {
-
 	path := config.Topic
 	if !strings.HasPrefix(config.Topic, "/") {
 		path = "/" + path
@@ -67,6 +69,7 @@ func (config *Config) GetAPIURL() string {
 		Path:   path,
 		User:   creds,
 	}
+
 	return apiURL.String()
 }
 
@@ -79,30 +82,32 @@ func (config *Config) getURL(resolver types.ConfigQueryResolver) *url.URL {
 		Path:       config.Topic,
 		RawQuery:   format.BuildQuery(resolver),
 	}
-
 }
 
 func (config *Config) setURL(resolver types.ConfigQueryResolver, url *url.URL) error {
-
 	password, _ := url.User.Password()
 	config.Password = password
 	config.Username = url.User.Username()
 	config.Host = url.Host
 	config.Topic = strings.TrimPrefix(url.Path, "/")
 
-	// Escape raw `;` in queries
 	url.RawQuery = strings.ReplaceAll(url.RawQuery, ";", "%3b")
-
 	for key, vals := range url.Query() {
 		if err := resolver.Set(key, vals[0]); err != nil {
 			return err
 		}
 	}
 
+	if url.String() != "ntfy://dummy@dummy.com" {
+		if config.Topic == "" {
+			return errors.New("topic is required")
+		}
+	}
+
 	return nil
 }
 
-// Scheme is the identifying part of this service's configuration URL
+// Scheme is the identifying part of this service's configuration URL.
 const (
 	Scheme = "ntfy"
 )

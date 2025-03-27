@@ -1,8 +1,10 @@
 package matrix
 
-type messageType string
-type flowType string
-type identifierType string
+type (
+	messageType    string
+	flowType       string
+	identifierType string
+)
 
 const (
 	apiLogin       = "/_matrix/client/r0/login"

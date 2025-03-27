@@ -6,7 +6,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 )
 
-// TestLogger returns a log.Logger that writes to ginkgo.GinkgoWriter for use in tests
+// TestLogger returns a log.Logger that writes to ginkgo.GinkgoWriter for use in tests.
 func TestLogger() *log.Logger {
 	return log.New(ginkgo.GinkgoWriter, "[Test] ", 0)
 }

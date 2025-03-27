@@ -67,7 +67,7 @@ On a system with Go installed you can install the latest Shoutrrr CLI
 command with:
 
 ```shell
-go install github.com/containrrr/shoutrrr/shoutrrr@latest
+go install github.com/nicholas-fedor/shoutrrr/shoutrrr@latest
 ```
 
 ### Commands
@@ -148,7 +148,7 @@ jobs:
       - name: Some other steps needed for deploying
         run: ...
       - name: Shoutrrr
-        uses: containrrr/shoutrrr-action@v1
+        uses: nicholas-fedor/shoutrrr-action@v1
         with:
           url: ${{ secrets.SHOUTRRR_URL }}
           title: Deployed ${{ github.sha }}

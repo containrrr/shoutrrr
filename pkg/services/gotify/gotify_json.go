@@ -2,7 +2,7 @@ package gotify
 
 import "fmt"
 
-// messageRequest is the actual payload being sent to the Gotify API
+// messageRequest is the actual payload being sent to the Gotify API.
 type messageRequest struct {
 	Message  string `json:"message"`
 	Title    string `json:"title"`

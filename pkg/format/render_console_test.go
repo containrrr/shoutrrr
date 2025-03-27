@@ -1,16 +1,16 @@
 package format
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	gformat "github.com/onsi/gomega/format"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 )
 
-var _ = Describe("RenderConsole", func() {
-	gformat.CharactersAroundMismatchToInclude = 30
+var _ = ginkgo.Describe("RenderConsole", func() {
+	format.CharactersAroundMismatchToInclude = 30
 	renderer := ConsoleTreeRenderer{WithValues: false}
 
-	It("should render the expected output based on config reflection/tags", func() {
+	ginkgo.It("should render the expected output based on config reflection/tags", func() {
 		actual := testRenderTree(renderer, &struct {
 			Name string `default:"notempty"`
 			Host string `url:"host"`
@@ -21,20 +21,20 @@ Host string                                                                     
 Name string                                                                       <Default: notempty>
 `[1:]
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	It(`should render enum types as "option"`, func() {
+	ginkgo.It(`should render enum types as "option"`, func() {
 		actual := testRenderTree(renderer, &testEnummer{})
 
 		expected := `
 Choice option                                                                       <Default: Maybe> [Yes, No, Maybe]
 `[1:]
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	It("should render url paths in sorted order", func() {
+	ginkgo.It("should render url paths in sorted order", func() {
 		actual := testRenderTree(renderer, &struct {
 			Host  string `url:"host"`
 			Path1 string `url:"path1"`
@@ -49,6 +49,6 @@ Path2 string                                                                    
 Path3 string                                                                       <URL: Path> <Required>
 `[1:]
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 })

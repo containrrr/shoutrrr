@@ -1,22 +1,22 @@
 package join_test
 
 import (
-	"github.com/containrrr/shoutrrr/internal/testutils"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/join"
-	"github.com/jarcoal/httpmock"
-
 	"net/url"
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/jarcoal/httpmock"
+	"github.com/nicholas-fedor/shoutrrr/internal/testutils"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/join"
+
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 )
 
 func TestJoin(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Join Suite")
+	gomega.RegisterFailHandler(ginkgo.Fail)
+	ginkgo.RunSpecs(t, "Join Suite")
 }
 
 var (
@@ -24,113 +24,116 @@ var (
 	config     *join.Config
 	pkr        format.PropKeyResolver
 	envJoinURL *url.URL
-	_          = BeforeSuite(func() {
+	_          = ginkgo.BeforeSuite(func() {
 		service = &join.Service{}
 		envJoinURL, _ = url.Parse(os.Getenv("SHOUTRRR_JOIN_URL"))
 	})
 )
-var _ = Describe("the join service", func() {
 
-	When("running integration tests", func() {
-		It("should work", func() {
+var _ = ginkgo.Describe("the join service", func() {
+	ginkgo.When("running integration tests", func() {
+		ginkgo.It("should work", func() {
 			if envJoinURL.String() == "" {
 				return
 			}
 			serviceURL, _ := url.Parse(envJoinURL.String())
-			var err = service.Initialize(serviceURL, testutils.TestLogger())
-			Expect(err).NotTo(HaveOccurred())
+			err := service.Initialize(serviceURL, testutils.TestLogger())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			err = service.Send("this is an integration test", nil)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+		ginkgo.It("returns the correct service identifier", func() {
+			gomega.Expect(service.GetID()).To(gomega.Equal("join"))
 		})
 	})
 })
 
-var _ = Describe("the join config", func() {
-	BeforeEach(func() {
+var _ = ginkgo.Describe("the join config", func() {
+	ginkgo.BeforeEach(func() {
 		config = &join.Config{}
 		pkr = format.NewPropKeyResolver(config)
 	})
-	When("updating it using an url", func() {
-		It("should update the API key using the password part of the url", func() {
+	ginkgo.When("updating it using an url", func() {
+		ginkgo.It("should update the API key using the password part of the url", func() {
 			url := createURL("dummy", "TestToken", "testDevice")
 			err := config.SetURL(url)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(config.APIKey).To(Equal("TestToken"))
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(config.APIKey).To(gomega.Equal("TestToken"))
 		})
-		It("should error if supplied with an empty token", func() {
+		ginkgo.It("should error if supplied with an empty token", func() {
 			url := createURL("user", "", "testDevice")
 			expectErrorMessageGivenURL(join.APIKeyMissing, url)
 		})
 	})
-	When("getting the current config", func() {
-		It("should return the config that is currently set as an url", func() {
+	ginkgo.When("getting the current config", func() {
+		ginkgo.It("should return the config that is currently set as an url", func() {
 			config.APIKey = "test-token"
 
 			url := config.GetURL()
 			password, _ := url.User.Password()
-			Expect(password).To(Equal(config.APIKey))
-			Expect(url.Scheme).To(Equal("join"))
+			gomega.Expect(password).To(gomega.Equal(config.APIKey))
+			gomega.Expect(url.Scheme).To(gomega.Equal("join"))
 		})
 	})
-	When("setting a config key", func() {
-		It("should split it by commas if the key is devices", func() {
+	ginkgo.When("setting a config key", func() {
+		ginkgo.It("should split it by commas if the key is devices", func() {
 			err := pkr.Set("devices", "a,b,c,d")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(config.Devices).To(Equal([]string{"a", "b", "c", "d"}))
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(config.Devices).To(gomega.Equal([]string{"a", "b", "c", "d"}))
 		})
-		It("should update icon when an icon is supplied", func() {
+		ginkgo.It("should update icon when an icon is supplied", func() {
 			err := pkr.Set("icon", "https://example.com/icon.png")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(config.Icon).To(Equal("https://example.com/icon.png"))
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(config.Icon).To(gomega.Equal("https://example.com/icon.png"))
 		})
-		It("should update the title when it is supplied", func() {
+		ginkgo.It("should update the title when it is supplied", func() {
 			err := pkr.Set("title", "new title")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(config.Title).To(Equal("new title"))
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(config.Title).To(gomega.Equal("new title"))
 		})
-		It("should return an error if the key is not recognized", func() {
+		ginkgo.It("should return an error if the key is not recognized", func() {
 			err := pkr.Set("devicey", "a,b,c,d")
-			Expect(err).To(HaveOccurred())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 	})
-	When("getting a config key", func() {
-		It("should join it with commas if the key is devices", func() {
+	ginkgo.When("getting a config key", func() {
+		ginkgo.It("should join it with commas if the key is devices", func() {
 			config.Devices = []string{"a", "b", "c"}
 			value, err := pkr.Get("devices")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(value).To(Equal("a,b,c"))
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(value).To(gomega.Equal("a,b,c"))
 		})
-		It("should return an error if the key is not recognized", func() {
+		ginkgo.It("should return an error if the key is not recognized", func() {
 			_, err := pkr.Get("devicey")
-			Expect(err).To(HaveOccurred())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 	})
 
-	When("listing the query fields", func() {
-		It("should return the keys \"devices\", \"icon\", \"title\" in alphabetical order", func() {
+	ginkgo.When("listing the query fields", func() {
+		ginkgo.It("should return the keys \"devices\", \"icon\", \"title\" in alphabetical order", func() {
 			fields := pkr.QueryFields()
-			Expect(fields).To(Equal([]string{"devices", "icon", "title"}))
+			gomega.Expect(fields).To(gomega.Equal([]string{"devices", "icon", "title"}))
 		})
 	})
 
-	When("parsing the configuration URL", func() {
-		It("should be identical after de-/serialization", func() {
+	ginkgo.When("parsing the configuration URL", func() {
+		ginkgo.It("should be identical after de-/serialization", func() {
 			input := "join://Token:apikey@join?devices=dev1%2Cdev2&icon=warning&title=hey"
 			config := &join.Config{}
-			Expect(config.SetURL(testutils.URLMust(input))).To(Succeed())
-			Expect(config.GetURL().String()).To(Equal(input))
+			gomega.Expect(config.SetURL(testutils.URLMust(input))).To(gomega.Succeed())
+			gomega.Expect(config.GetURL().String()).To(gomega.Equal(input))
 		})
 	})
 
-	Describe("sending the payload", func() {
+	ginkgo.Describe("sending the payload", func() {
 		var err error
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			httpmock.Activate()
 		})
-		AfterEach(func() {
+		ginkgo.AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
-		It("should not report an error if the server accepts the payload", func() {
+		ginkgo.It("should not report an error if the server accepts the payload", func() {
 			config := join.Config{
 				APIKey:  "apikey",
 				Devices: []string{"dev1"},
@@ -138,14 +141,17 @@ var _ = Describe("the join config", func() {
 			serviceURL := config.GetURL()
 			service := join.Service{}
 			err = service.Initialize(serviceURL, nil)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			httpmock.RegisterResponder("POST", "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush", httpmock.NewStringResponder(200, ``))
+			httpmock.RegisterResponder(
+				"POST",
+				"https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush",
+				httpmock.NewStringResponder(200, ``),
+			)
 
 			err = service.Send("Message", nil)
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
-
 	})
 })
 
@@ -159,6 +165,6 @@ func createURL(username string, token string, devices string) *url.URL {
 
 func expectErrorMessageGivenURL(msg join.ErrorMessage, url *url.URL) {
 	err := config.SetURL(url)
-	Expect(err).To(HaveOccurred())
-	Expect(err.Error()).To(Equal(string(msg)))
+	gomega.Expect(err).To(gomega.HaveOccurred())
+	gomega.Expect(err.Error()).To(gomega.Equal(string(msg)))
 }

@@ -3,7 +3,7 @@
 ## URL Format
 
 !!! info ""
-    mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__][?icon=__`smiley`__]
+    mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__][?icon=__`smiley`__&disabletls=__`yes`__]
 
 --8<-- "docs/services/mattermost/config.md"
 

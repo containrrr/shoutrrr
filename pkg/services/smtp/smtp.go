@@ -11,16 +11,19 @@ import (
 	"os"
 	"time"
 
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/standard"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
-// Service sends notifications to a given e-mail addresses via SMTP
+// DefaultSMTPPort is the standard port for SMTP communication.
+const DefaultSMTPPort = 25
+
+// Service sends notifications to a given e-mail addresses via SMTP.
 type Service struct {
 	standard.Standard
 	standard.Templater
-	config            *Config
+	Config            *Config
 	multipartBoundary string
 	propKeyResolver   format.PropKeyResolver
 }
@@ -31,11 +34,11 @@ const (
 	contentMultipart = "multipart/alternative; boundary=%s"
 )
 
-// Initialize loads ServiceConfig from configURL and sets logger for this Service
+// Initialize loads ServiceConfig from configURL and sets logger for this Service.
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{
-		Port:        25,
+	service.Config = &Config{
+		Port:        DefaultSMTPPort,
 		ToAddresses: nil,
 		Subject:     "",
 		Auth:        AuthTypes.Unknown,
@@ -45,17 +48,17 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		ClientHost:  "localhost",
 	}
 
-	pkr := format.NewPropKeyResolver(service.config)
+	pkr := format.NewPropKeyResolver(service.Config)
 
-	if err := service.config.setURL(&pkr, configURL); err != nil {
+	if err := service.Config.setURL(&pkr, configURL); err != nil {
 		return err
 	}
 
-	if service.config.Auth == AuthTypes.Unknown {
-		if service.config.Username != "" {
-			service.config.Auth = AuthTypes.Plain
+	if service.Config.Auth == AuthTypes.Unknown {
+		if service.Config.Username != "" {
+			service.Config.Auth = AuthTypes.Plain
 		} else {
-			service.config.Auth = AuthTypes.None
+			service.Config.Auth = AuthTypes.None
 		}
 	}
 
@@ -64,14 +67,19 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 	return nil
 }
 
-// Send a notification message to e-mail recipients
+// GetID returns the service identifier.
+func (service *Service) GetID() string {
+	return Scheme
+}
+
+// Send a notification message to e-mail recipients.
 func (service *Service) Send(message string, params *types.Params) error {
-	config := service.config.Clone()
+	config := service.Config.Clone()
 	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
 		return fail(FailApplySendParams, err)
 	}
 
-	client, err := getClientConnection(service.config)
+	client, err := getClientConnection(service.Config)
 	if err != nil {
 		return fail(FailGetSMTPClient, err)
 	}
@@ -80,11 +88,11 @@ func (service *Service) Send(message string, params *types.Params) error {
 }
 
 func getClientConnection(config *Config) (*smtp.Client, error) {
-
 	var conn net.Conn
+
 	var err error
 
-	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
+	addr := net.JoinHostPort(config.Host, fmt.Sprintf("%d", config.Port))
 
 	if useImplicitTLS(config.Encryption, config.Port) {
 		conn, err = tls.Dial("tcp", addr, &tls.Config{
@@ -107,7 +115,6 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 }
 
 func (service *Service) doSend(client *smtp.Client, message string, config *Config) failure {
-
 	config.FixEmailTags()
 
 	clientHost := service.resolveClientHost(config)
@@ -141,7 +148,6 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 	}
 
 	for _, toAddress := range config.ToAddresses {
-
 		err := service.sendToRecipient(client, toAddress, config, message)
 		if err != nil {
 			return fail(FailSendRecipient, err)
@@ -167,6 +173,7 @@ func (service *Service) resolveClientHost(config *Config) string {
 	hostname, err := os.Hostname()
 	if err != nil {
 		service.Logf("Failed to get hostname, falling back to localhost: %v", err)
+
 		return "localhost"
 	}
 
@@ -174,7 +181,6 @@ func (service *Service) resolveClientHost(config *Config) string {
 }
 
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
-
 	switch config.Auth {
 	case AuthTypes.None:
 		return nil, nil
@@ -187,15 +193,14 @@ func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 	default:
 		return nil, fail(FailAuthType, nil, config.Auth.String())
 	}
-
 }
 
 func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, config *Config, message string) failure {
-
 	// Set the sender and recipient first
 	if err := client.Mail(config.FromAddress); err != nil {
 		return fail(FailSetSender, err)
 	}
+
 	if err := client.Rcpt(toAddress); err != nil {
 		return fail(FailSetRecipient, err)
 	}
@@ -229,7 +234,7 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 }
 
 func (service *Service) getHeaders(toAddress string, subject string) map[string]string {
-	conf := service.config
+	conf := service.Config
 
 	var contentType string
 	if conf.UseHTML {
@@ -249,10 +254,10 @@ func (service *Service) getHeaders(toAddress string, subject string) map[string]
 }
 
 func (service *Service) writeMultipartMessage(wc io.WriteCloser, message string) failure {
-
 	if err := writeMultipartHeader(wc, service.multipartBoundary, contentPlain); err != nil {
 		return fail(FailPlainHeader, err)
 	}
+
 	if err := service.writeMessagePart(wc, message, "plain"); err != nil {
 		return err
 	}
@@ -260,13 +265,13 @@ func (service *Service) writeMultipartMessage(wc io.WriteCloser, message string)
 	if err := writeMultipartHeader(wc, service.multipartBoundary, contentHTML); err != nil {
 		return fail(FailHTMLHeader, err)
 	}
+
 	if err := service.writeMessagePart(wc, message, "HTML"); err != nil {
 		return err
 	}
 
 	if err := writeMultipartHeader(wc, service.multipartBoundary, ""); err != nil {
 		return fail(FailMultiEndHeader, err)
-
 	}
 
 	return nil
@@ -276,6 +281,7 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 	if tpl, found := service.GetTemplate(template); found {
 		data := make(map[string]string)
 		data["message"] = message
+
 		if err := tpl.Execute(wc, data); err != nil {
 			return fail(FailMessageTemplate, err)
 		}
@@ -284,6 +290,7 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 			return fail(FailMessageRaw, err)
 		}
 	}
+
 	return nil
 }
 
@@ -317,5 +324,6 @@ func writeHeaders(wc io.WriteCloser, headers map[string]string) failure {
 	if err != nil {
 		return fail(FailWriteHeaders, err)
 	}
+
 	return nil
 }

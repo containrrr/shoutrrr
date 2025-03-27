@@ -2,7 +2,7 @@ package types
 
 import "log"
 
-// ServiceOpts is the interface describing the service options
+// ServiceOpts is the interface describing the service options.
 type ServiceOpts interface {
 	Verbose() bool
 	Logger() *log.Logger

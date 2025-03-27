@@ -1,0 +1,32 @@
+name: Push to main
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "v*"
+    paths-ignore:
+      - "docs/*"
+
+permissions:
+  contents: write
+  actions: read
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yaml
+
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  build-and-publish:
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    needs:
+      - test
+    with:
+      snapshot: true

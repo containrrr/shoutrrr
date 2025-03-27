@@ -1,62 +1,110 @@
-build:
-  dir: .
-  main: ./shoutrrr
-  binary: shoutrrr
-  goos:
-    - linux
-    - windows
-  goarch:
-    - amd64
-    - 386
-    - arm
-    - arm64
+version: 2
+
+builds:
+  - main: ./shoutrrr/main.go
+    binary: shoutrrr/shoutrrr
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - "386"
+      - arm
+      - arm64
+    ldflags:
+      - -s -w -X github.com/nicholas-fedor/shoutrrr/internal/meta.Version={{ .Version }}
+
 archives:
-  - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}'
-    format: tar.gz
-    replacements:
-      arm: armhf
-      arm64: arm64v8
-      amd64: amd64
-      386: 386
-      darwin: macOS
-      linux: linux
-    format_overrides:
-      - goos: windows
-        format: zip
+  - id: default # Unique ID for this archive configuration
+    name_template: >-
+      {{- .ProjectName }}_
+      {{- if eq .Os "darwin" }}macOS
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm" }}armhf
+      {{- else if eq .Arch "arm64" }}arm64v8
+      {{- else }}{{ .Arch }}{{ end }}_
+      {{- .Version -}}
+    files:
+      - LICENSE.md
+    builds:
+      - shoutrrr
+    formats: ["tar.gz"]
+  - id: windows
+    name_template: >-
+      {{- .ProjectName }}_
+      {{- .Os }}_
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm" }}armhf
+      {{- else if eq .Arch "arm64" }}arm64v8
+      {{- else }}{{ .Arch }}{{ end }}_
+      {{- .Version -}}
+    files:
+      - LICENSE.md
+    builds:
+      - shoutrrr
+    formats: ["zip"]
+
 dockers:
-  - goos: linux
+  - use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+    goos: linux
     goarch: amd64
-    goarm: ''
-    dockerfile: Dockerfile
+    goarm: ""
+    dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/shoutrrr:amd64-{{ .Version }}
-      - containrrr/shoutrrr:amd64-latest
-    binaries:
-      - shoutrrr
-  - goos: linux
-    goarch: 386
-    goarm: ''
-    dockerfile: Dockerfile
+      - nickfedor/shoutrrr:amd64-{{ .Version }}
+      - nickfedor/shoutrrr:amd64-latest
+      - ghcr.io/nicholas-fedor/shoutrrr:amd64-{{ .Version }}
+      - ghcr.io/nicholas-fedor/shoutrrr:amd64-latest
+  - use: buildx
+    build_flag_templates:
+      - "--platform=linux/i386"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+    goos: linux
+    goarch: "386"
+    goarm: ""
+    dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/shoutrrr:i386-{{ .Version }}
-      - containrrr/shoutrrr:i386-latest
-    binaries:
-      - shoutrrr
-  - goos: linux
+      - nickfedor/shoutrrr:i386-{{ .Version }}
+      - nickfedor/shoutrrr:i386-{{ if .IsSnapshot }}latest-dev{{ else }}latest{{ end }}
+      - ghcr.io/nicholas-fedor/shoutrrr:i386-{{ .Version }}
+      - ghcr.io/nicholas-fedor/shoutrrr:i386-{{ if .IsSnapshot }}latest-dev{{ else }}latest{{ end }}
+  - use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm/v6"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+    goos: linux
     goarch: arm
     goarm: 6
-    dockerfile: Dockerfile
+    dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/shoutrrr:armhf-{{ .Version }}
-      - containrrr/shoutrrr:armhf-latest
-    binaries:
-      - shoutrrr
-  - goos: linux
+      - nickfedor/shoutrrr:armhf-{{ .Version }}
+      - nickfedor/shoutrrr:armhf-{{ if .IsSnapshot }}latest-dev{{ else }}latest{{ end }}
+      - ghcr.io/nicholas-fedor/shoutrrr:armhf-{{ .Version }}
+      - ghcr.io/nicholas-fedor/shoutrrr:armhf-{{ if .IsSnapshot }}latest-dev{{ else }}latest{{ end }}
+  - use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+    goos: linux
     goarch: arm64
-    goarm: ''
-    dockerfile: Dockerfile
+    goarm: ""
+    dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/shoutrrr:arm64v8-{{ .Version }}
-      - containrrr/shoutrrr:arm64v8-latest
-    binaries:
-      - shoutrrr
+      - nickfedor/shoutrrr:arm64v8-{{ .Version }}
+      - nickfedor/shoutrrr:arm64v8-latest
+      - ghcr.io/nicholas-fedor/shoutrrr:arm64v8-{{ .Version }}
+      - ghcr.io/nicholas-fedor/shoutrrr:arm64v8-{{ if .IsSnapshot }}latest-dev{{ else }}latest{{ end }}

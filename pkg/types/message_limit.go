@@ -1,6 +1,6 @@
 package types
 
-// MessageLimit is used for declaring the payload limits for services upstream APIs
+// MessageLimit is used for declaring the payload limits for services upstream APIs.
 type MessageLimit struct {
 	ChunkSize      int
 	TotalChunkSize int

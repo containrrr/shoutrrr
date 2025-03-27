@@ -35,9 +35,9 @@ The easiest way to retrieve them is by using the `shoutrrr generate telegram` co
 creating a URL with your target chats.
 
 !!! tip
-    You can use the `containrrr/shoutrrr` image in docker to run it without download/installing the `shoutrrr` CLI using:
+    You can use the `nickfedor/shoutrrr` image in docker to run it without download/installing the `shoutrrr` CLI using:
     ```
-    docker run --rm -it containrrr/shoutrrr generate telegram
+    docker run --rm -it nickfedor/shoutrrr generate telegram
     ```
 
 ### Asking @shoutrrrbot
@@ -46,7 +46,7 @@ It will reply with the Chat ID for the chat where the forwarded message was orig
 Note that it will not work correctly for Group chats, as those messages are just seen as being posted by a user, not in a specific chat.
 Instead you can use the second method, which is to invite the @shoutrrrbot into your group chat and address a message to it (start the message with @shoutrrrbot). You can then safely kick the bot from the group. 
 
-The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at [github.com/containrrr/shoutrrrbot](https://github.com/containrrr/shoutrrrbot).
+The bot should be constantly online, unless it's usage exceeds the free tier on GCP. It's source is available at [github.com/nicholas-fedor/shoutrrrbot](https://github.com/nicholas-fedor/shoutrrrbot).
 
 
 

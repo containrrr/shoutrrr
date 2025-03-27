@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// SendMessagePayload is the notification payload for the telegram notification service
+// SendMessagePayload is the notification payload for the telegram notification service.
 type SendMessagePayload struct {
 	Text                string       `json:"text"`
 	ID                  string       `json:"chat_id"`
@@ -21,7 +21,7 @@ type SendMessagePayload struct {
 	MessageID           int64        `json:"message_id,omitempty"`
 }
 
-// Message represents one chat message
+// Message represents one chat message.
 type Message struct {
 	MessageID int64  `json:"message_id"`
 	Text      string `json:"text"`
@@ -36,12 +36,14 @@ type messageResponse struct {
 
 func createSendMessagePayload(message string, channel string, config *Config) SendMessagePayload {
 	var threadID *int = nil
+
 	chatID, thread, ok := strings.Cut(channel, ":")
 	if ok {
 		if parsed, err := strconv.Atoi(thread); err == nil {
 			threadID = &parsed
 		}
 	}
+
 	payload := SendMessagePayload{
 		Text:                message,
 		ID:                  chatID,
@@ -84,7 +86,7 @@ type userResponse struct {
 	Result User `json:"result"`
 }
 
-// User contains information about a telegram user or bot
+// User contains information about a telegram user or bot.
 type User struct {
 	//	Unique identifier for this User or bot
 	ID int64 `json:"id"`
@@ -131,7 +133,7 @@ type inlineQuery struct {
 
 type chosenInlineResult struct{}
 
-// Update contains state changes since the previous Update
+// Update contains state changes since the previous Update.
 type Update struct {
 	// 	The Update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you're using Webhooks, since it allows you to ignore repeated updates or to restore the correct Update sequence, should they get out of order. If there are no new updates for at least a week, then identifier of the next Update will be chosen randomly instead of sequentially.
 	UpdateID int `json:"update_id"`
@@ -153,18 +155,18 @@ type Update struct {
 	// API fields that are not used by the client has been commented out
 
 	//// 	Optional. New incoming shipping query. Only for invoices with flexible price
-	//ShippingQuery	ShippingQuery `json:"shipping_query"`
+	//ShippingQuery	`json:"shipping_query"`
 	//// 	Optional. New incoming pre-checkout query. Contains full information about checkout
-	//PreCheckoutQuery	PreCheckoutQuery `json:"pre_checkout_query"`
+	//PreCheckoutQuery	`json:"pre_checkout_query"`
 	//// 	Optional. New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot
-	//Poll	Poll `json:"poll"`
+	//Poll	`json:"poll"`
 	//// 	Optional. A User changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
 	//Poll_answer	PollAnswer `json:"poll_answer"`
 
 	ChatMemberUpdate *ChatMemberUpdate `json:"my_chat_member"`
 }
 
-// Chat represents a telegram conversation
+// Chat represents a telegram conversation.
 type Chat struct {
 	ID       int64  `json:"id"`
 	Type     string `json:"type"`
@@ -172,11 +174,12 @@ type Chat struct {
 	Username string `json:"username"`
 }
 
-// Name returns the name of the channel based on its type
+// Name returns the name of the channel based on its type.
 func (c *Chat) Name() string {
 	if c.Type == "private" || c.Type == "channel" && c.Username != "" {
 		return "@" + c.Username
 	}
+
 	return c.Title
 }
 
@@ -206,7 +209,7 @@ type callbackQuery struct {
 	Data    string   `json:"data"`
 }
 
-// ChatMemberUpdate represents a member update in a telegram chat
+// ChatMemberUpdate represents a member update in a telegram chat.
 type ChatMemberUpdate struct {
 	// Chat the user belongs to
 	Chat *Chat `json:"chat"`
@@ -222,7 +225,7 @@ type ChatMemberUpdate struct {
 	// invite_link ChatInviteLink
 }
 
-// ChatMember represents the membership state for a user in a telegram chat
+// ChatMember represents the membership state for a user in a telegram chat.
 type ChatMember struct {
 	//	The member's status in the chat
 	Status string `json:"status"`

@@ -1,9 +1,8 @@
 package types
 
-// StdLogger is an interface of a subset of the stdlib log.Logger used for
-// outputting log information from services that are non-fatal
+// StdLogger is an interface for outputting log information from services that are non-fatal.
 type StdLogger interface {
-	Print(...interface{})
-	Printf(string, ...interface{})
-	Println(...interface{})
+	Print(args ...any)
+	Printf(format string, args ...any)
+	Println(args ...any)
 }

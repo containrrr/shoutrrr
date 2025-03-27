@@ -3,8 +3,8 @@ package jsonclient
 import "net/http"
 
 type Client interface {
-	Get(url string, response interface{}) error
-	Post(url string, request interface{}, response interface{}) error
+	Get(url string, response any) error
+	Post(url string, request any, response any) error
 	Headers() http.Header
-	ErrorResponse(err error, response interface{}) bool
+	ErrorResponse(err error, response any) bool
 }

@@ -4,13 +4,27 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util"
+)
+
+const (
+	// schemeHTTPPrefixLength is the length of "http" in "https", used to strip TLS suffix.
+	schemeHTTPPrefixLength = 4
+
+	// tokenHintLength is the number of characters to display as a preview of the access token.
+	tokenHintLength = 3
+
+	// minSliceLength is the minimum length for a non-empty slice (used for rooms check).
+	minSliceLength = 1
+
+	// httpClientErrorStatus is the minimum HTTP status code indicating a client error (400 Bad Request).
+	httpClientErrorStatus = 400
 )
 
 type client struct {
@@ -33,7 +47,7 @@ func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client)
 	}
 
 	if disableTLS {
-		c.apiURL.Scheme = c.apiURL.Scheme[:4]
+		c.apiURL.Scheme = c.apiURL.Scheme[:schemeHTTPPrefixLength] // "https" -> "http"
 	}
 
 	c.logger.Printf("Using server: %v\n", c.apiURL.String())
@@ -55,11 +69,14 @@ func (c *client) login(user string, password string) error {
 		return fmt.Errorf("failed to get login flows: %w", err)
 	}
 
-	var flows []string
+	// Pre-allocate flows slice with capacity based on response length.
+	flows := make([]string, 0, len(resLogin.Flows))
 	for _, flow := range resLogin.Flows {
 		flows = append(flows, string(flow.Type))
+
 		if flow.Type == flowLoginPassword {
 			c.logf("Using login flow '%v'", flow.Type)
+
 			return c.loginPassword(user, password)
 		}
 	}
@@ -78,9 +95,10 @@ func (c *client) loginPassword(user string, password string) error {
 	}
 
 	c.accessToken = response.AccessToken
+
 	tokenHint := ""
-	if len(response.AccessToken) > 3 {
-		tokenHint = response.AccessToken[:3]
+	if len(response.AccessToken) > tokenHintLength {
+		tokenHint = response.AccessToken[:tokenHintLength]
 	}
 
 	c.logf("AccessToken: %v...\n", tokenHint)
@@ -91,9 +109,10 @@ func (c *client) loginPassword(user string, password string) error {
 }
 
 func (c *client) sendMessage(message string, rooms []string) (errors []error) {
-	if len(rooms) > 0 {
+	if len(rooms) >= minSliceLength {
 		return c.sendToExplicitRooms(rooms, message)
 	}
+
 	return c.sendToJoinedRooms(message)
 }
 
@@ -106,6 +125,7 @@ func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []e
 		var roomID string
 		if roomID, err = c.joinRoom(room); err != nil {
 			errors = append(errors, fmt.Errorf("error joining room %v: %w", roomID, err))
+
 			continue
 		}
 
@@ -127,9 +147,9 @@ func (c *client) sendToJoinedRooms(message string) (errors []error) {
 		return append(errors, fmt.Errorf("failed to get joined rooms: %w", err))
 	}
 
-	// Send to all rooms that are joined
 	for _, roomID := range joinedRooms {
 		c.logf("Sending message to '%v'...\n", roomID)
+
 		if err := c.sendMessageToRoom(message, roomID); err != nil {
 			errors = append(errors, fmt.Errorf("failed to send message to room '%v': %w", roomID, err))
 		}
@@ -143,11 +163,13 @@ func (c *client) joinRoom(room string) (roomID string, err error) {
 	if err = c.apiPost(fmt.Sprintf(apiRoomJoin, room), nil, &resRoom); err != nil {
 		return "", err
 	}
+
 	return resRoom.RoomID, nil
 }
 
 func (c *client) sendMessageToRoom(message string, roomID string) error {
 	resEvent := apiResEvent{}
+
 	return c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
 		MsgType: msgTypeText,
 		Body:    message,
@@ -158,17 +180,20 @@ func (c *client) apiGet(path string, response interface{}) error {
 	c.apiURL.Path = path
 
 	var err error
+
 	var res *http.Response
+
 	res, err = http.Get(c.apiURL.String())
 	if err != nil {
 		return err
 	}
 
 	var body []byte
-	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
 
-	if res.StatusCode >= 400 {
+	defer res.Body.Close()
+	body, err = io.ReadAll(res.Body)
+
+	if res.StatusCode >= httpClientErrorStatus {
 		resError := &apiResError{}
 		if err == nil {
 			if err = json.Unmarshal(body, resError); err == nil {
@@ -190,6 +215,7 @@ func (c *client) apiPost(path string, request interface{}, response interface{})
 	c.apiURL.Path = path
 
 	var err error
+
 	var body []byte
 
 	body, err = json.Marshal(request)
@@ -198,15 +224,16 @@ func (c *client) apiPost(path string, request interface{}, response interface{})
 	}
 
 	var res *http.Response
+
 	res, err = http.Post(c.apiURL.String(), contentType, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
 
 	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 
-	if res.StatusCode >= 400 {
+	if res.StatusCode >= httpClientErrorStatus {
 		resError := &apiResError{}
 		if err == nil {
 			if err = json.Unmarshal(body, resError); err == nil {
@@ -230,7 +257,7 @@ func (c *client) updateAccessToken() {
 	c.apiURL.RawQuery = query.Encode()
 }
 
-func (c *client) logf(format string, v ...interface{}) {
+func (c *client) logf(format string, v ...any) {
 	c.logger.Printf(format, v...)
 }
 
@@ -239,5 +266,6 @@ func (c *client) getJoinedRooms() ([]string, error) {
 	if err := c.apiGet(apiJoinedRooms, &response); err != nil {
 		return []string{}, err
 	}
+
 	return response.Rooms, nil
 }

@@ -51,18 +51,20 @@ func (err *ErrorResponse) Error() string {
 func (p *PushRequest) SetTarget(target string) {
 	if emailPattern.MatchString(target) {
 		p.Email = target
+
 		return
 	}
 
 	if len(target) > 0 && string(target[0]) == "#" {
 		p.ChannelTag = target[1:]
+
 		return
 	}
 
 	p.DeviceIden = target
 }
 
-// NewNotePush creates a new push request
+// NewNotePush creates a new push request.
 func NewNotePush(message, title string) *PushRequest {
 	return &PushRequest{
 		Type:  "note",

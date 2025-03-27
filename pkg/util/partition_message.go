@@ -1,18 +1,19 @@
 package util
 
 import (
-	t "github.com/containrrr/shoutrrr/pkg/types"
-
 	"strings"
+
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
 const ellipsis = " [...]"
 
-// PartitionMessage splits a string into chunks that is at most chunkSize runes, it will search the last distance runes
-// for a whitespace to make the split appear nicer. It will keep adding chunks until it reaches maxCount chunks, or if
-// the total amount of runes in the chunks reach maxTotal.
-// The chunks are returned together with the number of omitted runes (that did not fit into the chunks)
-func PartitionMessage(input string, limits t.MessageLimit, distance int) (items []t.MessageItem, omitted int) {
+// PartitionMessage splits a string into chunks that is at most chunkSize runes,
+// it will search the last distance runes for a whitespace to make the split appear nicer.
+// It will keep adding chunks until it reaches maxCount chunks,
+// or if the total amount of runes in the chunks reach maxTotal.
+// The chunks are returned together with the number of omitted runes (that did not fit into the chunks).
+func PartitionMessage(input string, limits types.MessageLimit, distance int) (items []types.MessageItem, omitted int) {
 	runes := []rune(input)
 	chunkOffset := 0
 	maxTotal := Min(len(runes), limits.TotalChunkSize)
@@ -21,7 +22,8 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 	if len(input) == 0 {
 		// If the message is empty, return an empty array
 		omitted = 0
-		return
+
+		return items, omitted
 	}
 
 	for i := 0; i < maxCount; i++ {
@@ -29,6 +31,7 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 		chunkEnd := chunkOffset + limits.ChunkSize
 		// ... and start next chunk directly after this one
 		nextChunkStart := chunkEnd
+
 		if chunkEnd >= maxTotal {
 			// The chunk is smaller than the limit, no need to search
 			chunkEnd = maxTotal
@@ -41,12 +44,13 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 					chunkEnd = rp
 					// Since the split is on a whitespace, skip it in the next chunk
 					nextChunkStart = chunkEnd + 1
+
 					break
 				}
 			}
 		}
 
-		items = append(items, t.MessageItem{
+		items = append(items, types.MessageItem{
 			Text: string(runes[chunkOffset:chunkEnd]),
 		})
 
@@ -59,25 +63,26 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 	return items, len(runes) - chunkOffset
 }
 
-// Ellipsis returns a string that is at most maxLength characters with a ellipsis appended if the input was longer
+// Ellipsis returns a string that is at most maxLength characters with a ellipsis appended if the input was longer.
 func Ellipsis(text string, maxLength int) string {
 	if len(text) > maxLength {
 		text = text[:maxLength-len(ellipsis)] + ellipsis
 	}
+
 	return text
 }
 
-// MessageItemsFromLines creates a set of MessageItems that is compatible with the supplied limits
-func MessageItemsFromLines(plain string, limits t.MessageLimit) (batches [][]t.MessageItem) {
+// MessageItemsFromLines creates a set of MessageItems that is compatible with the supplied limits.
+func MessageItemsFromLines(plain string, limits types.MessageLimit) (batches [][]types.MessageItem) {
 	maxCount := limits.ChunkCount
 
 	lines := strings.Split(plain, "\n")
-	batches = make([][]t.MessageItem, 0)
-	items := make([]t.MessageItem, 0, Min(maxCount, len(lines)))
+	batches = make([][]types.MessageItem, 0)
+	items := make([]types.MessageItem, 0, Min(maxCount, len(lines)))
 
 	totalLength := 0
-	for _, line := range lines {
 
+	for _, line := range lines {
 		maxLen := limits.ChunkSize
 
 		if len(items) == maxCount || totalLength+maxLen > limits.TotalChunkSize {
@@ -96,7 +101,7 @@ func MessageItemsFromLines(plain string, limits t.MessageLimit) (batches [][]t.M
 			continue
 		}
 
-		items = append(items, t.MessageItem{
+		items = append(items, types.MessageItem{
 			Text: line,
 		})
 

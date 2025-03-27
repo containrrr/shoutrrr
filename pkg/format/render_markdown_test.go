@@ -1,15 +1,15 @@
 package format
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	gformat "github.com/onsi/gomega/format"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 )
 
-var _ = Describe("RenderMarkdown", func() {
-	gformat.CharactersAroundMismatchToInclude = 10
+var _ = ginkgo.Describe("RenderMarkdown", func() {
+	format.CharactersAroundMismatchToInclude = 10
 
-	It("should render the expected output based on config reflection/tags", func() {
+	ginkgo.It("should render the expected output based on config reflection/tags", func() {
 		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
 			Name string `default:"notempty"`
 			Host string `url:"host"`
@@ -28,10 +28,10 @@ var _ = Describe("RenderMarkdown", func() {
 
 `
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	It("should render url paths in sorted order", func() {
+	ginkgo.It("should render url paths in sorted order", func() {
 		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
 			Host  string `url:"host"`
 			Path1 string `url:"path1"`
@@ -55,10 +55,10 @@ var _ = Describe("RenderMarkdown", func() {
 
 `[1:] // Remove initial newline
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	It("should render prop aliases", func() {
+	ginkgo.It("should render prop aliases", func() {
 		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &struct {
 			Name string `key:"name,handle,title,target"`
 		}{})
@@ -74,10 +74,10 @@ var _ = Describe("RenderMarkdown", func() {
 
 `
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	It("should render possible enum values", func() {
+	ginkgo.It("should render possible enum values", func() {
 		actual := testRenderTree(MarkdownTreeRenderer{HeaderPrefix: `### `}, &testEnummer{})
 
 		expected := `
@@ -92,11 +92,11 @@ var _ = Describe("RenderMarkdown", func() {
 
 `
 
-		Expect(actual).To(Equal(expected))
+		gomega.Expect(actual).To(gomega.Equal(expected))
 	})
 
-	When("there are no query props", func() {
-		It("should prepend an empty-message instead of props description", func() {
+	ginkgo.When("there are no query props", func() {
+		ginkgo.It("should prepend an empty-message instead of props description", func() {
 			actual := testRenderTree(MarkdownTreeRenderer{
 				HeaderPrefix:      `### `,
 				PropsDescription:  "Feel free to set these:",
@@ -118,12 +118,12 @@ There is nothing to set!
 			//_ = actual == expected
 			//println()
 			//println(actual)
-			Expect(actual).To(Equal(expected))
+			gomega.Expect(actual).To(gomega.Equal(expected))
 		})
 	})
 
-	When("there are query props", func() {
-		It("should prepend the props description", func() {
+	ginkgo.When("there are query props", func() {
+		ginkgo.It("should prepend the props description", func() {
 			actual := testRenderTree(MarkdownTreeRenderer{
 				HeaderPrefix:      `### `,
 				PropsDescription:  "Feel free to set these:",
@@ -146,8 +146,7 @@ Feel free to set these:
 
 `[1:] // Remove initial newline
 
-			Expect(actual).To(Equal(expected))
+			gomega.Expect(actual).To(gomega.Equal(expected))
 		})
 	})
-
 })

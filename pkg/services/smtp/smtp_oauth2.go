@@ -15,7 +15,6 @@ func OAuth2Auth(username, accessToken string) smtp.Auth {
 }
 
 func (a *oauth2Auth) Start(_ *smtp.ServerInfo) (string, []byte, error) {
-
 	resp := []byte("user=" + a.username + "\x01auth=Bearer " + a.accessToken + "\x01\x01")
 
 	return "XOAUTH2", resp, nil
@@ -24,5 +23,3 @@ func (a *oauth2Auth) Start(_ *smtp.ServerInfo) (string, []byte, error) {
 func (a *oauth2Auth) Next(_ []byte, _ bool) ([]byte, error) {
 	return nil, nil
 }
-
-

@@ -1,0 +1,20 @@
+name: Pull Request
+
+on:
+  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
+# jobs:
+#   lint:
+#     uses: ./.github/workflows/lint.yaml
+
+  test:
+    uses: ./.github/workflows/test.yaml

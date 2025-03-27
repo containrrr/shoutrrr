@@ -1,34 +1,31 @@
 package format_test
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
-	. "github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 )
 
-var _ = Describe("URLPart", func() {
-	It("should return the expected URL part for each lookup key", func() {
-		Expect(ParseURLPart("user")).To(Equal(URLUser))
-		Expect(ParseURLPart("pass")).To(Equal(URLPassword))
-		Expect(ParseURLPart("password")).To(Equal(URLPassword))
-		Expect(ParseURLPart("host")).To(Equal(URLHost))
-		Expect(ParseURLPart("port")).To(Equal(URLPort))
-
-		Expect(ParseURLPart("path")).To(Equal(URLPath))
-		Expect(ParseURLPart("path1")).To(Equal(URLPath))
-		Expect(ParseURLPart("path2")).To(Equal(URLPath + 1))
-		Expect(ParseURLPart("path3")).To(Equal(URLPath + 2))
-		Expect(ParseURLPart("path4")).To(Equal(URLPath + 3))
-
-		Expect(ParseURLPart("query")).To(Equal(URLQuery))
-		Expect(ParseURLPart("")).To(Equal(URLQuery))
+var _ = ginkgo.Describe("URLPart", func() {
+	ginkgo.It("should return the expected URL part for each lookup key", func() {
+		gomega.Expect(format.ParseURLPart("user")).To(gomega.Equal(format.URLUser))
+		gomega.Expect(format.ParseURLPart("pass")).To(gomega.Equal(format.URLPassword))
+		gomega.Expect(format.ParseURLPart("password")).To(gomega.Equal(format.URLPassword))
+		gomega.Expect(format.ParseURLPart("host")).To(gomega.Equal(format.URLHost))
+		gomega.Expect(format.ParseURLPart("port")).To(gomega.Equal(format.URLPort))
+		gomega.Expect(format.ParseURLPart("path")).To(gomega.Equal(format.URLPath))
+		gomega.Expect(format.ParseURLPart("path1")).To(gomega.Equal(format.URLPath))
+		gomega.Expect(format.ParseURLPart("path2")).To(gomega.Equal(format.URLPath + 1))
+		gomega.Expect(format.ParseURLPart("path3")).To(gomega.Equal(format.URLPath + 2))
+		gomega.Expect(format.ParseURLPart("path4")).To(gomega.Equal(format.URLPath + 3))
+		gomega.Expect(format.ParseURLPart("query")).To(gomega.Equal(format.URLQuery))
+		gomega.Expect(format.ParseURLPart("")).To(gomega.Equal(format.URLQuery))
 	})
-	It("should return the expected suffix for each URL part", func() {
-		Expect(URLUser.Suffix()).To(Equal(':'))
-		Expect(URLPassword.Suffix()).To(Equal('@'))
-		Expect(URLHost.Suffix()).To(Equal(':'))
-		Expect(URLPort.Suffix()).To(Equal('/'))
-		Expect(URLPath.Suffix()).To(Equal('/'))
+	ginkgo.It("should return the expected suffix for each URL part", func() {
+		gomega.Expect(format.URLUser.Suffix()).To(gomega.Equal(':'))
+		gomega.Expect(format.URLPassword.Suffix()).To(gomega.Equal('@'))
+		gomega.Expect(format.URLHost.Suffix()).To(gomega.Equal(':'))
+		gomega.Expect(format.URLPort.Suffix()).To(gomega.Equal('/'))
+		gomega.Expect(format.URLPath.Suffix()).To(gomega.Equal('/'))
 	})
 })

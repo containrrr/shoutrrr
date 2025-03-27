@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// MessagePayload used within the Slack service
+// MessagePayload used within the Slack service.
 type MessagePayload struct {
 	Text        string       `json:"text"`
 	BotName     string       `json:"username,omitempty"`
@@ -19,7 +19,7 @@ type MessagePayload struct {
 
 var iconURLPattern = regexp.MustCompile(`https?://`)
 
-// SetIcon sets the appropriate icon field in the payload based on whether the input is a URL or not
+// SetIcon sets the appropriate icon field in the payload based on whether the input is a URL or not.
 func (p *MessagePayload) SetIcon(icon string) {
 	p.IconURL = ""
 	p.IconEmoji = ""
@@ -59,7 +59,7 @@ type legacyField struct {
 	Short bool   `json:"short,omitempty"`
 }
 
-// APIResponse is the default generic response message sent from the API
+// APIResponse is the default generic response message sent from the API.
 type APIResponse struct {
 	Ok       bool   `json:"ok"`
 	Error    string `json:"error"`
@@ -69,17 +69,25 @@ type APIResponse struct {
 	} `json:"response_metadata"`
 }
 
-// CreateJSONPayload compatible with the slack post message API
-func CreateJSONPayload(config *Config, message string) interface{} {
+// Constants for Slack API limits.
+const (
+	MaxAttachments = 100 // Maximum number of attachments allowed by Slack API
+)
 
-	var atts []attachment
-	for i, line := range strings.Split(message, "\n") {
-		// When 100 attachments have been reached, append the remaining line to the last
-		// attachment to prevent reaching the slack API limit
-		if i >= 100 {
-			atts[len(atts)-1].Text += "\n" + line
+// CreateJSONPayload compatible with the slack post message API.
+func CreateJSONPayload(config *Config, message string) interface{} {
+	lines := strings.Split(message, "\n")
+	// Pre-allocate atts with a capacity of min(len(lines), MaxAttachments)
+	atts := make([]attachment, 0, minInt(len(lines), MaxAttachments))
+
+	for i, line := range lines {
+		// When MaxAttachments have been reached, append the remaining lines to the last attachment
+		if i >= MaxAttachments {
+			atts[MaxAttachments-1].Text += "\n" + line
+
 			continue
 		}
+
 		atts = append(atts, attachment{
 			Text:  line,
 			Color: config.Color,
@@ -87,7 +95,7 @@ func CreateJSONPayload(config *Config, message string) interface{} {
 	}
 
 	// Remove last attachment if empty
-	if atts[len(atts)-1].Text == "" {
+	if len(atts) > 0 && atts[len(atts)-1].Text == "" {
 		atts = atts[:len(atts)-1]
 	}
 
@@ -105,4 +113,13 @@ func CreateJSONPayload(config *Config, message string) interface{} {
 	}
 
 	return payload
+}
+
+// minInt returns the smaller of two integers.
+func minInt(a, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
 }

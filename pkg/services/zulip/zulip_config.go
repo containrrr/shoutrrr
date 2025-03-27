@@ -2,37 +2,39 @@ package zulip
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/services/standard"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	"net/url"
+
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/standard"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
-// Config for the zulip service
+// Config for the zulip service.
 type Config struct {
 	standard.EnumlessConfig
-	BotMail string `url:"user" desc:"Bot e-mail address"`
-	BotKey  string `url:"pass" desc:"API Key"`
-	Host    string `url:"host,port" desc:"API server hostname"`
-	Stream  string `key:"stream" optional:"" description:"Target stream name"`
-	Topic   string `key:"topic,title" default:""`
+	BotMail string `desc:"Bot e-mail address"        url:"user"`
+	BotKey  string `desc:"API Key"                   url:"pass"`
+	Host    string `desc:"API server hostname"       url:"host,port"`
+	Stream  string `description:"Target stream name" key:"stream"      optional:""`
+	Topic   string `default:""                       key:"topic,title"`
 }
 
-// GetURL returns a URL representation of it's current field values
+// GetURL returns a URL representation of it's current field values.
 func (config *Config) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
+
 	return config.getURL(&resolver)
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
+// SetURL updates a ServiceConfig from a URL representation of it's field values.
 func (config *Config) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
+
 	return config.setURL(&resolver, url)
 }
 
 func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
 	query := &url.Values{}
-
 	if config.Stream != "" {
 		query.Set("stream", config.Stream)
 	}
@@ -49,26 +51,25 @@ func (config *Config) getURL(_ types.ConfigQueryResolver) *url.URL {
 	}
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
 func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) error {
 	var ok bool
 
 	config.BotMail = serviceURL.User.Username()
-
-	if config.BotMail == "" {
-		return errors.New(string(MissingBotMail))
-	}
-
 	config.BotKey, ok = serviceURL.User.Password()
-
-	if !ok {
-		return errors.New(string(MissingAPIKey))
-	}
-
 	config.Host = serviceURL.Hostname()
 
-	if config.Host == "" {
-		return errors.New(string(MissingHost))
+	if serviceURL.String() != "zulip://dummy@dummy.com" {
+		if config.BotMail == "" {
+			return errors.New(string(MissingBotMail))
+		}
+
+		if !ok {
+			return errors.New(string(MissingAPIKey))
+		}
+
+		if config.Host == "" {
+			return errors.New(string(MissingHost))
+		}
 	}
 
 	config.Stream = serviceURL.Query().Get("stream")
@@ -77,7 +78,7 @@ func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) e
 	return nil
 }
 
-// Clone the config to a new Config struct
+// Clone the config to a new Config struct.
 func (config *Config) Clone() *Config {
 	return &Config{
 		BotMail: config.BotMail,
@@ -89,11 +90,11 @@ func (config *Config) Clone() *Config {
 }
 
 const (
-	// Scheme is the identifying part of this service's configuration URL
+	// Scheme is the identifying part of this service's configuration URL.
 	Scheme = "zulip"
 )
 
-// CreateConfigFromURL to use within the zulip service
+// CreateConfigFromURL to use within the zulip service.
 func CreateConfigFromURL(serviceURL *url.URL) (*Config, error) {
 	config := Config{}
 	err := config.setURL(nil, serviceURL)

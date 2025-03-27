@@ -4,7 +4,7 @@ import (
 	"net/url"
 )
 
-// CreatePayload compatible with the zulip api
+// CreatePayload compatible with the zulip api.
 func CreatePayload(config *Config, message string) url.Values {
 	form := url.Values{}
 	form.Set("type", "stream")

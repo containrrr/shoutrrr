@@ -1,0 +1,56 @@
+name: Publish Docs
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Setup Go
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+        with:
+          go-version: "1.24"
+
+      - name: Generate Service Config Docs
+        run: |
+          go mod download
+          go clean -cache  # Clear build cache
+          ./generate-service-config-docs.sh
+
+      - name: Setup Python
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55
+        with:
+          python-version: "3.13.2"
+          cache: "pip"
+          cache-dependency-path: |
+            docs-requirements.txt
+
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+
+          restore-keys: |
+            mkdocs-material-
+
+      - name: Install mkdocs
+        run: |
+          pip install -r docs-requirements.txt
+
+      - name: Build and Deploy
+        run: mkdocs gh-deploy --force --verbose

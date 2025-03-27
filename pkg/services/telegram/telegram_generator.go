@@ -1,19 +1,19 @@
 package telegram
 
 import (
-	f "github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util/generator"
-
 	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+
+	"github.com/nicholas-fedor/shoutrrr/pkg/format"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/nicholas-fedor/shoutrrr/pkg/util/generator"
 )
 
-// Generator is the telegram-specific URL generator
+// Generator is the telegram-specific URL generator.
 type Generator struct {
 	ud        *generator.UserDialog
 	client    *Client
@@ -26,36 +26,47 @@ type Generator struct {
 	Writer    io.Writer
 }
 
-// Generate a telegram Shoutrrr configuration from a user dialog
+// Constants for GetUpdates parameters.
+const (
+	UpdatesLimit   = 10  // Number of updates to retrieve per call
+	UpdatesTimeout = 120 // Timeout in seconds for long polling
+)
+
+// Generate a telegram Shoutrrr configuration from a user dialog.
 func (g *Generator) Generate(_ types.Service, props map[string]string, _ []string) (types.ServiceConfig, error) {
 	var config Config
+
 	if g.Reader == nil {
 		g.Reader = os.Stdin
 	}
+
 	if g.Writer == nil {
 		g.Writer = os.Stdout
 	}
+
 	g.ud = generator.NewUserDialog(g.Reader, g.Writer, props)
 	ud := g.ud
 
-	ud.Writeln("To start we need your bot token. If you haven't created a bot yet, you can use this link:")
-	ud.Writeln("  %v", f.ColorizeLink("https://t.me/botfather?start"))
-	ud.Writeln("")
+	ud.Writelnf("To start we need your bot token. If you haven't created a bot yet, you can use this link:")
+	ud.Writelnf("  %v", format.ColorizeLink("https://t.me/botfather?start"))
+	ud.Writelnf("")
 
 	token := ud.QueryString("Enter your bot token:", generator.ValidateFormat(IsTokenValid), "token")
 
-	ud.Writeln("Fetching bot info...")
+	ud.Writelnf("Fetching bot info...")
 
 	g.client = &Client{token: token}
+
 	botInfo, err := g.client.GetBotInfo()
 	if err != nil {
 		return &Config{}, err
 	}
 
 	g.botName = botInfo.Username
-	ud.Writeln("")
-	ud.Writeln("Okay! %v will listen for any messages in PMs and group chats it is invited to.",
-		f.ColorizeString("@", g.botName))
+
+	ud.Writelnf("")
+	ud.Writelnf("Okay! %v will listen for any messages in PMs and group chats it is invited to.",
+		format.ColorizeString("@", g.botName))
 
 	g.done = false
 	lastUpdate := 0
@@ -66,10 +77,9 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
 	for !g.done {
+		ud.Writelnf("Waiting for messages to arrive...")
 
-		ud.Writeln("Waiting for messages to arrive...")
-
-		updates, err := g.client.GetUpdates(lastUpdate, 10, 120, nil)
+		updates, err := g.client.GetUpdates(lastUpdate, UpdatesLimit, UpdatesTimeout, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -93,55 +103,56 @@ func (g *Generator) Generate(_ types.Service, props map[string]string, _ []strin
 					source = "@" + message.From.Username
 				}
 
-				ud.Writeln("Got Message '%v' from %v in %v chat %v",
-					f.ColorizeString(message.Text),
-					f.ColorizeProp(source),
-					f.ColorizeEnum(chat.Type),
-					f.ColorizeNumber(chat.ID))
-				ud.Writeln(g.addChat(chat))
+				ud.Writelnf("Got Message '%v' from %v in %v chat %v",
+					format.ColorizeString(message.Text),
+					format.ColorizeProp(source),
+					format.ColorizeEnum(chat.Type),
+					format.ColorizeNumber(chat.ID))
+				ud.Writelnf(g.addChat(chat))
 				// Another chat was added, prompt user to continue
 				promptDone = true
 			} else if update.ChatMemberUpdate != nil {
 				cmu := update.ChatMemberUpdate
 				oldStatus := cmu.OldChatMember.Status
 				newStatus := cmu.NewChatMember.Status
-				ud.Writeln("Got a bot chat member update for %v, status was changed from %v to %v",
-					f.ColorizeProp(cmu.Chat.Name()),
-					f.ColorizeEnum(oldStatus),
-					f.ColorizeEnum(newStatus))
+				ud.Writelnf("Got a bot chat member update for %v, status was changed from %v to %v",
+					format.ColorizeProp(cmu.Chat.Name()),
+					format.ColorizeEnum(oldStatus),
+					format.ColorizeEnum(newStatus))
 			} else {
-				ud.Writeln("Got unknown Update. Ignored!")
+				ud.Writelnf("Got unknown Update. Ignored!")
 			}
 		}
+
 		if promptDone {
-			ud.Writeln("")
+			ud.Writelnf("")
 
 			g.done = !ud.QueryBool(fmt.Sprintf("Got %v chat ID(s) so far. Want to add some more?",
-				f.ColorizeNumber(len(g.chats))), "")
+				format.ColorizeNumber(len(g.chats))), "")
 		}
 	}
 
-	ud.Writeln("")
-	ud.Writeln("Cleaning up the bot session...")
+	ud.Writelnf("")
+	ud.Writelnf("Cleaning up the bot session...")
 
 	// Notify API that we got the updates
 	if _, err = g.client.GetUpdates(lastUpdate, 0, 0, nil); err != nil {
-		g.ud.Writeln("Failed to mark last updates as received: %v", f.ColorizeError(err))
+		g.ud.Writelnf("Failed to mark last updates as received: %v", format.ColorizeError(err))
 	}
 
 	if len(g.chats) < 1 {
 		return nil, fmt.Errorf("no chats were selected")
 	}
 
-	ud.Writeln("Selected chats:")
+	ud.Writelnf("Selected chats:")
 
 	for i, id := range g.chats {
 		name := g.chatNames[i]
 		chatType := g.chatTypes[i]
-		ud.Writeln("  %v (%v) %v", f.ColorizeNumber(id), f.ColorizeEnum(chatType), f.ColorizeString(name))
+		ud.Writelnf("  %v (%v) %v", format.ColorizeNumber(id), format.ColorizeEnum(chatType), format.ColorizeString(name))
 	}
 
-	ud.Writeln("")
+	ud.Writelnf("")
 
 	config = Config{
 		Notification: true,
@@ -158,12 +169,13 @@ func (g *Generator) addChat(chat *Chat) (result string) {
 
 	for _, c := range g.chats {
 		if c == id {
-			return fmt.Sprintf("chat %v is already selected!", f.ColorizeString(name))
+			return fmt.Sprintf("chat %v is already selected!", format.ColorizeString(name))
 		}
 	}
+
 	g.chats = append(g.chats, id)
 	g.chatNames = append(g.chatNames, name)
 	g.chatTypes = append(g.chatTypes, chat.Type)
 
-	return fmt.Sprintf("Added new chat %v!", f.ColorizeString(name))
+	return fmt.Sprintf("Added new chat %v!", format.ColorizeString(name))
 }

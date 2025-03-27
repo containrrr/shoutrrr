@@ -1,55 +1,54 @@
 package format
 
 import (
-	t "github.com/containrrr/shoutrrr/pkg/types"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 )
 
-var _ = Describe("Prop Key Resolver", func() {
+var _ = ginkgo.Describe("Prop Key Resolver", func() {
 	var (
 		ts  *testStruct
 		pkr PropKeyResolver
 	)
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		ts = &testStruct{}
 		pkr = NewPropKeyResolver(ts)
 		_ = pkr.SetDefaultProps(ts)
 	})
-	Describe("Updating config props from params", func() {
-		When("a param matches a prop key", func() {
-			It("should be updated in the config", func() {
-				err := pkr.UpdateConfigFromParams(nil, &t.Params{"str": "newValue"})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ts.Str).To(Equal("newValue"))
+	ginkgo.Describe("Updating config props from params", func() {
+		ginkgo.When("a param matches a prop key", func() {
+			ginkgo.It("should be updated in the config", func() {
+				err := pkr.UpdateConfigFromParams(nil, &types.Params{"str": "newValue"})
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(ts.Str).To(gomega.Equal("newValue"))
 			})
 		})
-		When("a param does not match a prop key", func() {
-			It("should report the first error", func() {
-				err := pkr.UpdateConfigFromParams(nil, &t.Params{"a": "z"})
-				Expect(err).To(HaveOccurred())
+		ginkgo.When("a param does not match a prop key", func() {
+			ginkgo.It("should report the first error", func() {
+				err := pkr.UpdateConfigFromParams(nil, &types.Params{"a": "z"})
+				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
-			It("should process the other keys", func() {
-				_ = pkr.UpdateConfigFromParams(nil, &t.Params{"signed": "1", "b": "c", "str": "val"})
-				Expect(ts.Signed).To(Equal(1))
-				Expect(ts.Str).To(Equal("val"))
+			ginkgo.It("should process the other keys", func() {
+				_ = pkr.UpdateConfigFromParams(nil, &types.Params{"signed": "1", "b": "c", "str": "val"})
+				gomega.Expect(ts.Signed).To(gomega.Equal(1))
+				gomega.Expect(ts.Str).To(gomega.Equal("val"))
 			})
 		})
 	})
-	Describe("Setting default props", func() {
-		When("a default tag are set for a field", func() {
-			It("should have that value as default", func() {
-				Expect(ts.Str).To(Equal("notempty"))
+	ginkgo.Describe("Setting default props", func() {
+		ginkgo.When("a default tag are set for a field", func() {
+			ginkgo.It("should have that value as default", func() {
+				gomega.Expect(ts.Str).To(gomega.Equal("notempty"))
 			})
 		})
-		When("a default tag have an invalid value", func() {
-			It("should have that value as default", func() {
+		ginkgo.When("a default tag have an invalid value", func() {
+			ginkgo.It("should have that value as default", func() {
 				tsb := &testStructBadDefault{}
 				pkr = NewPropKeyResolver(tsb)
 				err := pkr.SetDefaultProps(tsb)
-				Expect(err).To(HaveOccurred())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 		})
 	})
-
 })

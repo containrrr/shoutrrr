@@ -7,11 +7,11 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/mattn/go-colorable"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 
-	"github.com/containrrr/shoutrrr/pkg/services/telegram"
+	"github.com/nicholas-fedor/shoutrrr/pkg/services/telegram"
 )
 
 const (
@@ -25,7 +25,7 @@ var (
 	userInMono io.Writer
 )
 
-func mockTyped(a ...interface{}) {
+func mockTyped(a ...any) {
 	_, _ = fmt.Fprint(userOut, a...)
 	_, _ = fmt.Fprint(userOut, "\n")
 }
@@ -34,6 +34,7 @@ func dumpBuffers() {
 	for _, line := range strings.Split(string(userIn.Contents()), "\n") {
 		println(">", line)
 	}
+
 	for _, line := range strings.Split(string(userOut.Contents()), "\n") {
 		println("<", line)
 	}
@@ -43,18 +44,17 @@ func mockAPI(endpoint string) string {
 	return mockAPIBase + endpoint
 }
 
-var _ = Describe("TelegramGenerator", func() {
-
-	BeforeEach(func() {
+var _ = ginkgo.Describe("TelegramGenerator", func() {
+	ginkgo.BeforeEach(func() {
 		userOut = gbytes.NewBuffer()
 		userIn = gbytes.NewBuffer()
 		userInMono = colorable.NewNonColorable(userIn)
 		httpmock.Activate()
 	})
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		httpmock.DeactivateAndReset()
 	})
-	It("should return the ", func() {
+	ginkgo.It("should return the ", func() {
 		gen := telegram.Generator{
 			Reader: userOut,
 			Writer: userInMono,
@@ -97,11 +97,11 @@ var _ = Describe("TelegramGenerator", func() {
 		}))
 
 		go func() {
-			defer GinkgoRecover()
+			defer ginkgo.GinkgoRecover()
 			conf, err := gen.Generate(nil, nil, nil)
 
-			Expect(conf).ToNot(BeNil())
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(conf).ToNot(gomega.BeNil())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			resultChannel <- conf.GetURL().String()
 		}()
 
@@ -110,12 +110,11 @@ var _ = Describe("TelegramGenerator", func() {
 		mockTyped(mockToken)
 		mockTyped(`no`)
 
-		Eventually(userIn).Should(gbytes.Say(`Got a bot chat member update for mockChannel, status was changed from kicked to administrator`))
-		Eventually(userIn).Should(gbytes.Say(`Got 1 chat ID\(s\) so far\. Want to add some more\?`))
-		Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
-		Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))
+		gomega.Eventually(userIn).Should(gbytes.Say(`Got a bot chat member update for mockChannel, status was changed from kicked to administrator`))
+		gomega.Eventually(userIn).Should(gbytes.Say(`Got 1 chat ID\(s\) so far\. Want to add some more\?`))
+		gomega.Eventually(userIn).Should(gbytes.Say(`Selected chats:`))
+		gomega.Eventually(userIn).Should(gbytes.Say(`667 \(private\) @mockUser`))
 
-		Eventually(resultChannel).Should(Receive(Equal(`telegram://0:MockToken@telegram?chats=667&preview=No`)))
+		gomega.Eventually(resultChannel).Should(gomega.Receive(gomega.Equal(`telegram://0:MockToken@telegram?chats=667&preview=No`)))
 	})
-
 })
