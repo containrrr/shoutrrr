@@ -14,6 +14,26 @@ The shoutrrr service URL should look like this:
 
 --8<-- "docs/services/discord/config.md"
 
+## Optional: Sending messages to a specific thread
+
+Discord supports sending messages via webhook to threads. You can target a specific thread by appending
+`?thread_id=<id>` to the end of the url.
+
+!!! info ""
+### Example
+
+```
+discord://<token>@<webhook_id>?thread_id=1234567890123456789
+```
+
+To get the thread ID:
+ - Open a Discord Thread
+ - Right click -> copy link
+ - OR Right click -> copy thread ID (Developer mode turned on in discord settings)
+
+!!! warning ""
+A valid thread_id must is 19 digits long. If extracting from a link don't confuse the channel ID and thread ID.
+
 ## Creating a webhook in Discord
 
 1. Open your channel settings by first clicking on the gear icon next to the name of the channel.
