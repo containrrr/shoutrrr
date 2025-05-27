@@ -126,6 +126,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url
 func CreateAPIURLFromConfig(config *Config) string {
+	// Optional queryParams
 	queryParams := ""
     if config.ThreadID != "" {
         queryParams = "?thread_id=" + config.ThreadID
