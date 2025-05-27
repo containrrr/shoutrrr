@@ -128,17 +128,17 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 func CreateAPIURLFromConfig(config *Config) string {
 	// Optional queryParams
 	queryParams := ""
-    if config.ThreadID != "" {
-        queryParams = "?thread_id=" + config.ThreadID
-    }
+	if config.ThreadID != "" {
+		queryParams = "?thread_id=" + config.ThreadID
+	}
 
-    return fmt.Sprintf(
-        "%s/%s/%s%s",
-        hookURL,
-        config.WebhookID,
-        config.Token,
-        queryParams,
-    )
+	return fmt.Sprintf(
+		"%s/%s/%s%s",
+		hookURL,
+		config.WebhookID,
+		config.Token,
+		queryParams,
+	)
 }
 
 func doSend(payload []byte, postURL string) error {
