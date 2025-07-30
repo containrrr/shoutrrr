@@ -44,6 +44,7 @@ nav:
       - Matrix: 'services/matrix.md'
       - Ntfy: 'services/ntfy.md'
       - OpsGenie: 'services/opsgenie.md'
+      - PagerDuty: 'services/pagerduty.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'
       - Rocketchat: 'services/rocketchat.md'

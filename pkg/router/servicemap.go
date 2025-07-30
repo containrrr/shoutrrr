@@ -13,6 +13,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
 	"github.com/containrrr/shoutrrr/pkg/services/ntfy"
 	"github.com/containrrr/shoutrrr/pkg/services/opsgenie"
+	"github.com/containrrr/shoutrrr/pkg/services/pagerduty"
 	"github.com/containrrr/shoutrrr/pkg/services/pushbullet"
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/containrrr/shoutrrr/pkg/services/rocketchat"
@@ -38,6 +39,7 @@ var serviceMap = map[string]func() t.Service{
 	"mattermost": func() t.Service { return &mattermost.Service{} },
 	"ntfy":       func() t.Service { return &ntfy.Service{} },
 	"opsgenie":   func() t.Service { return &opsgenie.Service{} },
+	"pagerduty":  func() t.Service { return &pagerduty.Service{} },
 	"pushbullet": func() t.Service { return &pushbullet.Service{} },
 	"pushover":   func() t.Service { return &pushover.Service{} },
 	"rocketchat": func() t.Service { return &rocketchat.Service{} },
