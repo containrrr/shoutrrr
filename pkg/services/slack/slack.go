@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/containrrr/shoutrrr/pkg/format"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
 
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -52,7 +53,9 @@ func (service *Service) Send(message string, params *types.Params) error {
 // Initialize loads ServiceConfig from configURL and sets logger for this Service
 func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) error {
 	service.Logger.SetLogger(logger)
-	service.config = &Config{}
+	service.config = &Config{
+		SplitLines: true,
+	}
 	service.pkr = format.NewPropKeyResolver(service.config)
 
 	return service.config.setURL(&service.pkr, configURL)

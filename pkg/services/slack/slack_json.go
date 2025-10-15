@@ -73,15 +73,22 @@ type APIResponse struct {
 func CreateJSONPayload(config *Config, message string) interface{} {
 
 	var atts []attachment
-	for i, line := range strings.Split(message, "\n") {
-		// When 100 attachments have been reached, append the remaining line to the last
-		// attachment to prevent reaching the slack API limit
-		if i >= 100 {
-			atts[len(atts)-1].Text += "\n" + line
-			continue
+	if config.SplitLines {
+		for i, line := range strings.Split(message, "\n") {
+			// When 100 attachments have been reached, append the remaining line to the last
+			// attachment to prevent reaching the slack API limit
+			if i >= 100 {
+				atts[len(atts)-1].Text += "\n" + line
+				continue
+			}
+			atts = append(atts, attachment{
+				Text:  line,
+				Color: config.Color,
+			})
 		}
+	} else {
 		atts = append(atts, attachment{
-			Text:  line,
+			Text:  message,
 			Color: config.Color,
 		})
 	}
