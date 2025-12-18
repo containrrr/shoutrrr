@@ -116,6 +116,29 @@ var _ = Describe("the discord service", func() {
 			})
 		})
 	})
+	Describe("creating an API URL", func() {
+		When("given a config without thread ID", func() {
+			It("should create a URL without query parameters", func() {
+				config := &Config{
+					WebhookID: "1",
+					Token:     "dummyToken",
+				}
+				apiURL := CreateAPIURLFromConfig(config)
+				Expect(apiURL).To(Equal("https://discord.com/api/webhooks/1/dummyToken"))
+			})
+		})
+		When("given a config with thread ID", func() {
+			It("should create a URL with thread_id query parameter", func() {
+				config := &Config{
+					WebhookID: "1",
+					Token:     "dummyToken",
+					ThreadID:  "987654321",
+				}
+				apiURL := CreateAPIURLFromConfig(config)
+				Expect(apiURL).To(Equal("https://discord.com/api/webhooks/1/dummyToken?thread_id=987654321"))
+			})
+		})
+	})
 	Describe("creating a json payload", func() {
 		When("given a blank message", func() {
 			When("split lines is enabled", func() {
