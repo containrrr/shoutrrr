@@ -30,6 +30,19 @@ func (service *Service) Send(message string, params *types.Params) error {
 		return err
 	}
 
+	// Prevent enabling templated messages without custom data
+	if config.Template && message == "" {
+		return fmt.Errorf("body must be set if template is enabled")
+	}
+
+	if config.Template && config.Message == "" && config.Title == "" {
+		return fmt.Errorf("at least title or message must be set if template is enabled")
+	}
+
+	if config.Message != "" && !config.Template {
+		return fmt.Errorf("message should not be filled if template is disabled, use body instead")
+	}
+
 	if err := service.sendAPI(config, message); err != nil {
 		return fmt.Errorf("failed to send ntfy notification: %w", err)
 	}
@@ -73,6 +86,10 @@ func (service *Service) sendAPI(config *Config, message string) error {
 	}
 	if !config.Firebase {
 		headers.Add("Firebase", "no")
+	}
+	if config.Template {
+		headers.Add("Template", "yes")
+		headers.Add("Message", config.Message)
 	}
 
 	if err := jsonClient.Post(config.GetAPIURL(), request, &response); err != nil {

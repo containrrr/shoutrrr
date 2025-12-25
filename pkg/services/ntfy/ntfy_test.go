@@ -71,16 +71,65 @@ var _ = Describe("the ntfy service", func() {
 					Priority: 3,
 					Firebase: true,
 					Cache:    true,
+					Template: false,
+					Message:  "",
 				}))
 			})
 		})
+
+		When("validate that template behaves correctly", func() {
+			BeforeEach(func() {
+				httpmock.Activate()
+			})
+			AfterEach(func() {
+				httpmock.DeactivateAndReset()
+			})
+
+			It("should not allow templated messages if message and title are not set", func() {
+				serviceURL := testutils.URLMust("ntfy://hostname/topic?template=true&message=&title=hello")
+				Expect(service.Initialize(serviceURL, logger)).ShouldNot(HaveOccurred())
+				Expect(service.Send("", nil)).Should(HaveOccurred())
+			})
+			It("should allow templated messages if title is set", func() {
+				serviceURL := testutils.URLMust("ntfy://:devicekey@hostname/topic?template=true&message=&title=hello")
+				Expect(service.Initialize(serviceURL, logger)).ShouldNot(HaveOccurred())
+
+				httpmock.RegisterResponder("POST", service.config.GetAPIURL(), testutils.JSONRespondMust(200, apiResponse{
+					Code:    http.StatusOK,
+					Message: "OK",
+				}))
+				Expect(service.Send("{}", nil)).To(Succeed())
+			})
+			It("should allow templated messages if message is set", func() {
+				serviceURL := testutils.URLMust("ntfy://:devicekey@hostname/topic?template=true&message=hello&title=")
+				Expect(service.Initialize(serviceURL, logger)).ShouldNot(HaveOccurred())
+
+				httpmock.RegisterResponder("POST", service.config.GetAPIURL(), testutils.JSONRespondMust(200, apiResponse{
+					Code:    http.StatusOK,
+					Message: "OK",
+				}))
+				Expect(service.Send("{}", nil)).To(Succeed())
+			})
+			It("should not allow templated messages if body is empty", func() {
+				serviceURL := testutils.URLMust("ntfy://hostname/topic?template=true&message=hello&title=hello")
+				Expect(service.Initialize(serviceURL, logger)).ShouldNot(HaveOccurred())
+				Expect(service.Send("", nil)).Should(HaveOccurred())
+			})
+			It("should validate that message is empty if template is disabled", func() {
+				serviceURL := testutils.URLMust("ntfy://hostname/topic?template=false&message=test")
+				Expect(service.Initialize(serviceURL, logger)).ShouldNot(HaveOccurred())
+				Expect(service.Send("test", nil)).Should(HaveOccurred())
+			})
+		})
+
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "ntfy://user:pass@example.com:2225/topic?cache=No&click=CLICK&firebase=No&icon=ICON&priority=Max&scheme=http&title=TITLE"
+				testURL := "ntfy://user:pass@example.com:2225/topic?cache=No&click=CLICK&firebase=No&icon=ICON&priority=Max&scheme=http&template=Yes&title=TITLE"
 				config := &Config{}
 				pkr := format.NewPropKeyResolver(config)
 				Expect(config.setURL(&pkr, testutils.URLMust(testURL))).To(Succeed(), "verifying")
 				Expect(config.GetURL().String()).To(Equal(testURL))
+				Expect(config.Template).To(Equal(true))
 			})
 		})
 	})
@@ -132,7 +181,7 @@ var _ = Describe("the ntfy service", func() {
 				testutils.TestConfigSetDefaultValues(&Config{})
 
 				testutils.TestConfigGetEnumsCount(&Config{}, 1)
-				testutils.TestConfigGetFieldsCount(&Config{}, 15)
+				testutils.TestConfigGetFieldsCount(&Config{}, 17)
 			})
 		})
 		Describe("the service instance", func() {

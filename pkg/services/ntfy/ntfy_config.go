@@ -27,6 +27,8 @@ type Config struct {
 	Icon     string   `key:"icon"        optional:""         desc:"URL to use as notification icon"`
 	Cache    bool     `key:"cache"       default:"yes"       desc:"Cache messages"`
 	Firebase bool     `key:"firebase"    default:"yes"       desc:"Send to firebase"`
+	Template bool     `key:"template"    default:"no"        desc:"Use message and title as template"`
+	Message  string   `key:"message"     optional:""         desc:"Message, to be used only then template is set to true"`
 }
 
 // Enums implements types.ServiceConfig
