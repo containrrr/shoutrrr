@@ -167,13 +167,13 @@ func setupMockResponders() {
 		mockServer+apiJoinedRooms,
 		httpmock.NewStringResponder(200, `{ "joined_rooms": [ "!room:mockserver" ] }`))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver"),
+	httpmock.RegisterResponder("PUT", `=~`+mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver", `[0-9]+`),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "7"}))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "1"),
+	httpmock.RegisterResponder("PUT", `=~`+mockServer+fmt.Sprintf(apiSendMessage, "1", `[0-9]+`),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "8"}))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "2"),
+	httpmock.RegisterResponder("PUT", `=~`+mockServer+fmt.Sprintf(apiSendMessage, "2", `[0-9]+`),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "9"}))
 
 	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23room1"),

@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+	"sync/atomic"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
@@ -17,6 +19,7 @@ type client struct {
 	apiURL      url.URL
 	accessToken string
 	logger      types.StdLogger
+	counter     uint64
 }
 
 func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client) {
@@ -39,6 +42,10 @@ func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client)
 	c.logger.Printf("Using server: %v\n", c.apiURL.String())
 
 	return c
+}
+
+func (c *client) txId() uint64 {
+	return atomic.AddUint64(&c.counter, 1)
 }
 
 func (c *client) useToken(token string) {
@@ -127,6 +134,10 @@ func (c *client) sendToJoinedRooms(message string) (errors []error) {
 		return append(errors, fmt.Errorf("failed to get joined rooms: %w", err))
 	}
 
+	if len(joinedRooms) == 0 {
+		return append(errors, fmt.Errorf("no rooms has been joined"))
+	}
+
 	// Send to all rooms that are joined
 	for _, roomID := range joinedRooms {
 		c.logf("Sending message to '%v'...\n", roomID)
@@ -148,63 +159,49 @@ func (c *client) joinRoom(room string) (roomID string, err error) {
 
 func (c *client) sendMessageToRoom(message string, roomID string) error {
 	resEvent := apiResEvent{}
-	return c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
+	return c.apiPut(fmt.Sprintf(apiSendMessage, roomID, c.txId()), apiReqSend{
 		MsgType: msgTypeText,
 		Body:    message,
 	}, &resEvent)
 }
 
 func (c *client) apiGet(path string, response interface{}) error {
-	c.apiURL.Path = path
-
-	var err error
-	var res *http.Response
-	res, err = http.Get(c.apiURL.String())
-	if err != nil {
-		return err
-	}
-
-	var body []byte
-	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
-
-	if res.StatusCode >= 400 {
-		resError := &apiResError{}
-		if err == nil {
-			if err = json.Unmarshal(body, resError); err == nil {
-				return resError
-			}
-		}
-
-		return fmt.Errorf("got HTTP %v", res.Status)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, response)
+	return c.apiReq(path, "GET", nil, response)
 }
 
 func (c *client) apiPost(path string, request interface{}, response interface{}) error {
+	return c.apiReq(path, "POST", request, response)
+}
+
+func (c *client) apiPut(path string, request interface{}, response interface{}) error {
+	return c.apiReq(path, "PUT", request, response)
+}
+
+func (c *client) apiReq(path string, method string, request interface{}, response interface{}) error {
 	c.apiURL.Path = path
 
-	var err error
-	var body []byte
+	var payload io.Reader = nil
+	if request != nil {
+		body, err := json.Marshal(request)
+		if err != nil {
+			return err
+		}
+		payload = bytes.NewReader(body)
+	}
 
-	body, err = json.Marshal(request)
+	req, err := http.NewRequest(method, c.apiURL.String(), payload)
 	if err != nil {
 		return err
 	}
+	req.Header.Set("Content-Type", contentType)
 
-	var res *http.Response
-	res, err = http.Post(c.apiURL.String(), contentType, bytes.NewReader(body))
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
 
 	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
 
 	if res.StatusCode >= 400 {
 		resError := &apiResError{}

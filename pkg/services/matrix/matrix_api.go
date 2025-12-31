@@ -7,7 +7,7 @@ type identifierType string
 const (
 	apiLogin       = "/_matrix/client/r0/login"
 	apiRoomJoin    = "/_matrix/client/r0/join/%s"
-	apiSendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message"
+	apiSendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message/%v"
 	apiJoinedRooms = "/_matrix/client/r0/joined_rooms"
 
 	contentType = "application/json"
