@@ -50,6 +50,7 @@ nav:
       - Slack: 'services/slack.md'
       - Teams: 'services/teams.md'
       - Telegram: 'services/telegram.md'
+      - XMPP: 'services/xmpp.md'
       - Zulip Chat: 'services/zulip.md'
       - Generic Webhook: 'services/generic.md'
   - Guides:
