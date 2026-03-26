@@ -272,6 +272,32 @@ var _ = Describe("the SMTP service", func() {
 			})
 		})
 
+		When("given a configuration URL with OAuth2 authentication", func() {
+
+			It("should send notifications without any errors", func() {
+				testURL := "smtp://user:accesstoken@example.com:2225/?useStartTLS=no&auth=OAuth2&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+				err := testIntegration(testURL, []string{
+					"250-mx.google.com at your service",
+					"250-SIZE 35651584",
+					"250-AUTH XOAUTH2",
+					"250 8BITMIME",
+					"235 Accepted",
+					"250 Sender OK",
+					"250 Receiver OK",
+					"354 Go ahead",
+					"250 Data OK",
+					"221 OK",
+				}, "", "",
+					"AUTH XOAUTH2 dXNlcj11c2VyAWF1dGg9QmVhcmVyIGFjY2Vzc3Rva2VuAQE=",
+				)
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
 		When("given a configuration URL with authentication disabled", func() {
 
 			It("should send notifications without any errors", func() {
