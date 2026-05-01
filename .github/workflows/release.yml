@@ -18,7 +18,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - uses: arnested/go-version-action@v1
+      - uses: arnested/go-version-action@v2
         id: go-version
 
       - name: Set up Go ${{ steps.go-version.outputs.latest }}

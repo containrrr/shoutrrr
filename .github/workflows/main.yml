@@ -22,7 +22,7 @@ jobs:
       matrix: ${{ steps.versions.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - uses: arnested/go-version-action@v1
+      - uses: arnested/go-version-action@v2
         id: versions
   build:
     name: Build Shoutrrr
