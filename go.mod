@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/fatih/color v1.15.0
-	github.com/jarcoal/httpmock v1.3.0
+	github.com/jarcoal/httpmock v1.4.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.8
