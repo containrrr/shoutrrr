@@ -27,6 +27,7 @@ type Config struct {
 	Icon     string   `key:"icon"        optional:""         desc:"URL to use as notification icon"`
 	Cache    bool     `key:"cache"       default:"yes"       desc:"Cache messages"`
 	Firebase bool     `key:"firebase"    default:"yes"       desc:"Send to firebase"`
+	Markdown bool     `key:"markdown"    default:"no"        desc:"Enable markdown formatting"`
 }
 
 // Enums implements types.ServiceConfig

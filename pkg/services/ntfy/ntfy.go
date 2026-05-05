@@ -74,6 +74,9 @@ func (service *Service) sendAPI(config *Config, message string) error {
 	if !config.Firebase {
 		headers.Add("Firebase", "no")
 	}
+	if config.Markdown {
+		headers.Add("Markdown", "yes")
+	}
 
 	if err := jsonClient.Post(config.GetAPIURL(), request, &response); err != nil {
 		if jsonClient.ErrorResponse(err, &response) {

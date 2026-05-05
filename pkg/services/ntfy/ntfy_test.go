@@ -76,7 +76,7 @@ var _ = Describe("the ntfy service", func() {
 		})
 		When("parsing the configuration URL", func() {
 			It("should be identical after de-/serialization", func() {
-				testURL := "ntfy://user:pass@example.com:2225/topic?cache=No&click=CLICK&firebase=No&icon=ICON&priority=Max&scheme=http&title=TITLE"
+				testURL := "ntfy://user:pass@example.com:2225/topic?cache=No&click=CLICK&firebase=No&icon=ICON&markdown=No&priority=Max&scheme=http&title=TITLE"
 				config := &Config{}
 				pkr := format.NewPropKeyResolver(config)
 				Expect(config.setURL(&pkr, testutils.URLMust(testURL))).To(Succeed(), "verifying")
@@ -132,7 +132,7 @@ var _ = Describe("the ntfy service", func() {
 				testutils.TestConfigSetDefaultValues(&Config{})
 
 				testutils.TestConfigGetEnumsCount(&Config{}, 1)
-				testutils.TestConfigGetFieldsCount(&Config{}, 15)
+				testutils.TestConfigGetFieldsCount(&Config{}, 16)
 			})
 		})
 		Describe("the service instance", func() {
