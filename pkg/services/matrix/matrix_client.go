@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync/atomic"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/containrrr/shoutrrr/pkg/util"
@@ -17,6 +18,7 @@ type client struct {
 	apiURL      url.URL
 	accessToken string
 	logger      types.StdLogger
+	txnID       uint64
 }
 
 func newClient(host string, disableTLS bool, logger types.StdLogger) (c *client) {
@@ -46,7 +48,7 @@ func (c *client) useToken(token string) {
 	c.updateAccessToken()
 }
 
-func (c *client) login(user string, password string) error {
+func (c *client) login(user string, password string, deviceID string) error {
 	c.apiURL.RawQuery = ""
 	defer c.updateAccessToken()
 
@@ -60,19 +62,20 @@ func (c *client) login(user string, password string) error {
 		flows = append(flows, string(flow.Type))
 		if flow.Type == flowLoginPassword {
 			c.logf("Using login flow '%v'", flow.Type)
-			return c.loginPassword(user, password)
+			return c.loginPassword(user, password, deviceID)
 		}
 	}
 
 	return fmt.Errorf("none of the server login flows are supported: %v", strings.Join(flows, ", "))
 }
 
-func (c *client) loginPassword(user string, password string) error {
+func (c *client) loginPassword(user string, password string, deviceID string) error {
 	response := apiResLogin{}
 	if err := c.apiPost(apiLogin, apiReqLogin{
 		Type:       flowLoginPassword,
 		Password:   password,
 		Identifier: newUserIdentifier(user),
+		DeviceID:   deviceID,
 	}, &response); err != nil {
 		return fmt.Errorf("failed to log in: %w", err)
 	}
@@ -103,14 +106,16 @@ func (c *client) sendToExplicitRooms(rooms []string, message string) (errors []e
 	for _, room := range rooms {
 		c.logf("Sending message to '%v'...\n", room)
 
-		var roomID string
-		if roomID, err = c.joinRoom(room); err != nil {
-			errors = append(errors, fmt.Errorf("error joining room %v: %w", roomID, err))
-			continue
-		}
+		roomID := room
+		if !strings.HasPrefix(room, "!") {
+			if roomID, err = c.joinRoom(room); err != nil {
+				errors = append(errors, fmt.Errorf("error joining room %v: %w", roomID, err))
+				continue
+			}
 
-		if room != roomID {
-			c.logf("Resolved room alias '%v' to ID '%v'", room, roomID)
+			if room != roomID {
+				c.logf("Resolved room alias '%v' to ID '%v'", room, roomID)
+			}
 		}
 
 		if err := c.sendMessageToRoom(message, roomID); err != nil {
@@ -148,7 +153,7 @@ func (c *client) joinRoom(room string) (roomID string, err error) {
 
 func (c *client) sendMessageToRoom(message string, roomID string) error {
 	resEvent := apiResEvent{}
-	return c.apiPost(fmt.Sprintf(apiSendMessage, roomID), apiReqSend{
+	return c.apiPut(fmt.Sprintf(apiSendMessage, roomID, c.nextTransactionID()), apiReqSend{
 		MsgType: msgTypeText,
 		Body:    message,
 	}, &resEvent)
@@ -187,6 +192,14 @@ func (c *client) apiGet(path string, response interface{}) error {
 }
 
 func (c *client) apiPost(path string, request interface{}, response interface{}) error {
+	return c.apiRequest(http.MethodPost, path, request, response)
+}
+
+func (c *client) apiPut(path string, request interface{}, response interface{}) error {
+	return c.apiRequest(http.MethodPut, path, request, response)
+}
+
+func (c *client) apiRequest(method string, path string, request interface{}, response interface{}) error {
 	c.apiURL.Path = path
 
 	var err error
@@ -198,7 +211,13 @@ func (c *client) apiPost(path string, request interface{}, response interface{})
 	}
 
 	var res *http.Response
-	res, err = http.Post(c.apiURL.String(), contentType, bytes.NewReader(body))
+	req, err := http.NewRequest(method, c.apiURL.String(), bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", contentType)
+
+	res, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -222,6 +241,10 @@ func (c *client) apiPost(path string, request interface{}, response interface{})
 	}
 
 	return json.Unmarshal(body, response)
+}
+
+func (c *client) nextTransactionID() string {
+	return fmt.Sprintf("shoutrrr-%d", atomic.AddUint64(&c.txnID, 1))
 }
 
 func (c *client) updateAccessToken() {

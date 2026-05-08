@@ -1,7 +1,10 @@
 package matrix
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
@@ -120,6 +123,18 @@ var _ = Describe("the matrix service", func() {
 				err = service.Send("Test message", nil)
 				Expect(err).NotTo(HaveOccurred())
 			})
+			When("sending to a room ID", func() {
+				It("should not try to join the room", func() {
+					setupMockResponders()
+					serviceURL, _ := url.Parse("matrix://user:pass@mockserver?rooms=!room:mockserver")
+					err := service.Initialize(serviceURL, logger)
+					Expect(err).NotTo(HaveOccurred())
+
+					err = service.Send("Test message", nil)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(httpmock.GetCallCountInfo()["POST https://mockserver/_matrix/client/r0/join/%21room:mockserver?access_token=TOKEN"]).To(Equal(0))
+				})
+			})
 			When("sending to one room fails", func() {
 				It("should report one error", func() {
 					setupMockResponders()
@@ -135,6 +150,30 @@ var _ = Describe("the matrix service", func() {
 
 		})
 
+		When("logging in with a password", func() {
+			It("should reuse a stable device ID by default", func() {
+				const mockServer = "https://mockserver"
+				httpmock.RegisterResponder(
+					"GET",
+					mockServer+apiLogin,
+					httpmock.NewStringResponder(200, `{"flows": [ { "type": "m.login.password" } ] }`))
+
+				httpmock.RegisterResponder("POST", mockServer+apiLogin, func(req *http.Request) (*http.Response, error) {
+					body, err := ioutil.ReadAll(req.Body)
+					Expect(err).NotTo(HaveOccurred())
+
+					login := apiReqLogin{}
+					Expect(json.Unmarshal(body, &login)).To(Succeed())
+					Expect(login.DeviceID).To(Equal(defaultDeviceID))
+
+					return httpmock.NewStringResponse(200, `{ "access_token": "TOKEN", "home_server": "mockserver", "user_id": "test:mockerserver", "device_id": "shoutrrr" }`), nil
+				})
+
+				serviceURL, _ := url.Parse("matrix://user:pass@mockserver")
+				Expect(service.Initialize(serviceURL, logger)).To(Succeed())
+			})
+		})
+
 		AfterEach(func() {
 			httpmock.DeactivateAndReset()
 		})
@@ -145,7 +184,7 @@ var _ = Describe("the matrix service", func() {
 		testutils.TestConfigSetInvalidQueryValue(&Config{}, "matrix://user:pass@host/?foo=bar")
 
 		testutils.TestConfigGetEnumsCount(&Config{}, 0)
-		testutils.TestConfigGetFieldsCount(&Config{}, 4)
+		testutils.TestConfigGetFieldsCount(&Config{}, 5)
 	})
 })
 
@@ -167,13 +206,13 @@ func setupMockResponders() {
 		mockServer+apiJoinedRooms,
 		httpmock.NewStringResponder(200, `{ "joined_rooms": [ "!room:mockserver" ] }`))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver"),
+	httpmock.RegisterResponder("PUT", mockServer+fmt.Sprintf(apiSendMessage, "%21room:mockserver", "shoutrrr-1"),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "7"}))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "1"),
+	httpmock.RegisterResponder("PUT", mockServer+fmt.Sprintf(apiSendMessage, "1", "shoutrrr-1"),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "8"}))
 
-	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiSendMessage, "2"),
+	httpmock.RegisterResponder("PUT", mockServer+fmt.Sprintf(apiSendMessage, "2", "shoutrrr-2"),
 		httpmock.NewJsonResponderOrPanic(200, apiResEvent{EventID: "9"}))
 
 	httpmock.RegisterResponder("POST", mockServer+fmt.Sprintf(apiRoomJoin, "%23room1"),

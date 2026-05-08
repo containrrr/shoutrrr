@@ -18,6 +18,9 @@ flow your server uses, if you can manually retrieve a token, then Shoutrrr can u
 ### Password Login Flow
 
 If a `user` and `password` is supplied, the `m.login.password` login flow is attempted if the server supports it.
+Shoutrrr sends a stable Matrix `device_id` during password login to avoid creating a new Matrix device on every
+initialization. The default device ID is `shoutrrr`; override it with `deviceID=...` if you need separate devices for
+separate Shoutrrr instances using the same account.
 
 ## Rooms
 

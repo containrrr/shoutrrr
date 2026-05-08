@@ -31,7 +31,7 @@ func (s *Service) Initialize(configURL *url.URL, logger t.StdLogger) error {
 
 	s.client = newClient(s.config.Host, s.config.DisableTLS, logger)
 	if s.config.User != "" {
-		return s.client.login(s.config.User, s.config.Password)
+		return s.client.login(s.config.User, s.config.Password, s.config.DeviceID)
 	}
 
 	s.client.useToken(s.config.Password)

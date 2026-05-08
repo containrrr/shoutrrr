@@ -7,7 +7,7 @@ type identifierType string
 const (
 	apiLogin       = "/_matrix/client/r0/login"
 	apiRoomJoin    = "/_matrix/client/r0/join/%s"
-	apiSendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message"
+	apiSendMessage = "/_matrix/client/r0/rooms/%s/send/m.room.message/%s"
 	apiJoinedRooms = "/_matrix/client/r0/joined_rooms"
 
 	contentType = "application/json"
@@ -28,6 +28,7 @@ type apiReqLogin struct {
 	Identifier *identifier `json:"identifier"`
 	Password   string      `json:"password,omitempty"`
 	Token      string      `json:"token,omitempty"`
+	DeviceID   string      `json:"device_id,omitempty"`
 }
 
 type apiResLogin struct {
