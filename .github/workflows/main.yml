@@ -22,7 +22,7 @@ jobs:
       matrix: ${{ steps.versions.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - uses: arnested/go-version-action@v1
+      - uses: arnested/go-version-action@v2
         id: versions
   build:
     name: Build Shoutrrr
@@ -33,7 +33,7 @@ jobs:
         version: ${{ fromJSON(needs.go-versions.outputs.matrix) }}
     steps:
       - name: Set up Go ${{ matrix.version }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         id: go
         with:
           go-version: ${{ matrix.version }}
@@ -58,6 +58,6 @@ jobs:
         run: CGO_ENABLED=0 SHOUTRRR_MATRIX_CONDUIT_E2E=1 go test -tags conduit_e2e -v ./pkg/services/matrix -run TestConduitE2E
 
       - name: Publish coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

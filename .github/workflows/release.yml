@@ -18,11 +18,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - uses: arnested/go-version-action@v1
+      - uses: arnested/go-version-action@v2
         id: go-version
 
       - name: Set up Go ${{ steps.go-version.outputs.latest }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         id: go
         with:
           go-version: ${{ steps.go-version.outputs.latest }}
@@ -35,12 +35,12 @@ jobs:
         run: CGO_ENABLED=0 go test -v -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Publish coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v7
         with:
           install-only: true
 
@@ -48,7 +48,7 @@ jobs:
         run: goreleaser -v
 
       - name: Login to docker hub
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@v2
         with:
           username: '${{ secrets.DOCKER_USER }}'
           password: '${{ secrets.DOCKER_PASSWORD }}'
