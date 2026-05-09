@@ -29,14 +29,12 @@ jobs:
           python-version: '3.x'
 
       - name: Install mkdocs
-        env:
-          MKDOCSMAT_TOKEN: ${{ secrets.MKDOCSMAT_TOKEN }}
         run: |
           pip install \
             mkdocs \
+            mkdocs-material \
             mike \
-            md-toc \
-            git+https://${MKDOCSMAT_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
+            md-toc
 
       - name: Generate service config docs
         run: bash generate-service-config-docs.sh
