@@ -3,6 +3,7 @@ module github.com/containrrr/shoutrrr
 go 1.25.0
 
 require (
+	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6
 	github.com/fatih/color v1.19.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/mattn/go-colorable v0.1.14
