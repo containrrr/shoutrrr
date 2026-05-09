@@ -62,6 +62,20 @@ var _ = Describe("the mattermost service", func() {
 				Expect(config.UserName).To(BeEmpty())
 			})
 		})
+		When("generating a config object with a port", func() {
+			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken")
+			config := &Config{}
+			err := config.SetURL(mattermostURL)
+			It("should not have caused an error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+			It("should preserve the port", func() {
+				Expect(config.Host).To(Equal("mattermost.my-domain.com:8065"))
+			})
+			It("should preserve the port in the generated URL", func() {
+				Expect(config.GetURL().String()).To(Equal("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken"))
+			})
+		})
 		When("generating a new config with url, that has no token", func() {
 			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com")
 			config := &Config{}
@@ -164,6 +178,15 @@ var _ = Describe("the mattermost service", func() {
 				Expect(string(json)).To(Equal("{\"text\":\"this is a message\"}"))
 			})
 		})
+		When("sending to a URL with a port", func() {
+			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken")
+			config := &Config{}
+			Expect(config.SetURL(mattermostURL)).To(Succeed())
+			It("should generate the correct URL including the port", func() {
+				generatedURL := buildURL(config)
+				Expect(generatedURL).To(Equal("https://mattermost.my-domain.com:8065/hooks/thisshouldbeanapitoken"))
+			})
+		})
 		When("sending a message with pre set username and channel", func() {
 			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
@@ -261,6 +284,17 @@ var _ = Describe("the mattermost service", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			httpmock.RegisterResponder("POST", "https://mattermost.host/hooks/token", httpmock.NewStringResponder(200, ``))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should post to the configured port", func() {
+			serviceURL := testutils.URLMust("mattermost://mattermost.host:8065/token")
+			service := Service{}
+			err = service.Initialize(serviceURL, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", "https://mattermost.host:8065/hooks/token", httpmock.NewStringResponder(200, ``))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
