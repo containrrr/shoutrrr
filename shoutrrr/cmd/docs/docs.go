@@ -40,7 +40,7 @@ func Run(cmd *cobra.Command, args []string) {
 
 	res := printDocs(format, args)
 	if res.ExitCode != 0 {
-		_, _ = fmt.Fprintf(os.Stderr, res.Message)
+		_, _ = fmt.Fprint(os.Stderr, res.Message)
 	}
 	os.Exit(res.ExitCode)
 }
