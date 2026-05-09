@@ -1,9 +1,14 @@
 package zulip_test
 
 import (
+	"errors"
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/services/zulip"
 	. "github.com/containrrr/shoutrrr/pkg/services/zulip"
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
+	"io"
+	"net/http"
 
 	"net/url"
 	"os"
@@ -147,6 +152,121 @@ var _ = Describe("the zulip service", func() {
 				}
 				url := config.GetURL()
 				Expect(url.String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo"))
+			})
+		})
+		When("given a service url with a non-standard port", func() {
+			It("should preserve the port", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com:8443?stream=foo&topic=bar")
+				Expect(err).NotTo(HaveOccurred())
+				serviceConfig, err := CreateConfigFromURL(zulipURL)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(serviceConfig.Host).To(Equal("example.zulipchat.com:8443"))
+				Expect(serviceConfig.GetURL().String()).To(Equal("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com:8443?stream=foo&topic=bar"))
+			})
+		})
+	})
+	Describe("sending messages", func() {
+		const apiURL = "https://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com/api/v1/messages"
+
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+
+		When("the topic is too long", func() {
+			It("should return an error before posting", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghi")
+				Expect(err).NotTo(HaveOccurred())
+
+				service := &Service{}
+				err = service.Initialize(zulipURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				err = service.Send("This is a message", nil)
+				Expect(err).To(MatchError("topic exceeds max length (60 characters): was 61 characters"))
+				Expect(httpmock.GetTotalCallCount()).To(Equal(0))
+			})
+		})
+
+		When("the message is too large", func() {
+			It("should return an error before posting", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar")
+				Expect(err).NotTo(HaveOccurred())
+
+				service := &Service{}
+				err = service.Initialize(zulipURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				err = service.Send(string(make([]byte, 10001)), nil)
+				Expect(err).To(MatchError("message exceeds max size (10000 bytes): was 10001 bytes"))
+				Expect(httpmock.GetTotalCallCount()).To(Equal(0))
+			})
+		})
+
+		When("send-time params override stream and topic", func() {
+			It("should post the overridden form values", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar")
+				Expect(err).NotTo(HaveOccurred())
+
+				service := &Service{}
+				err = service.Initialize(zulipURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, apiURL, func(req *http.Request) (*http.Response, error) {
+					body, err := io.ReadAll(req.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(req.Header.Get("Content-Type")).To(Equal("application/x-www-form-urlencoded"))
+
+					form, err := url.ParseQuery(string(body))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(form.Get("type")).To(Equal("stream"))
+					Expect(form.Get("to")).To(Equal("overridden-stream"))
+					Expect(form.Get("topic")).To(Equal("overridden-topic"))
+					Expect(form.Get("content")).To(Equal("This is a message"))
+
+					return httpmock.NewStringResponse(http.StatusOK, ""), nil
+				})
+
+				params := types.Params{"stream": "overridden-stream", "topic": "overridden-topic"}
+				err = service.Send("This is a message", &params)
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the Zulip API rejects the notification", func() {
+			It("should report the response status", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar")
+				Expect(err).NotTo(HaveOccurred())
+
+				service := &Service{}
+				err = service.Initialize(zulipURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, apiURL, httpmock.NewStringResponder(http.StatusBadRequest, "bad payload"))
+
+				err = service.Send("This is a message", nil)
+				Expect(err).To(MatchError("failed to send zulip message: response status code 400 Bad Request"))
+			})
+		})
+
+		When("the Zulip API cannot be reached", func() {
+			It("should report the transport error", func() {
+				zulipURL, err := url.Parse("zulip://bot-name%40zulipchat.com:correcthorsebatterystable@example.zulipchat.com?stream=foo&topic=bar")
+				Expect(err).NotTo(HaveOccurred())
+
+				service := &Service{}
+				err = service.Initialize(zulipURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, apiURL, httpmock.NewErrorResponder(errors.New("network down")))
+
+				err = service.Send("This is a message", nil)
+				Expect(err).To(MatchError(ContainSubstring("failed to send zulip message")))
+				Expect(err).To(MatchError(ContainSubstring("network down")))
 			})
 		})
 	})

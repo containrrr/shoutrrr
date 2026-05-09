@@ -1,12 +1,16 @@
 package rocketchat
 
 import (
+	"errors"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"testing"
 
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/jarcoal/httpmock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -61,6 +65,20 @@ var _ = Describe("the rocketchat service", func() {
 			It("should not set channel or username", func() {
 				Expect(config.Channel).To(BeEmpty())
 				Expect(config.UserName).To(BeEmpty())
+			})
+			It("should generate a URL without an empty port", func() {
+				Expect(config.GetURL().String()).To(Equal("rocketchat://rocketchat.my-domain.com/tokenA/tokenB"))
+			})
+		})
+		When("generating a config object with a port", func() {
+			rocketchatURL, _ := url.Parse("rocketchat://rocketchat.my-domain.com:5055/tokenA/tokenB")
+			config := &Config{}
+			err := config.SetURL(rocketchatURL)
+			It("should not have caused an error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+			It("should preserve the port in the generated URL", func() {
+				Expect(config.GetURL().String()).To(Equal("rocketchat://rocketchat.my-domain.com:5055/tokenA/tokenB"))
 			})
 		})
 		When("generating a new config with url, that has no token", func() {
@@ -129,6 +147,14 @@ var _ = Describe("the rocketchat service", func() {
 		})
 	})
 	Describe("Sending messages", func() {
+		BeforeEach(func() {
+			httpmock.Activate()
+		})
+
+		AfterEach(func() {
+			httpmock.DeactivateAndReset()
+		})
+
 		When("sending a message completely without parameters", func() {
 			rocketchatURL, _ := url.Parse("rocketchat://rocketchat.my-domain.com/tokenA/tokenB")
 			config := &Config{}
@@ -185,6 +211,64 @@ var _ = Describe("the rocketchat service", func() {
 				config := &Config{}
 				config.SetURL(rocketchatURL)
 				Expect(config.Channel).To(ContainSubstring("#testChannel"))
+			})
+		})
+		When("the webhook accepts the notification", func() {
+			It("should post the expected JSON payload", func() {
+				serviceURL, _ := url.Parse("rocketchat://testUserName@rocketchat.my-domain.com/tokenA/tokenB/testChannel")
+				hookURL := "https://rocketchat.my-domain.com/hooks/tokenA/tokenB"
+
+				service := &Service{}
+				err := service.Initialize(serviceURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, hookURL, func(req *http.Request) (*http.Response, error) {
+					body, err := io.ReadAll(req.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(req.Header.Get("Content-Type")).To(Equal("application/json"))
+					Expect(string(body)).To(MatchJSON(`{
+						"text": "this is a message",
+						"username": "testUserName",
+						"channel": "#testChannel"
+					}`))
+
+					return httpmock.NewStringResponse(http.StatusOK, ""), nil
+				})
+
+				err = service.Send("this is a message", nil)
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+		When("the webhook rejects the notification", func() {
+			It("should include the response body in the error", func() {
+				serviceURL, _ := url.Parse("rocketchat://rocketchat.my-domain.com/tokenA/tokenB")
+				hookURL := "https://rocketchat.my-domain.com/hooks/tokenA/tokenB"
+
+				service := &Service{}
+				err := service.Initialize(serviceURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, hookURL, httpmock.NewStringResponder(http.StatusBadRequest, "bad payload"))
+
+				err = service.Send("this is a message", nil)
+				Expect(err).To(MatchError("notification failed: 400 bad payload"))
+			})
+		})
+		When("the webhook cannot be reached", func() {
+			It("should report the transport error with host and port context", func() {
+				serviceURL, _ := url.Parse("rocketchat://rocketchat.my-domain.com:5055/tokenA/tokenB")
+				hookURL := "https://rocketchat.my-domain.com:5055/hooks/tokenA/tokenB"
+
+				service := &Service{}
+				err := service.Initialize(serviceURL, testutils.TestLogger())
+				Expect(err).NotTo(HaveOccurred())
+
+				httpmock.RegisterResponder(http.MethodPost, hookURL, httpmock.NewErrorResponder(errors.New("network down")))
+
+				err = service.Send("this is a message", nil)
+				Expect(err).To(MatchError(ContainSubstring("network down")))
+				Expect(err).To(MatchError(ContainSubstring("HOST: rocketchat.my-domain.com")))
+				Expect(err).To(MatchError(ContainSubstring("PORT: 5055")))
 			})
 		})
 	})

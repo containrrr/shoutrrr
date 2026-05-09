@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"net"
 	"net/url"
 	"strings"
 
@@ -23,9 +24,13 @@ type Config struct {
 
 // GetURL returns a URL representation of it's current field values
 func (config *Config) GetURL() *url.URL {
+	host := config.Host
+	if config.Port != "" {
+		host = net.JoinHostPort(config.Host, config.Port)
+	}
 
 	u := &url.URL{
-		Host:       fmt.Sprintf("%s:%v", config.Host, config.Port),
+		Host:       host,
 		Path:       fmt.Sprintf("%s/%s", config.TokenA, config.TokenB),
 		Scheme:     Scheme,
 		ForceQuery: false,
