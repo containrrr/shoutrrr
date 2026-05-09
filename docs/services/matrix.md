@@ -1,5 +1,9 @@
 # Matrix
 
+!!! note Usage of the `title` parameter
+    Do note that Matrix will discard any information put in the `title` parameter as the service has no analogue to a
+    a title. Instead, use a custom message format to supply your wanted title as part of the message.
+
 ## URL Format
 
 *matrix://__`user`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]][&disableTLS=yes]*
@@ -14,6 +18,9 @@ flow your server uses, if you can manually retrieve a token, then Shoutrrr can u
 ### Password Login Flow
 
 If a `user` and `password` is supplied, the `m.login.password` login flow is attempted if the server supports it.
+Shoutrrr sends a stable Matrix `device_id` during password login to avoid creating a new Matrix device on every
+initialization. The default device ID is `shoutrrr`; override it with `deviceID=...` if you need separate devices for
+separate Shoutrrr instances using the same account.
 
 ## Rooms
 

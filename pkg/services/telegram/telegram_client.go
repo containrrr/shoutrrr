@@ -21,7 +21,7 @@ func (c *Client) GetBotInfo() (*User, error) {
 	err := jsonclient.Get(c.apiURL("getMe"), response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, GetResponseError(err)
 	}
 
 	return &response.Result, nil
@@ -40,7 +40,7 @@ func (c *Client) GetUpdates(offset int, limit int, timeout int, allowedUpdates [
 	err := jsonclient.Post(c.apiURL("getUpdates"), request, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, GetResponseError(err)
 	}
 
 	return response.Result, nil
@@ -53,7 +53,7 @@ func (c *Client) SendMessage(message *SendMessagePayload) (*Message, error) {
 	err := jsonclient.Post(c.apiURL("sendMessage"), message, response)
 
 	if !response.OK {
-		return nil, GetErrorResponse(jsonclient.ErrorBody(err))
+		return nil, GetResponseError(err)
 	}
 
 	return response.Result, nil
@@ -66,4 +66,12 @@ func GetErrorResponse(body string) error {
 		return response
 	}
 	return nil
+}
+
+// GetResponseError preserves Telegram API errors, falling back to transport errors.
+func GetResponseError(err error) error {
+	if responseErr := GetErrorResponse(jsonclient.ErrorBody(err)); responseErr != nil {
+		return responseErr
+	}
+	return err
 }

@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -29,14 +29,15 @@ var (
 	service       *Service
 	envDiscordURL *url.URL
 	logger        *log.Logger
-)
-
-var _ = Describe("the discord service", func() {
-	BeforeSuite(func() {
+	_             = BeforeSuite(func() {
 		service = &Service{}
 		envDiscordURL, _ = url.Parse(os.Getenv("SHOUTRRR_DISCORD_URL"))
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
+)
+
+var _ = Describe("the discord service", func() {
+
 	When("running integration tests", func() {
 		It("should work without errors", func() {
 			if envDiscordURL.String() == "" {
@@ -112,6 +113,29 @@ var _ = Describe("the discord service", func() {
 
 				Expect(outputURL.String()).To(Equal(testURL))
 
+			})
+		})
+	})
+	Describe("creating an API URL", func() {
+		When("given a config without thread ID", func() {
+			It("should create a URL without query parameters", func() {
+				config := &Config{
+					WebhookID: "1",
+					Token:     "dummyToken",
+				}
+				apiURL := CreateAPIURLFromConfig(config)
+				Expect(apiURL).To(Equal("https://discord.com/api/webhooks/1/dummyToken"))
+			})
+		})
+		When("given a config with thread ID", func() {
+			It("should create a URL with thread_id query parameter", func() {
+				config := &Config{
+					WebhookID: "1",
+					Token:     "dummyToken",
+					ThreadID:  "987654321",
+				}
+				apiURL := CreateAPIURLFromConfig(config)
+				Expect(apiURL).To(Equal("https://discord.com/api/webhooks/1/dummyToken?thread_id=987654321"))
 			})
 		})
 	})
@@ -215,7 +239,7 @@ var _ = Describe("the discord service", func() {
 			httpmock.Activate()
 			service = Service{}
 			if err := service.Initialize(dummyConfig.GetURL(), logger); err != nil {
-				panic(fmt.Errorf("service initialization failed: %v", err))
+				panic(fmt.Errorf("service initialization failed: %w", err))
 			}
 		})
 		AfterEach(func() {

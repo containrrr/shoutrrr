@@ -12,6 +12,8 @@ import (
 type Config struct {
 	standard.EnumlessConfig
 	webhookURL    *url.URL
+	headers       map[string]string
+	extraData     map[string]string
 	ContentType   string `key:"contenttype" default:"application/json" desc:"The value of the Content-Type header"`
 	DisableTLS    bool   `key:"disabletls"  default:"No"`
 	Template      string `key:"template"    optional:"" desc:"The template used for creating the request payload"`
@@ -53,13 +55,13 @@ func (config *Config) WebhookURL() *url.URL {
 	return &webhookURL
 }
 
-// GetURL returns a URL representation of it's current field values
+// GetURL returns a URL representation of its current field values
 func (config *Config) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
+// SetURL updates a ServiceConfig from a URL representation of its field values
 func (config *Config) SetURL(serviceURL *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, serviceURL)
@@ -70,6 +72,7 @@ func (config *Config) getURL(resolver t.ConfigQueryResolver) *url.URL {
 	serviceURL := *config.webhookURL
 	webhookQuery := config.webhookURL.Query()
 	serviceQuery := format.BuildQueryWithCustomFields(resolver, webhookQuery)
+	appendCustomQueryValues(serviceQuery, config.headers, config.extraData)
 	serviceURL.RawQuery = serviceQuery.Encode()
 	serviceURL.Scheme = Scheme
 
@@ -80,13 +83,15 @@ func (config *Config) setURL(resolver t.ConfigQueryResolver, serviceURL *url.URL
 
 	webhookURL := *serviceURL
 	serviceQuery := serviceURL.Query()
-
+	headers, extraData := stripCustomQueryValues(serviceQuery)
 	customQuery, err := format.SetConfigPropsFromQuery(resolver, serviceQuery)
 	if err != nil {
 		return err
 	}
 	webhookURL.RawQuery = customQuery.Encode()
 	config.webhookURL = &webhookURL
+	config.headers = headers
+	config.extraData = extraData
 
 	return nil
 }

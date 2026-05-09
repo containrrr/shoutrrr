@@ -10,7 +10,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -43,6 +43,7 @@ var serviceURLs = map[string]string{
 var serviceResponses = map[string]string{
 	"pushbullet": `{"created": 0}`,
 	"gotify":     `{"id": 0}`,
+	"telegram":   `{"ok":true,"result":{"message_id":1,"text":"test"}}`,
 }
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)

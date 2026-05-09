@@ -37,7 +37,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 	json, _ := CreateJSONPayload(config, message, params)
 	res, err = http.Post(apiURL, "application/json", bytes.NewReader(json))
 	if err != nil {
-		return fmt.Errorf("Error while posting to URL: %v\nHOST: %s\nPORT: %s", err, config.Host, config.Port)
+		return fmt.Errorf("Error while posting to URL: %w\nHOST: %s\nPORT: %s", err, config.Host, config.Port)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {

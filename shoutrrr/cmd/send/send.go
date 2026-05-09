@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/containrrr/shoutrrr/internal/dedupe"
 	intutil "github.com/containrrr/shoutrrr/internal/util"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -46,6 +47,7 @@ func run(cmd *cobra.Command) error {
 	verbose, _ := flags.GetBool("verbose")
 
 	urls, _ := flags.GetStringArray("url")
+	urls = dedupe.RemoveDuplicates(urls)
 	message, _ := flags.GetString("message")
 	title, _ := flags.GetString("title")
 
@@ -54,7 +56,7 @@ func run(cmd *cobra.Command) error {
 		sb := strings.Builder{}
 		count, err := io.Copy(&sb, os.Stdin)
 		if err != nil {
-			return fmt.Errorf("failed to read message from stdin: %v", err)
+			return fmt.Errorf("failed to read message from stdin: %w", err)
 		}
 		logf("Read %d byte(s)", count)
 		message = sb.String()

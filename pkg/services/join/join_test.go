@@ -10,7 +10,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -24,12 +24,13 @@ var (
 	config     *join.Config
 	pkr        format.PropKeyResolver
 	envJoinURL *url.URL
-)
-var _ = Describe("the join service", func() {
-	BeforeSuite(func() {
+	_          = BeforeSuite(func() {
 		service = &join.Service{}
 		envJoinURL, _ = url.Parse(os.Getenv("SHOUTRRR_JOIN_URL"))
 	})
+)
+var _ = Describe("the join service", func() {
+
 	When("running integration tests", func() {
 		It("should work", func() {
 			if envJoinURL.String() == "" {

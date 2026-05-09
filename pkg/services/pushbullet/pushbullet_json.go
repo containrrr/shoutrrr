@@ -35,7 +35,7 @@ type PushResponse struct {
 }
 
 type ErrorResponse struct {
-	Error struct {
+	ErrorData struct {
 		Cat     string `json:"cat"`
 		Message string `json:"message"`
 		Type    string `json:"type"`
@@ -43,6 +43,10 @@ type ErrorResponse struct {
 }
 
 var emailPattern = regexp.MustCompile(`.*@.*\..*`)
+
+func (err *ErrorResponse) Error() string {
+	return err.ErrorData.Message
+}
 
 func (p *PushRequest) SetTarget(target string) {
 	if emailPattern.MatchString(target) {

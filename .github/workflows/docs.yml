@@ -10,28 +10,31 @@ on:
       - main
       - latest
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
       - name: Install mkdocs
-        env:
-          MKDOCSMAT_TOKEN: ${{ secrets.MKDOCSMAT_TOKEN }}
         run: |
           pip install \
             mkdocs \
+            mkdocs-material \
             mike \
-            md-toc \
-            git+https://${MKDOCSMAT_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
+            md-toc
 
       - name: Generate service config docs
         run: bash generate-service-config-docs.sh

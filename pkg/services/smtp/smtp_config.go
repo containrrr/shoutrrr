@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -25,15 +26,16 @@ type Config struct {
 	Encryption  encMethod `desc:"Encryption method" default:"Auto" key:"encryption"`
 	UseStartTLS bool      `desc:"Whether to use StartTLS encryption" default:"Yes" key:"usestarttls,starttls"`
 	UseHTML     bool      `desc:"Whether the message being sent is in HTML" default:"No" key:"usehtml"`
+	ClientHost  string    `desc:"The client host name sent to the SMTP server during HELLO phase. If set to \"auto\" it will use the OS hostname" key:"clienthost" default:"localhost"`
 }
 
-// GetURL returns a URL representation of it's current field values
+// GetURL returns a URL representation of its current field values
 func (config *Config) GetURL() *url.URL {
 	resolver := format.NewPropKeyResolver(config)
 	return config.getURL(&resolver)
 }
 
-// SetURL updates a ServiceConfig from a URL representation of it's field values
+// SetURL updates a ServiceConfig from a URL representation of its field values
 func (config *Config) SetURL(url *url.URL) error {
 	resolver := format.NewPropKeyResolver(config)
 	return config.setURL(&resolver, url)
@@ -89,8 +91,16 @@ func (config *Config) Clone() Config {
 	return clone
 }
 
+// FixEmailTags replaces parsed spaces (+) in e-mail addresses with '+'
+func (config *Config) FixEmailTags() {
+	config.FromAddress = strings.ReplaceAll(config.FromAddress, " ", "+")
+	for i, adr := range config.ToAddresses {
+		config.ToAddresses[i] = strings.ReplaceAll(adr, " ", "+")
+	}
+}
+
 // Enums returns the fields that should use a corresponding EnumFormatter to Print/Parse their values
-func (config Config) Enums() map[string]types.EnumFormatter {
+func (config *Config) Enums() map[string]types.EnumFormatter {
 	return map[string]types.EnumFormatter{
 		"Auth":       AuthTypes.Enum,
 		"Encryption": EncMethods.Enum,

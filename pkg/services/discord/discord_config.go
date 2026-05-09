@@ -23,6 +23,7 @@ type Config struct {
 	ColorDebug uint   `key:"colorDebug" default:"0x7b00ab" desc:"The color of the left border for debug messages"   base:"16"`
 	SplitLines bool   `key:"splitLines" default:"Yes"      desc:"Whether to send each line as a separate embedded item"`
 	JSON       bool   `key:"json"       default:"No"       desc:"Whether to send the whole message as the JSON payload instead of using it as the 'content' field"`
+	ThreadID   string `key:"thread_id"  default:""         desc:"Optional thread ID for posting into a channel thread"`
 }
 
 // LevelColors returns an array of colors with a MessageLevel index

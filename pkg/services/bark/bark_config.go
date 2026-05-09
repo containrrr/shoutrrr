@@ -9,7 +9,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
 
-// Config for use within the telegram plugin
+// Config for use within the bark service
 type Config struct {
 	standard.EnumlessConfig
 	Title     string `key:"title"    default:""      desc:"Notification title, optionally set by the sender"`

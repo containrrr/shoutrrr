@@ -1,18 +1,20 @@
 package telegram_test
 
 import (
+	"errors"
 	"fmt"
-	"github.com/jarcoal/httpmock"
 	"log"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/jarcoal/httpmock"
+
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	. "github.com/containrrr/shoutrrr/pkg/services/telegram"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -21,15 +23,18 @@ func TestTelegram(t *testing.T) {
 	RunSpecs(t, "Shoutrrr Telegram Suite")
 }
 
-var _ = Describe("the telegram service", func() {
-	var telegram *Service
-	var envTelegramURL string
-	var logger *log.Logger
+var (
+	envTelegramURL string
+	logger         *log.Logger
 
-	BeforeSuite(func() {
+	_ = BeforeSuite(func() {
 		envTelegramURL = os.Getenv("SHOUTRRR_TELEGRAM_URL")
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 	})
+)
+
+var _ = Describe("the telegram service", func() {
+	var telegram *Service
 
 	BeforeEach(func() {
 		telegram = &Service{}
@@ -137,10 +142,32 @@ var _ = Describe("the telegram service", func() {
 			err = telegram.Initialize(serviceURL, logger)
 			Expect(err).NotTo(HaveOccurred())
 
-			setupResponder("sendMessage", telegram.GetConfig().Token, 200, "")
+			setupResponder("sendMessage", telegram.GetConfig().Token, 200, `{"ok":true,"result":{"message_id":1,"text":"Message"}}`)
 
 			err = telegram.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should report transport errors", func() {
+			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1")
+			err = telegram.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			setupErrorResponder("sendMessage", telegram.GetConfig().Token, errors.New("dummy transport error"))
+
+			err = telegram.Send("Message", nil)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("dummy transport error"))
+		})
+		It("should report Telegram API errors", func() {
+			serviceURL, _ := url.Parse("telegram://12345:mock-token@telegram/?chats=channel-1")
+			err = telegram.Initialize(serviceURL, logger)
+			Expect(err).NotTo(HaveOccurred())
+
+			setupResponder("sendMessage", telegram.GetConfig().Token, 401, `{"ok":false,"error_code":401,"description":"Unauthorized"}`)
+
+			err = telegram.Send("Message", nil)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("Unauthorized"))
 		})
 
 	})
@@ -166,4 +193,9 @@ func expectErrorAndEmptyObject(telegram *Service, rawURL string, logger *log.Log
 func setupResponder(endpoint string, token string, code int, body string) {
 	targetUrl := fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, endpoint)
 	httpmock.RegisterResponder("POST", targetUrl, httpmock.NewStringResponder(code, body))
+}
+
+func setupErrorResponder(endpoint string, token string, err error) {
+	targetUrl := fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, endpoint)
+	httpmock.RegisterResponder("POST", targetUrl, httpmock.NewErrorResponder(err))
 }

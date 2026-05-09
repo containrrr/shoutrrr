@@ -126,11 +126,15 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // CreateAPIURLFromConfig takes a discord config object and creates a post url
 func CreateAPIURLFromConfig(config *Config) string {
-	return fmt.Sprintf(
-		"%s/%s/%s",
-		hookURL,
-		config.WebhookID,
-		config.Token)
+	baseURL := fmt.Sprintf("%s/%s/%s", hookURL, config.WebhookID, config.Token)
+
+	if config.ThreadID != "" {
+		queryParams := url.Values{}
+		queryParams.Set("thread_id", config.ThreadID)
+		return baseURL + "?" + queryParams.Encode()
+	}
+
+	return baseURL
 }
 
 func doSend(payload []byte, postURL string) error {

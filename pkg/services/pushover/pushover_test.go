@@ -12,7 +12,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/pushover"
 	"github.com/jarcoal/httpmock"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -29,13 +29,14 @@ var (
 	keyResolver    format.PropKeyResolver
 	envPushoverURL *url.URL
 	logger         *log.Logger
-)
-var _ = Describe("the pushover service", func() {
-	BeforeSuite(func() {
+	_              = BeforeSuite(func() {
 		service = &pushover.Service{}
 		logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
 		envPushoverURL, _ = url.Parse(os.Getenv("SHOUTRRR_PUSHOVER_URL"))
 	})
+)
+var _ = Describe("the pushover service", func() {
+
 	When("running integration tests", func() {
 		It("should work", func() {
 			if envPushoverURL.String() == "" {

@@ -23,6 +23,26 @@ Heavily inspired by <a href="https://github.com/caronc/apprise">caronc/apprise</
 </div>
 <br/><br/>
 
+## Installation
+
+### Using the snap
+
+```bash
+$ sudo snap install shoutrrr
+```
+
+### Using the Go CLI
+
+```bash
+$ go install github.com/containrrr/shoutrrr/shoutrrr@latest
+```
+
+### From Source
+
+```bash
+$ go build -o shoutrrr ./shoutrrr
+```
+
 ## Quick Start
 
 ### As a package
@@ -134,3 +154,4 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## Related Project(s)
 - [watchtower](https://github.com/containrrr/watchtower) - process for automating Docker container base image updates that uses shoutrrr for notifications
 - [kured](https://github.com/weaveworks/kured) - kubernetes reboot daemon has adopted shoutrrr as their unified notification method starting with version 1.7.0.
+- [Green Orb](https://github.com/atgreen/green-orb) - a versatile 'observe and report' buddy for your application logs

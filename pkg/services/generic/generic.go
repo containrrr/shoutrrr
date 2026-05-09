@@ -2,8 +2,6 @@ package generic
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
@@ -38,9 +36,10 @@ func (service *Service) Send(message string, paramsPtr *types.Params) error {
 		service.Logf("Failed to update params: %v", err)
 	}
 
-	updateParams(&config, params, message)
+	// Create a mutable copy of the passed params
+	sendParams := createSendParams(&config, params, message)
 
-	if err := service.doSend(&config, params); err != nil {
+	if err := service.doSend(&config, sendParams); err != nil {
 		return fmt.Errorf("an error occurred while sending notification to generic webhook: %s", err.Error())
 	}
 
@@ -81,11 +80,14 @@ func (service *Service) doSend(config *Config, params types.Params) error {
 	if err == nil {
 		req.Header.Set("Content-Type", config.ContentType)
 		req.Header.Set("Accept", config.ContentType)
+		for key, value := range config.headers {
+			req.Header.Set(key, value)
+		}
 		var res *http.Response
 		res, err = http.DefaultClient.Do(req)
 		if res != nil && res.Body != nil {
 			defer res.Body.Close()
-			if body, errRead := ioutil.ReadAll(res.Body); errRead == nil {
+			if body, errRead := io.ReadAll(res.Body); errRead == nil {
 				service.Log("Server response: ", string(body))
 			}
 		}
@@ -102,6 +104,9 @@ func (service *Service) getPayload(config *Config, params types.Params) (io.Read
 	case "":
 		return bytes.NewBufferString(params[config.MessageKey]), nil
 	case "json", "JSON":
+		for key, value := range config.extraData {
+			params[key] = value
+		}
 		jsonBytes, err := json.Marshal(params)
 		if err != nil {
 			return nil, err
@@ -118,12 +123,14 @@ func (service *Service) getPayload(config *Config, params types.Params) (io.Read
 	return bb, err
 }
 
-func updateParams(config *Config, params types.Params, message string) {
-	if title, found := params.Title(); found {
-		if config.TitleKey != "title" {
-			delete(params, "title")
-			params[config.TitleKey] = title
+func createSendParams(config *Config, params types.Params, message string) types.Params {
+	sendParams := types.Params{}
+	for key, val := range params {
+		if key == types.TitleKey {
+			key = config.TitleKey
 		}
+		sendParams[key] = val
 	}
-	params[config.MessageKey] = message
+	sendParams[config.MessageKey] = message
+	return sendParams
 }

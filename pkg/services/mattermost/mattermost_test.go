@@ -9,13 +9,17 @@ import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/jarcoal/httpmock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var (
 	service          *Service
 	envMattermostURL *url.URL
+	_                = BeforeSuite(func() {
+		service = &Service{}
+		envMattermostURL, _ = url.Parse(os.Getenv("SHOUTRRR_MATTERMOST_URL"))
+	})
 )
 
 func TestMattermost(t *testing.T) {
@@ -24,10 +28,7 @@ func TestMattermost(t *testing.T) {
 }
 
 var _ = Describe("the mattermost service", func() {
-	BeforeSuite(func() {
-		service = &Service{}
-		envMattermostURL, _ = url.Parse(os.Getenv("SHOUTRRR_MATTERMOST_URL"))
-	})
+
 	When("running integration tests", func() {
 		It("should work without errors", func() {
 			if envMattermostURL.String() == "" {
@@ -59,6 +60,20 @@ var _ = Describe("the mattermost service", func() {
 			It("should not set channel or username", func() {
 				Expect(config.Channel).To(BeEmpty())
 				Expect(config.UserName).To(BeEmpty())
+			})
+		})
+		When("generating a config object with a port", func() {
+			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken")
+			config := &Config{}
+			err := config.SetURL(mattermostURL)
+			It("should not have caused an error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+			It("should preserve the port", func() {
+				Expect(config.Host).To(Equal("mattermost.my-domain.com:8065"))
+			})
+			It("should preserve the port in the generated URL", func() {
+				Expect(config.GetURL().String()).To(Equal("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken"))
 			})
 		})
 		When("generating a new config with url, that has no token", func() {
@@ -163,6 +178,15 @@ var _ = Describe("the mattermost service", func() {
 				Expect(string(json)).To(Equal("{\"text\":\"this is a message\"}"))
 			})
 		})
+		When("sending to a URL with a port", func() {
+			mattermostURL, _ := url.Parse("mattermost://mattermost.my-domain.com:8065/thisshouldbeanapitoken")
+			config := &Config{}
+			Expect(config.SetURL(mattermostURL)).To(Succeed())
+			It("should generate the correct URL including the port", func() {
+				generatedURL := buildURL(config)
+				Expect(generatedURL).To(Equal("https://mattermost.my-domain.com:8065/hooks/thisshouldbeanapitoken"))
+			})
+		})
 		When("sending a message with pre set username and channel", func() {
 			mattermostURL, _ := url.Parse("mattermost://testUserName@mattermost.my-domain.com/thisshouldbeanapitoken/testChannel")
 			config := &Config{}
@@ -260,6 +284,17 @@ var _ = Describe("the mattermost service", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			httpmock.RegisterResponder("POST", "https://mattermost.host/hooks/token", httpmock.NewStringResponder(200, ``))
+
+			err = service.Send("Message", nil)
+			Expect(err).NotTo(HaveOccurred())
+		})
+		It("should post to the configured port", func() {
+			serviceURL := testutils.URLMust("mattermost://mattermost.host:8065/token")
+			service := Service{}
+			err = service.Initialize(serviceURL, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			httpmock.RegisterResponder("POST", "https://mattermost.host:8065/hooks/token", httpmock.NewStringResponder(200, ``))
 
 			err = service.Send("Message", nil)
 			Expect(err).NotTo(HaveOccurred())

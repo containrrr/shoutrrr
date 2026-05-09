@@ -2,12 +2,13 @@ package jsonclient_test
 
 import (
 	"errors"
-	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
-	"github.com/onsi/gomega/ghttp"
 	"net/http"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	"github.com/containrrr/shoutrrr/pkg/util/jsonclient"
+	"github.com/onsi/gomega/ghttp"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

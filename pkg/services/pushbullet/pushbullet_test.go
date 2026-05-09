@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -23,15 +23,13 @@ func TestPushbullet(t *testing.T) {
 var (
 	service          *Service
 	envPushbulletURL *url.URL
+	_                = BeforeSuite(func() {
+		service = &Service{}
+		envPushbulletURL, _ = url.Parse(os.Getenv("SHOUTRRR_PUSHBULLET_URL"))
+	})
 )
 
 var _ = Describe("the pushbullet service", func() {
-
-	BeforeSuite(func() {
-		service = &Service{}
-		envPushbulletURL, _ = url.Parse(os.Getenv("SHOUTRRR_PUSHBULLET_URL"))
-
-	})
 
 	When("running integration tests", func() {
 		It("should not error out", func() {

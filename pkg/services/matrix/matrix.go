@@ -31,7 +31,7 @@ func (s *Service) Initialize(configURL *url.URL, logger t.StdLogger) error {
 
 	s.client = newClient(s.config.Host, s.config.DisableTLS, logger)
 	if s.config.User != "" {
-		return s.client.login(s.config.User, s.config.Password)
+		return s.client.login(s.config.User, s.config.Password, s.config.DeviceID)
 	}
 
 	s.client.useToken(s.config.Password)
@@ -49,7 +49,7 @@ func (s *Service) Send(message string, params *t.Params) error {
 
 	if len(errors) > 0 {
 		for _, err := range errors {
-			s.Logf("error sending message: %v", err)
+			s.Logf("error sending message: %w", err)
 		}
 		return fmt.Errorf("%v error(s) sending message, with initial error: %v", len(errors), errors[0])
 	}

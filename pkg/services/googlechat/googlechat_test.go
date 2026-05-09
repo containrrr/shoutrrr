@@ -1,11 +1,12 @@
 package googlechat
 
 import (
-	"github.com/jarcoal/httpmock"
 	"net/url"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	"github.com/jarcoal/httpmock"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

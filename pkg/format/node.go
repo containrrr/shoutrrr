@@ -2,12 +2,13 @@ package format
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // NodeTokenType is used to represent the type of value that a node has for syntax highlighting
@@ -268,6 +269,7 @@ func getValueNodeValue(fieldValue r.Value, fieldInfo *FieldInfo) (string, NodeTo
 }
 
 func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
+	itemSep := fieldInfo.ItemSeparator
 	sliceLen := fieldValue.Len()
 	var mapKeys []r.Value
 	if fieldInfo.Type.Kind() == r.Map {
@@ -282,7 +284,7 @@ func getContainerValueString(fieldValue r.Value, fieldInfo *FieldInfo) string {
 	for i := 0; i < sliceLen; i++ {
 		var itemValue r.Value
 		if i > 0 {
-			sb.WriteRune(',')
+			sb.WriteRune(itemSep)
 		}
 
 		if mapKeys != nil {

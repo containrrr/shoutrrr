@@ -3,14 +3,15 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/format"
 	"io"
 	"math/rand"
 	"net"
 	"net/smtp"
 	"net/url"
+	"os"
 	"time"
 
+	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 )
@@ -41,6 +42,7 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 		UseStartTLS: true,
 		UseHTML:     false,
 		Encryption:  EncMethods.Auto,
+		ClientHost:  "localhost",
 	}
 
 	pkr := format.NewPropKeyResolver(service.config)
@@ -64,14 +66,14 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 // Send a notification message to e-mail recipients
 func (service *Service) Send(message string, params *types.Params) error {
-	client, err := getClientConnection(service.config)
-	if err != nil {
-		return fail(FailGetSMTPClient, err)
-	}
-
 	config := service.config.Clone()
 	if err := service.propKeyResolver.UpdateConfigFromParams(&config, params); err != nil {
 		return fail(FailApplySendParams, err)
+	}
+
+	client, err := getClientConnection(service.config)
+	if err != nil {
+		return fail(FailGetSMTPClient, err)
 	}
 
 	return service.doSend(client, message, &config)
@@ -105,6 +107,14 @@ func getClientConnection(config *Config) (*smtp.Client, error) {
 }
 
 func (service *Service) doSend(client *smtp.Client, message string, config *Config) failure {
+
+	config.FixEmailTags()
+
+	clientHost := service.resolveClientHost(config)
+
+	if err := client.Hello(clientHost); err != nil {
+		return fail(FailHandshake, err)
+	}
 
 	if config.UseHTML {
 		service.multipartBoundary = fmt.Sprintf("%x", rand.Int63())
@@ -149,6 +159,20 @@ func (service *Service) doSend(client *smtp.Client, message string, config *Conf
 	return nil
 }
 
+func (service *Service) resolveClientHost(config *Config) string {
+	if config.ClientHost != "auto" {
+		return config.ClientHost
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		service.Logf("Failed to get hostname, falling back to localhost: %v", err)
+		return "localhost"
+	}
+
+	return hostname
+}
+
 func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
 	switch config.Auth {
@@ -182,8 +206,8 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 		return fail(FailOpenDataStream, err)
 	}
 
-	if err := writeHeaders(wc, service.getHeaders(toAddress, config.Subject)); err != nil {
-		return fail(FailWriteHeaders, err)
+	if err := writeHeaders(wc, service.getHeaders(config, toAddress)); err != nil {
+		return err
 	}
 
 	var ferr failure
@@ -204,21 +228,17 @@ func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, c
 	return nil
 }
 
-func (service *Service) getHeaders(toAddress string, subject string) map[string]string {
-	conf := service.config
-
-	var contentType string
-	if conf.UseHTML {
+func (service *Service) getHeaders(config *Config, toAddress string) map[string]string {
+	contentType := contentPlain
+	if config.UseHTML {
 		contentType = fmt.Sprintf(contentMultipart, service.multipartBoundary)
-	} else {
-		contentType = contentPlain
 	}
 
 	return map[string]string{
-		"Subject":      subject,
+		"Subject":      config.Subject,
 		"Date":         time.Now().Format(time.RFC1123Z),
 		"To":           toAddress,
-		"From":         fmt.Sprintf("%s <%s>", conf.FromName, conf.FromAddress),
+		"From":         fmt.Sprintf("%s <%s>", config.FromName, config.FromAddress),
 		"MIME-version": "1.0",
 		"Content-Type": contentType,
 	}
@@ -256,7 +276,7 @@ func (service *Service) writeMessagePart(wc io.WriteCloser, message string, temp
 			return fail(FailMessageTemplate, err)
 		}
 	} else {
-		if _, err := fmt.Fprintf(wc, message); err != nil {
+		if _, err := fmt.Fprint(wc, message); err != nil {
 			return fail(FailMessageRaw, err)
 		}
 	}
@@ -282,13 +302,16 @@ func writeMultipartHeader(wc io.WriteCloser, boundary string, contentType string
 	return nil
 }
 
-func writeHeaders(wc io.WriteCloser, headers map[string]string) error {
+func writeHeaders(wc io.WriteCloser, headers map[string]string) failure {
 	for key, val := range headers {
 		if _, err := fmt.Fprintf(wc, "%s: %s\n", key, val); err != nil {
-			return err
+			return fail(FailWriteHeaders, err)
 		}
 	}
 
 	_, err := fmt.Fprintln(wc)
-	return err
+	if err != nil {
+		return fail(FailWriteHeaders, err)
+	}
+	return nil
 }

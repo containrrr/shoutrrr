@@ -13,6 +13,7 @@ Click on the service for a more thorough explanation. <!-- @formatter:off -->
 | [Join](./join.md)                 | *join://shoutrrr:__`api-key`__@join/?devices=__`device1`__[,__`device2`__, ...][&icon=__`icon`__][&title=__`title`__]*                          |
 | [Mattermost](./mattermost.md)     | *mattermost://[__`username`__@]__`mattermost-host`__/__`token`__[/__`channel`__]*                                                               |
 | [Matrix](./matrix.md)             | *matrix://__`username`__:__`password`__@__`host`__:__`port`__/[?rooms=__`!roomID1`__[,__`roomAlias2`__]]*                                       |
+| [Ntfy](./ntfy.md)                 | *ntfy://__`username`__:__`password`__@ntfy.sh/__`topic`__*                                                                                      |
 | [OpsGenie](./opsgenie.md)         | *opsgenie://__`host`__/token?responders=__`responder1`__[,__`responder2`__]*                                                                    |
 | [Pushbullet](./pushbullet.md)     | *pushbullet://__`api-token`__[/__`device`__/#__`channel`__/__`email`__]*                                                                        |
 | [Pushover](./pushover.md)         | *pushover://shoutrrr:__`apiToken`__@__`userKey`__/?devices=__`device1`__[,__`device2`__, ...]*                                                  |

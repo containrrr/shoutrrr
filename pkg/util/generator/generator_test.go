@@ -2,14 +2,15 @@ package generator_test
 
 import (
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/util/generator"
-	"github.com/mattn/go-colorable"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 	re "regexp"
 	"strings"
 	"testing"
+
+	"github.com/containrrr/shoutrrr/pkg/util/generator"
+	"github.com/mattn/go-colorable"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 func TestGenerator(t *testing.T) {

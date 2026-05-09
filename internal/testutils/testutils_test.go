@@ -8,7 +8,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
 	"github.com/containrrr/shoutrrr/pkg/types"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -23,8 +23,8 @@ var _ = Describe("the testutils package", func() {
 		It("should not return nil", func() {
 			Expect(TestLogger()).NotTo(Equal(nil))
 		})
-		It("should have the prefix \"Test\"", func() {
-			Expect(TestLogger().Prefix()).To(Equal("Test"))
+		It(`should have the prefix "[Test] "`, func() {
+			Expect(TestLogger().Prefix()).To(Equal("[Test] "))
 		})
 	})
 

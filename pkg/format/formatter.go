@@ -3,12 +3,13 @@ package format
 import (
 	"errors"
 	"fmt"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/containrrr/shoutrrr/pkg/util"
 	r "reflect"
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/util"
 )
 
 // GetServiceConfig returns the inner config of a service
@@ -139,7 +140,7 @@ func SetConfigField(config r.Value, field FieldInfo, inputValue string) (valid b
 			return false, errors.New("field format is not supported")
 		}
 
-		values := strings.Split(inputValue, ",")
+		values := strings.Split(inputValue, string(field.ItemSeparator))
 
 		var value r.Value
 		if elemKind == r.Struct {

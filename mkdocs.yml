@@ -42,6 +42,7 @@ nav:
       - Join: 'services/join.md'
       - Mattermost: 'services/mattermost.md'
       - Matrix: 'services/matrix.md'
+      - Ntfy: 'services/ntfy.md'
       - OpsGenie: 'services/opsgenie.md'
       - Pushbullet: 'services/pushbullet.md'
       - Pushover: 'services/pushover.md'
@@ -53,6 +54,8 @@ nav:
       - Generic Webhook: 'services/generic.md'
   - Guides:
       - Slack: 'guides/slack/index.md'
+  - Examples:
+      - Generic Webhook: 'examples/generic.md'
   - Advanced usage:
       - Proxy: 'proxy.md'
 

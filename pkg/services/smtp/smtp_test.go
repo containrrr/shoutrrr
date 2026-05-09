@@ -1,7 +1,6 @@
 package smtp
 
 import (
-	"fmt"
 	"log"
 	"net/smtp"
 	"net/url"
@@ -14,13 +13,19 @@ import (
 	"github.com/containrrr/shoutrrr/internal/testutils"
 	"github.com/containrrr/shoutrrr/pkg/format"
 	"github.com/containrrr/shoutrrr/pkg/services/standard"
+	"github.com/containrrr/shoutrrr/pkg/types"
 
-	. "github.com/onsi/ginkgo"
+	gt "github.com/onsi/gomega/types"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
+var tt *testing.T
+
 func TestSMTP(t *testing.T) {
 	RegisterFailHandler(Fail)
+	tt = t
 	RunSpecs(t, "Shoutrrr SMTP Suite")
 }
 
@@ -28,60 +33,58 @@ var (
 	service    *Service
 	envSMTPURL string
 	logger     *log.Logger
-)
-
-var _ = Describe("the SMTP service", func() {
-
-	BeforeSuite(func() {
+	_          = BeforeSuite(func() {
 
 		envSMTPURL = os.Getenv("SHOUTRRR_SMTP_URL")
 		logger = testutils.TestLogger()
 	})
+	urlWithAllProps = "smtp://user:password@example.com:2225/?auth=None&clienthost=testhost&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
+)
+
+var _ = Describe("the SMTP service", func() {
+
 	BeforeEach(func() {
 		service = &Service{}
 
 	})
 	When("parsing the configuration URL", func() {
 		It("should be identical after de-/serialization", func() {
-			testURL := "smtp://user:password@example.com:2225/?auth=None&encryption=ExplicitTLS&fromaddress=sender%40example.com&fromname=Sender&subject=Subject&toaddresses=rec1%40example.com%2Crec2%40example.com&usehtml=Yes&usestarttls=No"
-
-			url, err := url.Parse(testURL)
-			fmt.Println(url)
-			Expect(err).NotTo(HaveOccurred(), "parsing")
-
+			url := testutils.URLMust(urlWithAllProps)
 			config := &Config{}
 			pkr := format.NewPropKeyResolver(config)
-			err = config.setURL(&pkr, url)
+			err := config.setURL(&pkr, url)
 			Expect(err).NotTo(HaveOccurred(), "verifying")
 
 			outputURL := config.GetURL()
-			fmt.Printf("\n\n%s\n%s\n\n-", outputURL, testURL)
+			GinkgoT().Logf("\n\n%s\n%s\n\n-", outputURL, urlWithAllProps)
 
-			Expect(outputURL.String()).To(Equal(testURL))
+			Expect(outputURL.String()).To(Equal(urlWithAllProps))
 
+		})
+		When("resolving client host", func() {
+			When("clienthost is set to auto", func() {
+				It("should return the os hostname", func() {
+					hostname, err := os.Hostname()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(service.resolveClientHost(&Config{ClientHost: "auto"})).To(Equal(hostname))
+				})
+			})
+			When("clienthost is set to a custom value", func() {
+				It("should return that value", func() {
+					Expect(service.resolveClientHost(&Config{ClientHost: "computah"})).To(Equal("computah"))
+				})
+			})
 		})
 		When("fromAddress is missing", func() {
 			It("should return an error", func() {
-				testURL := "smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com"
-
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
-
-				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).To(HaveOccurred(), "verifying")
+				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?toAddresses=rec1@example.com,rec2@example.com")
+				Expect((&Config{}).SetURL(testURL)).ToNot(Succeed())
 			})
 		})
 		When("toAddresses are missing", func() {
 			It("should return an error", func() {
-				testURL := "smtp://user:password@example.com:2225/?fromAddress=sender@example.com"
-
-				url, err := url.Parse(testURL)
-				Expect(err).NotTo(HaveOccurred(), "parsing")
-
-				config := &Config{}
-				err = config.SetURL(url)
-				Expect(err).To(HaveOccurred(), "verifying")
+				testURL := testutils.URLMust("smtp://user:password@example.com:2225/?fromAddress=sender@example.com")
+				Expect((&Config{}).SetURL(testURL)).NotTo(Succeed())
 			})
 
 		})
@@ -100,17 +103,33 @@ var _ = Describe("the SMTP service", func() {
 
 		It("should have the expected number of fields and enums", func() {
 			testutils.TestConfigGetEnumsCount(config, 2)
-			testutils.TestConfigGetFieldsCount(config, 12)
+			testutils.TestConfigGetFieldsCount(config, 13)
 		})
 	})
+	When("cloning a config", func() {
+		It("should be identical to the original", func() {
+			config := &Config{}
+			Expect(config.SetURL(testutils.URLMust(urlWithAllProps))).To(Succeed())
 
-	When("the service is not configured correctly", func() {
-		It("should fail to send messages", func() {
-			service := Service{
-				config: &Config{},
-			}
-			err := service.Send("test message", nil)
-			Expect(err).To(HaveOccurred())
+			Expect(config.Clone()).To(Equal(*config))
+
+		})
+	})
+	When("sending a message", func() {
+		When("the service is not configured correctly", func() {
+			It("should fail to send messages", func() {
+				service := Service{config: &Config{}}
+				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+
+				service.config.Encryption = EncMethods.ImplicitTLS
+				Expect(service.Send("test message", nil)).To(matchFailure(FailGetSMTPClient))
+			})
+		})
+		When("an invalid param is passed", func() {
+			It("should fail to send messages", func() {
+				service := Service{config: &Config{}}
+				Expect(service.Send("test message", &types.Params{"invalid": "value"})).To(matchFailure(FailApplySendParams))
+			})
 		})
 	})
 
@@ -217,6 +236,42 @@ var _ = Describe("the SMTP service", func() {
 			})
 		})
 
+		When("given e-mail addresses with pluses in the configuration URL", func() {
+
+			It("should send notifications without any errors", func() {
+				testURL := "smtp://user:password@example.com:2225/?useStartTLS=no&fromAddress=sender+tag@example.com&toAddresses=rec1+tag@example.com,rec2@example.com&useHTML=yes"
+				err := testIntegration(
+					testURL,
+					[]string{
+						"250-mx.google.com at your service",
+						"250-SIZE 35651584",
+						"250-AUTH LOGIN PLAIN",
+						"250 8BITMIME",
+						"235 Accepted",
+						"250 Sender OK",
+						"250 Receiver OK",
+						"354 Go ahead",
+						"250 Data OK",
+						"250 Sender OK",
+						"250 Receiver OK",
+						"354 Go ahead",
+						"250 Data OK",
+						"221 OK",
+					},
+					// Message templates:
+					"<pre>{{ .message }}</pre>", "{{ .message }}",
+					// Expected to be sent from client
+					"RCPT TO:<rec1+tag@example.com>",
+					"To: rec1+tag@example.com",
+					"From:  <sender+tag@example.com>")
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
 		When("given a configuration URL with authentication disabled", func() {
 
 			It("should send notifications without any errors", func() {
@@ -265,6 +320,18 @@ var _ = Describe("the SMTP service", func() {
 
 		When("server communication fails", func() {
 
+			It("should fail when initial handshake is not accepted", func() {
+				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no&clienthost=spammer"
+				err := testIntegration(testURL, []string{
+					"421 4.7.0 Try again later, closing connection. (EHLO) r20-20020a50d694000000b004588af8956dsm771862edi.9 - gsmtp",
+				}, "", "")
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).To(MatchError(fail(FailHandshake, nil)))
+			})
+
 			It("should fail when not being able to enable StartTLS", func() {
 				testURL := "smtp://example.com:2225/?useStartTLS=yes&auth=none&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
 				err := testIntegration(testURL, []string{
@@ -279,8 +346,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailEnableStartTLS))
+				Expect(err).To(matchFailure(FailEnableStartTLS))
 			})
 
 			It("should fail when authentication type is invalid", func() {
@@ -290,8 +356,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(standard.FailServiceInit))
+				Expect(err).To(matchFailure(standard.FailServiceInit))
 			})
 
 			It("should fail when not being able to use authentication type", func() {
@@ -307,8 +372,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailAuthenticating))
+				Expect(err).To(matchFailure(FailAuthenticating))
 			})
 
 			It("should fail when not being able to send to recipient", func() {
@@ -324,8 +388,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailSendRecipient))
+				Expect(err).To(matchFailure(FailSendRecipient))
 			})
 
 			It("should fail when the recipient is not accepted", func() {
@@ -339,8 +402,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailSetRecipient))
+				Expect(err).To(matchFailure(FailSetRecipient))
 			})
 
 			It("should fail when the server does not accept the data stream", func() {
@@ -355,8 +417,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailOpenDataStream))
+				Expect(err).To(matchFailure(FailOpenDataStream))
 			})
 
 			It("should fail when the server does not accept the data stream content", func() {
@@ -372,8 +433,7 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailCloseDataStream))
+				Expect(err).To(matchFailure(FailCloseDataStream))
 			})
 
 			It("should fail when the server does not close the connection gracefully", func() {
@@ -393,10 +453,23 @@ var _ = Describe("the SMTP service", func() {
 					Skip(msg)
 					return
 				}
-				Expect(err).To(HaveOccurred())
-				Expect(err.ID()).To(Equal(FailClosingSession))
+				Expect(err).To(matchFailure(FailClosingSession))
 			})
 
+		})
+	})
+	When("writing headers and the output stream is closed", func() {
+		When("it's closed during header content", func() {
+			It("should fail with correct error", func() {
+				fw := testutils.CreateFailWriter(0)
+				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+			})
+		})
+		When("it's closed after header content", func() {
+			It("should fail with correct error", func() {
+				fw := testutils.CreateFailWriter(1)
+				Expect(writeHeaders(fw, map[string]string{"key": "value"})).To(matchFailure(FailWriteHeaders))
+			})
 		})
 	})
 })
@@ -437,7 +510,7 @@ func testSendRecipient(testURL string, responses []string) failures.Failure {
 	return nil
 }
 
-func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string) failures.Failure {
+func testIntegration(testURL string, responses []string, htmlTemplate string, plainTemplate string, expectRec ...string) failures.Failure {
 
 	serviceURL, err := url.Parse(testURL)
 	if err != nil {
@@ -470,6 +543,11 @@ func testIntegration(testURL string, responses []string, htmlTemplate string, pl
 
 	ferr := service.doSend(client, "Test message", service.config)
 
+	recieved := tcfaker.GetClientSentences()
+	for _, expected := range expectRec {
+		Expect(recieved).To(ContainElement(expected))
+	}
+
 	logger.Printf("\n%s", tcfaker.GetConversation(false))
 	if ferr != nil {
 		return ferr
@@ -492,4 +570,9 @@ func fakeTLSEnabled(client *smtp.Client, hostname string) {
 	cr = reflect.ValueOf(client).Elem().FieldByName("serverName")
 	cr = reflect.NewAt(cr.Type(), unsafe.Pointer(cr.UnsafeAddr())).Elem()
 	cr.SetString(hostname)
+}
+
+// matchFailure is a simple wrapper around `fail` and `gomega.MatchError`` to make it easier to use in tests
+func matchFailure(id failures.FailureID) gt.GomegaMatcher {
+	return MatchError(fail(id, nil))
 }

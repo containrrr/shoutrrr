@@ -65,7 +65,7 @@ func (config *Config) setURL(_ types.ConfigQueryResolver, serviceURL *url.URL) e
 		return errors.New(string(MissingAPIKey))
 	}
 
-	config.Host = serviceURL.Hostname()
+	config.Host = serviceURL.Host
 
 	if config.Host == "" {
 		return errors.New(string(MissingHost))

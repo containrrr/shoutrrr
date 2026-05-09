@@ -33,7 +33,7 @@ func (service *Service) Send(message string, params *types.Params) error {
 
 	device := strings.Join(config.Devices, ",")
 	if err := service.sendToDevice(device, message, config); err != nil {
-		return fmt.Errorf("failed to send notifications to pushover devices: %v", err)
+		return fmt.Errorf("failed to send notifications to pushover devices: %w", err)
 	}
 
 	return nil
