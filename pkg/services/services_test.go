@@ -43,6 +43,7 @@ var serviceURLs = map[string]string{
 var serviceResponses = map[string]string{
 	"pushbullet": `{"created": 0}`,
 	"gotify":     `{"id": 0}`,
+	"telegram":   `{"ok":true,"result":{"message_id":1,"text":"test"}}`,
 }
 
 var logger = log.New(GinkgoWriter, "Test", log.LstdFlags)
