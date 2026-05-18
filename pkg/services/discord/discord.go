@@ -36,11 +36,17 @@ const (
 func (service *Service) Send(message string, params *types.Params) error {
 	var firstErr error
 
+	splitLines := service.config.SplitLines
+	rawSplitLines, ok := (*params)["splitLines"]
+	if ok {
+		splitLines, _ = format.ParseBool(rawSplitLines, service.config.SplitLines)
+	}
+
 	if service.config.JSON {
 		postURL := CreateAPIURLFromConfig(service.config)
 		firstErr = doSend([]byte(message), postURL)
 	} else {
-		batches := CreateItemsFromPlain(message, service.config.SplitLines)
+		batches := CreateItemsFromPlain(message, splitLines)
 		for _, items := range batches {
 			if err := service.sendItems(items, params); err != nil {
 				service.Log(err)
