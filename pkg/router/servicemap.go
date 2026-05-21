@@ -8,6 +8,7 @@ import (
 	"github.com/containrrr/shoutrrr/pkg/services/gotify"
 	"github.com/containrrr/shoutrrr/pkg/services/ifttt"
 	"github.com/containrrr/shoutrrr/pkg/services/join"
+	"github.com/containrrr/shoutrrr/pkg/services/lark"
 	"github.com/containrrr/shoutrrr/pkg/services/logger"
 	"github.com/containrrr/shoutrrr/pkg/services/matrix"
 	"github.com/containrrr/shoutrrr/pkg/services/mattermost"
@@ -46,4 +47,5 @@ var serviceMap = map[string]func() t.Service{
 	"teams":      func() t.Service { return &teams.Service{} },
 	"telegram":   func() t.Service { return &telegram.Service{} },
 	"zulip":      func() t.Service { return &zulip.Service{} },
+	"lark":       func() t.Service { return &lark.Service{} },
 }

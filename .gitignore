@@ -19,6 +19,7 @@
 
 *.out
 .idea
+.vscode
 
 report.json
 coverage.txt
