@@ -45,8 +45,9 @@ func (service *Service) Send(message string, _ *types.Params) error {
 	if err != nil {
 		return fmt.Errorf("failed to send notification to Google Chat: %s", err)
 	}
-
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("Google Chat API notification returned %d HTTP status code", resp.StatusCode)

@@ -42,7 +42,9 @@ func (service *Service) sendAlert(url string, apiKey string, payload AlertPayloa
 	if err != nil {
 		return fmt.Errorf("failed to send notification to OpsGenie: %s", err)
 	}
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		body, err := ioutil.ReadAll(resp.Body)
