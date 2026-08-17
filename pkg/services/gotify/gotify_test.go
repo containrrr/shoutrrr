@@ -60,8 +60,13 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	})
 
 	When("provided a valid token", func() {
-		It("should return true", func() {
+		It("should accept a legacy token", func() {
 			token := "Ahwbsdyhwwgarxd"
+			Expect(isTokenValid(token)).To(BeTrue())
+		})
+
+		It("should accept an enhanced token", func() {
+			token := "gtfya.e2NcJK7AenXBPIRB3S03JsBlmy0V6xP8h0hwSiAJae8"
 			Expect(isTokenValid(token)).To(BeTrue())
 		})
 	})
@@ -74,6 +79,22 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 	When("provided a token with an invalid length", func() {
 		It("should return false", func() {
 			token := "Chwbsdyhwwga"
+			Expect(isTokenValid(token)).To(BeFalse())
+		})
+	})
+	When("provided an invalid enhanced token", func() {
+		It("should reject a client token", func() {
+			token := "gtfyc.e2NcJK7AenXBPIRB3S03JsBlmy0V6xP8h0hwSiAJae8"
+			Expect(isTokenValid(token)).To(BeFalse())
+		})
+
+		It("should reject an invalid payload length", func() {
+			token := "gtfya.e2NcJK7AenXBPIRB3S03JsBlmy0V6xP8h0hwSiA"
+			Expect(isTokenValid(token)).To(BeFalse())
+		})
+
+		It("should reject a payload outside the URL-safe base64 alphabet", func() {
+			token := "gtfya.e2NcJK7AenXBPIRB3S03JsBlmy0V6xP8h0hwSiAJae+"
 			Expect(isTokenValid(token)).To(BeFalse())
 		})
 	})
