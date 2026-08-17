@@ -2,6 +2,7 @@ package gotify
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -51,10 +52,17 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 const tokenChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_"
 
+const enhancedTokenPrefix = "gtfya."
+
 // The validation rules have been taken directly from the Gotify source code.
 // These will have to be adapted in case of a change:
-// https://github.com/gotify/server/blob/ad157a138b4985086c484a7aabfc2deada5a33dd/auth/token.go#L8
+// https://github.com/gotify/server/blob/ad977d3d9c53910f2ea485abf2b295281d705f9a/auth/token.go
 func isTokenValid(token string) bool {
+	if encoded, found := strings.CutPrefix(token, enhancedTokenPrefix); found {
+		decoded, err := base64.RawURLEncoding.DecodeString(encoded)
+		return err == nil && len(decoded) == 32
+	}
+
 	if len(token) != 15 {
 		return false
 	} else if token[0] != 'A' {
