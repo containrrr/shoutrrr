@@ -78,6 +78,27 @@ var _ = Describe("the telegram service", func() {
 						Expect(payload.MessageThreadID).To(PointTo(Equal(10)))
 					})
 				})
+				When("a thread id query parameter is provided", func() {
+					It("should use the thread parameter", func() {
+						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&thread=10", "Message", logger)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(payload.MessageThreadID).To(PointTo(Equal(10)))
+					})
+					It("should accept message_thread_id as an alias", func() {
+						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&message_thread_id=10", "Message", logger)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(payload.MessageThreadID).To(PointTo(Equal(10)))
+					})
+					It("should prefer the per-chat thread id", func() {
+						payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:20&thread=10", "Message", logger)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(payload.MessageThreadID).To(PointTo(Equal(20)))
+					})
+					It("should reject a non-numeric thread parameter", func() {
+						_, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1&thread=invalid", "Message", logger)
+						Expect(err).To(HaveOccurred())
+					})
+				})
 				When("non-numeric thread id is provided", func() {
 					payload, err := getPayloadFromURL("telegram://12345:mock-token@telegram/?channels=channel-1:invalid&title=MessageTitle", `Oh wow! <3 Cool & stuff ->`, logger)
 					Expect(err).NotTo(HaveOccurred())
