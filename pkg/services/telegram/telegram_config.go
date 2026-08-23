@@ -17,6 +17,7 @@ type Config struct {
 	Notification bool      `key:"notification" default:"Yes" desc:"If disabled, sends Message silently"`
 	ParseMode    parseMode `key:"parsemode" default:"None" desc:"How the text Message should be parsed"`
 	Chats        []string  `key:"chats,channels" desc:"Chat IDs or Channel names (using @channel-name)"`
+	ThreadID     int       `key:"thread,message_thread_id" default:"0" desc:"Telegram message thread ID"`
 	Title        string    `key:"title" default:"" desc:"Notification title, optionally set by the sender"`
 }
 
