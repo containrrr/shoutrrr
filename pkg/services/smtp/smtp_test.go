@@ -236,6 +236,36 @@ var _ = Describe("the SMTP service", func() {
 			})
 		})
 
+		When("using LOGIN authentication", func() {
+
+			It("should send the username and password when challenged", func() {
+				testURL := "smtp://user:password@example.com:2225/?useStartTLS=no&auth=login&fromAddress=sender@example.com&toAddresses=rec1@example.com&useHTML=no"
+				err := testIntegration(testURL, []string{
+					"250-mx.google.com at your service",
+					"250-SIZE 35651584",
+					"250-AUTH LOGIN PLAIN",
+					"250 8BITMIME",
+					// base64 of "Username:" and "Password:"
+					"334 VXNlcm5hbWU6",
+					"334 UGFzc3dvcmQ6",
+					"235 Accepted",
+					"250 Sender OK",
+					"250 Receiver OK",
+					"354 Go ahead",
+					"250 Data OK",
+					"221 OK",
+				}, "", "",
+					// base64 of "user" and "password"
+					"dXNlcg==",
+					"cGFzc3dvcmQ=")
+				if msg, test := standard.IsTestSetupFailure(err); test {
+					Skip(msg)
+					return
+				}
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
 		When("given e-mail addresses with pluses in the configuration URL", func() {
 
 			It("should send notifications without any errors", func() {
@@ -456,6 +486,36 @@ var _ = Describe("the SMTP service", func() {
 				Expect(err).To(matchFailure(FailClosingSession))
 			})
 
+		})
+	})
+	When("using the LOGIN auth mechanism", func() {
+		var auth smtp.Auth
+		BeforeEach(func() {
+			auth = LoginAuth("bob", "hunter2")
+		})
+		It("should start with the LOGIN identifier and no initial response", func() {
+			proto, resp, err := auth.Start(nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(proto).To(Equal("LOGIN"))
+			Expect(resp).To(BeNil())
+		})
+		It("should answer the username and password challenges", func() {
+			resp, err := auth.Next([]byte("Username:"), true)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(resp)).To(Equal("bob"))
+
+			resp, err = auth.Next([]byte("Password:"), true)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(resp)).To(Equal("hunter2"))
+		})
+		It("should not respond to the final empty challenge", func() {
+			resp, err := auth.Next(nil, false)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp).To(BeNil())
+		})
+		It("should fail on an unexpected challenge", func() {
+			_, err := auth.Next([]byte("Riddle me this:"), true)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 	When("writing headers and the output stream is closed", func() {
