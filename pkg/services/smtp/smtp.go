@@ -6,9 +6,11 @@ import (
 	"io"
 	"math/rand"
 	"net"
+	"net/mail"
 	"net/smtp"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/format"
@@ -192,11 +194,23 @@ func (service *Service) getAuth(config *Config) (smtp.Auth, failure) {
 
 func (service *Service) sendToRecipient(client *smtp.Client, toAddress string, config *Config, message string) failure {
 
+	mailbox := toAddress
+	if strings.ContainsAny(toAddress, "<>") {
+		address, err := mail.ParseAddress(toAddress)
+		if err != nil {
+			return fail(FailSetRecipient, err)
+		}
+		// ParseAddress removes local-part quotes. Serialize an address without
+		// its name to restore required quoting, then remove the outer brackets.
+		envelope := (&mail.Address{Address: address.Address}).String()
+		mailbox = envelope[1 : len(envelope)-1]
+	}
+
 	// Set the sender and recipient first
 	if err := client.Mail(config.FromAddress); err != nil {
 		return fail(FailSetSender, err)
 	}
-	if err := client.Rcpt(toAddress); err != nil {
+	if err := client.Rcpt(mailbox); err != nil {
 		return fail(FailSetRecipient, err)
 	}
 
