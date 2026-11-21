@@ -54,7 +54,7 @@ var _ = Describe("TelegramGenerator", func() {
 	AfterEach(func() {
 		httpmock.DeactivateAndReset()
 	})
-	It("should return the ", func() {
+	It("should generate a URL from the supplied token and selected chats", func() {
 		gen := telegram.Generator{
 			Reader: userOut,
 			Writer: userInMono,
@@ -96,6 +96,10 @@ var _ = Describe("TelegramGenerator", func() {
 			},
 		}))
 
+		// An empty gbytes.Buffer returns EOF rather than waiting for input.
+		mockTyped(mockToken)
+		mockTyped(`no`)
+
 		go func() {
 			defer GinkgoRecover()
 			conf, err := gen.Generate(nil, nil, nil)
@@ -106,9 +110,6 @@ var _ = Describe("TelegramGenerator", func() {
 		}()
 
 		defer dumpBuffers()
-
-		mockTyped(mockToken)
-		mockTyped(`no`)
 
 		Eventually(userIn).Should(gbytes.Say(`Got a bot chat member update for mockChannel, status was changed from kicked to administrator`))
 		Eventually(userIn).Should(gbytes.Say(`Got 1 chat ID\(s\) so far\. Want to add some more\?`))

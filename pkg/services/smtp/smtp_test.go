@@ -2,10 +2,12 @@ package smtp
 
 import (
 	"log"
+	"net/mail"
 	"net/smtp"
 	"net/url"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 	"unsafe"
 
@@ -185,6 +187,115 @@ var _ = Describe("the SMTP service", func() {
 			Expect(err.ID()).To(Equal(FailMessageTemplate))
 		})
 
+	})
+
+	When("sending recipients with display names", func() {
+		// All SMTP responses and client output stay in memory.
+		send := func(config *Config) []string {
+			responses := []string{"250 localhost"}
+			for range config.ToAddresses {
+				responses = append(responses, "250 Sender OK", "250 Receiver OK", "354 Go ahead", "250 Data OK")
+			}
+			responses = append(responses, "221 OK")
+			textCon, conversation := testutils.CreateTextConFaker(responses, "\r\n")
+			client := &smtp.Client{Text: textCon}
+			DeferCleanup(client.Close)
+			Expect(service.doSend(client, "Test message", config)).To(Succeed())
+			return conversation.GetClientSentences()
+		}
+
+		initialize := func(recipient string) {
+			testURL := "smtp://example.com:25/?useStartTLS=no&fromAddress=sender+tag@example.com&fromName=John%20Smith%20Watchtower&toAddresses=" + recipient
+			Expect(service.Initialize(testutils.URLMust(testURL), logger)).To(Succeed())
+		}
+
+		DescribeTable("preserves header names and sends only the envelope mailbox",
+			func(query, header, name, mailbox, envelope string) {
+				initialize(query)
+				sent := send(service.config)
+				Expect(sent).To(ContainElement("To: " + header))
+				Expect(sent).To(ContainElement("RCPT TO:<" + envelope + ">"))
+				Expect(sent).To(ContainElement("MAIL FROM:<sender+tag@example.com>"))
+				Expect(sent).To(ContainElement("From: John Smith Watchtower <sender+tag@example.com>"))
+				for _, line := range sent {
+					if strings.HasPrefix(line, "To: ") {
+						parsed, err := mail.ParseAddress(strings.TrimPrefix(line, "To: "))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(parsed.Name).To(Equal(name))
+						Expect(parsed.Address).To(Equal(mailbox))
+					}
+				}
+			},
+			Entry("reported percent-encoded spaces", "John%20Smith%20<john.smith%40example.com>", "John Smith <john.smith@example.com>", "John Smith", "john.smith@example.com", "john.smith@example.com"),
+			Entry("query plus spaces", "John+Smith+<john.smith%40example.com>", "John Smith <john.smith@example.com>", "John Smith", "john.smith@example.com", "john.smith@example.com"),
+			Entry("encoded mailbox tag", "John%20Smith%20<john.smith%2Btag%40example.com>", "John Smith <john.smith+tag@example.com>", "John Smith", "john.smith+tag@example.com", "john.smith+tag@example.com"),
+			Entry("legacy mailbox tag", "John%20Smith%20<john.smith+tag%40example.com>", "John Smith <john.smith+tag@example.com>", "John Smith", "john.smith+tag@example.com", "john.smith+tag@example.com"),
+			Entry("literal display-name pluses", "C%2B%2B%20Team%20<john%2Btag%40example.com>", "C++ Team <john+tag@example.com>", "C++ Team", "john+tag@example.com", "john+tag@example.com"),
+			Entry("quoted display name with an angle bracket", "%22A%20%3C%20B%22%20<john%2Btag%40example.com>", `"A < B" <john+tag@example.com>`, "A < B", "john+tag@example.com", "john+tag@example.com"),
+			Entry("quoted name with legacy mailbox tag", "%22A%20%3C%20B%22%20<john+tag%40example.com>", `"A < B" <john+tag@example.com>`, "A < B", "john+tag@example.com", "john+tag@example.com"),
+			Entry("quoted mailbox with a space", "%22John%20Smith%22%20<%22john%20smith%22%40example.com>", `"John Smith" <"john smith"@example.com>`, "John Smith", "john smith@example.com", `"john smith"@example.com`),
+			Entry("bare encoded mailbox tag", "john%2Btag%40example.com", "john+tag@example.com", "", "john+tag@example.com", "john+tag@example.com"),
+			Entry("bare legacy mailbox tag", "john+tag%40example.com", "john+tag@example.com", "", "john+tag@example.com", "john+tag@example.com"),
+		)
+
+		It("round trips display spaces and literal pluses through GetURL and SetURL", func() {
+			initialize("C%2B%2B+Team+<john%2Btag%40example.com>")
+			config := &Config{}
+			Expect(config.SetURL(service.config.GetURL())).To(Succeed())
+			Expect(config.ToAddresses).To(Equal(service.config.ToAddresses))
+			sent := send(config)
+			Expect(sent).To(ContainElement("To: C++ Team <john+tag@example.com>"))
+			Expect(sent).To(ContainElement("RCPT TO:<john+tag@example.com>"))
+		})
+
+		It("sends a separate message for each named or bare recipient", func() {
+			initialize("John+Smith+<john%2Btag%40example.com>,other%40example.com")
+			sent := send(service.config)
+			Expect(sent).To(ContainElement("To: John Smith <john+tag@example.com>"))
+			Expect(sent).To(ContainElement("To: other@example.com"))
+			Expect(sent).To(ContainElement("RCPT TO:<john+tag@example.com>"))
+			Expect(sent).To(ContainElement("RCPT TO:<other@example.com>"))
+			Expect(sent).To(ContainElement("DATA"))
+			count := 0
+			for _, line := range sent {
+				if line == "DATA" {
+					count++
+				}
+			}
+			Expect(count).To(Equal(2))
+		})
+
+		It("prepares recipient overrides after applying send params", func() {
+			initialize("original%40example.com")
+			config := service.config.Clone()
+			params := types.Params{"to": "John Smith <john tag@example.com>"}
+			Expect(service.propKeyResolver.UpdateConfigFromParams(&config, &params)).To(Succeed())
+			sent := send(&config)
+			Expect(sent).To(ContainElement("To: John Smith <john+tag@example.com>"))
+			Expect(sent).To(ContainElement("RCPT TO:<john+tag@example.com>"))
+			Expect(service.config.ToAddresses).To(Equal([]string{"original@example.com"}))
+		})
+
+		DescribeTable("rejects malformed named recipients before RCPT or DATA",
+			func(recipient string) {
+				config := &Config{ToAddresses: []string{recipient}}
+				config.FixEmailTags()
+				textCon, conversation := testutils.CreateTextConFaker(nil, "\r\n")
+				client := &smtp.Client{Text: textCon}
+				DeferCleanup(client.Close)
+				err := service.sendToRecipient(client, config.ToAddresses[0], config, "Test message")
+				Expect(err).To(HaveOccurred())
+				Expect(err.ID()).To(Equal(FailSetRecipient))
+				for _, line := range conversation.GetClientSentences() {
+					Expect(line).NotTo(HavePrefix("RCPT"))
+					Expect(line).NotTo(Equal("DATA"))
+				}
+			},
+			Entry("missing closing angle bracket", "John Smith <john@example.com"),
+			Entry("missing mailbox", "John Smith <>"),
+			Entry("nonterminal angle-address", "John Smith <john tag@example.com> extra"),
+			Entry("invalid mailbox", "John Smith <not-an-address>"),
+		)
 	})
 
 	When("running E2E tests", func() {
@@ -572,7 +683,7 @@ func fakeTLSEnabled(client *smtp.Client, hostname string) {
 	cr.SetString(hostname)
 }
 
-// matchFailure is a simple wrapper around `fail` and `gomega.MatchError`` to make it easier to use in tests
+// matchFailure is a simple wrapper around `fail` and `gomega.MatchError“ to make it easier to use in tests
 func matchFailure(id failures.FailureID) gt.GomegaMatcher {
 	return MatchError(fail(id, nil))
 }

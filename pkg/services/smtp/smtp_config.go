@@ -3,6 +3,7 @@ package smtp
 import (
 	"errors"
 	"fmt"
+	"net/mail"
 	"net/url"
 	"strconv"
 	"strings"
@@ -91,11 +92,26 @@ func (config *Config) Clone() Config {
 	return clone
 }
 
-// FixEmailTags replaces parsed spaces (+) in e-mail addresses with '+'
+// FixEmailTags restores mailbox tags decoded as spaces, preserving display names.
 func (config *Config) FixEmailTags() {
 	config.FromAddress = strings.ReplaceAll(config.FromAddress, " ", "+")
 	for i, adr := range config.ToAddresses {
-		config.ToAddresses[i] = strings.ReplaceAll(adr, " ", "+")
+		if !strings.ContainsAny(adr, "<>") {
+			config.ToAddresses[i] = strings.ReplaceAll(adr, " ", "+")
+			continue
+		}
+		// Valid named addresses may contain spaces even in a quoted local part.
+		if _, err := mail.ParseAddress(adr); err == nil {
+			continue
+		}
+		// Only repair the mailbox in a terminal angle-address. Use the last '<'
+		// so a quoted display name such as "A < B" is left intact.
+		if start := strings.LastIndex(adr, "<"); start >= 0 && strings.HasSuffix(adr, ">") {
+			repaired := adr[:start+1] + strings.ReplaceAll(adr[start+1:len(adr)-1], " ", "+") + ">"
+			if _, err := mail.ParseAddress(repaired); err == nil {
+				config.ToAddresses[i] = repaired
+			}
+		}
 	}
 }
 

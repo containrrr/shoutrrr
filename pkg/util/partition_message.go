@@ -11,22 +11,21 @@ const ellipsis = " [...]"
 // PartitionMessage splits a string into chunks that is at most chunkSize runes, it will search the last distance runes
 // for a whitespace to make the split appear nicer. It will keep adding chunks until it reaches maxCount chunks, or if
 // the total amount of runes in the chunks reach maxTotal.
-// The chunks are returned together with the number of omitted runes (that did not fit into the chunks)
+// The chunks are returned together with the number of omitted runes (that did not fit into the chunks).
+// Nonpositive size limits or fewer than two chunk slots omit the entire input. A nonpositive distance disables searching.
 func PartitionMessage(input string, limits t.MessageLimit, distance int) (items []t.MessageItem, omitted int) {
 	runes := []rune(input)
+	if len(runes) == 0 || limits.ChunkSize <= 0 || limits.TotalChunkSize <= 0 || limits.ChunkCount <= 1 {
+		return nil, len(runes)
+	}
+
 	chunkOffset := 0
 	maxTotal := Min(len(runes), limits.TotalChunkSize)
 	maxCount := limits.ChunkCount - 1
 
-	if len(input) == 0 {
-		// If the message is empty, return an empty array
-		omitted = 0
-		return
-	}
-
 	for i := 0; i < maxCount; i++ {
 		// If no suitable split point is found, use the chunkSize
-		chunkEnd := chunkOffset + limits.ChunkSize
+		chunkEnd := chunkOffset + Min(limits.ChunkSize, maxTotal-chunkOffset)
 		// ... and start next chunk directly after this one
 		nextChunkStart := chunkEnd
 		if chunkEnd >= maxTotal {
@@ -34,7 +33,7 @@ func PartitionMessage(input string, limits t.MessageLimit, distance int) (items 
 			chunkEnd = maxTotal
 			nextChunkStart = maxTotal
 		} else {
-			for r := 0; r < distance; r++ {
+			for r := 0; r < distance && r <= chunkEnd-chunkOffset; r++ {
 				rp := chunkEnd - r
 				if runes[rp] == '\n' || runes[rp] == ' ' {
 					// Suitable split point found
