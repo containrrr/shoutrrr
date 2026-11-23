@@ -26,7 +26,7 @@ Replace the `t.me/` prefix from the link with a `@`.
     If your channel only has an invite link (starting with `t.me/+`), you have to use it's Chat ID (see below)
 
 !!! note
-    A `message_thread_id` param ([reference](https://core.telegram.org/bots/api#sendmessage)) can be added, with the format of `$chat_id:$message_thread_id`. [More info](https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418) on how to obtain the `message_thread_id`.
+    To target a forum topic, set the `thread` query parameter (or its `message_thread_id` alias), or append the thread ID to an individual chat using the format `$chat_id:$message_thread_id`. An ID appended to a chat takes precedence over the query parameter. See the [Telegram API reference](https://core.telegram.org/bots/api#sendmessage) and [this guide](https://stackoverflow.com/questions/74773675/how-to-get-topic-id-for-telegram-group-chat/75178418#75178418) for more information.
 
 ### Chats
 Private channels, Group chats and private chats are identified by `Chat ID`s. Unfortunatly, they are generally not visible in the
@@ -52,10 +52,10 @@ The bot should be constantly online, unless it's usage exceeds the free tier on 
 
 ## Optional parameters
 
-You can optionally specify the __`notification`__, __`parseMode`__ and __`preview`__ parameters in the URL:  
+You can optionally specify the __`notification`__, __`parseMode`__, __`preview`__ and __`thread`__ parameters in the URL:
 
 !!! info ""
-    <pre>telegram://__`token`__@__`telegram`__/?channels=__`channel`__&notification=no&preview=false&parseMode=html</pre>
+    <pre>telegram://__`token`__@__`telegram`__/?channels=__`channel`__&notification=no&preview=false&parseMode=html&thread=123</pre>
 
 See [the telegram documentation](https://core.telegram.org/bots/api#sendmessage) for more information.
 
