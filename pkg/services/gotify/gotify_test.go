@@ -2,6 +2,7 @@ package gotify
 
 import (
 	"log"
+	"net/http"
 	"net/url"
 	"testing"
 
@@ -15,6 +16,16 @@ import (
 func TestGotify(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Shoutrrr Gotify Suite")
+}
+
+// Synthetic examples shared by validation, configuration, and delivery tests.
+var supportedTokens = []struct {
+	name  string
+	token string
+}{
+	{"legacy", "AzyoeNS.D4iJLVa"},
+	{"modern", "gtfya.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_"},
+	{"signed modern", "gtfya.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_.1700000000.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_"},
 }
 
 var logger *log.Logger
@@ -58,6 +69,91 @@ var _ = Describe("the Gotify plugin URL building and token validation functions"
 			Expect(url).To(Equal(expectedURL))
 		})
 	})
+
+	Describe("supported application token formats", func() {
+		for _, tokenCase := range supportedTokens {
+			It("should validate a "+tokenCase.name+" token", func() {
+				Expect(isTokenValid(tokenCase.token)).To(BeTrue())
+			})
+
+			for _, pathCase := range []struct {
+				name         string
+				subpath      string
+				endpointPath string
+			}{
+				{"without subpath", "", "/message"},
+				// Preserve the existing URL builder's separator after a parsed subpath.
+				{"with subpath", "/path/to/gotify", "/path/to/gotify//message"},
+			} {
+				for _, trailingSlash := range []string{"", "/"} {
+					name := tokenCase.name + " " + pathCase.name + " trailing slash=" + trailingSlash
+					canonicalURL := "gotify://my.gotify.tld" + pathCase.subpath + "/" + tokenCase.token + "?title=Test+title"
+					inputURL := "gotify://my.gotify.tld" + pathCase.subpath + "/" + tokenCase.token + trailingSlash + "?title=Test+title"
+
+					It("should preserve the token and canonicalize configuration for "+name, func() {
+						config := &Config{}
+						Expect(config.SetURL(testutils.URLMust(inputURL))).To(Succeed())
+						Expect(config.Token).To(Equal(tokenCase.token))
+						Expect(config.GetURL().String()).To(Equal(canonicalURL))
+
+						roundTrip := &Config{}
+						Expect(roundTrip.SetURL(config.GetURL())).To(Succeed())
+						Expect(roundTrip.Token).To(Equal(tokenCase.token))
+					})
+
+					It("should initialize and deliver the complete token for "+name, func() {
+						service := &Service{}
+						Expect(service.Initialize(testutils.URLMust(inputURL), logger)).To(Succeed())
+						httpmock.ActivateNonDefault(service.GetHTTPClient())
+						DeferCleanup(httpmock.DeactivateAndReset)
+
+						calls := 0
+						httpmock.RegisterResponder("POST", "https://my.gotify.tld"+pathCase.endpointPath+"?token="+tokenCase.token,
+							func(request *http.Request) (*http.Response, error) {
+								calls++
+								Expect(request.URL.Path).To(Equal(pathCase.endpointPath))
+								Expect(request.URL.Query().Get("token")).To(Equal(tokenCase.token))
+								Expect(request.URL.Query()).To(HaveLen(1))
+								return testutils.JSONRespondMust(200, messageResponse{})(request)
+							})
+
+						Expect(service.Send("Message", nil)).To(Succeed())
+						Expect(calls).To(Equal(1))
+					})
+				}
+			}
+		}
+	})
+
+	DescribeTable("checking modern token syntax without validating its key", func(token string) {
+		Expect(isTokenValid(token)).To(BeTrue())
+	},
+		Entry("nonempty suffix without a fixed length", "gtfya.a"),
+		Entry("all supported character classes", "gtfya.aAZ09.-_"),
+	)
+
+	DescribeTable("rejecting invalid application tokens", func(token string) {
+		Expect(isTokenValid(token)).To(BeFalse())
+		_, err := buildURL(&Config{Token: token, Host: "my.gotify.tld"})
+		Expect(err).To(HaveOccurred())
+	},
+		Entry("empty", ""),
+		Entry("bare modern prefix", "gtfya."),
+		Entry("client prefix", "gtfyc.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_"),
+		Entry("wrong prefix", "gtfyx.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_"),
+		Entry("uppercase prefix", "GTFYA.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno-_"),
+		Entry("short legacy", "AzyoeNS.D4iJLV"),
+		Entry("long legacy", "AzyoeNS.D4iJLVaX"),
+		Entry("legacy whitespace", "AzyoeNS D4iJLVa"),
+		Entry("modern whitespace", "gtfya.abc def"),
+		Entry("newline", "gtfya.abc\n"),
+		Entry("Unicode", "gtfya.abcé"),
+		Entry("query separator", "gtfya.abc&priority=1"),
+		Entry("query start", "gtfya.abc?priority=1"),
+		Entry("query assignment", "gtfya.abc=def"),
+		Entry("fragment", "gtfya.abc#def"),
+		Entry("path separator", "gtfya.abc/def"),
+	)
 
 	When("provided a valid token", func() {
 		It("should return true", func() {

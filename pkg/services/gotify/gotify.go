@@ -51,13 +51,14 @@ func (service *Service) Initialize(configURL *url.URL, logger types.StdLogger) e
 
 const tokenChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_"
 
-// The validation rules have been taken directly from the Gotify source code.
-// These will have to be adapted in case of a change:
-// https://github.com/gotify/server/blob/ad157a138b4985086c484a7aabfc2deada5a33dd/auth/token.go#L8
+// isTokenValid checks application-token syntax for legacy and Gotify 3 tokens.
+// Modern tokens may include signed representations, so their length is not fixed.
+// Gotify validates key encoding, ownership, signatures, and expiration:
+// https://github.com/gotify/server/blob/v3.0.0/auth/token.go
 func isTokenValid(token string) bool {
-	if len(token) != 15 {
-		return false
-	} else if token[0] != 'A' {
+	legacy := len(token) == 15 && token[0] == 'A'
+	modern := strings.HasPrefix(token, "gtfya.") && len(token) > len("gtfya.")
+	if !legacy && !modern {
 		return false
 	}
 	for _, c := range token {
